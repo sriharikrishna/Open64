@@ -38,8 +38,8 @@
 // ====================================================================
 //
 // Module: opt_ipaa_summary.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:32 $
+// $Revision: 1.2 $
+// $Date: 2003-11-04 16:09:16 $
 //
 // Revision history:
 //  2-Nov-95 - Original Version
@@ -823,7 +823,12 @@ class IPAA_CALLSITE
 
 extern "C" {
   // Read table from .B file
-  void *IPAA_CALLSITES_Read ( char *base, UINT32 size );
+
+  // eraxxon: N.B.: there is a type conflict between the declaration and
+  // definition of the second argument.  I have used the type of the
+  // definition...
+
+  void *IPAA_CALLSITES_Read ( char *base, Elf64_Word /*UINT32*/ size );
 
   // Write the table to the .B file
   void IPAA_CALLSITES_Write ( void *callsites, struct output_file *fl );
@@ -839,7 +844,7 @@ class IPAA_CALLSITES
   IPAA_CALLSITE *_callsites;	// IPAA_CALLSITE vector
   MEM_POOL *_mpool;		// Memory pool to use for _pu_idx
 
-  friend void *IPAA_CALLSITES_Read(char *base, UINT32 size);
+  friend void *IPAA_CALLSITES_Read(char *base, Elf64_Word /*UINT32*/ size);
   friend void IPAA_CALLSITES_Write(void *callsites, struct output_file *fl);
 
   // Access to callsite vector:
@@ -903,6 +908,17 @@ class IPAA_CALLSITES
 // ====================================================================
 // ====================================================================
 
+extern "C" {
+
+  // eraxxon: N.B.: there is a type conflict between the declaration and
+  // definition of the second argument.  I have used the type of the
+  // definition...
+  void *IPAA_LOCAL_MAP_Read(char *base, Elf64_Word /* UINT32 */ size);
+  void IPAA_LOCAL_MAP_Write(void *localmap, struct output_file *fl);
+
+}
+
+
 class IPAA_LOCAL_MAP
 {
   INT32 _max;		// Number of elements allocated in the maps
@@ -911,7 +927,11 @@ class IPAA_LOCAL_MAP
   mINT32 *_st_id;	// The local-id -> ST_id value map
   MEM_POOL *_mpool;	// Where to put _symtab_id and _st_id?
 
-  friend void *IPAA_LOCAL_MAP_Read(char *base, UINT32 size);
+  // eraxxon: N.B.: there is a type conflict between the declaration and
+  // definition of the second argument.  I have used the type of the
+  // definition...
+
+  friend void *IPAA_LOCAL_MAP_Read(char *base, Elf64_Word /* UINT32 */ size);
   friend void IPAA_LOCAL_MAP_Write(void *localmap, struct output_file *fl);
 
  public:
