@@ -232,6 +232,8 @@ static void 	open_arith_file();
 static int64	load_pvp_word(long vaddr);
 static void 	store_pvp_word(long vaddr, int64 word);
 
+static int      ar_imul64u(int64* result, int64 opnd1, int64 opnd2);
+
 int
 ar_clear_sim_state(AR_TYPE resulttype)
 {
@@ -710,8 +712,6 @@ ar_sim(char* intrinsic)
 	int save_trunc_bits;
 
 	AR_COMPARE_TYPE cmpres;
-
-	static int ar_imul64u();
 
 	/* Set up initial Cray stack and register values */
 
