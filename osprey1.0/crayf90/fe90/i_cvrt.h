@@ -1516,7 +1516,8 @@ extern void  fei_new_select_case 	  ( INT64 low_value_pres,
                                  	    INT64 high_value_pres,
                                  	    INT32 case_follows );
 extern void  fei_new_select      	  ( INT32 num_cases,
-                                 	    INT32 default_label_idx );
+                                 	    INT32 default_label_idx,
+					    INT32 last_label_idx );
 extern TYPE  fei_dope_vector              ( INT32 num_dims, 
                                     	    TYPE  base_type,
                                      	    INT32 flags );
