@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.21 $
- * $Date: 2003-06-19 19:22:36 $
- * $Author: broom $
+ * $Revision: 1.22 $
+ * $Date: 2003-12-09 19:20:24 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.21 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.22 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -166,7 +166,7 @@ WN2F_Initiate_ZeroInt(void)
    WN       *wn = (WN*) &ZeroInt;
    OPCODE    opcode = OPCODE_make_op(OPR_INTCONST, MTYPE_I4, MTYPE_V);
 
-   bzero(wn, sizeof(WN));
+   memset(wn, '\0', sizeof(WN));
    WN_set_opcode(wn, opcode);
    WN_set_kid_count(wn, 0);
    WN_map_id(wn) =  WN_MAP_UNDEFINED;
@@ -181,7 +181,7 @@ WN2F_Initiate_OneInt(void)
    WN       *wn = (WN*) &OneInt;
    OPCODE    opcode = OPCODE_make_op(OPR_INTCONST, MTYPE_I4, MTYPE_V);
 
-   bzero(wn, sizeof(WN));
+   memset(wn, '\0', sizeof(WN));
    WN_set_opcode(wn, opcode);
    WN_set_kid_count(wn, 0);
    WN_map_id(wn) =  WN_MAP_UNDEFINED;

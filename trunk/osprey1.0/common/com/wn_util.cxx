@@ -39,8 +39,8 @@
 ***
 ***-------------------------------------------------------------------*/
 
-/** $Revision: 1.4 $
-*** $Date: 2002-10-10 19:31:33 $
+/** $Revision: 1.5 $
+*** $Date: 2003-12-09 19:20:23 $
 **/
 #ifdef USE_PCH
 #include "common_com_pch.h"
@@ -49,15 +49,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-
-/* 
- * Solaris workaround
- */
-#ifdef _SOLARIS_SOLARIS
-#include <strings.h>
-#else
-#include <bstring.h>	/* has bcopy */
-#endif
 
 #include "defs.h"
 #include "stab.h"

@@ -44,7 +44,7 @@
  * ====================================================================
  *
  * Module: wn_mp_dg.cxx  
- * $Revision: 1.1.1.1 $
+ * $Revision: 1.2 $
  *
  * Revision history:
  *  dd-mmm-94 - Original Version
@@ -55,18 +55,9 @@
  * ====================================================================
  */
 
-
-#include <sys/types.h>
 #include <elf.h>
 
 #define USE_STANDARD_TYPES	    /* override unwanted defines in "defs.h" */
-
-// Solaris workaround
-#ifdef _SOLARIS_SOLARIS
-#include <strings.h>
-#else
-#include <bstring.h>
-#endif
 
 #include "wn.h"
 #include "wn_util.h"
