@@ -34,17 +34,17 @@
 
 // Solaris workaround
 #ifdef _SOLARIS_SOLARIS
-#define ELF_COMMENT     ".comment"
-#define ELF_SHSTRTAB    ".shstrtab"
-extern int              sys_nerr;
-extern char *           sys_errlist[];
-#define ET_IR           1
-#define SHT_MIPS_WHIRL  1
+# define ELF_COMMENT     ".comment"
+# define ELF_SHSTRTAB    ".shstrtab"
+  extern int              sys_nerr;
+  extern char *           sys_errlist[];
+# define ET_IR           1
+# define SHT_MIPS_WHIRL  1
 #endif
 
 
 #ifdef USE_PCH
-#include "common_com_pch.h"
+# include "common_com_pch.h"
 #endif /* USE_PCH */
 #pragma hdrstop
 #include <unistd.h>		    /* for unlink() */
@@ -52,15 +52,19 @@ extern char *           sys_errlist[];
 #include <sys/mman.h>		    /* for mmap() */
 #include <alloca.h>		    /* for alloca() */
 #include <signal.h>		    /* for signal() */
+#include <string.h>                 /* for strerror() */
 #include <errno.h>		    /* for system error code */
 #include <elf.h>		    /* for all Elf stuff */
 #include <sys/elf_whirl.h>	    /* for WHIRL sections' sh_info */
 #include <cmplrs/rcodes.h>
 
+#include "x_stdlib.h" // for mkstemp()
+
+
 // Solaric CC workaround
 // no big deal, just to remove a compiler warning
 #ifndef USE_STANDARD_TYPES
-#define USE_STANDARD_TYPES	    /* override unwanted defines in "defs.h" */
+# define USE_STANDARD_TYPES	    /* override unwanted defines in "defs.h" */
 #endif
 
 #include "defs.h"		    /* for wn_core.h */
@@ -143,8 +147,8 @@ static void (*old_sigbus) (int);   /* the previous signal handler */
 
 Output_File *Current_Output = 0;
 
-#ifdef linux
-#define MAPPED_SIZE 0x400000
+#if (defined(linux) || defined(__CYGWIN__))
+# define MAPPED_SIZE 0x400000
 #endif
 
 static void
@@ -177,10 +181,12 @@ ir_bwrite_signal_handler (int sig, int err_num)
 {
     void (*old_handler) (int) = 0;
 
-    if (Doing_mmapped_io && err_num > 0 && err_num < sys_nerr)
+    if (Doing_mmapped_io && err_num > 0) {
 	Fatal_Error ("I/O error in %s: %s", Current_Output ?
 		     Current_Output->file_name : "mmapped object",
-		     sys_errlist[err_num]);
+		     strerror(err_num));
+    }
+    
     switch (sig) {
     case SIGBUS:
 	old_handler = old_sigbus;
@@ -295,11 +301,11 @@ layout_sections (Shdr& strtab_sec, Output_File *fl)
 } /* layout_sections */
 
 
-// Solaris CC workaround
-// the template function "write_output()" causes "Assertion error" with CC compiler when -g 
-// is present, to solve this problem, I removed the template definition and replaced it
-// with explicit overloaded definition. The following two definitions are for "ELF32" and
-// "ELF64", respectively.
+// Solaris CC workaround the template function "write_output()" causes
+// "Assertion error" with CC compiler when -g is present, to solve
+// this problem, I removed the template definition and replaced it
+// with explicit overloaded definition. The following two definitions
+// are for "ELF32" and "ELF64", respectively.
 //
 #if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
 
@@ -318,7 +324,7 @@ write_output (UINT64 e_shoff, const typename ELF::Elf_Shdr& strtab_sec,
     typename ELF::Elf_Ehdr* ehdr = (typename ELF::Elf_Ehdr *) fl->map_addr;
     strcpy ((char *) ehdr->e_ident, ELFMAG);
     ehdr->e_ident[EI_CLASS] = tag.Elf_class ();
-#ifndef linux
+#if (defined(__sgi) || defined(__sun) || defined(__MACH__))
     ehdr->e_ident[EI_DATA] = ELFDATA2MSB; /* assume MSB for now */
 #else
     ehdr->e_ident[EI_DATA] = ELFDATA2LSB; /* assume LSB for now */
@@ -377,7 +383,7 @@ write_output (UINT64 e_shoff, const typename ELF::Elf_Shdr& strtab_sec,
 } /* write_output */
 
 // Solaris CC workaround
-// as mentioned early, following is the definition on "ELF32"
+// as mentioned earlier, following is the definition on "ELF32"
 
 #ifdef ELF
 #undef ELF
@@ -394,7 +400,7 @@ write_output (UINT64 e_shoff, const typename ELF::Elf_Shdr& strtab_sec,
     typename ELF::Elf_Ehdr* ehdr = (typename ELF::Elf_Ehdr *) fl->map_addr;
     strcpy ((char *) ehdr->e_ident, ELFMAG);
     ehdr->e_ident[EI_CLASS] = tag.Elf_class ();
-#ifndef linux
+#if (defined(__sgi) || defined(__sun) || defined(__MACH__))
     ehdr->e_ident[EI_DATA] = ELFDATA2MSB; /* assume MSB for now */
 #else
     ehdr->e_ident[EI_DATA] = ELFDATA2LSB; /* assume LSB for now */
@@ -470,7 +476,7 @@ write_output (UINT64 e_shoff, const typename ELF::Elf_Shdr& strtab_sec,
     typename ELF::Elf_Ehdr* ehdr = (typename ELF::Elf_Ehdr *) fl->map_addr;
     strcpy ((char *) ehdr->e_ident, ELFMAG);
     ehdr->e_ident[EI_CLASS] = tag.Elf_class ();
-#ifndef linux
+#if (defined(__sgi) || defined(__sun) || defined(__MACH__))
     ehdr->e_ident[EI_DATA] = ELFDATA2MSB; /* assume MSB for now */
 #else
     ehdr->e_ident[EI_DATA] = ELFDATA2LSB; /* assume LSB for now */
@@ -553,7 +559,7 @@ create_temp_file (Output_File *fl)
 	return -1;
     strcpy (path, tmpdir);
     strcat (path, DEFAULT_TEMPLATE);
-    fd = mkstemp (path);
+    fd = ux_mkstemp (path);
     if (fd != -1)
 	unlink (path);
 
@@ -613,14 +619,11 @@ WN_open_output (char *file_name)
     if (fl->output_fd < 0)
 	return NULL;
 
-/* 
- * Solaris workaround
- * mmap() normally doesn't append to a file, so a new empty file need
- * to be ftruncate() before mmap, otherwise writing to it will cause
- * "Bus error". SGI has their own trick. So, instead of allocate 4MB:)
- * we can simply let Solaris do the same thing as linux
- */
-#ifdef linux
+
+    // mmap() normally doesn't append to a file, so a new empty file needs
+    // to be ftruncate()'d or writing to it will cause a "Bus error".  SGI
+    // has a trick to avoid this this hack of allocating 4MB.
+#if (defined(__linux__) || defined(__CYGWIN__))
     ftruncate(fl->output_fd, MAPPED_SIZE);
 #endif
 
@@ -1655,7 +1658,7 @@ Close_Output_Info (void)
 }
 
 
-#ifdef linux
+#if (defined(linux) || defined(__CYGWIN__))
 extern "C" void
 WN_write_elf_symtab (const void* symtab, UINT64 size, UINT64 entsize,
 		     UINT align, Output_File* fl)
