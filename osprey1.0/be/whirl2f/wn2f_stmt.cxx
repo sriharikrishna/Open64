@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.24 $
- * $Date: 2003-07-15 21:13:19 $
+ * $Revision: 1.25 $
+ * $Date: 2003-09-18 15:55:09 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.24 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.25 $";
 #endif
 
 #include <alloca.h>
@@ -93,6 +93,7 @@ extern WN_MAP *W2F_Construct_Map;   /* Defined in w2f_driver.c */
 extern BOOL    W2F_Prompf_Emission; /* Defined in w2f_driver.c */
 extern BOOL    W2F_Emit_Cgtag;      /* Defined in w2f_driver.c */
 
+extern TOKEN_BUFFER  param_tokens;
 
 static const char WN2F_Purple_Region_Name[] = "prp___region";
 static const char unnamed_interface[] = "unnamed interface"; 
@@ -1423,17 +1424,29 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
   decl_tokens = New_Token_Buffer();
   symtab = PU_lexical_level(pu);
 
+  WN2F_Append_Symtab_Vars(decl_tokens, GLOBAL_SYMTAB, 1); 
+
+   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens))
+        WHIRL2F_Append_Comment(tokens,
+                           "**** Global Variables ****", 1, 1);
+  Append_And_Reclaim_Token_List(tokens, &decl_tokens);
+  Stab_Reset_Referenced_Flag(GLOBAL_SYMTAB);
+
+  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(param_tokens)) {
+      WHIRL2F_Append_Comment(tokens,
+                           "**** Parameters ****", 1, 1);
+
+     Append_And_Reclaim_Token_List(tokens, &param_tokens); //fzhao
+   }
+
+  decl_tokens = New_Token_Buffer();
   WN2F_Append_Symtab_Vars(decl_tokens, symtab, 1/*Newlines*/);
   Stab_Reset_Referenced_Flag(symtab);
 
-  WN2F_Append_Symtab_Vars(decl_tokens, GLOBAL_SYMTAB, 1); 
-       
-  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens))
-    WHIRL2F_Append_Comment(tokens, 
-			   "**** Variables and functions ****", 1, 1);
-  Append_And_Reclaim_Token_List(tokens, &decl_tokens);
-
-  Stab_Reset_Referenced_Flag(GLOBAL_SYMTAB);
+  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens)) 
+        WHIRL2F_Append_Comment(tokens, 
+			   "**** Local Variables and functions ****", 1, 1);
+    Append_And_Reclaim_Token_List(tokens, &decl_tokens); 
 
   /* Declare pseudo registers and other temporary variables after
    * regular variables, since the declaration of these may create
