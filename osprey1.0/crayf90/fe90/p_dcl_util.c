@@ -3015,9 +3015,11 @@ static boolean	parse_int_spec_expr(long		*len_idx,
                *field_type	= CN_Tbl_Idx;
             }
             else {
+# if 0 
                *field_type      		= AT_Tbl_Idx;
                *len_idx				= ntr_bnds_tmp_list(&len_opnd);
                ATD_TMP_HAS_CVRT_OPR(*len_idx)	= TRUE;
+# endif
             }
          }
          else {
@@ -3066,27 +3068,20 @@ static boolean	parse_int_spec_expr(long		*len_idx,
          }
       }
 
+/* # if 0 fzhao May*/
       *field_type       = AT_Tbl_Idx;
       *len_idx		= ntr_bnds_tmp_list(&len_opnd);
-
-       /* do not generate temporary variables for non-trival 
-         expression bounds
-         --fzhao
-        */
-
-    if (AT_COMPILER_GEND(*len_idx)) {
       ATD_TMP_SEMANTICS_DONE(*len_idx) = fold_it;
       if (new_type != NULL_IDX) {
          ATD_TMP_HAS_CVRT_OPR(*len_idx) = TRUE;
       }
-   }
-
+/* # endif  may */
 
 # else
       *field_type       = AT_Tbl_Idx;
       *len_idx		= ntr_bnds_tmp_list(&len_opnd);
-     if (AT_COMPILER_GEND(*len_idx))
-        ATD_TMP_SEMANTICS_DONE(*len_idx) = fold_it;
+
+      ATD_TMP_SEMANTICS_DONE(*len_idx) = fold_it;
 # endif
 
    }
@@ -3201,43 +3196,26 @@ static int ntr_bnds_tmp_list (opnd_type	*opnd)
    }
    find_opnd_line_and_column(opnd, &line, &column);
 
-   if (OPND_FLD((*opnd))== AT_Tbl_Idx){
-         attr_idx = OPND_IDX((*opnd));
-         AL_ATTR_IDX(al_idx)          = attr_idx;
+   GEN_COMPILER_TMP_ASG(ir_idx, 
+                        attr_idx,
+                        FALSE,		/* Tmp should go through semantics */
+                        line,
+                        column,
+                        INTEGER_DEFAULT_TYPE,
+                        Priv);
+
+   AL_ATTR_IDX(al_idx)		= attr_idx;
+
+   COPY_OPND(IR_OPND_R(ir_idx), (*opnd));	/* IR_OPND_R = *opnd  */
+
+   if (cif_attr != NULL_IDX) {
+
+      /* This tmp is only being kept for CIF - Return the tmp to be shared. */
+
+      AT_REFERENCED(attr_idx)	= Not_Referenced;
+      attr_idx			= cif_attr;
    }
-   else 
-   if ( (OPND_FLD((*opnd))== IR_Tbl_Idx) &&
-         (IR_OPR(OPND_IDX((*opnd))) == Cvrt_Opr) &&
-          (IR_FLD_L(OPND_IDX((*opnd)))==AT_Tbl_Idx) &&
-            (ATD_CLASS(IR_IDX_L(OPND_IDX((*opnd)))) == Dummy_Argument ||
-             ATD_CLASS(IR_IDX_L(OPND_IDX((*opnd)))) == Variable)){
 
-             attr_idx = IR_IDX_L(OPND_IDX((*opnd)));
-             AL_ATTR_IDX(al_idx)           = attr_idx;
-
-    }    
-   else
-       {
-             GEN_COMPILER_TMP_ASG(ir_idx, 
-                                  attr_idx,
-                                  FALSE,		/* Tmp should go through semantics */
-                                  line,
-                                  column,
-                                  INTEGER_DEFAULT_TYPE,
-                                  Priv);
-
-             AL_ATTR_IDX(al_idx)		= attr_idx;
-    
-             COPY_OPND(IR_OPND_R(ir_idx), (*opnd));	/* IR_OPND_R = *opnd  */
-
-             if (cif_attr != NULL_IDX) {
-
-              /* This tmp is only being kept for CIF - Return the tmp to be shared. */
-
-                AT_REFERENCED(attr_idx)	= Not_Referenced;
-                attr_idx			= cif_attr;
-             }
-      }
 EXIT:
 
    TRACE (Func_Exit, "ntr_bnds_tmp_list", NULL);
