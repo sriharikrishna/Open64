@@ -6729,10 +6729,13 @@ CONTINUE:
 # endif
         break;
 
-
-
-
-
+/*FMZ add for allocate stmt with pointer */
+                                                                                      
+   case Alloc_Obj_Opr:
+        cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
+                        IR_FLD_L(ir_idx));
+        break;
+                                                                                      
 
    case Dv_Deref_Opr :
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
