@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.29 $
- * $Date: 2004-01-12 21:13:43 $
+ * $Revision: 1.30 $
+ * $Date: 2004-01-14 02:55:30 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.29 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.30 $";
 #endif
 
 #include <ctype.h>
@@ -479,7 +479,15 @@ ST2F_decl_parameter(TOKEN_BUFFER tokens, ST *st)
     Append_Token_String(decl_tokens,"PARAMETER (");
     Append_Token_String(decl_tokens,st_name);
     Append_Token_Special(decl_tokens, '=' );
-    Append_Token_String(decl_tokens,Targ_Print(NULL,Tcon_Table[base->u1.tcon]));
+    if(!TY_is_logical(ST_type(st)))
+        Append_Token_String(decl_tokens,Targ_Print(NULL,Tcon_Table[base->u1.tcon]));
+    else{
+        if (Targ_To_Host(Tcon_Table[base->u1.tcon]))
+          Append_Token_String(decl_tokens,".TRUE.");
+        else
+          Append_Token_String(decl_tokens,".FALSE.");
+     }
+
     Append_Token_Special(decl_tokens, ')'); 
     
     Append_Token_Special(tokens, '\n');
@@ -726,7 +734,7 @@ ST2F_decl_translate(TOKEN_BUFFER tokens, const ST *st)
 } 
 
 static void
-collectst(WN *wn,PARMSET &tempset,INT32 parms_num)
+collectst(WN *wn,PARMSET &tempset)
  {
 
    if (!wn) return;
@@ -735,13 +743,13 @@ collectst(WN *wn,PARMSET &tempset,INT32 parms_num)
        WN_opc_operator(wn) == OPR_LDA)
       tempset.insert(WN_st_idx(wn));
    else
-     for (INT32 kidnum = 0; kidnum < parms_num; kidnum++)
-       collectst(WN_kid(wn, kidnum),tempset,parms_num);
+     for (INT32 kidnum = 0; kidnum < WN_kid_count(wn); kidnum++)
+       collectst(WN_kid(wn, kidnum),tempset);
    return;
  }
 
 
-static void GetStSet(ST_IDX bnd,PARMSET &tempset,INT32 parms_num)
+static void GetStSet(ST_IDX bnd,PARMSET &tempset)
 {
    WN * stmt;
    WN *first_stmt = WN_first(PU_Body);
@@ -755,7 +763,7 @@ static void GetStSet(ST_IDX bnd,PARMSET &tempset,INT32 parms_num)
        stmt = WN_next(stmt);
 
   if (stmt && WN_kid(stmt,0))
-     collectst(WN_kid(stmt,0),tempset,parms_num);
+     collectst(WN_kid(stmt,0),tempset);
 }
 
 void ReorderParms(ST **parms,INT32 num_params)
@@ -797,7 +805,7 @@ void ReorderParms(ST **parms,INT32 num_params)
               if (!ARB_const_lbnd(arb) && !ARB_empty_lbnd(arb)){
                  bdindex = ARB_lbnd_var(arb);
                  if (ST_is_temp_var(St_Table[bdindex])){
-                     GetStSet(bdindex,tempst,num_params);
+                     GetStSet(bdindex,tempst);
                      runner = tempst.begin();
                      while (runner != tempst.end()){
                      if (st_idx_to_parms[*runner]!=i)
@@ -810,7 +818,7 @@ void ReorderParms(ST **parms,INT32 num_params)
               if (!ARB_const_ubnd(arb) && !ARB_empty_ubnd(arb)){
                  bdindex = ARB_ubnd_var(arb);
                  if (ST_is_temp_var(St_Table[bdindex])){
-                     GetStSet(bdindex,tempst,num_params);
+                     GetStSet(bdindex,tempst);
                      runner = tempst.begin();
                      while (runner != tempst.end()){
                      if (st_idx_to_parms[*runner]!=i)
@@ -903,7 +911,6 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    BOOL has_result = 0;
    BOOL add_rsl_type = 0;
    const char * func_n_name= W2CF_Symtab_Nameof_St(st);
-
 
    ASSERT_DBG_FATAL(TY_kind(funtype) == KIND_FUNCTION,
 		    (DIAG_W2F_UNEXPECTED_SYMBOL, "ST2F_func_header"));
