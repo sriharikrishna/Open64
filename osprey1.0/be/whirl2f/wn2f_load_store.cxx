@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.11 $
- * $Date: 2002-09-19 20:13:15 $
+ * $Revision: 1.12 $
+ * $Date: 2002-09-20 20:49:26 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.12 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1328,6 +1328,7 @@ WN2F_lda(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       object_ty = ST_type(WN_st(wn));
     }
 
+
   ST * st = WN_st(wn);
   TY_IDX ty ;
   TY_IDX ty_1;
@@ -1609,7 +1610,7 @@ WN2F_arrsection(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    {
 
      array_ty = W2F_TY_pointed(ptr_ty, "base of OPC_ARRAY");
-
+    
      if (WN_opc_operator(kid) == OPR_LDID       &&
 
          ST_sclass(WN_st(kid)) == SCLASS_FORMAL &&
@@ -1729,8 +1730,6 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    else 
    {
      array_ty = W2F_TY_pointed(ptr_ty, "base of OPC_ARRAY");
-     if (TY_is_f90_pointer(array_ty))
-        array_ty = TY_pointed(array_ty);
 
      if (WN_opc_operator(kid) == OPR_LDID       &&
 	 ST_sclass(WN_st(kid)) == SCLASS_FORMAL &&
@@ -1794,6 +1793,7 @@ WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL pare
   WN * kidz;
   INT32 co_dim;
   INT32 array_dim;
+  TY_IDX ttyy;
   ST * st;
   ARB_HANDLE arb_base;
    WN* kid;
@@ -1810,10 +1810,14 @@ WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL pare
 
   kidz = WN_kid0(wn);
   st  =  WN_st(kidz);
-  if (TY_Is_Pointer(ST_type(st)))
-      arb_base = TY_arb(TY_pointed(ST_type(st)));
-  else
-       arb_base = TY_arb(ST_type(st));
+  ttyy = ST_type(st);
+  if (TY_Is_Pointer(ttyy))  //Sept temp use
+     ttyy=TY_pointed(ttyy);
+  if (TY_is_f90_pointer(ttyy))
+     ttyy = TY_pointed(ttyy);
+
+   arb_base = TY_arb(ttyy);
+
   dim =  ARB_dimension(arb_base);
   co_dim = ARB_co_dimension(arb_base);
   if (co_dim <= 0)
@@ -1998,6 +2002,8 @@ WN2F_arrsection_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT
 
   INT32 dim;
 
+  if (TY_is_f90_pointer(array_ty))
+       array_ty = TY_pointed(array_ty);//Sept
 
   if (TY_Is_Array(array_ty) && TY_AR_ndims(array_ty) >= WN_num_dim(wn))
     {

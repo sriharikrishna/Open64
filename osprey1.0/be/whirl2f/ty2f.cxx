@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.8 $
- * $Date: 2002-09-18 17:56:42 $
+ * $Revision: 1.9 $
+ * $Date: 2002-09-20 20:49:26 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -64,6 +64,7 @@ extern WN* PU_Body;
 extern BOOL Array_Bnd_Temp_Var;
 
 #define NUMBER_OF_OPERATORS (OPERATOR_LAST + 1)
+//#define DBGPATH 1
 typedef WN2F_STATUS (*WN2F_HANDLER_FUNC)(TOKEN_BUFFER, WN*, WN2F_CONTEXT);
 extern WN2F_HANDLER_FUNC  WN2F_Handler[NUMBER_OF_OPERATORS];
 BOOL Use_Purple_Array_Bnds_Placeholder = FALSE;
@@ -1743,7 +1744,6 @@ TY2F_Get_Fld_Path(const TY_IDX struct_ty,
   FLD_PATH_INFO  *fld_path2 = NULL;
   TY & s_ty = Ty_Table[struct_ty] ;
   FLD_ITER fld_iter ;
-  
   
   ASSERT_DBG_FATAL(TY_kind(s_ty) == KIND_STRUCT,
 		   (DIAG_W2F_UNEXPECTED_TYPE_KIND, 

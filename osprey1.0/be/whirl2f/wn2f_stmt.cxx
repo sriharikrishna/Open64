@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.12 $
- * $Date: 2002-09-19 16:25:58 $
+ * $Revision: 1.13 $
+ * $Date: 2002-09-20 20:49:26 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.12 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.13 $";
 #endif
 
 #include <alloca.h>
@@ -1255,8 +1255,11 @@ public:
      char *stname = ST_name(st);
      BOOL variabledefinemodule = !strcmp(stbasename,scope_name);
 
-     nomodulevar = (strstr(stbasename,scope_name)==NULL &&
-                    strstr(scope_name,stbasename)==NULL );
+
+//     nomodulevar = (strstr(stbasename,scope_name)==NULL &&
+//                    strstr(scope_name,stbasename)==NULL );
+
+       nomodulevar = strcmp(stbasename,scope_name);
   
      if (ST_class(st)==CLASS_TYPE) 
         if (!TY_is_external(ST_type(st))){
