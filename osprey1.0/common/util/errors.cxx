@@ -1397,7 +1397,7 @@ DevWarn_limit_search(const char *const src_fname,
       new_ls_buf_siz = 1024;
     }
     else {
-      new_ls_buf_siz *= 2;
+      new_ls_buf_siz = dw_ls_buf_siz * 2;
     }
     new_ls_buf = (LIMIT_STRUCT *)
 	realloc(dw_ls_buf, new_ls_buf_siz * sizeof(LIMIT_STRUCT));
