@@ -499,7 +499,7 @@ endif
 
 ifeq ($(BUILD_COMPILER), GNU)
   STD_LOAD_OPTS =
-  STD_COMPILE_OPTS += -ansi
+  STD_COMPILE_OPTS += 
 endif
 
 ifeq ($(BUILD_COMPILER), VENDOR)
