@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.15 $
- * $Date: 2003-06-23 20:46:46 $
+ * $Revision: 1.16 $
+ * $Date: 2003-07-15 18:52:42 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.15 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.16 $";
 #endif
 
 #include <ctype.h>
@@ -400,7 +400,6 @@ ST2F_decl_type(TOKEN_BUFFER tokens, ST *st)
    const char  *st_name = W2CF_Symtab_Nameof_St(st);
    TOKEN_BUFFER decl_tokens = New_Token_Buffer();
    TY_IDX       ty_rt = ST_type(st);
-   ST *base;
 
    ASSERT_DBG_FATAL(ST_sym_class(st)==CLASS_TYPE, 
 		    (DIAG_W2F_UNEXPECTED_SYMCLASS, 
@@ -678,6 +677,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    ST *rslt = NULL;
    BOOL needcom=1;
    BOOL has_result = 0;
+   BOOL add_rsl_type = 0;
    const char * func_n_name= W2CF_Symtab_Nameof_St(st);
 
 
@@ -777,7 +777,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
        Prepend_Token_String(header_tokens, "ENTRY");
      else
      {
-       Prepend_Token_String(header_tokens, "function");
+       Prepend_Token_String(header_tokens, "Function");
 
      if (PU_recursive(Get_Current_PU())) 
        Prepend_Token_String(header_tokens, "RECURSIVE");
@@ -787,6 +787,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
 	* instead.
 	*/
 
+#if 0
        if (has_result)
            has_result = 0; 
        else {
@@ -804,6 +805,12 @@ ST2F_func_header(TOKEN_BUFFER tokens,
 	           TY2F_translate(header_tokens, return_ty);
             }
 	}
+#endif
+
+      if (!has_result && (TY_kind(return_ty)!= KIND_ARRAY ||
+	                        !TY_is_character(TY_AR_etype(return_ty))))
+              add_rsl_type=1;
+             
      }
    }
    else /* subroutine */
@@ -828,57 +835,52 @@ ST2F_func_header(TOKEN_BUFFER tokens,
     const char *st_name1;
 
 /* add a use stmt corresponding to an added module in *.w2f.f
- * to solve the real kind problem
+ * to solve the real kind problems
  *--------fzhao
  */
      Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(header_tokens, "use w2f__types");
 
-    while (stmt !=NULL) {
-   if (WN_operator(stmt)==OPR_USE){
-     st_name = W2CF_Symtab_Nameof_St(WN_st(stmt));
-     Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
-     Append_Token_String(header_tokens, "use");
-     Append_Token_String(header_tokens, st_name);
-     if (WN_rtype(stmt) == 1)
-        Append_Token_String(header_tokens, ",only:");
-     else
-       if (WN_kid_count(stmt)>0)
-           Append_Token_String(header_tokens, ",");
+    while (stmt) {
+      if (WN_operator(stmt)==OPR_USE){
+       st_name = W2CF_Symtab_Nameof_St(WN_st(stmt));
+       Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
+       Append_Token_String(header_tokens, "use");
+       Append_Token_String(header_tokens, st_name);
+       if (WN_rtype(stmt) == 1)
+           Append_Token_String(header_tokens, ",only:");
+       else
+          if (WN_kid_count(stmt)>0)
+               Append_Token_String(header_tokens, ",");
 
-     for(k=0;k< WN_kid_count(stmt);k=k+2 )
+       for(k=0;k< WN_kid_count(stmt);k=k+2 ) {
 
-       { st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(stmt,k)));
-         st_name1= W2CF_Symtab_Nameof_St(WN_st(WN_kid(stmt,k+1)));
-        if (k==0)
-           ;
-        else
-          Append_Token_String(header_tokens,",");
-        if (strcmp(st_name,st_name1)) {
-          Append_Token_String(header_tokens,st_name);
-          Append_Token_String(header_tokens,"=>");
-          Append_Token_String(header_tokens, st_name1);
-        }
-        else
-          Append_Token_String(header_tokens,st_name);
-
-       }
+             st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(stmt,k)));
+             st_name1= W2CF_Symtab_Nameof_St(WN_st(WN_kid(stmt,k+1)));
+             if (k==0)
+                ;
+             else
+             Append_Token_String(header_tokens,",");
+             if (strcmp(st_name,st_name1)) {
+                       Append_Token_String(header_tokens,st_name);
+                       Append_Token_String(header_tokens,"=>");
+                       Append_Token_String(header_tokens, st_name1);
+             } else
+       Append_Token_String(header_tokens,st_name);
+       } /*for*/
      }
       stmt = WN_next(stmt);
-    } 
+    }  /*while*/
 
-// for use statement lookup the symbal table to get the modules
-// name
- 
    if (!is_altentry)
    {
       /* Emit parameter declarations, indented and on a new line */
       Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
       Append_Token_String(header_tokens, "IMPLICIT NONE");
-      for (param = first_param; param < num_params -implicit_parms; param++)
-      {
+      for (param = first_param; param < num_params -implicit_parms; param++) {
+
 	 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-	 if (params[param] != NULL && TY_kind(ST_type(params[param]))!=KIND_POINTER) {
+	 if (params[param] ) 
    
             if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
 
@@ -907,56 +909,36 @@ ST2F_func_header(TOKEN_BUFFER tokens,
              }
 
            } 
-     else
-       if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
-           ST2F_decl_translate(header_tokens, params[param]);
-     }
+        else
+             if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
+                     ST2F_decl_translate(header_tokens, params[param]);
+       }
+
     }
-
-      for (param = first_param; param < num_params -implicit_parms; param++)
-      {
-         Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-         if (params[param] != NULL && TY_kind(ST_type(params[param]))==KIND_POINTER) {
-  
-            if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
-
-             ST2F_decl_translate(header_tokens, params[param]);
-
-             if (ST_is_optional_argument( params[param])) {
-                Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-                Append_Token_String(header_tokens,"OPTIONAL ");
-                Append_Token_String(header_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-             }
-             if (ST_is_intent_in_argument( params[param])) {
-                TOKEN_BUFFER temp_tokens = New_Token_Buffer();
-                Append_F77_Indented_Newline(temp_tokens, 1, NULL/*label*/);
-                Append_Token_String(temp_tokens,"INTENT(IN) ");
-                Append_Token_String(temp_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-                Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
-
-              }
-             if (ST_is_intent_out_argument( params[param])) {
-                 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-                 Append_Token_String(header_tokens,"INTENT(OUT) ");
-                 Append_Token_String(header_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-             }
-
-           }
-     else
-       if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
-           ST2F_decl_translate(header_tokens, params[param]);
-     }
+    
+    if (add_rsl_type){
+      TOKEN_BUFFER temp_tokens = New_Token_Buffer();
+       Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+       if (TY_Is_Pointer(return_ty))
+           TY2F_translate(temp_tokens, Stab_Mtype_To_Ty(TY_mtype(return_ty)));
+       else {
+           if (TY_kind(return_ty)==KIND_ARRAY)  {
+                  if (TY_is_character(TY_AR_etype(return_ty)))
+                             ;
+                   else
+  	   		 TY2F_translate(temp_tokens,TY_AR_etype(return_ty));
+                  }
+           else
+                TY2F_translate(temp_tokens, return_ty);
+            }
+       Append_Token_String(temp_tokens, W2CF_Symtab_Nameof_St(st));
+       Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
     }
-
-   }
-
 
    Append_Token_Special(tokens, '\n');
    Append_F77_Indented_Newline(tokens, 0, NULL);
    Append_And_Reclaim_Token_List(tokens, &header_tokens);
+
 } /* ST2F_func_header */
 
 void
