@@ -104,7 +104,6 @@ struct consistency_value *current_consistency_stack;
 struct consistency_nesting_level *stmt_consistency_nesting_level;
 extern int keep_decl_for_w2c;
 
-
 /* While defining an enum type, this is 1 plus the last enumerator
    constant value.  Note that will do not have to save this or `enum_overflow'
    around nested function definition since such a definition could only
@@ -3006,7 +3005,7 @@ init_decl_processing ()
   if (flag_traditional && TREE_UNSIGNED (t))
     t = signed_type (t);
     
-  set_sizetype (t);
+    set_sizetype (t);
 
   /* Create the widest literal types. */
   widest_integer_literal_type_node
@@ -3083,8 +3082,13 @@ init_decl_processing ()
   ptrdiff_type_node
     = TREE_TYPE (IDENTIFIER_GLOBAL_VALUE (get_identifier (PTRDIFF_TYPE)));
 
-  c_common_nodes_and_builtins (0, flag_no_builtin, flag_no_nonansi_builtin);
+  if (compiling_upc) {
+    /* disallow builtin functions for max portability */
+    flag_no_builtin = 1;
+  }
 
+  c_common_nodes_and_builtins (0, flag_no_builtin, flag_no_nonansi_builtin);
+  
   endlink = void_list_node;
   ptr_ftype_void = build_function_type (ptr_type_node, endlink);
   ptr_ftype_ptr
@@ -3734,6 +3738,12 @@ finish_decl (decl, init, asmspec_tree)
 
       if (failure == 1)
 	error_with_decl (decl, "initializer fails to determine size of `%s'");
+      
+/*       if(failure == 2 && TREE_CODE(decl) == FIELD_DECL && do_default) { */
+/* 	failure = 0; */
+/* 	type = build_type_copy(type); */
+/* 	TYPE_SIZE(type) = build_int_2(0,0); */
+/*       } */
 
       if (failure == 2)
 	{
@@ -4511,7 +4521,11 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
       }
   }
 
-  if (declarator && TREE_CODE(declarator) == IDENTIFIER_NODE) {
+  //if (declarator && TREE_CODE(declarator) == IDENTIFIER_NODE) {
+  if (!declarator || TREE_CODE(declarator) == IDENTIFIER_NODE) {
+    /* it's possible for a declarator to be null when processing a typename,
+     * and in this case we still want to set its blocksize (or upc_blocksizeof on the typename will work)
+     */
     /* WEI: for scalars we need to set its blocksize here, since 
        the following loop won't get executed */
     if (layout_specifier) {
@@ -4524,7 +4538,8 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
       layout_specifier = 0;
     }
   }
-      
+
+
   /* Now figure out the structure of the declarator proper.
      Descend through it, creating more complex types, until we reach
      the declared identifier (or NULL_TREE, in an absolute declarator).  */
@@ -4539,17 +4554,22 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 
       /* Add UPC-defined block size, if supplied */
       /* WEI: since pointers can also have blocksizes qualifiers,
-	 move the code here outside the  if (TREE_CODE (declarator) == ARRAY_REF) */
-      if (layout_specifier) {
+ 	 move the code here outside the  if (TREE_CODE (declarator) == ARRAY_REF)
+	 Costin: bad choice since the shared qualifier behaves differently
+	 for ptrs and arrays */
+  
+      if ((layout_specifier || sharedp) && TREE_CODE(declarator) != ARRAY_REF) {
 	if (sharedp) {
 	  type = set_upc_blocksize (type, layout_specifier);
 	}
 	else
 	  error ("UPC layout specifier requires `shared' type qualifier"
 		 " in the declaration of `%s'", name);
+	if(TREE_CODE(declarator) == INDIRECT_REF)
+	  sharedp--;
 	layout_specifier = 0;
       }
-
+      
       /* Each level of DECLARATOR is either an ARRAY_REF (for ...[..]),
 	 an INDIRECT_REF (for *...),
 	 a CALL_EXPR (for ...(...)),
@@ -4570,11 +4590,43 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	  tree size = TREE_OPERAND (declarator, 1);
 	  /* The index is a signed object `sizetype' bits wide.  */
 	  tree index_type = signed_type (sizetype);
+
+	  /* Add UPC-defined block size, if supplied */
+	  if (layout_specifier ) {
+	    if (sharedp) {
+	      type = set_upc_blocksize (type, layout_specifier);
+	    }
+	    else
+	      error ("UPC layout specifier requires `shared' type qualifier"
+		     " in the declaration of `%s'", name); 
+	    layout_specifier = 0;
+	  }
+
+	  /* for arrays with indefinite size ISO C99 style, fake them
+	     with arrays with size 0. 
+	     This is to allow that type as the type of the last field
+	     of a structure.
+	     Previously the front-end could handle 
+	       struct {
+	          int a;
+	          int b[0];
+	        }
+	     but not struct {int a; int b[];}
+	  */
+	  if (!size && !initialized  )
+	    size = integer_zero_node;
 	  
+	  declarator = TREE_OPERAND (declarator, 0);
 	  /* if the UPC shared qualifier has been applied to an array,
 	     then process the dimensions according to UPC semantics */
-	  if (sharedp
-	      && TREE_CODE (TREE_OPERAND (declarator, 0)) != INDIRECT_REF)
+	  /*
+	  if (sharedp && declarator
+	      && TREE_CODE (declarator) != INDIRECT_REF)
+	  */
+	  /* We also need to do this for typenames,
+	     which may have a null declarator
+	   */
+	  if (sharedp && (declarator == NULL || TREE_CODE(declarator) != INDIRECT_REF))
 	    {
 	      int n_thread_refs = count_upc_thread_refs (size);
 	      has_threads = 0;
@@ -4594,7 +4646,7 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	        } 
 	    }
 	  
-	  declarator = TREE_OPERAND (declarator, 0);
+	  
 
 	  /* Check for some types that there cannot be arrays of.  */
 
@@ -4631,6 +4683,7 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 
 	  if (size)
 	    {
+	      int div_by_thread = 0; // mark whether we have divided size by threads
 	      /* Strip NON_LVALUE_EXPRs since we aren't using as an lvalue.  */
 	      STRIP_TYPE_NOPS (size);
 
@@ -4668,6 +4721,24 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 		    }
 		}
 
+	      /* for shared arrays in static env on 32-bit platforms, 
+		 its total size may overflow, causing an error. (see bug247)
+		 To prevent this, we divide the size by THREADS here,
+		 and patch the size later in tree_symtab.cxx
+	      */
+	      if (sharedp && threads_int != 0) {
+		tree maxsize = TYPE_MAX_VALUE(sizetype);
+		tree ty_size = fold (build (MULT_EXPR, long_long_unsigned_type_node, size, convert (long_long_unsigned_type_node, TYPE_SIZE(type))));
+		//debug_tree(ty_size);
+		if (INT_CST_LT(maxsize, ty_size)) {
+		  tree rem = fold (build (TRUNC_MOD_EXPR, index_type, size, build_int_2(threads_int, 0)));
+		  if (TREE_INT_CST_LOW(rem) == 0) {
+		    size = fold (build (TRUNC_DIV_EXPR, index_type, size, build_int_2(threads_int,0)));
+		    div_by_thread  = 1;
+		  }
+		}
+	      }
+	      
 	      /* Convert size to index_type, so that if it is a variable
 		 the computations will be done in the proper mode.  */
 	      itype = fold (build (MINUS_EXPR, index_type,
@@ -4690,6 +4761,7 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 		itype = variable_size (itype);
 	      itype = build_index_type (itype);
 
+	      UPC_TYPE_HAS_THREADS(itype) = div_by_thread;
 	    }
 
 #if 0 /* This had bad results for pointers to arrays, as in
@@ -4717,11 +4789,15 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	     is set correctly.  */
 
 	  type = build_array_type (type, itype);
-	  if (type_quals)
+	  if (type_quals) {
 	    type = c_build_qualified_type (type, type_quals);
-	  
+	  } 
+
 	  if (compiling_upc && sharedp)
 	    {
+	      tree elt_type = TREE_TYPE(type);
+	      //if (!(TREE_CODE(elt_type) == POINTER_TYPE && !TYPE_SHARED(elt_type))) {
+	      /* we do not mark array as shared, if it's an array of private pointer-to-shared */
 	      TYPE_SHARED(type) = 1;
 	      if (threads_found)
 		UPC_TYPE_USES_THREADS (type) = 1;
@@ -4730,7 +4806,7 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	      }
 	    }
 
-
+	  
 #if 0	/* don't clear these; leave them set so that the array type
 	   or the variable is itself const or volatile.  */
 	  type_quals = TYPE_UNQUALIFIED;
@@ -4849,8 +4925,11 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 		  else if (qualifier == ridpointers[(int) RID_RELAXED])
 		    relaxedp++;
 		  /* A TREE_LIST value is used to tag a UPC-defined
-		     layout specifier. */
-		  else if (TREE_CODE (typemodlist) == TREE_LIST)
+		     layout specifier. 
+		     Make sure the next in the list is the shared  qualifier */
+		  else if (TREE_CODE (typemodlist) == TREE_LIST && 
+			   TREE_VALUE(TREE_CHAIN(typemodlist)) == 
+			   ridpointers[RID_SHARED])
 		    {
 		      tree blocksize;
 		      if (layout_specifier)
@@ -4860,7 +4939,7 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 		      type = set_upc_blocksize (type, layout_specifier);
 		      layout_specifier = 0;
 		    }
-		  else if (!erred)
+		  else if (!erred  && (sharedp == 0 && TREE_CODE (typemodlist) != TREE_LIST) )
 		    {
 		      erred = 1;
 		      error ("invalid type modifier within pointer declarator");
@@ -4931,6 +5010,8 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
       if ((specbits & (1 << (int) RID_SIGNED))
 	  || (typedef_decl && C_TYPEDEF_EXPLICITLY_SIGNED (typedef_decl)))
 	C_TYPEDEF_EXPLICITLY_SIGNED (decl) = 1;
+      if(sharedp && TYPE_BLOCK_SIZE(type) != TYPE_BLOCK_SIZE(TYPE_MAIN_VARIANT(type)))
+	TYPE_MAIN_VARIANT(type) = type;
       return decl;
     }
 
@@ -5160,9 +5241,14 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	  {
 	    //WEI: again, need to preserve the has_thread flag here
 	    int thread_dim = UPC_TYPE_HAS_THREADS(type);
+	    int elt_shared = TYPE_SHARED(TREE_TYPE(type));
 	    type = build_array_type (c_build_qualified_type (TREE_TYPE (type),
 							     type_quals),
 				     TYPE_DOMAIN (type));
+	    
+	    if (!elt_shared) {
+	      TYPE_SHARED(TREE_TYPE(type)) = 0;
+	    }
 	    if (thread_dim) {
 	      UPC_TYPE_HAS_THREADS(type) = 1;
 	    }
@@ -5838,8 +5924,8 @@ finish_struct (t, fieldlist, attributes)
 
   /* Finish debugging output for this type.  */
   rest_of_type_compilation (t, toplevel);
-  /* mark the type for w2c */
 
+  /* mark the type for w2c */
   if (keep_decl_for_w2c) {
     Mark_TY_Written(t);
   }
