@@ -38,6 +38,8 @@
 #ifndef symtab_defs_INCLUDED
 #define symtab_defs_INCLUDED
 
+#include <string.h> /* for memset() */
+
 // Note:
 //
 // The comments in this file are intentionally brief.  For detail description,
@@ -361,7 +363,7 @@ struct ARB
 	
     // operations
 
-    ARB () { bzero (this, sizeof(ARB)); }
+    ARB () { memset (this, '\0', sizeof(ARB)); }
 
     void Verify (mUINT16 dim) const;
     
@@ -699,7 +701,7 @@ public:
 
 	BLK () : size (0), section_idx(0), scninfo_idx(0), flags (0) {}
 
-	void Init (void)	{ bzero (this, sizeof(BLK)); }
+	void Init (void)	{ memset (this, '\0', sizeof(BLK)); }
 
 public:
 
@@ -975,7 +977,7 @@ struct SYMTAB_HEADER_TABLE
     SYMTAB_HEADER_TABLE () {
 	size = sizeof(self);
 	entries = table_size;
-	bzero (header, sizeof(header));
+	memset (header, '\0', sizeof(header));
     }
 
 }; // SYMTAB_HEADER_TABLE

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_pdgcs
- * $Revision: 1.3 $
- * $Date: 2003-11-04 16:12:49 $
+ * $Revision: 1.4 $
+ * $Date: 2003-11-28 23:04:08 $
  * $Author: eraxxon $
  * $Source: 
  *
@@ -59,11 +59,12 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_mkdepend.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_mkdepend.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
 
+#include <string.h> /* for memset() */
 #include "x_string.h" // for strdup()
 
 /* sgi includes */
@@ -94,7 +95,7 @@ cwh_next_table_entry( table_p t)
 {
    if (t->current_size == 0) {
       t->ptr = (void**) malloc(sizeof(void *) * TABLE_INCREMENT);
-      bzero(t->ptr,sizeof (void *) * TABLE_INCREMENT);
+      memset(t->ptr, '\0', sizeof (void *) * TABLE_INCREMENT);
       t->current_size = TABLE_INCREMENT;
    } 
 
@@ -103,7 +104,8 @@ cwh_next_table_entry( table_p t)
       /* reallocate the table */
       t->current_size += TABLE_INCREMENT;
       t->ptr = (void **) realloc (t->ptr, sizeof (void *) * t->current_size);
-      bzero(t->ptr+(t->current_size-TABLE_INCREMENT),sizeof (void *) * TABLE_INCREMENT);
+      memset(t->ptr+(t->current_size-TABLE_INCREMENT),'\0', 
+	    sizeof (void *) * TABLE_INCREMENT);
    }
    return (t->current_idx);
 }

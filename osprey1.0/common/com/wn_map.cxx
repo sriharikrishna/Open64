@@ -37,7 +37,7 @@
  * ====================================================================
  *
  * Module: wn_map.c
- * $Author: fzhao $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_map.cxx,v $
  *
  * Revision history:
@@ -53,6 +53,8 @@
 #include "common_com_pch.h"
 #endif /* USE_PCH */
 #pragma hdrstop
+
+#include <string.h> /* for memset() */
 #include "wn.h"
 
 /**                     Mapping mechanism for tree nodes
@@ -344,7 +346,7 @@ WN_MAP_realloc_array (WN_MAP_TAB *maptab, OPERATOR_MAPCAT category,
   /* make sure the new storage is zeroed */
   if (!(maptab->_pool[wn_map]->bz)) {
       INTPS address = ((INTPS) maptab->_mapping[category][wn_map]) + (old_size * elemsz);
-      bzero((void *) address, (new_size - old_size) * elemsz);
+      memset((void *) address, '\0', (new_size - old_size) * elemsz);
   }
 }
 

@@ -40,7 +40,7 @@ http://oss.sgi.com/projects/GenInfo/NoticeExplan
 #pragma hdrstop
 
 #include <alloca.h>
-#include <strings.h>
+#include <string.h> /* for memmove() */
 
 #include <map>
 #include "HashTable.h"
@@ -427,7 +427,7 @@ static inline void initialize_strtab (STRTAB& strtab, const char *buf, UINT32 si
   strtab.hash_table.clear();
   strtab.buffer_size = size;
   strtab.buffer = (char *) MEM_POOL_Alloc (Malloc_Mem_Pool, size);
-  bcopy (buf, strtab.buffer, size);
+  memmove (strtab.buffer, buf, size);
   strtab.last_idx = size;
   strtab.init_hash ();
 } // Initialize_Strtab

@@ -61,6 +61,7 @@
 #pragma hdrstop
 
 #include <elf.h>
+#include <string.h> /* for memset() */
 #include "cxx_memory.h"
 #include "defs.h"
 #include "symtab.h"
@@ -282,7 +283,7 @@ Read_PU_Infos (char *base, INT32 size, INT32 *p_num_PUs)
 
     pu_array = (PU_Info *)malloc(sizeof(PU_Info) * num_PUs);
 
-    bzero(pu_array, sizeof(PU_Info) * num_PUs);
+    memset(pu_array, '\0', sizeof(PU_Info) * num_PUs);
 
     for (n = 0, pu = pu_array; n < num_PUs; n++, pu++) {
 	/* initialize */
