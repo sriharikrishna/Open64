@@ -35,16 +35,13 @@
 
 #ifndef em_elf_INCLUDED
 #define em_elf_INCLUDED
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* ====================================================================
  * ====================================================================
  *
  * Module: em_elf.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:30 $
+ * $Revision: 1.3 $
+ * $Date: 2003-12-09 19:23:29 $
  *
  * Description:
  *
@@ -54,13 +51,12 @@ extern "C" {
  * ====================================================================
  */
 
-/* Solaris workaround
- * the following definitions are copied from IRIX elftypes.h
- */
-#ifdef _SOLARIS_SOLARIS
-typedef unsigned char       Elf32_Byte;
-typedef unsigned short      Elf32_Section;
-typedef unsigned char       Elf64_Byte;
+#include <stdio.h> /* for FILE */
+#include <elf.h>   /* Open64 version */
+
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /* the default gp value for gprel and reginfo */
@@ -374,7 +370,9 @@ extern void Em_End_Unwind (FILE *trace_file, pSCNINFO text_scn);
 /* must be called after Em_End_File */
 extern void Em_Cleanup_Unwind (void);
 
+
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* em_elf_INCLUDED */
