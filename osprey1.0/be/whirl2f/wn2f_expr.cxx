@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.17 $
- * $Date: 2004-04-13 19:55:11 $
+ * $Revision: 1.18 $
+ * $Date: 2004-04-26 21:44:33 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.17 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.18 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -633,7 +633,7 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
    else if (OPCODE_operator(opcode) == OPR_MPY)
          priori_p = 2;
 
-   if (binary_op){
+   if (binary_op) {
       if (WN_operator(wn0) == OPR_ADD ||
           WN_operator(wn0) == OPR_SUB)
               priori_k0 = 1;
@@ -652,82 +652,61 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
          set_WN2F_CONTEXT_subexp_no_parenthesis(context);
 
    /* First operand */
-   if (binary_op)
-     {
+   if (binary_op) {
       WN2F_Translate_Arithmetic_Operand(tokens, wn0, wn0_ty, 
 					TRUE/*call-by-value*/,
 					context);
-      } 
+   } 
 
    reset_WN2F_CONTEXT_subexp_no_parenthesis(context);
 
    /* Operation */
-
-
-  switch (OPCODE_operator(opcode)) {
-    case  OPR_EQ:
-
-      if (WN_rtype(wn0)!=MTYPE_I4 ||
-              WN_rtype(wn1)!=MTYPE_I4)
-       {
-	     kid0_ty=0;
-             kid1_ty=0;
-       }
-       else 
-       {
-              kid0_ty= (WN_operator(wn0) == OPR_CALL)? 
-                      TY_ret_type(ST_pu_type(WN_st(wn0))):WN_ty(wn0);
-	      kid1_ty= (WN_operator(wn1) == OPR_CALL)?
-                      TY_ret_type(ST_pu_type(WN_st(wn1))):WN_ty(wn1);
-	}
-
-
-      if ( wn0 && (kid0_ty && TY_is_logical(kid0_ty)||TY_is_logical(wn0_ty))  ||
-           ( wn1 && (kid1_ty && TY_is_logical(kid1_ty)||TY_is_logical(wn1_ty))) )
-     {
-         set_WN2F_CONTEXT_has_logical_arg(context);
-            Append_Token_String(tokens,".eqv.");
+   OPERATOR opr = OPCODE_operator(opcode);
+   if (opr == OPR_EQ || opr == OPR_NE) {     
+      const char *oprstr = NULL, *logoprstr = NULL;
+      switch (opr) {
+      case OPR_EQ:
+	oprstr = ".eq.";
+	logoprstr = ".eqv.";
+	break;
+      case OPR_NE:
+	oprstr = ".ne.";
+	logoprstr = ".neqv.";
+	break;
+      };
+      
+      kid0_ty = kid1_ty = 0;
+      if (WN_rtype(wn0) == MTYPE_I4 && WN_rtype(wn1) == MTYPE_I4) {
+	 if (WN_operator(wn0) == OPR_CALL) {
+	    kid0_ty = TY_ret_type(ST_pu_type(WN_st(wn0)));
+	 } 
+	 else if (OPERATOR_has_1ty(WN_operator(wn0))) {
+	    kid0_ty = WN_ty(wn0);
+	 }
+	 if (WN_operator(wn1) == OPR_CALL) {
+	    kid1_ty = TY_ret_type(ST_pu_type(WN_st(wn1)));
+	 } else if (OPERATOR_has_1ty(WN_operator(wn1))) {
+	    kid1_ty = WN_ty(wn1);
+	 }
       }
-      else
-            Append_Token_String(tokens,".eq.");
-
-     break;
-    case  OPR_NE:
-
-      if (WN_rtype(wn0)!=MTYPE_I4 ||
-              WN_rtype(wn1)!=MTYPE_I4)
-       {
-             kid0_ty=0;
-             kid1_ty=0;
-       }
-       else
-       {
-              kid0_ty= (WN_operator(wn0) == OPR_CALL)? 
-                      TY_ret_type(ST_pu_type(WN_st(wn0))):WN_ty(wn0);
-	      kid1_ty= (WN_operator(wn1) == OPR_CALL)?
-                      TY_ret_type(ST_pu_type(WN_st(wn1))):WN_ty(wn1);
-        }
-
-      if ( wn0 && (kid0_ty && TY_is_logical(kid0_ty)||TY_is_logical(wn0_ty))  ||
-           ( wn1 && (kid1_ty && TY_is_logical(kid1_ty)||TY_is_logical(wn1_ty))) )
-         {
-	    set_WN2F_CONTEXT_has_logical_arg(context); 
-            Append_Token_String(tokens,".neqv.");
-         }
-      else
-            Append_Token_String(tokens,".ne.");
-
-     break;
-
-    default:
+      
+      if ( (wn0 && (kid0_ty && 
+                    (TY_is_logical(kid0_ty) || TY_is_logical(wn0_ty)))) || 
+           (wn1 && (kid1_ty && 
+                    (TY_is_logical(kid1_ty) || TY_is_logical(wn1_ty)))) ) {
+	 set_WN2F_CONTEXT_has_logical_arg(context);
+         Append_Token_String(tokens, logoprstr);
+      }
+      else {
+         Append_Token_String(tokens, oprstr);
+      }
+   }
+   else {
       Append_Token_String(tokens, Opc_Fname[opcode]);
       reset_WN2F_CONTEXT_is_logical_operation(context);
-      break;
-    } /*switch */
+   } 
 
    /* Second operand, or only operand for unary operation */
-
-
    if (priori_p && priori_k1 &&
        priori_p <= priori_k1)
       set_WN2F_CONTEXT_subexp_no_parenthesis(context);
