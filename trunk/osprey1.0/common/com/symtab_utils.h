@@ -300,9 +300,30 @@ TY_KIND
 Name_To_Kind (const char* nm);
 
 
+const char *
+LABEL_Kind_Name (LABEL_KIND k);
+
+LABEL_KIND
+Name_To_LABEL_Kind (const char* nm);
+
+
+const char *
+ST_ATTR_Kind_Name (ST_ATTR_KIND k);
+
+ST_ATTR_KIND
+Name_To_ST_ATTR_Kind (const char* nm);
+
+
 //----------------------------------------------------------------------
 // Flags <-> string
 //----------------------------------------------------------------------
+
+const char *
+FILE_INFO_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_FILE_INFO_FLAGS (const char* str);
+
 
 const char *
 ST_FLAGS_To_Str (UINT64 flags);
@@ -319,10 +340,38 @@ Str_To_ST_EXT_FLAGS (const char* str);
 
 
 const char *
+FLD_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_FLD_FLAGS (const char* str);
+
+
+const char *
+ARB_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_ARB_FLAGS (const char* str);
+
+
+const char *
+LABEL_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_LABEL_FLAGS (const char* str);
+
+
+const char *
 TY_FLAGS_To_Str (UINT64 flags);
 
 UINT64
 Str_To_TY_FLAGS (const char* str);
+
+
+const char *
+TY_PU_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_TY_PU_FLAGS (const char* str);
 
 
 const char *
@@ -337,6 +386,13 @@ PU_SRC_LANG_FLAGS_To_Str (UINT64 flags);
 
 UINT64
 Str_To_PU_SRC_LANG_FLAGS (const char* str);
+
+
+const char *
+BLK_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_BLK_FLAGS (const char* str);
 
 
 //----------------------------------------------------------------------
