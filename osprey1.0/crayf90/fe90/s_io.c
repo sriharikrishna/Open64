@@ -4511,7 +4511,7 @@ static boolean io_list_semantics(opnd_type     *top_opnd,
                PRINTMSG(line, 1100, Error, col);
                semantically_correct = FALSE;
             }
-            else if (IL_MUST_FLATTEN(list_idx)) {
+            else if (IL_MUST_FLATTEN(list_idx) && FALSE) { 
                /* This is either a concat, array */
                /* syntax, or a vector valued subscript. All of which  */
                /* need to be flattened to a temp before the structure */
@@ -7631,7 +7631,7 @@ static void expand_io_list(void)
 
          break;
       }
-      else if (IL_MUST_FLATTEN(list_idx)) {
+      else if (IL_MUST_FLATTEN(list_idx) && FALSE ) {
 
          COPY_OPND(opnd, IL_OPND(list_idx));
 
