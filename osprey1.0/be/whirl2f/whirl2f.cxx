@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: whirl2f.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:34 $
+ * $Revision: 1.3 $
+ * $Date: 2004-01-28 23:01:40 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f.cxx,v $
  *
@@ -77,7 +77,7 @@
  * ====================================================================
  */
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f.cxx,v $ $Revision: 1.3 $";
 
 #include <unistd.h>		    /* for close(), etc. */
 #include <elf.h>              /* for wn.h */
@@ -342,12 +342,14 @@ main (INT argc,       /* Number of command line arguments */
 	 Read_Local_Info (MEM_pu_nz_pool_ptr, current_pu);
 	 pu = PU_Info_tree_ptr(current_pu);
 
-	 W2F_Outfile_Translate_Pu(pu);
-
-	 if (PU_Info_child(current_pu)) {
-	    fprintf(stderr, "WARNING: ignoring nested procedures in \"%s\"\n",
+//some works on IR may generate new PUs and discard some old ones---fzhao
+         if (PU_need_unparsed(pu)){
+	     W2F_Outfile_Translate_Pu(pu); 
+	     if (PU_Info_child(current_pu)) {
+	         fprintf(stderr, "WARNING: ignoring nested procedures in \"%s\"\n",
 		    ST_name(PU_Info_proc_sym(current_pu)));
-	 }
+	      }
+         }
 
 	 Free_Local_Info (current_pu);
 	 MEM_POOL_Pop (MEM_pu_nz_pool_ptr);

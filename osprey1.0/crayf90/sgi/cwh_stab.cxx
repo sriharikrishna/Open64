@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.24 $
- * $Date: 2003-11-13 21:12:31 $
+ * $Revision: 1.25 $
+ * $Date: 2004-01-28 23:01:41 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.24 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.25 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -349,6 +349,7 @@ fei_proc_def(char         *name_string,
     Set_ST_ofst(st,0);
     cwh_auxst_add_to_list(&Top_Text,st,FALSE);
     
+    
    }
  else {
     Set_ST_sclass(st, SCLASS_TEXT);
@@ -369,6 +370,7 @@ fei_proc_def(char         *name_string,
 
   Set_PU_prototype (pu, ty);
   Set_PU_f90_lang (pu);
+  Set_PU_need_unparsed(pu);
 
   if (is_inline_func)
      Set_PU_is_inline_function(pu);
@@ -532,6 +534,7 @@ fei_proc_interface(char         *name_string,
    PU_IDX pu_idx = ST_pu(st);
   PU& pu = Pu_Table[pu_idx];
 
+  Set_PU_need_unparsed(pu);
 
   if (test_flag(flags, FEI_PROC_RECURSE))
     Set_PU_recursive(pu);
@@ -681,6 +684,7 @@ if (Class ==  PDGCS_Proc_Imported &&
   pu_cp_idx = cwh_stab_mk_pu(ty_cp, CURRENT_SYMTAB);
 
   Set_PU_decl_view(pu_cp_idx); /*the extra PU entry for declaration only--Oct */
+  Set_PU_need_unparsed(pu_cp_idx);
  
   st_local_cp->u2.type =(TY_IDX)pu_cp_idx ;
   Set_ST_ofst(st_local_cp, 0);
@@ -3408,6 +3412,7 @@ cwh_stab_mk_fn_0args(char *name, ST_EXPORT eclass,SYMTAB_IDX level,TY_IDX rty)
   pu = cwh_stab_mk_pu(ty, level);
   st = New_ST(GLOBAL_SYMTAB);
   cwh_auxst_clear(st);
+  Set_PU_need_unparsed(pu);
 
   ST_Init (st, 
 	   Save_Str(name), 
@@ -3564,7 +3569,7 @@ fei_interface(char  * name_string,
                              
   cwh_auxst_clear(st);
 
-  ty = NULL;
+  ty = 0;
 
   ST_Init(st, Save_Str(name_string), CLASS_VAR, SCLASS_AUTO, EXPORT_LOCAL, ty);
   Set_ST_ofst(st, 0);
