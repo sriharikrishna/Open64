@@ -58,7 +58,7 @@ union aligned_value_entry	{
 
 typedef union aligned_value_entry aligned_value_type;
 
-
+
 /****************************************\
 |* static data used within this module. *|
 \****************************************/
@@ -707,6 +707,7 @@ static  kwd_type        kwd_open_mp_dir[] = {
 
 	"BARRIER",			Tok_Open_Mp_Dir_Barrier,
 
+	"COPYPRIVATE",			Tok_Open_Mp_Dir_Copyprivate,
 	"CRITICAL",			Tok_Open_Mp_Dir_Critical,
 	"COPYIN",			Tok_Open_Mp_Dir_Copyin,
 
@@ -717,8 +718,10 @@ static  kwd_type        kwd_open_mp_dir[] = {
 	"DATA",				Tok_Open_Mp_Dir_Data,
 	"DO",				Tok_Open_Mp_Dir_Do,
 
+	"ENDPARALLELWORKSHARE",		Tok_Open_Mp_Dir_Endparallelworkshare,
 	"ENDPARALLELSECTIONS",		Tok_Open_Mp_Dir_Endparallelsections,
 	"ENDPARALLELDO",		Tok_Open_Mp_Dir_Endparalleldo,
+	"ENDWORKSHARE",			Tok_Open_Mp_Dir_Endworkshare,
 	"ENDCRITICAL",			Tok_Open_Mp_Dir_Endcritical,
 	"ENDPARALLEL",			Tok_Open_Mp_Dir_Endparallel,
 	"ENDSECTIONS",			Tok_Open_Mp_Dir_Endsections,
@@ -745,6 +748,7 @@ static  kwd_type        kwd_open_mp_dir[] = {
 	"ORDERED",			Tok_Open_Mp_Dir_Ordered,
 	"ONTO",				Tok_Open_Mp_Dir_Onto,
 
+	"PARALLELWORKSHARE",		Tok_Open_Mp_Dir_Parallelworkshare,
 	"PARALLELSECTIONS",		Tok_Open_Mp_Dir_Parallelsections,
 	"PAGE_PLACE",   		Tok_Open_Mp_Dir_Page_Place,
 	"PARALLELDO",			Tok_Open_Mp_Dir_Paralleldo,
@@ -764,6 +768,8 @@ static  kwd_type        kwd_open_mp_dir[] = {
 
 	"THREADPRIVATE",		Tok_Open_Mp_Dir_Threadprivate,
 	"THREAD",			Tok_Open_Mp_Dir_Thread,
+
+	"WORKSHARE",			Tok_Open_Mp_Dir_Workshare,
 	"",				Tok_LAST };
 
 static  int                     kwd_open_mp_dir_idx[27];

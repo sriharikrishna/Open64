@@ -90,7 +90,7 @@ static void	set_up_letter_idx_table(int *,kwd_type *, int);
 static boolean	get_debug_directive (void);
 # endif
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -159,7 +159,7 @@ void init_lex (void)
    return;
 
 }  /* init_lex */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -189,7 +189,7 @@ void flush_LA_to_EOS (void)
    return;
 
 }  /* flush_LA_to_EOS */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -241,7 +241,7 @@ void flush_LA_to_symbol (void)
    return;
 
 }  /* flush_LA_to_symbol */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -748,7 +748,7 @@ boolean get_token (token_class_type class)
    return (result);
 
 }  /* get_token */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -785,7 +785,7 @@ void reset_lex (int buf_idx,
    return;
 
 }  /* reset_lex */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -919,7 +919,7 @@ static boolean get_directive (void)
    return (TRUE);
    
 }  /* get_directive */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -963,7 +963,7 @@ static boolean get_format_str (void)
 
 }  /* get_format_str */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1092,7 +1092,7 @@ static boolean fixed_get_keyword (void)
    return (TRUE);
    
 }  /* fixed_get_keyword */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1221,7 +1221,7 @@ static boolean free_get_keyword (void)
    return (TRUE);
 
 }  /* free_get_keyword */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1295,7 +1295,7 @@ static boolean get_label (void)
    return (TRUE);
 
 }  /* get_label */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1425,7 +1425,7 @@ static boolean get_micro_directive (void)
    return (TRUE);
    
 }  /* get_micro_directive */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1559,7 +1559,7 @@ EXIT:
    return (is_directive);
 
 }  /* is_par_directive */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1692,7 +1692,7 @@ static boolean get_open_mp_directive (void)
    return (TRUE);
 
 }  /* get_open_mp_directive */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1825,7 +1825,7 @@ static boolean get_sgi_directive (void)
    return (TRUE);
 
 }  /* get_sgi_directive */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1953,7 +1953,7 @@ EXIT:
    return (is_directive);
 
 }  /* is_dollar_directive */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2109,7 +2109,7 @@ EXIT:
    return (is_directive);
 
 }  /* is_star_directive */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2550,7 +2550,7 @@ EXIT:
    return (result);
 
 }  /* get_operand_digit */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2880,7 +2880,7 @@ EXIT:
    return (result);
 
 }  /* get_operand_dot */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3204,7 +3204,7 @@ static boolean get_operand_letter (void)
    return (result);
 
 }  /* get_operand_letter */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3523,7 +3523,7 @@ static boolean get_operand_quote (void)
    return (result);
 
 }  /* get_operand_quote */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3718,7 +3718,7 @@ static boolean get_operator (void)
    return (result);
 
 }  /* get_operator */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3935,7 +3935,7 @@ static boolean get_operator_dot (void)
    return (result);
 
 }  /* get_operator_dot */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3998,7 +3998,7 @@ static boolean get_program_str (void)
    return (result);
 
 }  /* get_program_str */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4118,7 +4118,7 @@ static boolean get_punctuator (void)
 
 }  /* get_punctuator */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4156,7 +4156,7 @@ char	ch_after_paren_grp(void)
    return(return_char);
 
 }  /* ch_after_paren_grp */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -4363,7 +4363,7 @@ static boolean convert_const(void)
    return(result_ok);
 
 } /* convert_const */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4551,7 +4551,7 @@ EXIT:
    return(value);
 
 }  /* get_dir_token_from_str */
-
+
 # ifdef _DEBUG
 /******************************************************************************\
 |*									      *|
@@ -4683,7 +4683,7 @@ static boolean get_debug_directive (void)
    
 }  /* get_debug_directive */
 # endif
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4789,7 +4789,7 @@ static void convert_octal_literal(boolean	is_boz)
    return;
 
 }  /* convert_octal_literal */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -4946,7 +4946,7 @@ static void convert_hex_literal(boolean       is_boz)
    return;
 
 }  /* convert_hex_literal */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5058,7 +5058,7 @@ static void convert_binary_literal(boolean       is_boz)
    return;
 
 }  /* convert_binary_literal */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -5140,7 +5140,7 @@ int	cvrt_str_to_cn(char	*str,
    return(cn_idx);
 
 }  /* cvrt_str_to_cn */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -5316,7 +5316,7 @@ void set_up_token_tables(void)
    return;
 
 }  /* set_up_token_tables */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|

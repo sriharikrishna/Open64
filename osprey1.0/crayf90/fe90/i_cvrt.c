@@ -317,9 +317,11 @@ static	char		*p_tasking_context[] = {
         		"Context_Omp_Shared",
         		"Context_Omp_Firstprivate",
         		"Context_Omp_Lastprivate",
+        		"Context_Omp_Copyprivate",
         		"Context_Omp_Copyin",
 			"Context_Omp_Affinity",
 			"Context_Omp_Nest"
+        		"Context_Omp_Flush",
 						 };
 
 int     pdg_align[8] = {0,                      /* Signifies no alignment */
@@ -332,7 +334,7 @@ int     pdg_align[8] = {0,                      /* Signifies no alignment */
                         FWord_Align
                         };
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -401,7 +403,7 @@ void blank_padding (long64    pad,
 
 
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -539,7 +541,7 @@ void init_PDGCS(void)
 
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -670,7 +672,7 @@ void cvrt_to_pdg (char	*compiler_gen_date)
 }  /*  cvrt_to_pdg  */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -896,7 +898,7 @@ PROCESS_SIBLING:
 }  /* cvrt_proc_to_pdg */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1064,7 +1066,7 @@ void push_data_value (int      t_idx)
 
 }  /*  push_data_value  */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1221,7 +1223,7 @@ static void	cvrt_sytb_to_pdg(void)
 
 }  /* cvrt_sytb_to_pdg */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -9674,6 +9676,9 @@ CONTINUE:
    case Single_Open_Mp_Opr:
    case Paralleldo_Open_Mp_Opr:
    case Parallelsections_Open_Mp_Opr:
+   case Parallelworkshare_Open_Mp_Opr:
+   case Endsingle_Open_Mp_Opr:
+   case Flush_Open_Mp_Opr:
         list_idx1 = IR_IDX_L(ir_idx);
 
         for (i = 0; i < OPEN_MP_LIST_CNT; i++) {
@@ -9951,6 +9956,8 @@ CONTINUE:
                PDG_AT_IDX(IL_IDX(list_array[OPEN_MP_SCHEDULE_CHUNK_IDX]));
         }
 
+
+
         /* process NEST clause */
         if (IL_FLD(list_array[OPEN_MP_NEST_IDX]) == IL_Tbl_Idx) {
            list_idx2 = IL_IDX(list_array[OPEN_MP_NEST_IDX]);
@@ -10040,6 +10047,66 @@ CONTINUE:
 
 
 
+        /* process COPYPRIVATE clause */
+        if (IL_FLD(list_array[OPEN_MP_COPYPRIVATE_IDX]) == IL_Tbl_Idx) {
+           list_idx2 = IL_IDX(list_array[OPEN_MP_COPYPRIVATE_IDX]);
+
+           while (list_idx2) {
+              if (IL_FLD(list_idx2) == AT_Tbl_Idx) {
+                 send_attr_ntry(IL_IDX(list_idx2));
+
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_task_var");
+                 PDG_DBG_PRINT_LD("(1) PDG_AT_IDX",
+                                   PDG_AT_IDX(IL_IDX(list_idx2)));
+                 PDG_DBG_PRINT_S("(2) context",
+                                   p_tasking_context[Context_Omp_Copyprivate]);
+                 PDG_DBG_PRINT_END
+
+# ifdef _ENABLE_FEI
+                 last_task_idx = fei_task_var(PDG_AT_IDX(IL_IDX(list_idx2)),
+                                              Context_Omp_Copyprivate);
+# endif
+
+              }
+
+              list_idx2 = IL_NEXT_LIST_IDX(list_idx2); 
+           }  
+        }
+
+
+
+        /* process FLUSH clause */
+        /* there is no FLUSH clause in OpenMP (radu@par.univie.ac.at) */
+        /* we fake this clause in order to treat FLUSH directive the same as the others */
+        if (IL_FLD(list_array[OPEN_MP_FLUSH_IDX]) == IL_Tbl_Idx) {
+           list_idx2 = IL_IDX(list_array[OPEN_MP_FLUSH_IDX]);
+
+           while (list_idx2) {
+              if (IL_FLD(list_idx2) == AT_Tbl_Idx) {
+                 send_attr_ntry(IL_IDX(list_idx2));
+
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_task_var");
+                 PDG_DBG_PRINT_LD("(1) PDG_AT_IDX",
+                                         PDG_AT_IDX(IL_IDX(list_idx2)));
+                 PDG_DBG_PRINT_S("(2) context",
+                                   p_tasking_context[Context_Omp_Flush]);
+                 PDG_DBG_PRINT_END
+
+# ifdef _ENABLE_FEI
+                 last_task_idx = fei_task_var(PDG_AT_IDX(IL_IDX(list_idx2)),
+                                              Context_Omp_Flush);
+# endif
+
+              }
+
+              list_idx2 = IL_NEXT_LIST_IDX(list_idx2);
+           }
+        }
+
+
+
 
 
         switch (IR_OPR(ir_idx)) {
@@ -10096,8 +10163,6 @@ CONTINUE:
 
 
 
-
-
         case Single_Open_Mp_Opr:
            PDG_DBG_PRINT_START
            PDG_DBG_PRINT_C("fei_single_open_mp");
@@ -10108,7 +10173,6 @@ CONTINUE:
            fei_single_open_mp();
 # endif
            break;
-
 
 
 
@@ -10140,8 +10204,6 @@ CONTINUE:
 
 
 
-
-
         case Parallelsections_Open_Mp_Opr:
            PDG_DBG_PRINT_START
            PDG_DBG_PRINT_C("fei_parallelsections_open_mp");
@@ -10153,6 +10215,63 @@ CONTINUE:
 # ifdef _ENABLE_FEI
            fei_parallelsections_open_mp(task_if_idx,
                                         defaultt);
+# endif
+           break;
+
+
+
+        case Parallelworkshare_Open_Mp_Opr:
+           PDG_DBG_PRINT_START
+           PDG_DBG_PRINT_C("fei_parallelworkshare_open_mp");
+           PDG_DBG_PRINT_D("(1) if idx", task_if_idx);
+           PDG_DBG_PRINT_LD("(2) defaultt", defaultt);
+           PDG_DBG_PRINT_END
+
+
+# ifdef _ENABLE_FEI
+           fei_parallelworkshare_open_mp(task_if_idx,
+					 defaultt);
+# endif
+           break;
+
+
+
+        case Workshare_Open_Mp_Opr:
+           PDG_DBG_PRINT_START
+           PDG_DBG_PRINT_C("fei_workshare_open_mp");
+           PDG_DBG_PRINT_END
+
+
+# ifdef _ENABLE_FEI
+           fei_workshare_open_mp();
+# endif
+           break;
+
+
+
+        case Endsingle_Open_Mp_Opr:
+           PDG_DBG_PRINT_START
+           PDG_DBG_PRINT_C("fei_endsingle_open_mp");
+           PDG_DBG_PRINT_LD("(1) nowait", nowait);
+           PDG_DBG_PRINT_END
+
+
+# ifdef _ENABLE_FEI
+           fei_endsingle_open_mp(nowait);
+# endif
+           break;
+
+
+
+        case Flush_Open_Mp_Opr:
+           PDG_DBG_PRINT_START
+           PDG_DBG_PRINT_C("fei_flush_open_mp");
+           PDG_DBG_PRINT_D("(1) list_cnt", list_cnt);
+           PDG_DBG_PRINT_END
+
+
+# ifdef _ENABLE_FEI
+           fei_flush_open_mp();
 # endif
            break;
         }
@@ -10182,6 +10301,19 @@ CONTINUE:
 
 # ifdef _ENABLE_FEI
         fei_master_open_mp();
+# endif
+        break;
+
+
+
+     case Workshare_Open_Mp_Opr:
+        PDG_DBG_PRINT_START
+        PDG_DBG_PRINT_C("fei_workshare_open_mp");
+        PDG_DBG_PRINT_END
+
+
+# ifdef _ENABLE_FEI
+        fei_workshare_open_mp();
 # endif
         break;
 
@@ -10265,6 +10397,19 @@ CONTINUE:
 
 
 
+     case Endparallelworkshare_Open_Mp_Opr:
+        PDG_DBG_PRINT_START
+        PDG_DBG_PRINT_C("fei_endparallelworkshare_open_mp");
+        PDG_DBG_PRINT_END
+
+
+# ifdef _ENABLE_FEI
+        fei_endparallelworkshare_open_mp();
+# endif
+        break;
+
+
+
      case Section_Open_Mp_Opr:
         PDG_DBG_PRINT_START
         PDG_DBG_PRINT_C("fei_section_open_mp");
@@ -10314,42 +10459,20 @@ CONTINUE:
 
 
 
-     case Endsingle_Open_Mp_Opr:
+
+     case Endworkshare_Open_Mp_Opr:
         if (IR_FLD_L(ir_idx) == CN_Tbl_Idx) {
            nowait = (long) CN_INT_TO_C(IR_IDX_L(ir_idx));
         }
 
         PDG_DBG_PRINT_START
-        PDG_DBG_PRINT_C("fei_endsingle_open_mp");
+        PDG_DBG_PRINT_C("fei_endworkshare_open_mp");
         PDG_DBG_PRINT_LD("(1) nowait", nowait);
         PDG_DBG_PRINT_END
 
 
 # ifdef _ENABLE_FEI
-        fei_endsingle_open_mp(nowait);
-# endif
-        break;
-
-
-
-
-     case Flush_Open_Mp_Opr:
-        list_cnt = 0;
-        if (IR_FLD_L(ir_idx) == IL_Tbl_Idx) {
-           list_cnt = IR_LIST_CNT_L(ir_idx);
-        }
-
-        cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
-                        IR_FLD_L(ir_idx));
-
-        PDG_DBG_PRINT_START
-        PDG_DBG_PRINT_C("fei_flush_open_mp");
-        PDG_DBG_PRINT_D("(1) list_cnt", list_cnt);
-        PDG_DBG_PRINT_END
-
-
-# ifdef _ENABLE_FEI
-        fei_flush_open_mp(list_cnt);
+        fei_endworkshare_open_mp(nowait);
 # endif
         break;
 
@@ -10431,7 +10554,7 @@ return;
 }  /* cvrt_exp_to_pdg */
 
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -10480,7 +10603,7 @@ static	void	finish_symbolic_expr()
 
 }  /* finish_symbolic_expr */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -10548,7 +10671,7 @@ static void	cvrt_ir_to_pdg(int	scp_idx)
 }  /* cvrt_ir_to_pdg */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -10938,7 +11061,7 @@ static TYPE get_basic_type(int	type_idx,
 #endif
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -11635,7 +11758,7 @@ EXIT:
 
 }  /* get_type_desc */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -11848,7 +11971,7 @@ EXIT:
 }  /* send_stor_blk */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -11963,7 +12086,7 @@ static void  send_dummy_procedure(int	attr_idx)
 }   /* send_dummy_procedure */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -12388,7 +12511,7 @@ EXIT:
 }   /* send_procedure */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -12588,7 +12711,7 @@ EXIT:
 }   /* send_derived_type */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -12663,7 +12786,7 @@ static void  send_label(int	attr_idx)
 }   /* send_label */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -12892,7 +13015,7 @@ static  void    send_label_def(int	ir_idx)
 }  /* send_label_def */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -13087,7 +13210,7 @@ static void send_interface_list(int ng_attr_idx)
 
  
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -13147,7 +13270,7 @@ static void allocate_pdg_link_tbls(void)
 }  /* allocate_pdg_link_tbls */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -13972,7 +14095,7 @@ EXIT:
 
 }  /* send_attr_ntry */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -14146,7 +14269,7 @@ static void send_mod_file_name (void)
 }  /* send_mod_file_name */
 
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -14185,7 +14308,7 @@ void terminate_PDGCS(void)
 }  /* terminate_PDGCS */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -14276,7 +14399,7 @@ static void  send_darg_list(int		pgm_attr_idx,
 
 }   /* send_darg_list */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|

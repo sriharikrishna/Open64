@@ -82,6 +82,7 @@ static void cwh_directive_pragma_to_region(WN * prag, WN * region) ;
 static void cwh_directive_set_PU_flags(BOOL nested);
 static void cwh_directive_set_LNO_flags(void);
 static void cwh_directive_pop_and_nowait( BOOL nowait, BOOL is_omp);
+static void cwh_directive_pop_and_nowait_or_copyprivate( BOOL nowait);
 static void cwh_directive_add_pragma_to_loop(WN * wn, BOOL is_omp);
 static void cwh_directive_work_dist(INT32 work_dist, INT32 work_dist_opnd) ;
 static void cwh_directive_load_value_pragma(INT32 item, WN_PRAGMA_ID pragma, BOOL is_omp = FALSE);

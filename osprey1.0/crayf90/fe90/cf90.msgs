@@ -19407,7 +19407,7 @@ Error : Illegal branch %s a %s region.
 .PP
 It is illegal to branch into or out of the structured blocks created
 by OpenMP directives PARALLEL, DO, SECTIONS, SINGLE, PARALLEL DO,
-PARALLEL SECTIONS, MASTER, CRITICAL, and ORDERED.  This includes GOTO 
+PARALLEL SECTIONS, MASTER, CRITICAL, ORDERED, WORKSHARE, and PARALLEL WORKSHARE.  This includes GOTO 
 statements as well as ERR=, EOF= or EOR= branches from IO statements 
 and alternate return branches from subroutine calls.
 .ME

@@ -4385,6 +4385,10 @@ static void process_x_option (char *optargs)
                               Tok_Open_Mp_Dir_Start]			= TRUE;
             break;
 
+         case Tok_Open_Mp_Dir_Parallelworkshare :
+            disregard_open_mp[tok_type - Tok_Open_Mp_Dir_Start]		= TRUE;
+            break;
+
          case Tok_Mic_Permutation :
          case Tok_SGI_Dir_Permutation :   /* Keyword */
             disregard_mics[Tok_Mic_Permutation - Tok_Mic_Start]	= TRUE;
@@ -4413,6 +4417,11 @@ static void process_x_option (char *optargs)
          case Tok_Dir_Single :           /* Keyword */
          case Tok_Open_Mp_Dir_Single :
             disregard_open_mp[Tok_Open_Mp_Dir_Single - 
+                              Tok_Open_Mp_Dir_Start]			= TRUE;
+            break;
+
+         case Tok_Open_Mp_Dir_Workshare :
+            disregard_open_mp[Tok_Open_Mp_Dir_Workshare - 
                               Tok_Open_Mp_Dir_Start]			= TRUE;
             break;
 
@@ -4512,8 +4521,10 @@ static void process_x_option (char *optargs)
          case Tok_Open_Mp_Dir_Endordered :
          case Tok_Open_Mp_Dir_Endparalleldo :
          case Tok_Open_Mp_Dir_Endparallelsections :
+         case Tok_Open_Mp_Dir_Endparallelworkshare :
          case Tok_Open_Mp_Dir_Endsections :
          case Tok_Open_Mp_Dir_Endsingle :
+         case Tok_Open_Mp_Dir_Endworkshare :
          case Tok_Open_Mp_Dir_Parallelsections :
          case Tok_Open_Mp_Dir_Sections :
          case Tok_Open_Mp_Dir_Threadprivate :

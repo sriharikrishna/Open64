@@ -43,9 +43,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: wn_pragmas.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:33 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-09-12 13:06:11 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $
  *
  * Description:
@@ -115,7 +115,7 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *pragmas_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $ $Revision: 1.2 $";
+static char *pragmas_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Pragma IDs: */
@@ -348,7 +348,11 @@ typedef enum {
   WN_PRAGMA_ORDERED_LOWER_BOUND, /* Internal XPRAGMA, store loop lower bnd */
   WN_PRAGMA_ORDERED_STRIDE,      /* Internal XPRAGMA, store loop stride */
   WN_PRAGMA_END_MARKER,
-  WN_PRAGMA_PARALLEL_SECTIONS,  /* !$OMP parallel sections */
+  WN_PRAGMA_PARALLEL_SECTIONS,	/* !$OMP parallel sections */
+  WN_PRAGMA_PARALLEL_WORKSHARE,	/* !$OMP parallel workshare */
+  WN_PRAGMA_WORKSHARE,		/* !$OMP workshare */
+  WN_PRAGMA_COPYPRIVATE,
+  WN_PRAGMA_FLUSH,		/* !$OMP flush */
 
   WN_PRAGMA_START_STMT_CLUMP,    /* start/end of body of code that must be placed */
   WN_PRAGMA_END_STMT_CLUMP,	 /* within a single region. ie: region processing */

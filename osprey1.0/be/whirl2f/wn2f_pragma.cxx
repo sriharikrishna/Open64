@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_pragma.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:35 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-09-12 13:06:10 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $
  *
  * Revision history:
@@ -56,7 +56,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $ $Revision: 1.3 $";
 #endif
 
 #include "alloca.h"
@@ -329,6 +329,7 @@ Preg_Is_In_Clause_List(const WN *clause_list, ST *preg_st, PREG_IDX preg_idx)
       case WN_PRAGMA_SHARED:
       case WN_PRAGMA_FIRSTPRIVATE:
       case WN_PRAGMA_REDUCTION:
+      case WN_PRAGMA_COPYPRIVATE:
 	 if (WN_operator(clause_list) != OPR_XPRAGMA &&
 	     WN_st(clause_list) == preg_st && 
 	     WN_pragma_arg1(clause_list) == preg_idx)
@@ -502,7 +503,11 @@ Append_Implicit_Locals(TOKEN_BUFFER tokens,
       if (region_clauses != NULL)
 	 Append_Token_Special(tokens, ',');
 
-      Append_Token_String(tokens, "local");
+      /* generate valid OpenMP PRIVATE clause (radu@par.univie.ac.at) */
+      if(! WN2F_is_omp(region_clauses))
+        Append_Token_String(tokens, "local");
+      else
+        Append_Token_String(tokens, "private");
       Append_Token_Special(tokens, '(');
       for (i = 0; i < number_of_locals; i++)
       {
@@ -563,16 +568,20 @@ WN2F_Prepend_Value_Reference(TOKEN_BUFFER tokens, WN *expression)
 } // WN2F_Prepend_Value_Reference
 
 
+/* enhanced to emit proper OpenMP schedule clauses (radu@par.univie.ac.at) */
 static void
-Append_MP_Schedtype(TOKEN_BUFFER tokens, WN_PRAGMA_SCHEDTYPE_KIND kind)
+Append_MP_Schedtype(TOKEN_BUFFER tokens, WN *clause)
 {
-   switch (kind)
+   switch (WN_mp_schedtype(clause))
    {
    case WN_PRAGMA_SCHEDTYPE_RUNTIME:
       Append_Token_String(tokens, "runtime");
       break;
    case WN_PRAGMA_SCHEDTYPE_SIMPLE:
-      Append_Token_String(tokens, "simple");
+      if(WN2F_is_omp(clause))
+	Append_Token_String(tokens, "static");
+      else
+	Append_Token_String(tokens, "simple");
       break;
    case WN_PRAGMA_SCHEDTYPE_INTERLEAVE:
       Append_Token_String(tokens, "interleaved");
@@ -581,7 +590,10 @@ Append_MP_Schedtype(TOKEN_BUFFER tokens, WN_PRAGMA_SCHEDTYPE_KIND kind)
       Append_Token_String(tokens, "dynamic");
       break;
    case WN_PRAGMA_SCHEDTYPE_GSS:
-      Append_Token_String(tokens, "gss");
+      if(WN2F_is_omp(clause))
+        Append_Token_String(tokens, "guided");
+      else
+	Append_Token_String(tokens, "gss");
       break;
    case WN_PRAGMA_SCHEDTYPE_PSEUDOLOWERED:
       Append_Token_String(tokens, "pseudolowered");
@@ -1081,6 +1093,9 @@ Skip_Pragma_Clauses(WN         **clause_list,
       case WN_PRAGMA_MPNUM:
       case WN_PRAGMA_SYNC_DOACROSS:
       case WN_PRAGMA_FIRSTPRIVATE:
+/* there is no FLUSH clause in OpenMP */
+/* we fake this clause in order to treat FLUSH directive the same as the others (radu@par.univie.ac.at) */
+      case WN_PRAGMA_FLUSH:
          clause = WN_next(clause);
          break;
 
@@ -1217,7 +1232,7 @@ Append_Pragma_Clauses(TOKEN_BUFFER tokens,
 	 {
 	    Append_Token_String(tokens, "schedule");
 	    Append_Token_Special(tokens, '(');
-	    Append_MP_Schedtype(tokens, WN_mp_schedtype(clause));
+	    Append_MP_Schedtype(tokens, clause);
 	    if (WN_next(clause) != NULL &&
 		WN_pragma(WN_next(clause)) == WN_PRAGMA_CHUNKSIZE)
 	    {
@@ -1232,7 +1247,7 @@ Append_Pragma_Clauses(TOKEN_BUFFER tokens,
 	 {
 	    Append_Token_String(tokens, "mp_schedtype");
 	    Append_Token_Special(tokens, '=');
-	    Append_MP_Schedtype(tokens, WN_mp_schedtype(clause));
+	    Append_MP_Schedtype(tokens, clause);
 	 }
 	 break;
 
@@ -1274,6 +1289,12 @@ Append_Pragma_Clauses(TOKEN_BUFFER tokens,
       case WN_PRAGMA_FIRSTPRIVATE:
 	 Append_Token_String(tokens, "firstprivate");
 	 Append_Clause_Symbols(tokens, WN_PRAGMA_FIRSTPRIVATE, &clause);
+	 break;
+
+/* there is no FLUSH clause in OpenMP */
+/* we fake this clause in order to treat FLUSH directive the same as the others (radu@par.univie.ac.at) */
+      case WN_PRAGMA_FLUSH:
+	 Append_Clause_Symbols(tokens, WN_PRAGMA_FLUSH, &clause);
 	 break;
 
       default:
@@ -1567,7 +1588,7 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
       {
 	 Append_Token_String(tokens, "SCHEDULE");
 	 Append_Token_Special(tokens, '(');
-	 Append_MP_Schedtype(tokens, WN_mp_schedtype(apragma));
+	 Append_MP_Schedtype(tokens, apragma);
 	 if (WN_next(apragma) != NULL &&
 	     WN_pragma(WN_next(apragma)) == WN_PRAGMA_CHUNKSIZE)
 	 {
@@ -1582,7 +1603,7 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
       {
 	 Append_Token_String(tokens, "MP_SCHEDTYPE");
 	 Append_Token_Special(tokens, '=');
-	 Append_MP_Schedtype(tokens, WN_mp_schedtype(apragma));
+	 Append_MP_Schedtype(tokens, apragma);
       }
       break;
 
@@ -1798,6 +1819,20 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
       Append_Token_String(tokens, "SECTION");
       break;
 
+   case WN_PRAGMA_PARALLEL_WORKSHARE:
+      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      WN2F_Append_Pragma_Preamble(tokens,apragma);
+      Append_Token_String(tokens, "PARALLEL WORKSHARE");
+      apragma = WN_next(apragma);
+      Append_Pragma_Clauses(tokens, &apragma, context);
+      break;
+
+   case WN_PRAGMA_WORKSHARE:
+      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      Append_Token_String(tokens, "WORKSHARE");
+      break;
+
       /* region construct => construct id on region..*/
 
    case WN_PRAGMA_SINGLE_PROCESS_BEGIN:
@@ -1826,6 +1861,14 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
 	 else
 	   Append_Token_String(tokens, "MASTER PROCESS");
       }
+      break;
+
+    case WN_PRAGMA_FLUSH:
+      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      Append_Token_String(tokens, "FLUSH");
+      apragma = WN_next(apragma);
+      Append_Pragma_Clauses(tokens, &apragma, context);
       break;
 
    case WN_PRAGMA_NUMTHREADS:
@@ -2073,9 +2116,10 @@ WN2F_pragma_list_end(TOKEN_BUFFER tokens,
       case WN_PRAGMA_PSECTION_BEGIN:
          WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
 	 WN2F_Append_Pragma_Preamble(tokens,first_pragma);
-         Append_Token_String(tokens, "END PSECTION");
+         // correctly end the OpenMP PARALLEL SECTIONS (radu@par.univie.ac.at)
 	 if (WN2F_is_omp(first_pragma))
 	 {
+            Append_Token_String(tokens, "END PARALLEL SECTIONS");
 	    if (WN2F_Prompf_Subsection != NULL)
 	    {
 	       // End a the last SECTION directive seen!
@@ -2084,6 +2128,20 @@ WN2F_pragma_list_end(TOKEN_BUFFER tokens,
 	       WN2F_Prompf_Subsection = NULL;
 	    }
 	 }
+         else
+            Append_Token_String(tokens, "END PSECTION");
+         break;
+
+      case WN_PRAGMA_PARALLEL_WORKSHARE:
+	 WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
+	 WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+	 Append_Token_String(tokens, "END PARALLEL WORKSHARE");
+         break;
+
+      case WN_PRAGMA_WORKSHARE:
+	 WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
+	 WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+	 Append_Token_String(tokens, "END WORKSHARE");
          break;
 
       case WN_PRAGMA_SINGLE_PROCESS_BEGIN:
@@ -2095,6 +2153,17 @@ WN2F_pragma_list_end(TOKEN_BUFFER tokens,
 	      Append_Token_String(tokens, "END SINGLE");
 	    else 
 	      Append_Token_String(tokens, "END SINGLE PROCESS");
+            /* append clause COPYPRIVATE (radu@par.univie.ac.at) */
+	    WN *wn = first_pragma;
+	    while(wn != NULL)
+	      if ((WN_operator(wn) == OPR_PRAGMA || WN_operator(wn) == OPR_XPRAGMA) &&
+		  WN_pragma(wn) == WN_PRAGMA_COPYPRIVATE)
+              {
+		Append_Token_String(tokens, "copyprivate");
+		Append_Clause_Symbols(tokens, WN_PRAGMA_COPYPRIVATE, &wn);
+	      }
+	      else
+                wn = WN_next(wn);
 	 }
          break;
 

@@ -2008,6 +2008,13 @@ void directive_stmt_semantics(void)
          end_blk_mp_semantics(TRUE);
          break;
 
+      case Endparallelworkshare_Open_Mp_Opr:
+         end_blk_mp_semantics(TRUE);
+         break;
+
+      case Endworkshare_Open_Mp_Opr:
+         break;
+
       case Endmaster_Open_Mp_Opr:
          break;
 
@@ -2065,6 +2072,10 @@ void directive_stmt_semantics(void)
          open_mp_directive_semantics(Parallel_Sections_Omp);
          break;
 
+      case Parallelworkshare_Open_Mp_Opr:
+         open_mp_directive_semantics(Parallel_Workshare_Omp);
+         break;
+
       case Section_Open_Mp_Opr:
          break;
 
@@ -2076,6 +2087,9 @@ void directive_stmt_semantics(void)
          open_mp_directive_semantics(Single_Omp);
          break;
 
+      case Workshare_Open_Mp_Opr:
+         break;
+
    }
 
    TRACE (Func_Exit, "directive_stmt_semantics", NULL);
@@ -2083,7 +2097,7 @@ void directive_stmt_semantics(void)
    return;
 
 }  /* directive_stmt_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2735,7 +2749,7 @@ CONTINUE2:
    return;
 
 }  /* doall_cmic_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2880,7 +2894,7 @@ static void doparallel_cmic_semantics(void)
    return;
 
 }  /* doparallel_cmic_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2969,7 +2983,7 @@ static void endparallel_cmic_semantics(void)
    return;
 
 }  /* endparallel_cmic_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3505,7 +3519,7 @@ CONTINUE4:
    return;
 
 }  /* parallel_cmic_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4264,7 +4278,7 @@ static void mp_directive_semantics(mp_directive_type directive)
    return;
 
 }  /* mp_directive_semantics */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -4471,7 +4485,7 @@ static void set_mp_task_flags(int       ir_idx,
    return;
 
 }  /* set_mp_task_flags */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4622,7 +4636,7 @@ static void prefetch_ref_semantics(void)
    return;
 
 }  /* prefetch_ref_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4755,7 +4769,7 @@ void doall_end_semantics(void)
    return;
 
 }  /* doall_end_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4810,7 +4824,7 @@ static boolean power_o_two(int	idx)
    return(cnt == 1);
 
 }  /* power_o_two */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4910,7 +4924,7 @@ static boolean assert_semantics(void)
    return(ok);
 
 }  /* assert_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4930,11 +4944,13 @@ static boolean assert_semantics(void)
 |*                      |- ORDERED constant (ORDERED == 1, else NO_Tbl_Idx)   *|
 |*                      |- SCHEDULE type (CN_Tbl_Idx)                         *|
 |*                      |- SCHEDULE chunk (CN_Tbl_Idx)                        *|
+|*                      |- COPYPRIVATE var list                               *|
 |*                      |- AFFINITY index_var list                            *|
 |*                      |- IS THREAD constant (THREAD == 1, DATA == 0)        *|
 |*                      |- THREAD/DATA list                                   *|
 |*                      |- ONTO list                                          *|
 |*                      |- NEST list                                          *|
+|*                      |- FLUSH var list                                     *|
 |*									      *|
 |*	Not all clauses are valid for all directives.                         *|
 |*									      *|
@@ -5804,6 +5820,140 @@ static void open_mp_directive_semantics(open_mp_directive_type directive)
       }
    }
  
+   if (open_mp_clause_allowed[directive][Copyprivate_Omp_Clause]) {
+      /* process COPYPRIVATE var list */
+    
+      list_idx = list_array[OPEN_MP_COPYPRIVATE_IDX];
+      cdir_switches.copyprivate_list_idx = list_idx;
+    
+      if (IL_FLD(list_idx) != NO_Tbl_Idx) {
+    
+	 list2_idx = IL_IDX(list_idx);
+    
+	 while (list2_idx) {
+    
+            if (IL_FLD(list2_idx) == AT_Tbl_Idx) {
+	       attr_idx = IL_IDX(list2_idx);
+	       AT_LOCKED_IN(attr_idx) = TRUE;
+       
+	       while (AT_ATTR_LINK(attr_idx)) {
+		  attr_idx = AT_ATTR_LINK(attr_idx);
+		  AT_LOCKED_IN(attr_idx) = TRUE;
+	       }
+       
+	       IL_IDX(list2_idx) = attr_idx;
+       
+	       if (AT_OBJ_CLASS(attr_idx) != Data_Obj) {
+		  PRINTMSG(IL_LINE_NUM(list2_idx), 1473, Error,
+			   IL_COL_NUM(list2_idx),
+			   AT_OBJ_NAME_PTR(attr_idx),
+			   "COPYPRIVATE", open_mp_dir_str[directive]);
+	       }
+               else if (ATD_CLASS(attr_idx) == Constant) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1473, Error,
+                           IL_COL_NUM(list2_idx),
+                           AT_OBJ_NAME_PTR(attr_idx),
+                           "COPYPRIVATE", open_mp_dir_str[directive]);
+               }
+               else if (ATD_CLASS(attr_idx) == CRI__Pointee) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1477, Error,
+                           IL_COL_NUM(list2_idx),
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (TYP_TYPE(ATD_TYPE_IDX(attr_idx)) == CRI_Ptr ||
+                        TYP_TYPE(ATD_TYPE_IDX(attr_idx)) == CRI_Ch_Ptr) {
+
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1478, Error,
+                           IL_COL_NUM(list2_idx),
+                           "Cray pointer",
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (ATD_POINTER(attr_idx)) {
+
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1478, Error,
+                           IL_COL_NUM(list2_idx),
+                           "Pointer",
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (ATD_ALLOCATABLE(attr_idx)) {
+
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1478, Error,
+                           IL_COL_NUM(list2_idx),
+                           "Allocatable array",
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (ATD_ARRAY_IDX(attr_idx) != NULL_IDX &&
+                        (BD_ARRAY_CLASS(ATD_ARRAY_IDX(attr_idx)) == 
+                                                           Assumed_Size ||
+                         BD_ARRAY_CLASS(ATD_ARRAY_IDX(attr_idx)) == 
+                                                           Assumed_Shape)) {
+
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1482, Error,
+                           IL_COL_NUM(list2_idx),
+                            (BD_ARRAY_CLASS(ATD_ARRAY_IDX(attr_idx)) == 
+                                                           Assumed_Size ?
+                           "Assumed size" : "Assumed shape"),
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+	       else if (multiple_clause_err(attr_idx, 
+                                                  OPEN_MP_COPYPRIVATE_IDX)) {
+		  PRINTMSG(IL_LINE_NUM(list2_idx), 1476, Error,
+			   IL_COL_NUM(list2_idx),
+			   AT_OBJ_NAME_PTR(attr_idx));
+	       }
+               else if (work_sharing_dir &&
+                        has_been_reprivatized(attr_idx)) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1651, Error,
+                           IL_COL_NUM(list2_idx),
+                           "Privatized",
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (ATD_CLASS(attr_idx) == Dummy_Argument   &&
+                        ATD_INTENT(attr_idx) == Intent_In) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1492, Error,
+                           IL_COL_NUM(list2_idx),
+                           AT_OBJ_NAME_PTR(attr_idx),
+                           "COPYPRIVATE");
+               }
+               else if (ATD_PURE(attr_idx)) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1493, Error,
+                           IL_COL_NUM(list2_idx),
+                           AT_OBJ_NAME_PTR(attr_idx),
+                           "COPYPRIVATE");
+               }
+	       else {
+		  ATD_TASK_COPYPRIVATE(attr_idx) = TRUE;
+
+                  if (ATD_CLASS(attr_idx) == Variable &&
+                      ATD_AUTOMATIC(attr_idx) &&
+                      ATD_AUTO_BASE_IDX(attr_idx) != NULL_IDX &&
+                      ! ATD_TASK_COPYPRIVATE(ATD_AUTO_BASE_IDX(attr_idx))) {
+
+                     ATD_TASK_COPYPRIVATE(ATD_AUTO_BASE_IDX(attr_idx)) = TRUE;
+
+                     NTR_IR_LIST_TBL(list3_idx);
+                     IL_PREV_LIST_IDX(IL_IDX(list_idx)) = list3_idx;
+                     IL_NEXT_LIST_IDX(list3_idx) = IL_IDX(list_idx);
+                     IL_IDX(list_idx) = list3_idx;
+                     IL_LIST_CNT(list_idx)++;
+
+                     IL_FLD(list3_idx) = AT_Tbl_Idx;
+                     IL_IDX(list3_idx) = ATD_AUTO_BASE_IDX(attr_idx);
+                     IL_LINE_NUM(list3_idx) = IL_LINE_NUM(list2_idx);
+                     IL_COL_NUM(list3_idx) = IL_COL_NUM(list2_idx);
+                  }
+	       }
+            }
+            else {
+               /* SB_Tbl_Idx here */
+               add_common_blk_objects_to_list(list2_idx, list_idx);
+            }
+    
+	    list2_idx = IL_NEXT_LIST_IDX(list2_idx);
+	 }
+      }
+   }
+
    /* no calls to expr_semantics can be made before the NEST processing */
 
    if (open_mp_clause_allowed[directive][Nest_Omp_Clause]) {
@@ -5830,7 +5980,8 @@ static void open_mp_directive_semantics(open_mp_directive_type directive)
 
             if (! ATD_TASK_PRIVATE(attr_idx) &&
                 ! ATD_TASK_FIRSTPRIVATE(attr_idx) &&
-                ! ATD_TASK_LASTPRIVATE(attr_idx)) {
+                ! ATD_TASK_LASTPRIVATE(attr_idx) &&
+                ! ATD_TASK_COPYPRIVATE(attr_idx)) {
 
                NTR_IR_LIST_TBL(list3_idx);
                IL_NEXT_LIST_IDX(list3_idx) =
@@ -5981,6 +6132,142 @@ static void open_mp_directive_semantics(open_mp_directive_type directive)
    }
 
   
+   if (open_mp_clause_allowed[directive][Flush_Omp_Clause]) {
+      /* process FLUSH var list */
+      /* there is no FLUSH clause in OpenMP (radu@par.univie.ac.at) */
+      /* we fake this clause in order to treat FLUSH directive the same as the others */
+    
+      list_idx = list_array[OPEN_MP_FLUSH_IDX];
+      cdir_switches.flush_list_idx = list_idx;
+    
+      if (IL_FLD(list_idx) != NO_Tbl_Idx) {
+    
+	 list2_idx = IL_IDX(list_idx);
+    
+	 while (list2_idx) {
+    
+            if (IL_FLD(list2_idx) == AT_Tbl_Idx) {
+	       attr_idx = IL_IDX(list2_idx);
+	       AT_LOCKED_IN(attr_idx) = TRUE;
+       
+	       while (AT_ATTR_LINK(attr_idx)) {
+		  attr_idx = AT_ATTR_LINK(attr_idx);
+		  AT_LOCKED_IN(attr_idx) = TRUE;
+	       }
+       
+	       IL_IDX(list2_idx) = attr_idx;
+       
+	       if (AT_OBJ_CLASS(attr_idx) != Data_Obj) {
+		  PRINTMSG(IL_LINE_NUM(list2_idx), 1473, Error,
+			   IL_COL_NUM(list2_idx),
+			   AT_OBJ_NAME_PTR(attr_idx),
+			   "FLUSH", open_mp_dir_str[directive]);
+	       }
+               else if (ATD_CLASS(attr_idx) == Constant) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1473, Error,
+                           IL_COL_NUM(list2_idx),
+                           AT_OBJ_NAME_PTR(attr_idx),
+                           "FLUSH", open_mp_dir_str[directive]);
+               }
+               else if (ATD_CLASS(attr_idx) == CRI__Pointee) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1477, Error,
+                           IL_COL_NUM(list2_idx),
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (TYP_TYPE(ATD_TYPE_IDX(attr_idx)) == CRI_Ptr ||
+                        TYP_TYPE(ATD_TYPE_IDX(attr_idx)) == CRI_Ch_Ptr) {
+
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1478, Error,
+                           IL_COL_NUM(list2_idx),
+                           "Cray pointer",
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (ATD_POINTER(attr_idx)) {
+
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1478, Error,
+                           IL_COL_NUM(list2_idx),
+                           "Pointer",
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (ATD_ALLOCATABLE(attr_idx)) {
+
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1478, Error,
+                           IL_COL_NUM(list2_idx),
+                           "Allocatable array",
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (ATD_ARRAY_IDX(attr_idx) != NULL_IDX &&
+                        (BD_ARRAY_CLASS(ATD_ARRAY_IDX(attr_idx)) == 
+                                                           Assumed_Size ||
+                         BD_ARRAY_CLASS(ATD_ARRAY_IDX(attr_idx)) == 
+                                                           Assumed_Shape)) {
+
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1482, Error,
+                           IL_COL_NUM(list2_idx),
+                            (BD_ARRAY_CLASS(ATD_ARRAY_IDX(attr_idx)) == 
+                                                           Assumed_Size ?
+                           "Assumed size" : "Assumed shape"),
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+	       else if (multiple_clause_err(attr_idx, OPEN_MP_FLUSH_IDX)) {
+		  PRINTMSG(IL_LINE_NUM(list2_idx), 1476, Error,
+			   IL_COL_NUM(list2_idx),
+			   AT_OBJ_NAME_PTR(attr_idx));
+	       }
+               else if (work_sharing_dir &&
+                        has_been_reprivatized(attr_idx)) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1651, Error,
+                           IL_COL_NUM(list2_idx),
+                           "Privatized",
+                           AT_OBJ_NAME_PTR(attr_idx));
+               }
+               else if (ATD_CLASS(attr_idx) == Dummy_Argument   &&
+                        ATD_INTENT(attr_idx) == Intent_In) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1492, Error,
+                           IL_COL_NUM(list2_idx),
+                           AT_OBJ_NAME_PTR(attr_idx),
+                           "FLUSH");
+               }
+               else if (ATD_PURE(attr_idx)) {
+                  PRINTMSG(IL_LINE_NUM(list2_idx), 1493, Error,
+                           IL_COL_NUM(list2_idx),
+                           AT_OBJ_NAME_PTR(attr_idx),
+                           "FLUSH");
+               }
+	       else {
+		  ATD_TASK_FLUSH(attr_idx) = TRUE;
+
+                  if (ATD_CLASS(attr_idx) == Variable &&
+                      ATD_AUTOMATIC(attr_idx) &&
+                      ATD_AUTO_BASE_IDX(attr_idx) != NULL_IDX &&
+                      ! ATD_TASK_FLUSH(ATD_AUTO_BASE_IDX(attr_idx))) {
+
+                     ATD_TASK_FLUSH(ATD_AUTO_BASE_IDX(attr_idx)) = TRUE;
+
+                     NTR_IR_LIST_TBL(list3_idx);
+                     IL_PREV_LIST_IDX(IL_IDX(list_idx)) = list3_idx;
+                     IL_NEXT_LIST_IDX(list3_idx) = IL_IDX(list_idx);
+                     IL_IDX(list_idx) = list3_idx;
+                     IL_LIST_CNT(list_idx)++;
+
+                     IL_FLD(list3_idx) = AT_Tbl_Idx;
+                     IL_IDX(list3_idx) = ATD_AUTO_BASE_IDX(attr_idx);
+                     IL_LINE_NUM(list3_idx) = IL_LINE_NUM(list2_idx);
+                     IL_COL_NUM(list3_idx) = IL_COL_NUM(list2_idx);
+                  }
+	       }
+            }
+            else {
+               /* SB_Tbl_Idx here */
+               add_common_blk_objects_to_list(list2_idx, list_idx);
+            }
+    
+	    list2_idx = IL_NEXT_LIST_IDX(list2_idx);
+	 }
+      }
+   }
+
+
    if (open_mp_clause_allowed[directive][Default_Omp_Clause]) {
       /* save the DEFAULT scope list idx */
 
@@ -6001,7 +6288,7 @@ static void open_mp_directive_semantics(open_mp_directive_type directive)
    return;
 
 }  /* open_mp_directive_semantics */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -6085,7 +6372,7 @@ EXIT:
    return;
 
 }  /* end_blk_mp_semantics */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -6138,6 +6425,10 @@ static void set_open_mp_task_flags(int		ir_idx,
 
    case Parallelsections_Open_Mp_Opr:
       directive = Parallel_Sections_Omp;
+      break;
+
+   case Parallelworkshare_Open_Mp_Opr:
+      directive = Parallel_Workshare_Omp;
       break;
 
    case Sections_Open_Mp_Opr:
@@ -6303,6 +6594,54 @@ static void set_open_mp_task_flags(int		ir_idx,
       }
    }
 
+   if (open_mp_clause_allowed[directive][Copyprivate_Omp_Clause]) {
+      /* process COPYPRIVATE var list */
+
+      list_idx = list_array[OPEN_MP_COPYPRIVATE_IDX];
+
+      cdir_switches.copyprivate_list_idx = (flag ? list_idx : NULL_IDX) ;
+
+      if (IL_FLD(list_idx) != NO_Tbl_Idx) {
+
+         list2_idx = IL_IDX(list_idx);
+
+         while (list2_idx) {
+
+            if (IL_FLD(list2_idx) == AT_Tbl_Idx) {
+               attr_idx = IL_IDX(list2_idx);
+               ATD_TASK_COPYPRIVATE(attr_idx) = flag;
+            }
+
+            list2_idx = IL_NEXT_LIST_IDX(list2_idx);
+         }
+      }
+   }
+
+   if (open_mp_clause_allowed[directive][Flush_Omp_Clause]) {
+      /* process FLUSH var list */
+      /* there is no FLUSH clause in OpenMP (radu@par.univie.ac.at) */
+      /* we fake this clause in order to treat FLUSH directive the same as the others */
+
+      list_idx = list_array[OPEN_MP_FLUSH_IDX];
+
+      cdir_switches.flush_list_idx = (flag ? list_idx : NULL_IDX) ;
+
+      if (IL_FLD(list_idx) != NO_Tbl_Idx) {
+
+         list2_idx = IL_IDX(list_idx);
+
+         while (list2_idx) {
+
+            if (IL_FLD(list2_idx) == AT_Tbl_Idx) {
+               attr_idx = IL_IDX(list2_idx);
+               ATD_TASK_FLUSH(attr_idx) = flag;
+            }
+
+            list2_idx = IL_NEXT_LIST_IDX(list2_idx);
+         }
+      }
+   }
+
    cdir_switches.parallel_region = flag;
 
    TRACE (Func_Exit, "set_open_mp_task_flags", NULL);
@@ -6310,7 +6649,7 @@ static void set_open_mp_task_flags(int		ir_idx,
    return;
 
 }  /* set_open_mp_task_flags */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6356,7 +6695,7 @@ static void push_task_blk(int	sh_idx)
    return;
 
 }  /* push_task_blk */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6409,7 +6748,7 @@ static int pop_task_blk(void)
    return(sh_idx);
 
 }  /* pop_task_blk */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6446,11 +6785,13 @@ static boolean multiple_clause_err(int		attr_idx,
       test_clause_idx = OPEN_MP_PRIVATE_IDX;
    }
    else if (ATD_TASK_FIRSTPRIVATE(attr_idx) && 
+            clause_idx != OPEN_MP_COPYPRIVATE_IDX &&
             clause_idx != OPEN_MP_LASTPRIVATE_IDX &&
             clause_idx != OPEN_MP_FIRSTPRIVATE_IDX) {
       test_clause_idx = OPEN_MP_FIRSTPRIVATE_IDX;
    }
    else if (ATD_TASK_LASTPRIVATE(attr_idx) && 
+            clause_idx != OPEN_MP_COPYPRIVATE_IDX &&
             clause_idx != OPEN_MP_LASTPRIVATE_IDX &&
             clause_idx != OPEN_MP_FIRSTPRIVATE_IDX) {
       test_clause_idx = OPEN_MP_LASTPRIVATE_IDX;
@@ -6461,6 +6802,12 @@ static boolean multiple_clause_err(int		attr_idx,
    }
    else if (ATD_TASK_REDUCTION(attr_idx)) {
       test_clause_idx = OPEN_MP_REDUCTION_LIST_IDX;
+   }
+   else if (ATD_TASK_COPYPRIVATE(attr_idx) && 
+            clause_idx != OPEN_MP_COPYPRIVATE_IDX &&
+            clause_idx != OPEN_MP_LASTPRIVATE_IDX &&
+            clause_idx != OPEN_MP_FIRSTPRIVATE_IDX) {
+      test_clause_idx = OPEN_MP_COPYPRIVATE_IDX;
    }
 
    if (test_clause_idx >= 0) {
@@ -6484,7 +6831,7 @@ static boolean multiple_clause_err(int		attr_idx,
    return(issue_err);
 
 }  /* multiple_clause_err */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6546,7 +6893,7 @@ static boolean attr_is_in_list(int	list_idx,
    return(its_here);
 
 }  /* attr_is_in_list */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6619,7 +6966,7 @@ static void add_common_blk_objects_to_list(int		sb_list_idx,
    return;
 
 }  /* add_common_blk_objects_to_list */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6723,7 +7070,7 @@ EXIT:
    return(reprivatized);
 
 }  /* has_been_reprivatized */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -7048,7 +7395,7 @@ static void wait_send_semantics(void)
    return;
 
 }  /* wait_send_semantics */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|

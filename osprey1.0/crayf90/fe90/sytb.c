@@ -287,7 +287,7 @@ boolean	compare_value_to_cn(long_type	*value,
 
 }  /* compare_value_to_cn */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -342,7 +342,7 @@ int srch_sym_tbl (char	*name_str,
    return (idx);
  
 }  /* srch_sym_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -451,7 +451,7 @@ int ntr_sym_tbl(token_type *token,
    return (attr_idx);
 
 }  /* ntr_sym_tbl */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -517,7 +517,7 @@ int srch_host_sym_tbl (char	*name_str,
     return (idx);
 
 }  /* srch_host_sym_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -632,7 +632,7 @@ int ntr_host_in_sym_tbl(token_type     *token,
    return (attr_idx);
 
 }  /* ntr_host_in_sym_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -686,7 +686,7 @@ void remove_ln_ntry(int         name_idx)
    return;
 
 }  /* remove_ln_ntry */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -935,7 +935,7 @@ int srch_kwd_name(char		*name,
    return (i); 
 
 }  /*  srch_kwd_name  */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1192,7 +1192,7 @@ int srch_stor_blk_tbl (char		*name_str,
    return (i); 
 
 }  /* srch_stor_blk_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1295,7 +1295,7 @@ int ntr_stor_blk_tbl (char *name_str,
    return (stor_blk_tbl_idx); 
 
 }  /* ntr_stor_blk_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1372,7 +1372,7 @@ int ntr_array_in_bd_tbl(int	bd_idx)
    return(bd_idx);
 
 }  /* ntr_array_in_bd_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1437,7 +1437,7 @@ int reserve_array_ntry (int	rank)
 
 }  /* reserve_array_ntry */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1566,7 +1566,7 @@ void	init_sytb()
 
 }  /* init_sytb */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -1895,7 +1895,7 @@ FOUND:
    return (const_idx);
 
 }  /* ntr_const_tbl */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2353,7 +2353,7 @@ EXIT:
    return(cn_idx);
 
 }  /* insert_constant */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2466,7 +2466,7 @@ EXIT:
    return(cn_idx);
 
 }  /* insert_unordered_constant */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2523,7 +2523,7 @@ static void dump_cn_tree(int		root,
    return;
 
 }  /* dump_cn_tree */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2604,7 +2604,7 @@ FOUND:
    return (const_idx);
 
 }  /* ntr_boz_const_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2685,7 +2685,7 @@ FOUND:
 
 }  /* ntr_boolean_const_tbl */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2866,7 +2866,7 @@ int ntr_unshared_const_tbl (int           type_idx,
 }  /* ntr_unshared_const_tbl */
 
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -3021,7 +3021,7 @@ static int ntr_abnormal_ieee_const(int           type_idx,
 }  /* ntr_abnormal_ieee_const */
 
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3077,7 +3077,7 @@ int srch_host_stor_blk_tbl (token_type *token)
     return (idx);
 
 }  /* srch_host_stor_blk_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -3362,7 +3362,7 @@ DONE:
    return(same);
 
 }  /* compare_derived_types */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3455,7 +3455,7 @@ boolean compare_array_entries(int	bd_idx1,
    return(same);
 
 }  /* compare_array_entries */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -3598,7 +3598,7 @@ void init_name_and_stor_tbls(int	scp_idx,
 }  /* init_name_and_stor_tbls */
 
 # ifdef _DEBUG
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -3631,7 +3631,7 @@ static   int	been_here_before;
    return(attr_tbl);
 }
 # endif
-
+
 
 # ifdef _DEBUG
 /******************************************************************************\
@@ -3666,7 +3666,7 @@ static   int	been_here_before;
    return(attr_aux_tbl);
 }
 # endif
-
+
 # ifdef _DEBUG
 /******************************************************************************\
 |*                                                                            *|
@@ -3700,7 +3700,7 @@ static   int    been_here_before;
    return(bounds_tbl);
 }
 # endif
-
+
 # ifdef _DEBUG
 /******************************************************************************\
 |*                                                                            *|
@@ -3736,7 +3736,7 @@ static   int    been_here_before;
 # endif
 
 # ifdef _DEBUG
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -3770,7 +3770,7 @@ static   int	been_here_before;
    return(global_attr_tbl);
 }
 # endif
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3842,7 +3842,7 @@ int gen_internal_lbl (int		label_line)
    return (attr_idx);
 
 }  /* gen_internal_lbl */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4100,7 +4100,7 @@ size_offset_type	stor_bit_size_of(int		 attr_idx,
    return(constant);
 
 }  /* stor_bit_size_of */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4494,7 +4494,7 @@ void chg_data_obj_to_pgm_unit(int 		attr_idx,
 
 }  /* chg_data_obj_to_pgm_unit */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4584,7 +4584,7 @@ char *get_basic_type_str(int			type_idx)
    return(str);
 
 }  /* get_basic_type_str */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4707,7 +4707,7 @@ boolean	kind_to_linear_type(opnd_type		*opnd,
    return(error);
 
 }   /* kind_to_linear_type */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4817,7 +4817,7 @@ int	gen_debug_lbl_stmt(int			stmt_idx,
    return(stmt_idx);
 
 }  /* gen_debug_lbl_stmt */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4883,7 +4883,7 @@ int	make_in_parent_string(int	 name_str_idx,
    return(new_name_idx);
 
 }  /* make_in_parent_string */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -5010,7 +5010,7 @@ int	compare_names(long	*id1,
    return(matched);
 
 }   /* compare_names */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5057,7 +5057,7 @@ int ntr_local_attr_list(char *name_str,
    return(attr_idx);
 
 }   /* ntr_local_attr_list */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5105,7 +5105,7 @@ int	create_lib_entry_attr(char *name_str,
    return(attr_idx);
 
 }   /* create_lib_entry_attr */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5232,7 +5232,7 @@ void	set_stride_for_first_dim(int			 type_idx,
    return;
 
 }   /* set_stride_for_first_dim */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5346,7 +5346,7 @@ EXIT:
    return(new_type_idx);
 
 }   /* ntr_type_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5416,7 +5416,7 @@ int srch_linked_sn(char		*name,
    return (attr_idx); 
 
 }  /*  srch_linked_sn  */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5478,7 +5478,7 @@ void free_tables()
 }  /* free_tables */
 
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5660,7 +5660,7 @@ boolean	validate_kind(basic_type_type	 type,
 
 }  /* validate_kind */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6206,7 +6206,7 @@ void assign_offset(int	attr_idx)
    return;
 
 }  /* assign_offset */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6452,7 +6452,7 @@ DONE:
    return;
 
 }  /* calculate_pad */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6501,7 +6501,7 @@ boolean	srch_global_name_tbl(char	*name_str,
    return (found);
  
 }  /* srch_global_name_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -6593,7 +6593,7 @@ void	ntr_global_name_tbl(int		attr_idx,
    return;
 
 }  /* ntr_global_name_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -6856,7 +6856,7 @@ void	fill_in_global_attr_ntry(int	ga_idx,
    return;
 
 }  /* fill_in_global_attr_ntry */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -6952,7 +6952,7 @@ int	ntr_global_attr_tbl(int		attr_idx,
    return(ga_idx);
 
 }  /* ntr_global_attr_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7044,7 +7044,7 @@ int	ntr_common_in_global_attr_tbl(int	sb_idx,
    return(ga_idx);
 
 }  /* ntr_common_in_global_attr_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7186,7 +7186,7 @@ EXIT:
    return(new_type_idx);
 
 }   /* ntr_global_type_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7313,7 +7313,7 @@ EXIT:
    return(gb_idx);
 
 }   /* ntr_global_bounds_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7352,7 +7352,7 @@ int	ntr_ir_tbl(void)
    return(ir_idx);
 
 }  /* ntr_ir_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7391,7 +7391,7 @@ int	ntr_ir_list_tbl(void)
    return(il_idx);
 
 }  /* ntr_ir_list_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7424,7 +7424,7 @@ int     ntr_gl_ir_tbl(void)
    return(ir_idx);
 
 }  /* ntr_gl_ir_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7457,7 +7457,7 @@ int     ntr_gl_ir_list_tbl(void)
    return(il_idx);
 
 }  /* ntr_gl_ir_list_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7490,7 +7490,7 @@ int     ntr_gl_sh_tbl(void)
    return(sh_idx);
 
 }  /* ntr_gl_sh_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7530,7 +7530,7 @@ void	add_attr_to_local_list(int	attr_idx)
    return;
 
 }  /* add_attr_to_local_list */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7569,7 +7569,7 @@ int	ntr_sh_tbl(void)
    return(sh_idx);
 
 }  /* ntr_sh_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7628,7 +7628,7 @@ void	find_opnd_line_and_column(opnd_type	*opnd,
 
 }  /* find_opnd_line_and_column */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7709,7 +7709,7 @@ int srch_hidden_name_tbl(char	*name_str,
    return (idx);
  
 }  /* srch_hidden_name_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7807,7 +7807,7 @@ void ntr_hidden_name_tbl(int    attr_idx,
    return;
 
 }  /* ntr_hidden_name_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7861,7 +7861,7 @@ void remove_hidden_name_ntry(int         name_idx)
    return;
 
 }  /* remove_hidden_name_ntry */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8030,7 +8030,7 @@ void assign_storage_blk(int         attr_idx)
    return;
 
 }  /* assign_storage_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8278,7 +8278,7 @@ void	align_bit_length(size_offset_type	*bit_len,
    return;
 
 }  /* align_bit_length */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8367,7 +8367,7 @@ int	check_type_for_size_address(opnd_type	*opnd)
    return(type_idx);
 
 }  /* check_type_for_size_address */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8558,7 +8558,7 @@ void	bits_and_bytes_to_words(size_offset_type *bit_len,
    return;
 
 }  /* bits_and_bytes_to_words */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8597,7 +8597,7 @@ int	ntr_attr_list_tbl(void)
    return(al_idx);
 
 }  /* ntr_attr_list_tbl */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8656,7 +8656,7 @@ void	free_attr_list(int	al_idx)
    return;
 
 }  /* free_attr_list */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8713,7 +8713,7 @@ void	make_external_name(int	attr_idx,
 
 }  /* make_external_name */
 # endif
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -8757,7 +8757,7 @@ void	create_hidden_name_tbl(int	scp_idx)
    return;
 
 }   /* create_hidden_name_tbl */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -8795,7 +8795,7 @@ void	remove_hidden_name_tbl(int	scp_idx)
 
 }   /* remove_hidden_name_tbl */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8840,7 +8840,7 @@ static boolean pvp_isnormal(int		 type_idx,
 
 }  /* pvp_isnormal */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -9001,7 +9001,7 @@ static int is_normal_128(int		 type_idx,
 
 }  /* is_normal_128 */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -9143,7 +9143,7 @@ static int sign_bit_128(long_type	*constant)
 
 }  /* sign_bit_128 */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|

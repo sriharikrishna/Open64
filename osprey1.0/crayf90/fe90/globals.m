@@ -137,7 +137,7 @@
 |* open mp directive argument index macros *|
 \*******************************************/
 
-# define OPEN_MP_LIST_CNT               17
+# define OPEN_MP_LIST_CNT               19
 
 # define OPEN_MP_IF_IDX                  0
 # define OPEN_MP_PRIVATE_IDX             1
@@ -151,11 +151,13 @@
 # define OPEN_MP_ORDERED_IDX             9
 # define OPEN_MP_SCHEDULE_TYPE_IDX      10
 # define OPEN_MP_SCHEDULE_CHUNK_IDX     11
-# define OPEN_MP_AFFINITY_IDX           12
-# define OPEN_MP_IS_THREAD_IDX          13
-# define OPEN_MP_THREAD_DATA_IDX        14
-# define OPEN_MP_ONTO_IDX               15
-# define OPEN_MP_NEST_IDX               16
+# define OPEN_MP_COPYPRIVATE_IDX        12
+# define OPEN_MP_AFFINITY_IDX           13
+# define OPEN_MP_IS_THREAD_IDX          14
+# define OPEN_MP_THREAD_DATA_IDX        15
+# define OPEN_MP_ONTO_IDX               16
+# define OPEN_MP_NEST_IDX               17
+# define OPEN_MP_FLUSH_IDX              18
 
 /***************************************\
 |* sgi directive argument index macros *|
@@ -327,7 +329,7 @@
             			(TYP_TYPE(TYPE_IDX) == Structure &&            \
              			(ATT_ALIGNMENT(TYP_IDX(TYPE_IDX)) == Align_8 ||\
              			 ATT_ALIGNMENT(TYP_IDX(TYPE_IDX)) == Align_16)))
-
+
 /********************\
 |* SIZES AND LIMITS *|
 \********************/
@@ -512,7 +514,7 @@
 \***********************************/
 
 # define EQUAL_STRS(S1,S2)	(strcmp (S1, S2) == IDENTICAL)
-
+
 /***********************************************\
 |* STATEMENT/FUNCTION-LIKE REPLACEMENT STRINGS *|
 \***********************************************/

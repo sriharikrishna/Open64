@@ -131,54 +131,56 @@ char		*bd_array_size_str[]	= {
 
 char		*blk_struct_str[]	= {
 
-	"Unknown_Blk",			/* Unknown_Blk			*/
-	"Blockdata_Blk",		/* Blockdata_Blk		*/
-	"Module_Blk",	 		/* Module_Blk	   		*/
-	"Main_Program_Blk",		/* Main_Program_Blk		*/
-	"Function_Blk",	 		/* Function_Blk	   		*/
-	"Subroutine_Blk",		/* Subroutine_Blk		*/
-	"Internal_Blk",			/* Internal_Blk	   		*/
-	"Module_Proc_Blk",		/* Module_Proc_Blk		*/
-	"Interface_Body_Blk",		/* Interface_Body_Blk		*/
-	"Do_Blk",			/* Do_Blk			*/
-	"Forall_Blk",			/* Forall_Blk           	*/
-	"If_Blk",	 		/* If_Blk	   		*/
-	"If_Then_Blk",	 		/* If_Then_Blk	   		*/
-	"If_Else_If_Blk", 		/* If_Else_If_Blk   		*/
-	"If_Else_Blk",	 		/* If_Else_Blk	   		*/
-	"Select_Blk",	 		/* Select_Blk	   		*/
-	"Case_Blk",	 		/* Case_Blk	   		*/
-	"Where_Then_Blk",		/* Where_Then_Blk 		*/
-	"Where_Else_Blk",		/* Where_Else_Blk 		*/
-	"Where_Else_Mask_Blk",		/* Where_Else_Mask_Blk 		*/
-	"Parallel_Blk", 		/* Parallel_Blk			*/
-	"Doall_Blk",			/* Doall_Blk			*/
-	"Do_Parallel_Blk",		/* Do_Parallel_Blk		*/
-	"Guard_Blk",			/* Guard_Blk			*/
-	"Parallel_Case_Blk",		/* Parallel_Case_Blk		*/
-	"Wait_Blk",			/* Wait_Blk			*/
-	"SGI_Doacross_Blk",		/* SGI_Doacross_Blk		*/
-	"SGI_Psection_Blk",		/* SGI_Psection_Blk		*/
-	"SGI_Section_Blk",		/* SGI_Section_Blk		*/
-	"SGI_Pdo_Blk",			/* SGI_Pdo_Blk			*/
-	"SGI_Parallel_Do_Blk",		/* SGI_Parallel_Do_Blk		*/
-	"SGI_Parallel_Blk",		/* SGI_Parallel_Blk		*/
-	"SGI_Critical_Section_Blk",	/* SGI_Critical_Section_Blk	*/
-	"SGI_Single_Process_Blk",	/* SGI_Single_Process_Blk	*/
-	"SGI_Region_Blk",		/* SGI_Region_Blk		*/
-	"Open_Mp_Parallel_Blk",		/* Open_Mp_Parallel_Blk		*/
-	"Open_Mp_Do_Blk",		/* Open_Mp_Do_Blk		*/
-	"Open_Mp_Parallel_Sections_Blk",/* Open_Mp_Parallel_Section_Blk	*/
-	"Open_Mp_Sections_Blk",		/* Open_Mp_Sections_Blk		*/
-	"Open_Mp_Section_Blk",		/* Open_Mp_Section_Blk		*/
-	"Open_Mp_Single_Blk",		/* Open_Mp_Single_Blk		*/
-	"Open_Mp_Parallel_Do_Blk",	/* Open_Mp_Parallel_Do_Blk	*/
-	"Open_Mp_Master_Blk",		/* Open_Mp_Master_Blk		*/
-	"Open_Mp_Critical_Blk",		/* Open_Mp_Critical_Blk		*/
-	"Open_Mp_Ordered_Blk",		/* Open_Mp_Ordered_Blk		*/
-	"Contains_Blk",	 		/* Contains_Blk	   		*/
-	"Interface_Blk",		/* Interface_Blk		*/
-	"Derived_Type_Blk"		/* Derived_Type_Blk		*/
+	"Unknown_Blk",				/* Unknown_Blk			*/
+	"Blockdata_Blk",			/* Blockdata_Blk		*/
+	"Module_Blk",				/* Module_Blk	   		*/
+	"Main_Program_Blk",			/* Main_Program_Blk		*/
+	"Function_Blk",				/* Function_Blk	   		*/
+	"Subroutine_Blk",			/* Subroutine_Blk		*/
+	"Internal_Blk",				/* Internal_Blk	   		*/
+	"Module_Proc_Blk",			/* Module_Proc_Blk		*/
+	"Interface_Body_Blk",			/* Interface_Body_Blk		*/
+	"Do_Blk",				/* Do_Blk			*/
+	"Forall_Blk",				/* Forall_Blk           	*/
+	"If_Blk",				/* If_Blk	   		*/
+	"If_Then_Blk",				/* If_Then_Blk	   		*/
+	"If_Else_If_Blk",			/* If_Else_If_Blk   		*/
+	"If_Else_Blk",				/* If_Else_Blk	   		*/
+	"Select_Blk",				/* Select_Blk	   		*/
+	"Case_Blk",				/* Case_Blk	   		*/
+	"Where_Then_Blk",			/* Where_Then_Blk 		*/
+	"Where_Else_Blk",			/* Where_Else_Blk 		*/
+	"Where_Else_Mask_Blk",			/* Where_Else_Mask_Blk 		*/
+	"Parallel_Blk",				/* Parallel_Blk			*/
+	"Doall_Blk",				/* Doall_Blk			*/
+	"Do_Parallel_Blk",			/* Do_Parallel_Blk		*/
+	"Guard_Blk",				/* Guard_Blk			*/
+	"Parallel_Case_Blk",			/* Parallel_Case_Blk		*/
+	"Wait_Blk",				/* Wait_Blk			*/
+	"SGI_Doacross_Blk",			/* SGI_Doacross_Blk		*/
+	"SGI_Psection_Blk",			/* SGI_Psection_Blk		*/
+	"SGI_Section_Blk",			/* SGI_Section_Blk		*/
+	"SGI_Pdo_Blk",				/* SGI_Pdo_Blk			*/
+	"SGI_Parallel_Do_Blk",			/* SGI_Parallel_Do_Blk		*/
+	"SGI_Parallel_Blk",			/* SGI_Parallel_Blk		*/
+	"SGI_Critical_Section_Blk",		/* SGI_Critical_Section_Blk	*/
+	"SGI_Single_Process_Blk",		/* SGI_Single_Process_Blk	*/
+	"SGI_Region_Blk",			/* SGI_Region_Blk		*/
+	"Open_Mp_Parallel_Blk",			/* Open_Mp_Parallel_Blk		*/
+	"Open_Mp_Do_Blk",			/* Open_Mp_Do_Blk		*/
+	"Open_Mp_Parallel_Sections_Blk",	/* Open_Mp_Parallel_Section_Blk	*/
+	"Open_Mp_Sections_Blk",			/* Open_Mp_Sections_Blk		*/
+	"Open_Mp_Section_Blk",			/* Open_Mp_Section_Blk		*/
+	"Open_Mp_Single_Blk",			/* Open_Mp_Single_Blk		*/
+	"Open_Mp_Parallel_Do_Blk",		/* Open_Mp_Parallel_Do_Blk	*/
+	"Open_Mp_Master_Blk",			/* Open_Mp_Master_Blk		*/
+	"Open_Mp_Critical_Blk",			/* Open_Mp_Critical_Blk		*/
+	"Open_Mp_Ordered_Blk",			/* Open_Mp_Ordered_Blk		*/
+	"Open_Mp_Parallel_Workshare_Blk",	/* Open_Mp_Parallel_Workshare_Blk*/
+	"Open_Mp_Workshare_Blk",		/* Open_Mp_Workshare_Blk	*/
+	"Contains_Blk",				/* Contains_Blk			*/
+	"Interface_Blk",			/* Interface_Blk		*/
+	"Derived_Type_Blk"			/* Derived_Type_Blk		*/
 	};
 
 char		*boolean_str[]		= {
@@ -1285,6 +1287,12 @@ char		*operator_str[]		= {
 			"Copyin_Bound_Opr",
 			"Preferstream_Nocinv_Opr",
 
+                        /* OpenMP 2.0 operators (radu@par.univie.ac.at) */
+                        "Endparallelworkshare_Open_Mp_Opr",
+			"Endworkshare_Open_Mp_Opr",
+                        "Parallelworkshare_Open_Mp_Opr",
+                        "Workshare_Open_Mp_Opr",
+
                         "The_Last_Opr"
 		};
 
@@ -2013,11 +2021,15 @@ static char *open_mp_dir_opr_str[] = {
                          "ORDERED clause",
                          "SCHEDULE type",
                          "SCHEDULE list",
+                         "COPYPRIVATE clause",
 			 "AFFINITY clause",
 			 "IS_THREAD clause",
 			 "THREAD_DATA clause",
 			 "ONTO clause",
-			 "NEST clause"
+			 "NEST clause",
+/* there is no FLUSH clause in OpenMP (radu@par.univie.ac.at) */
+/* we fake this clause in order to treat FLUSH directive the same as the others */
+                         "FLUSH clause"
 		};
 
 static char *mp_dir_opr_str[] = {

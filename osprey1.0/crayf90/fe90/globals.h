@@ -1405,6 +1405,12 @@ enum    operator_values      {  Null_Opr,
 
 				Preferstream_Nocinv_Dir_Opr,
 
+                                /* OpenMP 2.0 operators (radu) */
+				Endparallelworkshare_Open_Mp_Opr,
+				Endworkshare_Open_Mp_Opr,
+				Parallelworkshare_Open_Mp_Opr,
+				Workshare_Open_Mp_Opr,
+
                                 /* PLACE NEW OPERATORS ABOVE THIS LINE. */
                                 /* DO NOT PUT ANY OPRS AFTER THIS ONE */
 				The_Last_Opr
@@ -1421,7 +1427,7 @@ enum    sh_position_values     {Before,			After};
 
 enum	src_form_values	       {Fixed_Form,		Free_Form };
 
-
+
 /******************************************************************************/
 /* DATA STRUCTURES DEPENDENT ON THE FOLLOWING ENUMERATION:                    */
 /*      token_to_stmt_type              DEFINED IN      p_driver.h            */
@@ -1571,6 +1577,8 @@ enum stmt_type_values           {Null_Stmt,
 				 Open_MP_End_Master_Stmt,
 				 Open_MP_End_Critical_Stmt,
 				 Open_MP_End_Ordered_Stmt,
+				 Open_MP_End_Parallel_Workshare_Stmt,
+				 Open_MP_End_Workshare_Stmt,
 
                                  Forall_Cstrct_Stmt,
                                  Forall_Stmt,
@@ -1672,6 +1680,9 @@ enum    open_mp_directive_values     {
                                 Single_Omp,
                                 Parallel_Do_Omp,
                                 Parallel_Sections_Omp,
+                                Parallel_Workshare_Omp,
+                                End_Single_Omp,
+				Flush_Omp,
                                 Num_Omp_Values   /* must be last */
                                 };
 
@@ -1688,9 +1699,13 @@ enum    open_mp_clause_values        {
                                 Lastprivate_Omp_Clause,
                                 Ordered_Omp_Clause,
                                 Schedule_Omp_Clause,
+                                Copyprivate_Omp_Clause,
 				Affinity_Omp_Clause,
 				Nest_Omp_Clause,
 				Onto_Omp_Clause,
+/* there is no FLUSH clause in OpenMP */
+/* we fake this clause in order to treat FLUSH directive the same as the others (radu) */
+                                Flush_Omp_Clause,
                                 Last_Omp_Clause     /* must be last */
                                 };
 typedef enum open_mp_clause_values open_mp_clause_type;
@@ -1699,7 +1714,7 @@ extern char    *(open_mp_dir_str[Num_Omp_Values]);
 
 extern boolean open_mp_clause_allowed[Num_Omp_Values][Last_Omp_Clause];
 
-
+
 typedef enum	addr_mode_values		addr_mode_type;
 typedef	enum	basic_type_values		basic_type_type;
 typedef	enum	convert_to_string_values 	convert_to_string_type;
@@ -1738,7 +1753,7 @@ union   id_str_entry		{char		string[MAX_ID_LEN+1];
                                  long           words[NUM_ID_WDS];
 				};
 
-
+
 
 struct	cmd_line_flags_entry {
 	boolean		align8			: 1;		/* -align8    */
@@ -2105,6 +2120,7 @@ struct	cdir_switch_entry	{
 				 int		cache_bypass_ir_idx;
 				 int		concurrent_idx;
 				 int		copyin_list_idx;
+				 int		copyprivate_list_idx;
 				 int		default_scope_list_idx;
 				 int		dir_nest_check_sh_idx;
                                  int		do_omp_sh_idx;
@@ -2112,6 +2128,7 @@ struct	cdir_switch_entry	{
 				 int		doall_sh_idx;
                                  int		dopar_sh_idx;
 				 int		firstprivate_list_idx;
+				 int		flush_list_idx;
 				 int		getfirst_list_idx;
 				 int		implicit_use_idx;
 				 int		inline_here_list_idx;
@@ -2259,7 +2276,7 @@ union	target_machine_entry   {
 # endif
 	};
 
-
+
 /******************************************************************************\
 |*   cif_usage_code_values and cif_usage_code_type must be defined here rather*|
 |*   than in the more appropriate fecif.h because procedures outside of       *|
@@ -2450,7 +2467,7 @@ typedef enum	cif_directive_code_values	cif_directive_code_type;
 typedef enum    cif_stmt_values			cif_stmt_type;
 typedef	enum	cif_usage_code_values		cif_usage_code_type;
 
-
+
 /*******************************************\
 |* globally accessible function prototypes *|
 \*******************************************/
@@ -2949,7 +2966,7 @@ extern	int			where_ir_idx;
 extern  int			where_dealloc_stmt_idx;
 extern  int                     type_alignment_tbl[Num_Linear_Types];
 
-
+
 /*********************************\
 |* global enums and types for io *|
 \*********************************/

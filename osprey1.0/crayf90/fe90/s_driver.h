@@ -209,6 +209,10 @@
                                  	/* Open_MP_End_Critical_Stmt */
                           directive_stmt_semantics,
                                  	/* Open_MP_End_Ordered_Stmt */
+                          directive_stmt_semantics,
+                                 	/* Open_MP_End_Parallel_Workshare_Stmt */
+                          directive_stmt_semantics,
+                                 	/* Open_MP_End_Workshare_Stmt */
                           forall_semantics,             /* Forall_Cstrct_Stmt */
                           forall_semantics,             /* Forall_Stmt        */
                           end_forall_semantics,         /* End_Forall_Stmt    */
