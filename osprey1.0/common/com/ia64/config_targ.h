@@ -43,9 +43,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: config_targ.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:03 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-02-17 23:52:37 $
+ * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_targ.h,v $
  *
  * Revision history:
@@ -53,18 +53,18 @@ extern "C" {
  *  25-Sep-91 - Added subprogram interface pointers.
  *  27-Nov-91 - Reconfiguration of target representation for TP.
  *  21-Apr-93 - Set TARG_NEEDS_QUAD_OP to 1
- *  14-Mar-97 - Removed most -TARG group flags to config_TARG.h.
+ *  14-Mar-97 - Removed most -TARG group flags to config_targ2.h.
  *
  * Description:
  *
  * This file defines general configuration parameters which are
  * specific to the compiler's target machine and system.
  * There is an approximate distinction between -TARG option group
- * flags and their configuration (in config_TARG.[hc]), and more
+ * flags and their configuration (in config_targ2.[hc]), and more
  * generic target configuration (in this file).  Note that this file
  * is included in config.h, and hence indirectly in most source files,
- * whereas config_TARG.h is only included directly, so putting new
- * -TARG option-related variables in config_TARG.[hc] is to be
+ * whereas config_targ2.h is only included directly, so putting new
+ * -TARG option-related variables in config_targ2.[hc] is to be
  * preferred to putting them here.
  *
  * See com/config.h for a detailed description of configuration
@@ -80,7 +80,7 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *config_targ_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_targ.h,v $ $Revision: 1.1.1.1 $";
+static char *config_targ_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_targ.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "mtypes.h"

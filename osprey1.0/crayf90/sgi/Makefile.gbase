@@ -221,7 +221,7 @@ CXXFILES = $(SGI_CXX_SRCS)
 #----------------------------------------------------------------------
 # extra files to be removed with make clobber
 #----------------------------------------------------------------------
-LDIRT = cf90.i cf90.cat cf90.exp cf90.cat.m cf90.exp.m ii_files
+LDIRT = cf90.i cf90.cat cf90.exp cf90.cat.m cf90.exp.m ii_files mfef90
 
 
 #----------------------------------------------------------------------
@@ -270,7 +270,6 @@ GLDOPTS = $(STD_LOAD_OPTS)
 #----------------------------------------------------------------------
 
 ifeq ($(BUILD_OS), IRIX)
-CXXFLAGS += -D_USE_STL_EXT
  ifeq ($(BUILD_COMPILER), VENDOR)
  WOFF = -woff 1174,1209,1375,1460,1552,3201
  else
@@ -280,7 +279,6 @@ CXXFLAGS += -D_USE_STL_EXT
 endif
 
 ifeq ($(BUILD_OS), LINUX)
-CXXFLAGS += -D_USE_STL_EXT
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
@@ -289,7 +287,7 @@ CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_PDGCS \
 	-DFRONT_END -DFRONT_F90 $(LCINCS) $(OPTIMIZER)
 LLDLIBS += -lelf
  ifeq ($(BUILD_COMPILER), GNU)
- CFLAGS += -D_USE_STL_EXT -D__GNU_BUG_WORKAROUND
+ CFLAGS += -D__GNU_BUG_WORKAROUND
  endif
  ifeq ($(BUILD_COMPILER), VENDOR)
  ifeq ($(BUILD_SB), YES)
@@ -427,5 +425,3 @@ make_depend.o : make_depend.cxx
 	$(C++F) -c -D__EXTENSIONS__ $(SGI_DIR)/make_depend.cxx
 endif
 endif
-
-

@@ -77,6 +77,8 @@ CFILES	=	cifbinread.c \
 
 SRC_DIRS = $(BUILD_BASE)
 
+LDIRT=
+
 #---------------------------------------------------------------------------
 # Platform specific options
 #---------------------------------------------------------------------------
@@ -110,11 +112,21 @@ include $(BUILD_TOT)/Makeinclude
 
 DIRTS = $(OBJECTS)
 
-exports: default
+
+REAL_OBJS = $(filter %.o,$(OBJECTS))
+
+$(LIBRARY) : $(REAL_OBJS)
+	$(AR) r $@ $(REAL_OBJS)
+
+
+
+cexports: default
 
 install: default
 
 include $(COMMONRULES)
 
 VPATH = $(BUILD_BASE)
+
+
 

@@ -30,7 +30,8 @@ TOOLROOT       = $(BUILD_TOT)
 #
 #  Note: the path is machine-dependent!
 #-----------------------------------------------------------------------
-STL_EXT_PATH = 
-#/usr/freeware/lib/gcc-lib/mips-sgi-irix6.5/3.0/include/g++/ext
 
 MAKE = gmake
+
+PLATFORM_DIRTS_SPECIFIC = 
+

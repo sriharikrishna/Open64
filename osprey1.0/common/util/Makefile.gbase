@@ -202,6 +202,13 @@ include $(BUILD_TOT)/Makeinclude
 DIRTS = $(OBJECTS)
 
 
+REAL_OBJS = $(filter %.o,$(OBJECTS))
+
+$(LIBRARY) : $(REAL_OBJS)
+	$(AR) r $@ $(REAL_OBJS)
+
+
+
 #----------------------------------------------------------------------
 #  installation
 #----------------------------------------------------------------------

@@ -242,7 +242,6 @@ LLDLIBS =
 #----------------------------------------------------------------------
 
 ifeq ($(BUILD_OS), IRIX)
-CXXFLAGS += -D_USE_STL_EXT
  ifeq ($(BUILD_COMPILER), VENDOR)
  CFLAGS += -woff 1209,1552,3201
  CXXFLAGS += -woff 1209,1552,3201 
@@ -250,7 +249,6 @@ CXXFLAGS += -D_USE_STL_EXT
 endif
 
 ifeq ($(BUILD_OS), LINUX)
-CXXFLAGS += -D_USE_STL_EXT
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
@@ -262,7 +260,6 @@ CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS $(LCINCS) $(OPTIMIZER)
  CFLAGS += -D__inline=
  endif
  ifeq ($(BUILD_COMPILER), GNU)
- CFLAGS += -D_USE_STL_EXT
  endif
 CXXFLAGS := $(CFLAGS)
 endif
