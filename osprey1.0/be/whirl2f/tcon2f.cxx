@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: tcon2f.c
- * $Revision: 1.7 $
- * $Date: 2003-02-24 20:28:56 $
+ * $Revision: 1.8 $
+ * $Date: 2003-05-14 20:44:15 $
  *
  * Revision history:
  *  27-Apr-95 - Original Version
@@ -323,8 +323,8 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object
  * otherwise should not add it,
  * will figure out a range later
  */
-/*         Append_Token_String(tokens, Targ_Print("%1lld_8", tvalue));*/
-         Append_Token_String(tokens, Targ_Print("%1lld", tvalue));
+         Append_Token_String(tokens, Targ_Print("%1lld_8", tvalue));
+//         Append_Token_String(tokens, Targ_Print("%1lld", tvalue));
 
 	 break;
       
@@ -336,8 +336,8 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object
 
       case MTYPE_U8:
 /* same thing to do with "MTYPE_I8 */
-/*	 Append_Token_String(tokens, Targ_Print("%1llu_8", tvalue));*/
-	 Append_Token_String(tokens, Targ_Print("%1llu", tvalue));
+	 Append_Token_String(tokens, Targ_Print("%1llu_8", tvalue));
+//	 Append_Token_String(tokens, Targ_Print("%1llu", tvalue));
 	 break;
 
       case MTYPE_F4:
