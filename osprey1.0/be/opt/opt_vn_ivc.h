@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_vn_ivc.h
-// $Revision: 1.4 $
-// $Date: 2003-04-22 19:15:15 $
-// $Author: jle $
+// $Revision: 1.5 $
+// $Date: 2003-05-28 20:15:20 $
+// $Author: broom $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn_ivc.h,v $
 //
 // ====================================================================
@@ -277,7 +277,7 @@ protected:
 
    bool _is_dereferencable() const {return _idx >= 0 && _idx < _obj->size();}
 
-   TYPENAME forward_to_next_iterator<Category, Container, Next>::reference _deref() const 
+   typename forward_to_next_iterator<Category, Container, Next>::reference _deref() const 
    {
       Is_True(_is_dereferencable(), 
 	      ("forward_to_next_iterator out of bounds %d", _idx));
@@ -295,7 +295,7 @@ public:
    Container *container() const {return _obj;}   // For "==" operator
    INT32      current_idx() const {return _idx;} // For "==" operator
    
-   TYPENAME forward_to_next_iterator<Category, Container, Next>::reference operator*() const 
+   typename forward_to_next_iterator<Category, Container, Next>::reference operator*() const 
    {
       return _deref();
    }
