@@ -57,6 +57,9 @@ typedef enum {
 
 /* kinds of source files */
 typedef enum {
+#ifdef _SOLARIS_SOLARIS
+#undef S_NONE
+#endif
 	S_NONE,
 	S_c,
 	S_C,

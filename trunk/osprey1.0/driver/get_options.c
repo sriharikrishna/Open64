@@ -37,7 +37,11 @@
 #include <ctype.h>
 #include <malloc.h>
 #include <stdlib.h>
+#ifdef _SOLARIS_SOLARIS
+#include <unistd.h>
+#else
 #include <getopt.h>
+#endif
 #include "string_utils.h"
 #include "get_options.h"
 #include "options.h"
