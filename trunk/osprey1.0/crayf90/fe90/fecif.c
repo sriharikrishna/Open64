@@ -2246,6 +2246,7 @@ void	cif_send_attr(int	attr_idx,
    /* ----------------------------------------------------------------------- */
 
    case Stmt_Func:
+     attributes	= 0; /* eraxxon: add to avoid unitialized read below */
 
 # if 0
       if (AT_DCL_ERR(attr_idx)) {
