@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.19 $
- * $Date: 2003-06-18 16:48:12 $
+ * $Revision: 1.20 $
+ * $Date: 2003-07-25 18:11:55 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.20 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -943,7 +943,6 @@ fei_object(char * name_string,
   STB_pkt *p;
   STB_pkt *o;
   STB_pkt *b;
- int fm,fm1,fm2;
   
 
   OBJECT_SYM  sym_class;
@@ -953,24 +952,22 @@ fei_object(char * name_string,
   ty = cast_to_TY(t_TY(type));
   p  = cast_to_STB(storage_idx);
 
-// # if 0 
 
 /* need to seperate two cases:interface & contained pu */
 
  if (!interface_pu) 
     hosted = (sym_class == Hosted_Dummy_Procedure) ||
            (sym_class == Hosted_Dummy_Arg ) || 
-//           (sym_class == Hosted_Compiler_Temp) || 
-//           (sym_class == Hosted_User_Variable ) ||
+           (sym_class == Hosted_Compiler_Temp) || 
+           (sym_class == Hosted_User_Variable ) ||
            (sym_class == CRI_Pointee && 
 	    (test_flag(flag_bits,FEI_OBJECT_INNER_REF) ||
 	     test_flag(flag_bits,FEI_OBJECT_INNER_DEF))) ;
  else 
     hosted = FALSE;
- 
-// # endif
-  
-//  hosted = FALSE;
+
+ if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE))
+       hosted = FALSE; //contained in a module
 
   /* ignore hosted args w/o inner ref/defs because don't    */
   /* want duplicates in symbol table for debug info (only   */
@@ -978,8 +975,6 @@ fei_object(char * name_string,
   /* on compiler temps not always set, and Namelist lists   */
   /* are built even if the ref/def isn't set on a varbl     */
 
-fm1 = test_flag(flag_bits,FEI_OBJECT_INNER_REF);
-fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
 
   if (hosted && 
      sym_class != Hosted_Compiler_Temp && 
@@ -1127,7 +1122,6 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
  else st1 = st;
     
   Set_ST_base(st,st1);
-//  Set_ST_base(st,st);
   Set_ST_ofst(st, off);
 
   cwh_stab_set_linenum(st,lineno);  
@@ -1359,12 +1353,10 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   if (p->form == is_ST) {
     Set_ST_sclass(st, ST_sclass(cast_to_ST(p->item)));
 
-//# if 0
     if (!test_flag(flag_bits,FEI_OBJECT_IN_COMMON)&& (
            ST_sclass(cast_to_ST(p->item))==SCLASS_COMMON ||
            ST_sclass(cast_to_ST(p->item))==SCLASS_MODULE ))
          Set_ST_sclass(st,SCLASS_AUTO);  
-//# endif
 
     Set_ST_base(st, cast_to_ST(p->item));
 
@@ -1490,7 +1482,6 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
      DevAssert((ST_ofst(st) == 0),("Offset?"));
 
   o = cwh_stab_packet(st,is_ST);
-  fm = cast_to_int(o); 
   return(cast_to_int(o));
 }
 
