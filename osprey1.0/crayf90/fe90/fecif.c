@@ -4722,6 +4722,13 @@ void cif_misc_compiler_opts_rec(void)
       strcat(work_buf, "\036");
    }
 
+   if (cmd_line_flags.disregard_all_openads) {
+      /* eraxxon: OpenAD directive */
+      ++num_items; 
+      strcat(work_buf, "openad");
+      strcat(work_buf, "\036");
+   }
+
    for (i = 0; i < (Tok_Dir_End - Tok_Dir_Start); i++) {
 
       if (disregard_directive[i]) {

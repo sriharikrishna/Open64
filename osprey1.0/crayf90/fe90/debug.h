@@ -1292,6 +1292,13 @@ char		*operator_str[]		= {
 			"Endworkshare_Open_Mp_Opr",
                         "Parallelworkshare_Open_Mp_Opr",
                         "Workshare_Open_Mp_Opr",
+			
+			/* eraxxon: OpenAD directive */
+			"XXX_OpenAD_Opr",
+			"Dependent_OpenAD_Opr",
+			"Independent_OpenAD_Opr",
+			"Simple_OpenAD_Opr",
+			"EndSimple_OpenAD_Opr",
 
                         "The_Last_Opr"
 		};

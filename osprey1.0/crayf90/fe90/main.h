@@ -290,6 +290,8 @@ enum    language        {Pdgcs_Ansi_C = 1,      Pdgcs_Fortran_77,
                                           [Tok_SGI_Dir_End-Tok_SGI_Dir_Start];
 	boolean			disregard_open_mp
                                    [Tok_Open_Mp_Dir_End-Tok_Open_Mp_Dir_Start];
+	boolean			disregard_openad /* eraxxon: OpenAD */	
+                                   [Tok_OpenAD_Dir_End-Tok_OpenAD_Dir_Start];
 	dump_flags_type		dump_flags;
 	
 	int			expanded_intrinsic_list = NULL_IDX;

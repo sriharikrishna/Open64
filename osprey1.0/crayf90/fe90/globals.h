@@ -1411,6 +1411,13 @@ enum    operator_values      {  Null_Opr,
 				Parallelworkshare_Open_Mp_Opr,
 				Workshare_Open_Mp_Opr,
 
+				/* eraxxon: OpenAD directive */
+				XXX_OpenAD_Opr,
+				Dependent_OpenAD_Opr,
+				Independent_OpenAD_Opr,
+				Simple_OpenAD_Opr,
+				EndSimple_OpenAD_Opr,
+
                                 /* PLACE NEW OPERATORS ABOVE THIS LINE. */
                                 /* DO NOT PUT ANY OPRS AFTER THIS ONE */
 				The_Last_Opr
@@ -1715,6 +1722,29 @@ extern char    *(open_mp_dir_str[Num_Omp_Values]);
 extern boolean open_mp_clause_allowed[Num_Omp_Values][Last_Omp_Clause];
 
 
+/* eraxxon: OpenAD directive */
+enum    openad_directive_values     {
+                                XXX_OpenAD,
+                                Dependent_OpenAD,
+                                Independent_OpenAD,
+                                Simple_OpenAD,
+                                EndSimple_OpenAD,
+                                Num_OpenAD_Values   /* must be last */
+                                };
+
+typedef enum openad_directive_values        openad_directive_type;
+
+enum    openad_clause_values        {
+                                XXX_OpenAD_Clause,
+                                Last_OpenAD_Clause     /* must be last */
+                                };
+typedef enum openad_clause_values openad_clause_type;
+
+extern char    *(openad_dir_str[Num_OpenAD_Values]);
+
+extern boolean openad_clause_allowed[Num_OpenAD_Values][Last_OpenAD_Clause];
+
+
 typedef enum	addr_mode_values		addr_mode_type;
 typedef	enum	basic_type_values		basic_type_type;
 typedef	enum	convert_to_string_values 	convert_to_string_type;
@@ -1807,6 +1837,8 @@ struct	cmd_line_flags_entry {
 	boolean		disregard_all_mpp_cdirs	: 1;		/* -x  mpp    */
 	boolean         disregard_all_omps      : 1;            /* -x  omp    */
 	boolean         disregard_conditional_omp : 1;          /* No !$      */
+        /* eraxxon: OpenAD directive */
+	boolean         disregard_all_openads   : 1;            /* -x  openad */
 	boolean		reserved_y		: 1;		/*	      */
 	boolean		reserved_z		: 1;		/*	      */
 	int		implicit_use_idx;
@@ -2888,6 +2920,7 @@ extern	boolean			disregard_mics[];
 extern	boolean			disregard_directive[];
 extern	boolean			disregard_mips[];
 extern	boolean			disregard_open_mp[];
+extern	boolean			disregard_openad[]; /* eraxxon: OpenAD */
 extern	FILE		       *debug_file;
 extern	char			debug_file_name[];
 extern	dump_flags_type		dump_flags;

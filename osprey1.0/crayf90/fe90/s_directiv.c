@@ -2090,6 +2090,14 @@ void directive_stmt_semantics(void)
       case Workshare_Open_Mp_Opr:
          break;
 
+	 /* eraxxon: OpenAD directive (skip semantic checking) */
+      case XXX_OpenAD_Opr:
+      case Dependent_OpenAD_Opr:
+      case Independent_OpenAD_Opr:
+      case Simple_OpenAD_Opr:
+      case EndSimple_OpenAD_Opr:
+	 break;
+
    }
 
    TRACE (Func_Exit, "directive_stmt_semantics", NULL);

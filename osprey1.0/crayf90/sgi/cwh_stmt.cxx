@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.25 $
- * $Date: 2004-07-07 20:19:32 $
+ * $Revision: 1.26 $
+ * $Date: 2004-12-14 17:34:47 $
  * $Author: eraxxon $
  *
  * Revision history:
@@ -3242,21 +3242,33 @@ cwh_stmt_character_icall(INTRINSIC intrinsic)
  *===============================================
  */ 
 extern BOOL
-cwh_stmt_add_to_preamble(WN *wn,enum site block)
+cwh_stmt_add_to_preamble(WN *wn, enum site block, 
+			 enum pu_pragma_placement_t placement)
 {
   BOOL res = FALSE; 
 
-  if (block == block_ca)
+  if (block == block_ca) {
     if (WN_pragma_ca != NULL) {
-      WN_INSERT_BlockFirst (WN_pragma_ca,wn);
+      if (placement == pu_pragma_placement_first) {
+	WN_INSERT_BlockFirst (WN_pragma_ca,wn);
+      }
+      else if (placement == pu_pragma_placement_last) {
+	WN_INSERT_BlockLast (WN_pragma_ca,wn);
+      }
       res = TRUE;
     }
-
-  if (block == block_pu)
+  }
+  else if (block == block_pu) {
     if (WN_pragma_pu != NULL) {
-      WN_INSERT_BlockFirst (WN_pragma_pu,wn);
+      if (placement == pu_pragma_placement_first) {
+	WN_INSERT_BlockFirst (WN_pragma_pu,wn);
+      }
+      else if (placement == pu_pragma_placement_last) {
+	WN_INSERT_BlockLast (WN_pragma_pu,wn);
+      }
       res = TRUE;
     }
+  }
 
   return res; 
 }

@@ -190,6 +190,15 @@ char    *(open_mp_dir_str[Num_Omp_Values]) = {
 				"FLUSH"
                                         };
 
+/* eraxxon: OpenAD directive */
+char    *(openad_dir_str[Num_OpenAD_Values]) = {
+                                "XXX",
+                                "DEPENDENT",
+                                "INDEPENDENT",
+                                "SIMPLE",
+				"ENDSIMPLE"
+                                        };
+
 
 boolean	clause_allowed[Num_Mp_Values][Last_Clause] = {
 					{
@@ -550,6 +559,13 @@ enum	directive_stmt_values  {Case_Dir,
                                 Single_Open_Mp_Dir,
                                 Workshare_Open_Mp_Dir,
 
+				/* eraxxon: OpenAD directive */
+                                XXX_OpenAD_Dir,
+                                Dependent_OpenAD_Dir,
+                                Independent_OpenAD_Dir,
+                                Simple_OpenAD_Dir,
+				EndSimple_OpenAD_Dir,
+
 				Last_Dir};
 
 typedef enum directive_stmt_values directive_stmt_type;
@@ -612,7 +628,15 @@ char	*(directive_stmt_str[Last_Dir]) =   {
                 "C$OMP SECTION",		/* Section_Open_Mp_Dir	*/
                 "C$OMP SECTIONS",		/* Sections_Open_Mp_Dir	*/
                 "C$OMP SINGLE", 		/* Single_Open_Mp_Dir	*/
-                "C$OMP WORKSHARE" 		/* Workshare_Open_Mp_Dir*/
+                "C$OMP WORKSHARE", 		/* Workshare_Open_Mp_Dir*/
+
+		/* eraxxon: OpenAD directive */
+                "C$OPENAD XXX", 		/* XXX_OpenAD_Dir */
+                "C$OPENAD DEPENDENT", 		/* Dependent_OpenAD_Dir */
+                "C$OPENAD INDEPENDENT", 	/* Independent_OpenAD_Dir */
+                "C$OPENAD SIMPLE", 		/* Simple_OpenAD_Dir */
+                "C$OPENAD ENDSIMPLE"  		/* EndSimple_OpenAD_Dir */
+
 				};
 
 long directive_cant_be_in[Last_Dir] = {
@@ -2184,6 +2208,149 @@ long directive_cant_be_in[Last_Dir] = {
                          (0 << Open_Mp_Workshare_Region)),
 
                                 /* Workshare_Open_Mp_Dir       */
+
+			/* eraxxon: OpenAD directive */
+
+                        ((1 << Parallel_Region) |
+                         (1 << Doall_Region) |
+                         (1 << Do_Parallel_Region) |
+                         (1 << Guard_Region) |
+                         (1 << Case_Region) |
+                         (1 << Region_Region) |
+                         (1 << Sgi_Parallel_Region) |
+                         (1 << Doacross_Region) |
+                         (1 << Parallel_Do_Region) |
+                         (1 << Pdo_Region) |
+                         (1 << Parallel_Section_Region) |
+                         (1 << Critical_Section_Region) |
+                         (1 << Single_Process_Region) |
+                         (1 << Open_Mp_Parallel_Region) |
+                         (1 << Open_Mp_Do_Region) |
+                         (1 << Open_Mp_Parallel_Sections_Region) |
+                         (1 << Open_Mp_Sections_Region) |
+                         (1 << Open_Mp_Section_Region) |
+                         (1 << Open_Mp_Single_Region) |
+                         (1 << Open_Mp_Parallel_Do_Region) |
+                         (1 << Open_Mp_Master_Region) |
+                         (1 << Open_Mp_Critical_Region) |
+                         (1 << Open_Mp_Ordered_Region) |
+                         (1 << Open_Mp_Parallel_Workshare_Region) |
+                         (1 << Open_Mp_Workshare_Region)),
+
+                                /* XXX_OpenAD_Dir       */
+
+                        ((1 << Parallel_Region) |
+                         (1 << Doall_Region) |
+                         (1 << Do_Parallel_Region) |
+                         (1 << Guard_Region) |
+                         (1 << Case_Region) |
+                         (1 << Region_Region) |
+                         (1 << Sgi_Parallel_Region) |
+                         (1 << Doacross_Region) |
+                         (1 << Parallel_Do_Region) |
+                         (1 << Pdo_Region) |
+                         (1 << Parallel_Section_Region) |
+                         (1 << Critical_Section_Region) |
+                         (1 << Single_Process_Region) |
+                         (1 << Open_Mp_Parallel_Region) |
+                         (1 << Open_Mp_Do_Region) |
+                         (1 << Open_Mp_Parallel_Sections_Region) |
+                         (1 << Open_Mp_Sections_Region) |
+                         (1 << Open_Mp_Section_Region) |
+                         (1 << Open_Mp_Single_Region) |
+                         (1 << Open_Mp_Parallel_Do_Region) |
+                         (1 << Open_Mp_Master_Region) |
+                         (1 << Open_Mp_Critical_Region) |
+                         (1 << Open_Mp_Ordered_Region) |
+                         (1 << Open_Mp_Parallel_Workshare_Region) |
+                         (1 << Open_Mp_Workshare_Region)),
+
+                                /* Dependent_OpenAD_Dir       */
+
+                        ((1 << Parallel_Region) |
+                         (1 << Doall_Region) |
+                         (1 << Do_Parallel_Region) |
+                         (1 << Guard_Region) |
+                         (1 << Case_Region) |
+                         (1 << Region_Region) |
+                         (1 << Sgi_Parallel_Region) |
+                         (1 << Doacross_Region) |
+                         (1 << Parallel_Do_Region) |
+                         (1 << Pdo_Region) |
+                         (1 << Parallel_Section_Region) |
+                         (1 << Critical_Section_Region) |
+                         (1 << Single_Process_Region) |
+                         (1 << Open_Mp_Parallel_Region) |
+                         (1 << Open_Mp_Do_Region) |
+                         (1 << Open_Mp_Parallel_Sections_Region) |
+                         (1 << Open_Mp_Sections_Region) |
+                         (1 << Open_Mp_Section_Region) |
+                         (1 << Open_Mp_Single_Region) |
+                         (1 << Open_Mp_Parallel_Do_Region) |
+                         (1 << Open_Mp_Master_Region) |
+                         (1 << Open_Mp_Critical_Region) |
+                         (1 << Open_Mp_Ordered_Region) |
+                         (1 << Open_Mp_Parallel_Workshare_Region) |
+                         (1 << Open_Mp_Workshare_Region)),
+
+                                /* Independent_OpenAD_Dir       */
+
+                        ((1 << Parallel_Region) |
+                         (1 << Doall_Region) |
+                         (1 << Do_Parallel_Region) |
+                         (1 << Guard_Region) |
+                         (1 << Case_Region) |
+                         (1 << Region_Region) |
+                         (1 << Sgi_Parallel_Region) |
+                         (1 << Doacross_Region) |
+                         (1 << Parallel_Do_Region) |
+                         (1 << Pdo_Region) |
+                         (1 << Parallel_Section_Region) |
+                         (1 << Critical_Section_Region) |
+                         (1 << Single_Process_Region) |
+                         (1 << Open_Mp_Parallel_Region) |
+                         (1 << Open_Mp_Do_Region) |
+                         (1 << Open_Mp_Parallel_Sections_Region) |
+                         (1 << Open_Mp_Sections_Region) |
+                         (1 << Open_Mp_Section_Region) |
+                         (1 << Open_Mp_Single_Region) |
+                         (1 << Open_Mp_Parallel_Do_Region) |
+                         (1 << Open_Mp_Master_Region) |
+                         (1 << Open_Mp_Critical_Region) |
+                         (1 << Open_Mp_Ordered_Region) |
+                         (1 << Open_Mp_Parallel_Workshare_Region) |
+                         (1 << Open_Mp_Workshare_Region)),
+
+                                /* Simple_OpenAD_Dir       */
+
+                        ((1 << Parallel_Region) |
+                         (1 << Doall_Region) |
+                         (1 << Do_Parallel_Region) |
+                         (1 << Guard_Region) |
+                         (1 << Case_Region) |
+                         (1 << Region_Region) |
+                         (1 << Sgi_Parallel_Region) |
+                         (1 << Doacross_Region) |
+                         (1 << Parallel_Do_Region) |
+                         (1 << Pdo_Region) |
+                         (1 << Parallel_Section_Region) |
+                         (1 << Critical_Section_Region) |
+                         (1 << Single_Process_Region) |
+                         (1 << Open_Mp_Parallel_Region) |
+                         (1 << Open_Mp_Do_Region) |
+                         (1 << Open_Mp_Parallel_Sections_Region) |
+                         (1 << Open_Mp_Sections_Region) |
+                         (1 << Open_Mp_Section_Region) |
+                         (1 << Open_Mp_Single_Region) |
+                         (1 << Open_Mp_Parallel_Do_Region) |
+                         (1 << Open_Mp_Master_Region) |
+                         (1 << Open_Mp_Critical_Region) |
+                         (1 << Open_Mp_Ordered_Region) |
+                         (1 << Open_Mp_Parallel_Workshare_Region) |
+                         (1 << Open_Mp_Workshare_Region)),
+
+                                /* EndSimple_OpenAD_Dir       */
+
 			};
 
 long directive_must_be_in[Last_Dir] = {
@@ -3701,6 +3868,153 @@ long directive_must_be_in[Last_Dir] = {
                          (0 << Open_Mp_Workshare_Region)),
 
                                 /* Workshare_Open_Mp_Dir       */
+
+			/* eraxxon: OpenAD directive */
+
+                        ((0 << Parallel_Region) |
+                         (0 << Doall_Region) |
+                         (0 << Do_Parallel_Region) |
+                         (0 << Guard_Region) |
+                         (0 << Case_Region) |
+                         (0 << Region_Region) |
+                         (0 << Sgi_Parallel_Region) |
+                         (0 << Doacross_Region) |
+                         (0 << Parallel_Do_Region) |
+                         (0 << Pdo_Region) |
+                         (0 << Parallel_Section_Region) |
+                         (0 << Critical_Section_Region) |
+                         (0 << Single_Process_Region) |
+                         (0 << Open_Mp_Parallel_Region) |
+                         (0 << Open_Mp_Do_Region) |
+                         (0 << Open_Mp_Parallel_Sections_Region) |
+                         (0 << Open_Mp_Sections_Region) |
+                         (0 << Open_Mp_Section_Region) |
+                         (0 << Open_Mp_Single_Region) |
+                         (0 << Open_Mp_Parallel_Do_Region) |
+                         (0 << Open_Mp_Master_Region) |
+                         (0 << Open_Mp_Critical_Region) |
+                         (0 << Open_Mp_Ordered_Region) |
+                         (0 << Open_Mp_Parallel_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region)),
+
+                                /* XXX_OpenAD_Dir       */
+
+                        ((0 << Parallel_Region) |
+                         (0 << Doall_Region) |
+                         (0 << Do_Parallel_Region) |
+                         (0 << Guard_Region) |
+                         (0 << Case_Region) |
+                         (0 << Region_Region) |
+                         (0 << Sgi_Parallel_Region) |
+                         (0 << Doacross_Region) |
+                         (0 << Parallel_Do_Region) |
+                         (0 << Pdo_Region) |
+                         (0 << Parallel_Section_Region) |
+                         (0 << Critical_Section_Region) |
+                         (0 << Single_Process_Region) |
+                         (0 << Open_Mp_Parallel_Region) |
+                         (0 << Open_Mp_Do_Region) |
+                         (0 << Open_Mp_Parallel_Sections_Region) |
+                         (0 << Open_Mp_Sections_Region) |
+                         (0 << Open_Mp_Section_Region) |
+                         (0 << Open_Mp_Single_Region) |
+                         (0 << Open_Mp_Parallel_Do_Region) |
+                         (0 << Open_Mp_Master_Region) |
+                         (0 << Open_Mp_Critical_Region) |
+                         (0 << Open_Mp_Ordered_Region) |
+                         (0 << Open_Mp_Parallel_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region)),
+
+                                /* Dependent_OpenAD_Dir       */
+
+                        ((0 << Parallel_Region) |
+                         (0 << Doall_Region) |
+                         (0 << Do_Parallel_Region) |
+                         (0 << Guard_Region) |
+                         (0 << Case_Region) |
+                         (0 << Region_Region) |
+                         (0 << Sgi_Parallel_Region) |
+                         (0 << Doacross_Region) |
+                         (0 << Parallel_Do_Region) |
+                         (0 << Pdo_Region) |
+                         (0 << Parallel_Section_Region) |
+                         (0 << Critical_Section_Region) |
+                         (0 << Single_Process_Region) |
+                         (0 << Open_Mp_Parallel_Region) |
+                         (0 << Open_Mp_Do_Region) |
+                         (0 << Open_Mp_Parallel_Sections_Region) |
+                         (0 << Open_Mp_Sections_Region) |
+                         (0 << Open_Mp_Section_Region) |
+                         (0 << Open_Mp_Single_Region) |
+                         (0 << Open_Mp_Parallel_Do_Region) |
+                         (0 << Open_Mp_Master_Region) |
+                         (0 << Open_Mp_Critical_Region) |
+                         (0 << Open_Mp_Ordered_Region) |
+                         (0 << Open_Mp_Parallel_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region)),
+
+                                /* Independent_OpenAD_Dir      */
+
+                        ((0 << Parallel_Region) |
+                         (0 << Doall_Region) |
+                         (0 << Do_Parallel_Region) |
+                         (0 << Guard_Region) |
+                         (0 << Case_Region) |
+                         (0 << Region_Region) |
+                         (0 << Sgi_Parallel_Region) |
+                         (0 << Doacross_Region) |
+                         (0 << Parallel_Do_Region) |
+                         (0 << Pdo_Region) |
+                         (0 << Parallel_Section_Region) |
+                         (0 << Critical_Section_Region) |
+                         (0 << Single_Process_Region) |
+                         (0 << Open_Mp_Parallel_Region) |
+                         (0 << Open_Mp_Do_Region) |
+                         (0 << Open_Mp_Parallel_Sections_Region) |
+                         (0 << Open_Mp_Sections_Region) |
+                         (0 << Open_Mp_Section_Region) |
+                         (0 << Open_Mp_Single_Region) |
+                         (0 << Open_Mp_Parallel_Do_Region) |
+                         (0 << Open_Mp_Master_Region) |
+                         (0 << Open_Mp_Critical_Region) |
+                         (0 << Open_Mp_Ordered_Region) |
+                         (0 << Open_Mp_Parallel_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region)),
+
+                                /* Simple_OpenAD_Dir      */
+
+                        ((0 << Parallel_Region) |
+                         (0 << Doall_Region) |
+                         (0 << Do_Parallel_Region) |
+                         (0 << Guard_Region) |
+                         (0 << Case_Region) |
+                         (0 << Region_Region) |
+                         (0 << Sgi_Parallel_Region) |
+                         (0 << Doacross_Region) |
+                         (0 << Parallel_Do_Region) |
+                         (0 << Pdo_Region) |
+                         (0 << Parallel_Section_Region) |
+                         (0 << Critical_Section_Region) |
+                         (0 << Single_Process_Region) |
+                         (0 << Open_Mp_Parallel_Region) |
+                         (0 << Open_Mp_Do_Region) |
+                         (0 << Open_Mp_Parallel_Sections_Region) |
+                         (0 << Open_Mp_Sections_Region) |
+                         (0 << Open_Mp_Section_Region) |
+                         (0 << Open_Mp_Single_Region) |
+                         (0 << Open_Mp_Parallel_Do_Region) |
+                         (0 << Open_Mp_Master_Region) |
+                         (0 << Open_Mp_Critical_Region) |
+                         (0 << Open_Mp_Ordered_Region) |
+                         (0 << Open_Mp_Parallel_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region) |
+                         (0 << Open_Mp_Workshare_Region)),
+
+                                /* EndSimple_OpenAD_Dir      */
 
 			};
 

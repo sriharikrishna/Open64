@@ -65,7 +65,9 @@ enum	dir_prefix_values	{Cdir_Dir,
 				 Cdollar_Dir,
 				 Comp_Dir,
 				 Cdbg_Dir,
-				 Csgi_Dir};
+				 Csgi_Dir,
+				 Copenad_Dir /* eraxxon: OpenAD directive */
+	};
 
 typedef enum dir_prefix_values	dir_prefix_type;
 
@@ -247,6 +249,8 @@ int	lc_l         = 'l';
 int      uc_l         = 'L';
 int      lc_m         = 'm';
 int      uc_m         = 'M';
+int      lc_n         = 'n';
+int      uc_n         = 'N';
 int      lc_o         = 'o';
 int      uc_o         = 'O';
 int      lc_p         = 'p';

@@ -135,6 +135,9 @@ enum    directive_region_values {Parallel_Region,
 				 Open_Mp_Ordered_Region,
 				 Open_Mp_Parallel_Workshare_Region,
 				 Open_Mp_Workshare_Region,
+
+				 /* eraxxon: OpenAD directive - no regions */
+
                                  Last_Region};
 
 
