@@ -392,19 +392,24 @@ endif
 $(MFEF90_EXE): $(OBJECTS) $(LIBRARIES) 
 	echo char \* mfef90_compiler_build_date = \" `date` \"\;> compiler_build_date.c
 	$(CC) -c  compiler_build_date.c
-	$(C++F) -o $@ $(OBJECTS) compiler_build_date.o $(TARG_COMUTIL_DIR)/libcomutil.a \
-	$(LDFLAGS)
-ifeq ($(BUILD_OS), LINUX)
-#	$(BUILD_TOT)/linux/tools/caterr -c cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.msgs
-	gencat cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.i
-endif
-ifeq ($(BUILD_OS), SOLARIS) # cf90.i must be created on IRIX by running caterr cf90.msgs > cf90.i
-	gencat cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.i
-endif
+	$(C++F) -o $@ $(OBJECTS) compiler_build_date.o \
+	  $(TARG_COMUTIL_DIR)/libcomutil.a $(LDFLAGS)
+#
+# eraxxon: Because Cygwin and MacOS do not support gencat, for the
+# time being we are replacing catgetmsg() et al. with our own implementation
+# that essentially contains a static version of cf90.i. See 
+#   Open64/osprey1.0/include/nl_types.h
+#   Open64/osprey1.0/libcsup/msgnew/mycat.*, catgetmsg.c, catmsgfmt.c.
+# The line below marked 'good' were commented out for this change.
+#
 ifeq ($(BUILD_OS), IRIX)
-	gencat cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.i
 #	caterr -c cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.msgs
+else
+#       cf90.i must be created on IRIX: caterr cf90.msgs > cf90.i
+#	$(BUILD_TOT)/linux/tools/caterr -c cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.msgs
 endif
+#good	gencat cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.i
+
 
 cf90.i: $(FE90_DIR)/cf90.msgs
 	$(CCF) -E $(FE90_DIR)/cf90.msgs > cf90.i
