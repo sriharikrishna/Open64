@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.18 $
- * $Date: 2003-06-09 22:06:39 $
+ * $Revision: 1.19 $
+ * $Date: 2003-06-18 16:48:12 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.18 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.19 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1494,19 +1494,24 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   return(cast_to_int(o));
 }
 
-INTPTR
-fei_derived_type_name(char * name_string,
-                      INT32 external)
+/*==================================================
+ * Use stmt rename-only list
+ *
+ *=================================================
+ */
+
+void
+fei_rename_list(char * name_string)
 {
   ST *st;
   st = New_ST(CURRENT_SYMTAB);
     ST_Init(st,
           Save_Str(name_string),
-          CLASS_TYPE,
+          CLASS_NAME,
           SCLASS_UNKNOWN,
           EXPORT_LOCAL,
           (TY_IDX)0);
-return (cast_to_int(cwh_stab_packet(st,is_ST)));
+   cwh_stk_push(st,ST_item);
 
 }
 
