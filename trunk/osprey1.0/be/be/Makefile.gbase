@@ -888,7 +888,10 @@ ifeq ($(BUILD_OS), IRIX)
 	$(C++F) $(BE_C_OBJS) $(BE_CXX_OBJS) $(BE_AS_OBJS) \
 	$(TARG_INFO_LIB_DIR)/libtarginfo.a $(LINK_TARGET_SO) -shared -o $@ -lm -lgen
 else # linux
-	$(C++F) $(BE_C_OBJS) $(BE_CXX_OBJS) $(BE_AS_OBJS) \
+# The addition of itanium.o below is a temporary measure to avoid the
+# (dynamically) unresolved SI_* symbols. This way, the are pre-linked
+# into the be.so. 
+	$(C++F) ../targ_info/itanium.o $(BE_C_OBJS) $(BE_CXX_OBJS) $(BE_AS_OBJS) \
 	$(TARG_INFO_LIB_DIR)/libtarginfo.a $(LINK_TARGET_SO) -shared -o $@ -lm
 endif
 endif
