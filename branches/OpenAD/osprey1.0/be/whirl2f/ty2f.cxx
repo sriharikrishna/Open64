@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.25.2.1 $
- * $Date: 2004-07-16 15:26:11 $
+ * $Revision: 1.25.2.2 $
+ * $Date: 2004-10-23 01:20:01 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -1809,13 +1809,25 @@ TY2F_Translate_Purple_Array(TOKEN_BUFFER tokens, ST *st, TY_IDX ty)
    }
 } /* TY2F_Translate_Purple_Array */
 
+
+
+static long
+GetLB(ARB_HANDLE arb)
+{
+  long lbnd = 1;
+  if (ARB_const_lbnd(arb)) {
+    lbnd = ARB_lbnd_val(arb);
+  }
+  return lbnd;
+}
+
+
 void 
 TY2F_Translate_ArrayElt(TOKEN_BUFFER tokens, 
 			TY_IDX       arr_ty_idx,
 			STAB_OFFSET  arr_ofst)
 {
   TOKEN_BUFFER idx_tokens = New_Token_Buffer();
-  STAB_OFFSET  idx;
   INT32        dim;
   ARB_HANDLE   arb;
   
@@ -1847,27 +1859,28 @@ TY2F_Translate_ArrayElt(TOKEN_BUFFER tokens,
       {
 	ARB_HANDLE arb = arb_base[dim];
 
-	if (arr_ofst == 0)
-	  {
-	    Prepend_Token_String(idx_tokens, Number_as_String(1LL, "%lld"));
-	  }
-	else if (ARB_const_stride(arb)) /* Constant stride */
-	  {
-	    idx = arr_ofst/ARB_stride_val(arb) + 1;
-	    Prepend_Token_String(idx_tokens, Number_as_String(idx, "%lld"));
-	    arr_ofst -= (arr_ofst/ARB_stride_val(arb))*ARB_stride_val(arb);
-	  }
-	else
-	  {
-	    Append_Token_String(idx_tokens, "*");
-	  }
+	if (arr_ofst == 0) {
+	  long lbnd = GetLB(arb);
+	  Prepend_Token_String(idx_tokens, Number_as_String(lbnd, "%ld"));
+	}
+	else if (ARB_const_stride(arb)) { /* Constant stride */
+	  long lbnd = GetLB(arb);
+	  long idx = arr_ofst/ARB_stride_val(arb) + lbnd;
+	  Prepend_Token_String(idx_tokens, Number_as_String(idx, "%ld"));
+	  arr_ofst -= (arr_ofst/ARB_stride_val(arb))*ARB_stride_val(arb);
+	}
+	else {
+	  Append_Token_String(idx_tokens, "*");
+	}
 	if (dim-- > 0)
 	  Prepend_Token_Special(idx_tokens, ',');
       }
-  Append_And_Reclaim_Token_List(tokens, &idx_tokens);
-}
-Append_Token_Special(tokens, ')');
+      Append_And_Reclaim_Token_List(tokens, &idx_tokens);
+    }
+  Append_Token_Special(tokens, ')');
 } /* TY2F_Translate_ArrayElt */
+
+
 
 void
 TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
@@ -1885,6 +1898,15 @@ TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
    */
   TOKEN_BUFFER decl_tokens = New_Token_Buffer();
 
+/* For named common block add "save" attribute---FMZ */
+  if (name != NULL && *name != '\0'){
+      Append_Token_String(decl_tokens,"SAVE");
+      Append_Token_String(decl_tokens, Concat3_Strings("/", name, "/"));
+      Append_F77_Indented_Newline(decl_tokens, 1, NULL/*label*/);
+      Append_And_Reclaim_Token_List(tokens, &decl_tokens);
+   }
+
+  decl_tokens = New_Token_Buffer();
   Append_Token_String(decl_tokens, "COMMON");
   if (name != NULL && *name != '\0')
     Append_Token_String(decl_tokens, Concat3_Strings("/", name, "/"));
