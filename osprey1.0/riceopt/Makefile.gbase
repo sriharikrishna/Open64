@@ -143,6 +143,7 @@ COMMON_COM_CXX_SRC =	\
 	strtab.cxx	\
 	symtab.cxx	\
 	symtab_verify.cxx	\
+	upc_symtab_utils.cxx	\
 	wn.cxx		\
 	wn_map.cxx	\
 	wn_pragmas.cxx	\
