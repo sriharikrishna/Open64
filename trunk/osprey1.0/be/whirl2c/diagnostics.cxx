@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: diagnostics.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:15 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2005-02-01 22:30:35 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/diagnostics.cxx,v $
  *
  * Revision history:
@@ -63,7 +63,8 @@
 #include "common_include.h"
 #include "file_util.h"
 
-static char        Diag_Phase_Name[80] = "";
+static const UINT  Diag_Phase_Name_Len = 80;
+static char        Diag_Phase_Name[Diag_Phase_Name_Len+1] = "";
 static FILE       *Diag_File = NULL;
 static INT         Diag_Max_Diags = 10;  /* Default */
 static INT         Diag_Warn_Count = 0;
@@ -254,7 +255,8 @@ void Diag_Exit(void)
 void Diag_Set_Phase(const char *phase_name)
 {
    Set_Error_Phase(phase_name); /* Initiate the common error handler */
-   (void)strcpy(Diag_Phase_Name, phase_name);
+   (void)strncpy(Diag_Phase_Name, phase_name, Diag_Phase_Name_Len);
+   Diag_Phase_Name[Diag_Phase_Name_Len] = '\0';
 } /* Diag_Set_Phase */
 
 
