@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.10 $
- * $Date: 2003-03-04 21:08:20 $
+ * $Revision: 1.11 $
+ * $Date: 2003-03-27 19:29:10 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.10 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.11 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -604,6 +604,8 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
    TY_IDX      wn0_ty;       /* Expected type of wn0 */
    TY_IDX      wn1_ty;       /* Expected type of wn1 */
+   TY_IDX      kid0_ty;
+   TY_IDX      kid1_ty;
 
    /* Ensure that subexpressions are parenthesized */
    reset_WN2F_CONTEXT_no_parenthesis(context);
@@ -632,9 +634,10 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
   switch (OPCODE_operator(opcode)) {
     case  OPR_EQ:
-
-      if ( (wn0!=NULL &&TY_is_logical(WN_ty(wn0))) ||
-           ( (wn1!=NULL) &&TY_is_logical(WN_ty(wn1))))
+       kid0_ty =(WN_opc_operator(wn0)==OPR_CONST)?0:WN_ty(wn0);
+       kid1_ty =(WN_opc_operator(wn1)==OPR_CONST)?0:WN_ty(wn1);
+      if ( (wn0!=NULL && kid0_ty && TY_is_logical(kid0_ty)) ||
+           ( (wn1!=NULL) && kid1_ty&&TY_is_logical(kid1_ty)))
 
             Append_Token_String(tokens,".eqv.");
       else
@@ -642,8 +645,12 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
      break;
     case  OPR_NE:
-      if ( (wn0!=NULL &&TY_is_logical(WN_ty(wn0))) ||
-           ((wn1!=NULL) &&TY_is_logical(WN_ty(wn1))))
+       kid0_ty =(WN_opc_operator(wn0)==OPR_CONST)?0:WN_ty(wn0);
+       kid1_ty =(WN_opc_operator(wn1)==OPR_CONST)?0:WN_ty(wn1);
+
+      if ( (wn0!=NULL && kid0_ty && TY_is_logical(kid0_ty)) ||
+           ( (wn1!=NULL) && kid1_ty&&TY_is_logical(kid1_ty)))
+
             Append_Token_String(tokens,".neqv.");
       else
             Append_Token_String(tokens,".ne.");
