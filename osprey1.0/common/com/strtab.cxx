@@ -376,7 +376,7 @@ UINT32 STR_TAB<STR>::insert (const char *str, UINT32 size)
 
   // try to insert the new string into the String Hash Table
   typename HASHTABLE::ValueBoolPair insertStatus = 
-    hash_table.insert(HASHTABLE::KeyValuePair(StringHashKey(oldLastIndex, size), new_index));
+    hash_table.insert(typename HASHTABLE::KeyValuePair(StringHashKey(oldLastIndex, size), new_index));
 
   if (insertStatus.second == false) {
     // the new string was already in the StringTable => 
@@ -407,7 +407,7 @@ void STR_TAB<STR>::init_hash () {
     UINT32 length = STR::get_length(buffer + idx);
 
     STR_INDEX new_index = make_STR_INDEX(length, idx);
-    hash_table.insert(HASHTABLE::KeyValuePair(StringHashKey(idx, length), new_index));
+    hash_table.insert(typename HASHTABLE::KeyValuePair(StringHashKey(idx, length), new_index));
     idx += STR::get_buffer_length (length);
   }
 } // STR_TAB<STR>::init_hash
