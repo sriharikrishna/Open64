@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2c.c
- * $Revision: 1.8 $
- * $Date: 2004-06-30 20:28:17 $
- * $Author: fzhao $
+ * $Revision: 1.8.2.1 $
+ * $Date: 2004-11-24 20:47:05 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $
  *
  * Revision history:
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.8.2.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -762,10 +762,12 @@ TY2C_Translate_Structure(TY_IDX ty,CONTEXT context)
    FLD_ITER     fld_iter;
    const UINT   current_indent = Current_Indentation();
    TY& ty_rt  = Ty_Table[ty];
-   
+
+/*
    ASSERT_DBG_FATAL(TY_kind(ty_rt) == KIND_STRUCT, 
 		    (DIAG_W2F_UNEXPECTED_TYPE_KIND, 
 		     TY_kind(ty_rt), "TY2C_Translate_Structure"));
+*/
 
    struct_tokens = New_Token_Buffer();
 
