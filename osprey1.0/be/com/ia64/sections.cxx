@@ -39,15 +39,6 @@
 #define INST_BYTES 16
 
 
-#if defined(__CYGWIN__)
-  // The $%&# g++ compiler under cygwin says a INT64 is 8 bytes but
-  // *will not* allow one to assign INT64_MAX to such a variable.
-  // FIXME
-# undef INT64_MAX
-# define INT64_MAX INT32_MAX
-#endif
-
-
 SECTION Sections[_SEC_INDEX_MAX] = {
   {_SEC_UNKNOWN,NULL,
      0,
