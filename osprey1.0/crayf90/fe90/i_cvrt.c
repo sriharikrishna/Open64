@@ -11781,7 +11781,7 @@ static TYPE get_type_desc(int	input_idx)
       pdg_array_idx = fei_co_array_dimen(flag,
                                       lbound,
                                       extent,
-/*                                      BD_RANK(bd_idx)+i, */
+                                      BD_RANK(bd_idx)+1,
  				      i,
                                       type_idx,
                                       span,
