@@ -37,22 +37,12 @@
  * =======================================================================
  *
  *  Module: c_q_sqrt.c
- *  $Revision: 1.1.1.1 $
- *  $Date: 2002-05-22 20:07:08 $
+ *  $Revision: 1.2 $
+ *  $Date: 2003-12-09 19:16:58 $
  *
  * =======================================================================
  * =======================================================================
  */
-
-/* Solaris workaround
- * sgidefs.h only exists in linux directory of sgipro64,
- * including this header caused a lot of errors. Remove it.
- */
-#if !defined(_SOLARIS_SOLARIS)
-#ifndef _LP64
-#include <sgidefs.h>
-#endif /* _LP64 */
-#endif
 
 #include <math.h>
 #include "defs.h"

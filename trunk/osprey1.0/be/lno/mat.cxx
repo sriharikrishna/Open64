@@ -35,8 +35,8 @@
 
 // -*-C++-*-
 
-/** $Revision: 1.1.1.1 $
-*** $Date: 2002-05-22 20:06:41 $
+/** $Revision: 1.2 $
+*** $Date: 2003-12-09 19:16:57 $
 **/
 
 #ifndef mat_CXX
@@ -99,11 +99,8 @@ INT MAT<T>::_calcx(INT v)
 			0x1000, 0x2000, 0x4000, 0x8000,
 		      };
   static INT elts = sizeof(szs)/sizeof(INT[1]);
-
-// Solaris CC workaround
-// compiler complain that i is not defined on the FmtAssert() line
+  
   INT i;
-
   for (i = 0; i < elts; i++) {
     if (v <= szs[i])
       break;

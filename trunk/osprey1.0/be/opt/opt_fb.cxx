@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_fb.cxx
-// $Revision: 1.2 $
-// $Date: 2002-09-06 22:34:54 $
-// $Author: open64 $
+// $Revision: 1.3 $
+// $Date: 2003-12-09 19:16:57 $
+// $Author: eraxxon $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_fb.cxx,v $
 //
 // ====================================================================
@@ -52,12 +52,8 @@
 
 
 #include <math.h>
-#include "opt_fb.h"
-#if 0 // FIXME
-#include "stack.h"
-#else
 #include <queue>
-#endif
+#include "opt_fb.h"
 #include "opt_htable.h" // for STMTREP
 #include "DaVinci.h"    // for DaVinci viewer
 

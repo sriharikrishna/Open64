@@ -87,21 +87,7 @@
  ****************************************************************************
  */
 
-/*
- * Solaris workaround
- * although memccpy() is declared in strings.h, but it is declared only if
- * __EXTENSIONS__ or _POSIX_C_SOURCE or _XOPEN_SOURCE is defined. So we
- * may need add __EXTENSIONS__ to command line?
- *
- */
-
-#ifdef _SOLARIS_SOLARIS
-#include <strings.h>
 #include "cmplrs/make_depend.h"
-#else
-#include <bstring.h>
-#include "cmplrs/make_depend.h"
-#endif
 
 #include <ctype.h>
 #include <errno.h>
@@ -420,17 +406,7 @@ MDgrow(MDhandle h)
  * Allocate a table for INITIALSIZE entries.
  */
 
-/*
- * Solaris CC workaround
- * CC still mangles the function's name although it's declared as
- * extern "C". This will cause "undefined name" error.
- * Adding extern "C" into the definition again seems to fix this
- * problem.
- *
- */
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
 extern "C" {
-#endif
 
 MDhandle
 MDopen(char *toolname, char *filename, char *target, void (*error)(char*,...))
@@ -462,9 +438,8 @@ MDopen(char *toolname, char *filename, char *target, void (*error)(char*,...))
 	return h;
 }
 
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
 }  /* extern "C" */
-#endif
+
 
 /*
  * Add a dependency to h's rule.
@@ -726,7 +701,7 @@ MDclose(MDhandle h, char *target)
 	if ( 0 < md.stb.st_size ) {
 		md.base = (char *) mmap	( 0, md.stb.st_size, PROT_READ|PROT_WRITE
 				, MAP_SHARED, md.f, 0);
-		if ((int) md.base < 0) 
+		if ((long) md.base < 0) 
 			ERR(("mmap (%s): %s", md.filename, strerror(errno)));
 		md.size  = md.stb.st_size;
 		md.limit = md.base + md.size;
