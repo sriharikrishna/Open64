@@ -89,6 +89,10 @@
 #include "ipl_summary.h"                // summary info data structures
 #endif // ipl_summary_INCLUDED
 
+#ifndef ipl_summarize_util_i_INCLUDED
+#include "ipl_summarize_util.i"                // summary util
+#endif // ipl_summarize_util_i_INCLUDED
+
 
 //---------------------------------------------------------------
 // alternate entry point array
