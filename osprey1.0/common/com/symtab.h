@@ -238,7 +238,7 @@ INITV_Table_Size () { return Initv_Table.Size();}
 inline INITV_IDX
 INITV_index (SYMTAB_IDX level, ST_IDX st) {
  
-  for (int i = 1; i < INITO_Table_Size(level); i++) {
+  for (UINT i = 1; i < INITO_Table_Size(level); i++) {
     INITO* init = &Inito_Table(level, i);
     if (init->st_idx == st) {
       return init->val;
