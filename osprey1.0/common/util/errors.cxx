@@ -1494,6 +1494,7 @@ extern const char* StrSignal(int sig)
   char** my_sys_siglist = NULL;
 #if defined(__sgi)
 # define I_USE_THE_CRUSTY_SYS_SIGLIST_ARRAY 1
+  using namespace std;
   my_sys_siglist = (char**)_sys_siglist;
 #elif defined(__MACH__) /* MacOS */
 # define I_USE_THE_CRUSTY_SYS_SIGLIST_ARRAY 1
