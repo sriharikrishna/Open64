@@ -28,9 +28,9 @@
 /* ====================================================================
  *
  * Module: unparse_target.h
- * $Revision: 1.1 $
- * $Date: 2003-06-12 15:27:49 $
- * $Author: broom $
+ * $Revision: 1.2 $
+ * $Date: 2003-06-13 19:14:12 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/unparse_target_ftn.h,v $
  *
  * Revision history:
@@ -38,7 +38,7 @@
  *
  * Description:
  *
- *     Runtime tests for the C target language.
+ *     Runtime tests for the Fortran target language.
  */
 
 #include "unparse_target.h"
