@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: defs.h
- * $Revision: 1.5 $
- * $Date: 2003-11-04 16:16:24 $
+ * $Revision: 1.6 $
+ * $Date: 2003-11-11 20:42:03 $
  *
  * Revision history:
  *  21-Aug-89 - Original Version
@@ -84,7 +84,8 @@
 #if defined(_SOLARIS_SOLARIS)
 #include <strings.h>
 #else
-#include <bstring.h>	/* for bzero */
+/* #include <bstring.h>	*/  /* for bzero */
+#include <string.h>	/* for bzero */
 #endif
 
 #ifdef __cplusplus
