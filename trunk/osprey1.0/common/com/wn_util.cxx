@@ -39,8 +39,8 @@
 ***
 ***-------------------------------------------------------------------*/
 
-/** $Revision: 1.3 $
-*** $Date: 2002-08-16 19:31:08 $
+/** $Revision: 1.4 $
+*** $Date: 2002-10-10 19:31:33 $
 **/
 #ifdef USE_PCH
 #include "common_com_pch.h"
@@ -432,7 +432,7 @@ extern void WN_INSERT_BlockBefore(WN *blck, WN *wn, WN *in)
 /* inserting into a block, at the end, wn is null */
  else 
    {
-   if (WN_opcode(in) != OPC_BLOCK && FALSE)
+   if (WN_opcode(in) != OPC_BLOCK)
      {
      if (WN_first(blck) != NULL)
        {
