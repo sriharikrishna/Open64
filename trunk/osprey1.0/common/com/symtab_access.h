@@ -658,7 +658,7 @@ inline void
 Clear_PU_no_side_effects (PU& pu)	{ pu.flags &= ~PU_NO_SIDE_EFFECTS; }
 
 inline BOOL
-PU_decl_view (const PU& pu)       { return pu.flags & PU_DECL_VIEW; }
+PU_decl_view (const PU& pu)       { return (pu.flags & PU_DECL_VIEW)!=0; }
 inline void
 Set_PU_decl_view (PU& pu)         { pu.flags |= PU_DECL_VIEW; }
 inline void
@@ -727,6 +727,22 @@ inline void
 Set_PU_args_aliased (PU& pu)		{ pu.flags |= PU_ARGS_ALIASED; }
 inline void
 Clear_PU_args_aliased (PU& pu)		{ pu.flags &= ~PU_ARGS_ALIASED; }
+
+
+inline BOOL 
+PU_need_unparsed (const PU& pu)       { return (pu.flags & PU_NEED_UNPARSED)!=0; }
+inline void
+Set_PU_need_unparsed (PU& pu)         { pu.flags |= PU_NEED_UNPARSED; }
+inline void
+Clear_PU_need_unparsed (PU& pu)       { pu.flags &= ~PU_NEED_UNPARSED; }
+                                                                                                                     
+inline BOOL 
+PU_need_unparsed (const PU_IDX pui)       { return PU_need_unparsed(Pu_Table[pui]); }
+inline void
+Set_PU_need_unparsed (PU_IDX  pui)         { Set_PU_need_unparsed(Pu_Table[pui]); }
+inline void
+Clear_PU_need_unparsed (PU_IDX pui)       { Clear_PU_need_unparsed(Pu_Table[pui]);}
+
 
 inline BOOL
 PU_needs_fill_align_lowering (const PU& pu) {
