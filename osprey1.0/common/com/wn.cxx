@@ -3043,7 +3043,8 @@ WN_CreateDealloca (INT32 nkids)
 } /* WN_CreateDealloca */
 
 WN*
-WN_CreateLdma (TYPE_ID rtype, WN_OFFSET offset, TY_IDX ty, ST_IDX st)
+WN_CreateLdma (TYPE_ID rtype, WN_OFFSET offset, TY_IDX ty, ST_IDX st, 
+	       UINT field_id)
 {
   WN *wn;
 
@@ -3051,6 +3052,7 @@ WN_CreateLdma (TYPE_ID rtype, WN_OFFSET offset, TY_IDX ty, ST_IDX st)
   WN_load_offset(wn) = offset;
   WN_st_idx(wn) = st;
   WN_set_ty(wn,ty);
+  WN_set_field_id(wn, field_id);
 
   return(wn);
 } /* WN_CreateLdma */

@@ -1582,7 +1582,15 @@ WN_generic_call (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc, INT32 n, ST *sym)
 extern WN* WN_CreateAffirm (WN* condition);
 extern WN* WN_CreateAlloca (WN* size);
 extern WN* WN_CreateDealloca (INT32 n);
-extern WN* WN_CreateLdma (TYPE_ID rtype, WN_OFFSET offset, TY_IDX ty, ST_IDX st);
+extern WN* WN_CreateLdma (TYPE_ID rtype, WN_OFFSET offset, TY_IDX ty, 
+			  ST_IDX st, UINT field_id = 0);
+
+inline WN*
+WN_CreateLdma (OPCODE opc, WN_OFFSET offset, TY_IDX ty, ST_IDX st, 
+	      UINT field_id = 0) {
+  return WN_CreateLdma (OPCODE_rtype(opc), offset, ty, st, field_id);
+}
+
 
 extern void WN_set_st_addr_saved (WN *);
 
