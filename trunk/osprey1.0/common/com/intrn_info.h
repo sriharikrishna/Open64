@@ -98,7 +98,18 @@ typedef struct intrn_info_t {
  char		*runtime_name;
 } intrn_info_t;
 
-extern const intrn_info_t intrn_info[INTRINSIC_LAST+1];
+
+// eraxxon: On Cygwin, it appears that the 'const' turns 'intrn_info'
+// into a *local* symbol.  When this symbol is referenced in multiple
+// places, only one will contain the initialization in
+// 'intrn_info.cxx', causing big problems.  The standard 'fix' on
+// Cygwin is to use a Microsoft language extension,
+// __declspec(dllexport) in the declaration, but this is really quite
+// hackish since this declaration tag is only valid for Windows DLLs.
+// Removing the 'const' fixes the problem on Cygwin without
+// introducing hackish Microsoft extensions.
+
+extern /*const*/ intrn_info_t intrn_info[INTRINSIC_LAST+1];
 
 inline BOOL INTRN_by_value (const INTRINSIC i)
 {
