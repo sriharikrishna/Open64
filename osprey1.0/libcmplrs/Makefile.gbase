@@ -68,9 +68,10 @@ CFILES = \
 	make_depend.c
 
 ifeq ($(BUILD_OS), IRIX)
-CFILES += \
-	elfmap.c \
-	events.c
+#CFILES += \
+#	elfmap.c \
+#	events.c
+CFILES += events.c 
 endif
 
 default: first depends $(TARGETS) last
