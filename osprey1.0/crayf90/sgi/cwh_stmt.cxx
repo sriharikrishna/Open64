@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.14 $
- * $Date: 2003-04-01 21:27:26 $
+ * $Revision: 1.15 $
+ * $Date: 2003-04-09 20:30:52 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -910,20 +910,30 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
 
     case WN_item:
     case WN_item_whole_array:
-
-      keepty = cwh_stk_get_TY(); //July
+      ta = cwh_stk_get_TY();
+      keepty = ta;   //July
       wa = cwh_stk_pop_WN();
-      wa = cwh_intrin_wrap_value_parm(wa);
+      if (WNOPR(wa)==OPR_ARRAYEXP  ||
+             WNOPR(wa)==OPR_PAREN )
+           wa = cwh_intrin_wrap_value_parm(wa);  
+      else wa = cwh_intrin_wrap_ref_parm(wa,ta);
+
       if (keepty !=NULL)
          WN_set_ty(wa,keepty); //July
       args[k] = wa;
+  
       break ;
 
     case FLD_item:
     case ST_item:
     case ST_item_whole_array:
+      ta = cwh_stk_get_TY();
+      keepty = ta;
       wa = cwh_expr_operand(NULL);
-      wa = cwh_intrin_wrap_value_parm(wa);
+//      wa = cwh_intrin_wrap_value_parm(wa);
+      wa = cwh_intrin_wrap_ref_parm(wa,ta);
+      if (keepty!=NULL)
+         WN_set_ty(wa,keepty); 
       args[k] = wa;
       break ;
 
