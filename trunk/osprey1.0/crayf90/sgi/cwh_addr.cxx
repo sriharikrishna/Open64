@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.5 $
- * $Date: 2002-10-09 16:04:14 $
+ * $Revision: 1.6 $
+ * $Date: 2002-10-11 16:53:03 $
  * $Author: open64 $
  *
  * Revision history:
@@ -1478,8 +1478,15 @@ cwh_addr_load_ST(ST * st, OFFSET_64 off, TY_IDX dty)
       break ;
       
     case KIND_ARRAY :	
-      wa = cwh_addr_address_ST(st,off);
-      wn = cwh_addr_load_WN(wa,0,0);
+      wn= cwh_addr_address_ST(st,off);
+
+/* don't know if wothout iload operator will cuse trouble or 
+ * not,why have to have OPR_ILOAD?We aready have OPR_LDA????
+ */
+//      wa = cwh_addr_address_ST(st,off);
+//      wn = cwh_addr_load_WN(wa,0,0);
+
+
       break ;
       
     case KIND_STRUCT :	
