@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: defs.h
- * $Revision: 1.4 $
- * $Date: 2003-06-03 21:10:08 $
+ * $Revision: 1.5 $
+ * $Date: 2003-11-04 16:16:24 $
  *
  * Revision history:
  *  21-Aug-89 - Original Version
@@ -76,6 +76,8 @@
 #include <stddef.h>
 #include <string.h>
 
+/* portable definition of basic types */
+#include <inttypes.h>
 
 /* Solaris workaround
  */
@@ -233,6 +235,7 @@ extern "C" {
    */
 
 #if (defined(HOST_SGI) || defined(__GNUC__) || defined(_SOLARIS_SOLARIS))
+
 typedef signed int	INT;	/* The natural integer on the host */
 typedef signed int	INT8;	/* Use the natural integer */
 typedef signed int	INT16;	/* Use the natural integer */
@@ -265,27 +268,44 @@ typedef unsigned long	UINTPS;	/* Pointer-sized integer */
 
 /* Provide some limits that match the above types */
 
-/* Solaris workaround 
- * to avoid a large number of "re-definition"  warning messages
- * during compilation, remove them. They were defined in Solaris's
- * <sys/int_limits.h>.
- */
-#if !defined(_SOLARIS_SOLARIS)
-
-#define	INT8_MAX	127		/* Max 8-bit int */
-#define	INT8_MIN	(-127)		/* Min 8-bit int */
-#define	UINT8_MAX	255u		/* Max 8-bit unsigned int */
-#define	INT16_MAX	32767		/* Max 16-bit int */
-#define	INT16_MIN	(-32768)	/* Min 16-bit int */
-#define	UINT16_MAX	65535u		/* Max 16-bit unsigned int */
-#define	INT32_MAX	2147483647	/* Max 32-bit int */
-#define	INT32_MIN	(-2147483647-1)	/* Min 32-bit int */
-#define	UINT32_MAX	4294967295u	/* Max 32-bit unsigned int */
-#define	INT64_MAX	0x7fffffffffffffffll	/* Max 64-bit int */
-#define	INT64_MIN	0x8000000000000000ll	/* Min 64-bit int */
-#define	UINT64_MAX	0xffffffffffffffffull	/* Max 64-bit unsigned int */
-
+/* The following are defined in <inttypes.h> but may not be visible in C++ */
+#ifndef INT8_MAX
+# define INT8_MAX	127		/* Max 8-bit int */
 #endif
+#ifndef INT8_MIN
+# define INT8_MIN	(-127)		/* Min 8-bit int */
+#endif
+#ifndef UINT8_MAX
+# define UINT8_MAX	255u		/* Max 8-bit unsigned int */
+#endif
+#ifndef INT16_MAX
+# define INT16_MAX	32767		/* Max 16-bit int */
+#endif
+#ifndef INT16_MIN
+# define INT16_MIN	(-32768)	/* Min 16-bit int */
+#endif
+#ifndef UINT16_MAX
+# define UINT16_MAX	65535u		/* Max 16-bit unsigned int */
+#endif
+#ifndef INT32_MAX
+# define INT32_MAX	2147483647	/* Max 32-bit int */
+#endif
+#ifndef INT32_MIN
+# define INT32_MIN	(-2147483647-1)	/* Min 32-bit int */
+#endif
+#ifndef UINT32_MAX
+# define UINT32_MAX	4294967295u	/* Max 32-bit unsigned int */
+#endif
+#ifndef INT64_MAX
+# define INT64_MAX	0x7fffffffffffffffll	/* Max 64-bit int */
+#endif
+#ifndef INT64_MIN
+# define INT64_MIN	0x8000000000000000ll	/* Min 64-bit int */
+#endif
+#ifndef UINT64_MAX
+# define UINT64_MAX	0xffffffffffffffffull	/* Max 64-bit unsigned int */
+#endif
+
 
 #define	INTSC_MAX	INT32_MAX	/* Max scaled int */
 #define	INTSC_MIN	INT32_MIN	/* Min scaled int */
@@ -293,6 +313,8 @@ typedef unsigned long	UINTPS;	/* Pointer-sized integer */
 #define	INTPS_MAX	INT32_MAX	/* Max pointer-sized int */
 #define	INTPS_MIN	INT32_MIN	/* Min pointer-sized int */
 #define	UINTPS_MAX	UINT32_MAX	/* Max pointer-sized uint */
+
+
 
 /* Define quad-precision floating point for the host machine.
  * WARNING: Depending on the host, this type need not be usable.
@@ -309,19 +331,21 @@ typedef unsigned long	UINTPS;	/* Pointer-sized integer */
  */
 #if (defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400) && _SGIAPI) \
     || defined(__GNUC__) || defined(_SOLARIS_SOLARIS)
-#define HOST_SUPPORTS_QUAD_FLOAT 1
+# define HOST_SUPPORTS_QUAD_FLOAT 1
 #else
-#define HOST_SUPPORTS_QUAD_FLOAT 0
+# define HOST_SUPPORTS_QUAD_FLOAT 0
 #endif
 
 #if HOST_SUPPORTS_QUAD_FLOAT
-/* Temporarily remove this to get rid of warnings: */
-typedef long double	QUADFP;		/* 128-bit floating point */
+  /* Temporarily remove this to get rid of warnings: */
+  typedef long double	QUADFP;		/* 128-bit floating point */
 #else 
-typedef double	QUADFP;		/* 128-bit floating point */
+  typedef double	QUADFP;		/* 128-bit floating point */
 #endif
 
 #endif /* HOST_SGI || __GNUC__ */
+
+/* ==================================================================== */
 
 /* We would like a generic memory pointer type, e.g. for use in the
  * memory allocation routines.  Ideally, it is (void *), but some
@@ -330,8 +354,8 @@ typedef double	QUADFP;		/* 128-bit floating point */
   
   /* Solaris CC workaround
    */
-#if(defined(HOST_SGI) || defined(__GNUC__) || defined(_SOLARIS_SOLARIS))
-typedef void	*MEM_PTR;
+#if (defined(HOST_SGI) || defined(__GNUC__) || defined(_SOLARIS_SOLARIS))
+  typedef void	*MEM_PTR;
 #endif /* HOST_SGI || __GNUC__*/
 
 /* Short hand for those who don't like "char *" */
@@ -353,17 +377,17 @@ typedef mUINT64 mTARG_UINT;
 
 /* Define standard values: */
 #ifndef TRUE
-#define TRUE	((BOOL) 1)
+# define TRUE	((BOOL) 1)
 #endif
 #ifndef FALSE
-#define FALSE	((BOOL) 0)
+# define FALSE	((BOOL) 0)
 #endif
 
 /* Something to use to represent undefined positive integers.  Perahps we
  * could generalize this somehow, but it is useful the way it is.
  */
 #ifndef UNDEFINED
-#define UNDEFINED -1
+# define UNDEFINED -1
 #endif
 
 /* Finally, eliminate the standard type names to prevent their
@@ -433,7 +457,10 @@ inline INT Min(INT i, INT j)
  */
 #define VERY_BAD_PTR (0xfffffff)
 
+
+
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* defs_INCLUDED */
