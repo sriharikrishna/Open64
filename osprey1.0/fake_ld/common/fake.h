@@ -41,7 +41,7 @@ typedef struct an_object_file an_object_file, *an_object_file_ptr;
 struct an_object_file {
     
     an_object_file_ptr next;
-    string	name;		    /* Name of the file */
+    char        *name;		    /* Name of the file */
     char 	*map_addr;	    /* Address where this file is mapped */
     char	ftype;		    /* object file type: FT_... */
     int 	offset;		    /* File offset of this object. This is */
@@ -470,7 +470,7 @@ extern "C" {
 
 extern void msg(int, int, ...);
 
-extern string concat_names(string, string);
+extern char *concat_names(char *, char *);
 
 extern EXTSYM *
 slookup_mext(char *);

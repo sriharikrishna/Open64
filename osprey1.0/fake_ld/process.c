@@ -36,9 +36,9 @@
  * ====================================================================
  *
  * Module: process.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:08:07 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-09-16 03:05:15 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/fake_ld/process.c,v $
  *
  * Revision history:
@@ -120,18 +120,18 @@ define ELF_WORD int
 
 extern char **environ_vars;	    /* list of environment variables */
 
-string toolroot = 0;		    /* set to environment variable TOOLROOT */
+char *toolroot = 0;		    /* set to environment variable TOOLROOT */
 
 static int active_pid;
 
 static mode_t cmask = 0;	    /* file creation mode mask */
 
-static string thisfile = __FILE__;
+static char *thisfile = __FILE__;
 
-static string *tmp_list = 0;
+static char **tmp_list = 0;
 static int tmp_list_size = 0;
 static int tmp_list_max = 0;
-string tmpdir = 0;
+char *tmpdir = 0;
 static int tmpdir_length;
 
 	/*******************************************************
@@ -141,7 +141,7 @@ static int tmpdir_length;
 
 	 *******************************************************/
 static void
-dump_argv (string *argv)
+dump_argv (char **argv)
 { 
     fputs (argv[0], stderr);
     argv++;
@@ -158,7 +158,7 @@ dump_argv (string *argv)
 
 	 *******************************************************/
 int
-do_compile (string *argv)
+do_compile (char **argv)
 {
     int pid;
     
@@ -222,15 +222,15 @@ ld_kill_compilation (int sig)
  * when done.  Assume the first entry is "tmpdir".
  */
 void
-add_to_tmp_file_list (string path)
+add_to_tmp_file_list (char *path)
 {
     if (tmp_list_max == 0) {
 	tmp_list_max = DEFAULT_TMP_LIST_SIZE;
-	tmp_list = (string *) MALLOC (tmp_list_max * sizeof(string));
+	tmp_list = (char **) MALLOC (tmp_list_max * sizeof(char *));
 	MALLOC_ASSERT (tmp_list);
     } else if (tmp_list_size >= tmp_list_max) {
 	tmp_list_max *= 2;
-	tmp_list = (string *)REALLOC (tmp_list, tmp_list_max * sizeof(string));
+	tmp_list = (char **)REALLOC (tmp_list, tmp_list_max * sizeof(char *));
 	MALLOC_ASSERT (tmp_list);
     }
 
@@ -245,7 +245,7 @@ add_to_tmp_file_list (string path)
 
 	 *******************************************************/
 static void
-remove_from_tmp_file_list (string path)
+remove_from_tmp_file_list (char *path)
 {
 
     if (tmp_list_size == 0)
@@ -291,8 +291,8 @@ cleanup_all_files (void)
 
 	 *******************************************************/
 /* create a unique file */
-string
-make_temp_file (string name, char suffix)
+char*
+make_temp_file (char *name, char suffix)
 {
     char path[PATH_MAX];
     int len;
@@ -413,7 +413,7 @@ create_tmpdir ( int tracing )
 		  if (_D_EXACT_NAMLEN(entryp) > 2)
 #endif
 		    {
-			string fname = concat_names ( prefix, entryp->d_name);
+			char *fname = concat_names ( prefix, entryp->d_name);
 			unlink (fname);
 			FREE (fname);
 		    }
@@ -439,17 +439,17 @@ create_tmpdir ( int tracing )
 		
 
 	 *******************************************************/
-string
-create_unique_file (string path, char suffix)
+char*
+create_unique_file (char *path, char suffix)
 {
-    string p;
-    string base = basename (path);
-    string new_path;
+    char *p;
+    char *base = basename (path);
+    char *new_path;
     int fd;
 
     /* length of tmpdir + basename of path and '/' between the dir
        and the basename + null terminator */
-    p = (string) MALLOC (tmpdir_length + strlen(base) + 2);
+    p = (char *) MALLOC (tmpdir_length + strlen(base) + 2);
     MALLOC_ASSERT (p);
     strcpy (p, tmpdir);
     strcat (p, "/");
@@ -475,16 +475,17 @@ create_unique_file (string path, char suffix)
 		
 
 	 *******************************************************/
-string *
+char**
 get_command_line(bfd *abfd, 
-    	    	 string in_path, 
-		 string out_path, 
+    	    	 char *in_path, 
+		 char *out_path, 
 		 int *arg_count)
 {
-    static string default_compilation_flags[] = DEFAULT_COMPILATION_FLAGS;
+    static char *default_compilation_flags[] = DEFAULT_COMPILATION_FLAGS;
     int i;
     int argc = 0;
-    string *old_argv, *new_argv;
+    char **old_argv;
+    char **new_argv;
     Elf_Internal_Ehdr *ehdr = elf_elfheader (abfd);
 
     for (i = 1; i < ehdr->e_shnum; i++)
@@ -503,7 +504,7 @@ get_command_line(bfd *abfd,
 	    argc = (int)(*((ELF_WORD *) base_addr));
 
 	    args = (ELF_WORD *) (base_addr + sizeof(ELF_WORD));
-	    old_argv = (string *) ALLOCA (sizeof(string) * argc);
+	    old_argv = (char **) ALLOCA (sizeof(char *) * argc);
 	    MALLOC_ASSERT (old_argv);
 	    
 	    for (j = 0; j < argc; j++) {
@@ -520,7 +521,7 @@ get_command_line(bfd *abfd,
 	old_argv = default_compilation_flags;
     }
 
-    new_argv = (string *) MALLOC ((argc + 6) * sizeof(string));
+    new_argv = (char **) MALLOC ((argc + 6) * sizeof(char *));
     MALLOC_ASSERT (new_argv);
 
     for (i = 0; i < argc; i++)
@@ -569,7 +570,7 @@ get_command_line(bfd *abfd,
 
 	 *******************************************************/
 static int
-extract_archive_member (bfd *abfd, string path)
+extract_archive_member (bfd *abfd, char *path)
 {
     int fd = -1;
     int mode = 0666;
@@ -606,9 +607,9 @@ extract_archive_member (bfd *abfd, string path)
 
 	 *******************************************************/
 int
-make_link (const string dest, const string src)
+make_link (const char *dest, const char *src)
 {
-    static string working_dir = 0;
+    static char *working_dir = 0;
     int link_result;
 
     LD_ASSERT (dest && src, thisfile,
@@ -624,10 +625,10 @@ make_link (const string dest, const string src)
     if (dest[0] == '/')
 	link_result = symlink (dest, src);
     else {
-	string new_dest;
+	char *new_dest;
 	
 	if (working_dir == 0) {
-	    string tmp;
+	    char *tmp;
 	    working_dir = getcwd ((char *) NULL, PATH_MAX);
 	    if (working_dir == NULL) {
 		perror("getcwd(3)");
@@ -653,13 +654,13 @@ make_link (const string dest, const string src)
 		
 
 	 *******************************************************/
-string
+char*
 ld_compile (bfd *abfd)
 {
-    string input_path;
-    string output_path;
+    char *input_path;
+    char *output_path;
     int argc;
-    string *argv;
+    char **argv;
     int child_pid;
     int statptr;
     
