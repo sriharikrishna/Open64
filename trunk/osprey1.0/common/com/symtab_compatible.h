@@ -341,6 +341,14 @@ inline void
 Clear_ST_is_in_module (ST* s)          { s->flags_ext &= ~ST_IS_IN_MODULE; }
 
 inline BOOL
+ST_is_block_data (const ST* s)          { return s->flags_ext & ST_IS_BLOCK_DATA;}
+inline void
+Set_ST_is_block_data (ST* s)            { s->flags_ext |= ST_IS_BLOCK_DATA; }
+inline void
+Clear_ST_is_block_data (ST* s)          { s->flags_ext &= ~ST_IS_BLOCK_DATA; }
+
+
+inline BOOL
 ST_is_external (const ST* s)          { return s->flags_ext & ST_IS_EXTERNAL;}
 inline void
 Set_ST_is_external (ST* s)            { s->flags_ext |= ST_IS_EXTERNAL; }

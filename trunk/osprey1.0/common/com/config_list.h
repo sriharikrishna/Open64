@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: config_list.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:59 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:48:28 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_list.h,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *config_list_h_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_list.h,v $ $Revision: 1.1.1.1 $";
+static char *config_list_h_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_list.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 

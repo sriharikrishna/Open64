@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: stab_attr.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:54 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:52:16 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.h,v $
  *
  * Revision history:

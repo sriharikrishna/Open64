@@ -161,7 +161,8 @@ enum ST_EXT_FLAGS
     ST_IS_POINTER       = 0x01,  
     ST_IS_ALLOCATABLE   = 0x02,
     ST_IS_IN_MODULE     = 0x04,
-    ST_IS_EXTERNAL      = 0x08 
+    ST_IS_EXTERNAL      = 0x08,
+    ST_IS_BLOCK_DATA    = 0x10 
  }; // ST_EXT_FLAGS
 
 
@@ -273,7 +274,9 @@ struct ARB
     mUINT16 flags;			// misc. attributes
     mUINT16 dimension;			// number of dimensions
 
-    mUINT32 unused;			// must be zero'ed
+//    mUINT32 unused;			// must be zero'ed
+    mUINT16 co_dimension;               // number of co_dimensions
+    mUINT16 unused;                     // must be zero'ed
 
     union {
 	mINT64 lbnd_val;		// constant lower bound value
