@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.17 $
- * $Date: 2004-06-01 22:03:18 $
+ * $Revision: 1.18 $
+ * $Date: 2004-06-22 14:42:32 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.17 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.18 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -3785,12 +3785,22 @@ WN2C_compgoto(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
    INT32     goto_entry;
    MTYPE     switch_mty;
    STATUS    status = EMPTY_STATUS;
+   OPCODE    myopcode;
+   const  WN *compgotoid;
    
    Is_True(WN_operator(wn) == OPR_COMPGOTO,
 	   ("Invalid operator for WN2C_compgoto()"));
 
    /* Emit the switch control */
-   switch_mty = TY_mtype(WN_Tree_Type(WN_compgoto_idx(wn)));
+   /* FMZ-fix bug for switch based on a field of structure-type variable*/ 
+  //  switch_mty = TY_mtype(WN_Tree_Type(WN_compgoto_idx(wn)));
+   compgotoid = WN_compgoto_idx(wn);
+   myopcode   = WN_opcode(compgotoid); 
+   if (OPCODE_has_field_id(myopcode) && WN_field_id(compgotoid)) 
+         switch_mty = WN_rtype(compgotoid);
+   else
+         switch_mty = TY_mtype(WN_Tree_Type(compgotoid));
+
    Append_Token_String(tokens, "switch");
    Append_Token_Special(tokens, '(');
    (void)WN2C_translate(tokens, WN_compgoto_idx(wn), context);
@@ -3869,12 +3879,24 @@ WN2C_switch(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
    const WN *goto_stmt;
    MTYPE     switch_mty;
    STATUS    status = EMPTY_STATUS;
-   
+   OPCODE    myopcode;
+   const  WN *compgotoid;
+
    Is_True(WN_operator(wn) == OPR_SWITCH, 
 	   ("Invalid operator for WN2C_switch()"));
 
+   compgotoid = WN_compgoto_idx(wn);
+   myopcode   = WN_opcode(compgotoid);
+
    /* Emit the switch control */
-   switch_mty = TY_mtype(WN_Tree_Type(WN_compgoto_idx(wn)));
+   /* FMZ-fix bug for switch based on a field of structure-type variable*/ 
+//   switch_mty = TY_mtype(WN_Tree_Type(WN_compgoto_idx(wn)));
+
+   if (OPCODE_has_field_id(myopcode) && WN_field_id(compgotoid))
+         switch_mty = WN_rtype(compgotoid);
+   else
+         switch_mty = TY_mtype(WN_Tree_Type(compgotoid));
+
    Append_Token_String(tokens, "switch");
    Append_Token_Special(tokens, '(');
    (void)WN2C_translate(tokens, WN_switch_test(wn), context);
@@ -3893,8 +3915,10 @@ WN2C_switch(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
       Is_True(WN_operator(goto_stmt) == OPR_CASEGOTO,
 	      ("Expected each SWITCH case to be an OPR_CASEGOTO"));
       Append_Token_String(tokens, "case");
+
       TCON2C_translate(tokens, 
 		       Host_To_Targ(switch_mty, WN_const_val(goto_stmt)));
+
       Append_Token_Special(tokens, ':');
       Increment_Indentation();
       Append_Indented_Newline(tokens, 1);
@@ -3921,7 +3945,6 @@ WN2C_switch(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
       
    /* Emit the end of the switch body */
    Append_Token_Special(tokens, '}');
-
    STATUS_set_block(status);
    return status;
 } /* WN2C_switch */
