@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.27 $
- * $Date: 2003-09-22 19:41:04 $
+ * $Revision: 1.28 $
+ * $Date: 2003-12-08 22:00:56 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.27 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.28 $";
 #endif
 
 #include <alloca.h>
@@ -3450,7 +3450,9 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
              Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
 
            }
-
+  
+      if (num_params) 
+	    ReorderParms(param_st,num_params);
 
       for (param = first_param; param < num_params ; param++)
    

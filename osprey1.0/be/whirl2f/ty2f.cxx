@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.18 $
- * $Date: 2003-12-08 15:45:41 $
+ * $Revision: 1.19 $
+ * $Date: 2003-12-08 22:00:56 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -85,6 +85,8 @@ static void TY2F_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_2_struct(TOKEN_BUFFER decl_tokens,TY_IDX ty);
 static void TY2F_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_void(TOKEN_BUFFER decl_tokens, TY_IDX ty) ;
+static WN* find_stmt(ST* st,WN* wn);
+
 
 static const TY2F_HANDLER_FUNC 
    TY2F_Handler[KIND_LAST/*TY_KIND*/] =
@@ -152,20 +154,53 @@ GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
                    WN*            wn)
 {
    WN * stmt;
-   ST *real_st;
+   WN *first_stmt;
+   ST *rst;
 
-   stmt = WN_first(wn);
+   first_stmt = WN_first(wn);
+   stmt = first_stmt;
    while ((stmt !=NULL)&&((WN_operator(stmt)!=OPR_STID)
                            ||(WN_operator(stmt) ==OPR_STID)
-                             &&strcmp(ST_name(WN_st(stmt)),ST_name(ST_ptr(arbnd)))))
+			   &&strcmp(ST_name(WN_st(stmt)),ST_name(ST_ptr(arbnd)))))
 
        stmt = WN_next(stmt);
-   if ( stmt !=NULL) {
+ 
+   if(stmt){
+      rst = WN_st(WN_kid0(stmt));
+      if(ST_is_temp_var(rst))
+          stmt = find_stmt(rst,first_stmt);
+     }
+
+   if ( stmt)
         return WN2F_tempvar_rhs(decl_tokens,stmt);
-   }
-   else return NULL;
+   else return ST_ptr(arbnd);
 
 }
+
+static WN *
+find_stmt(ST * st, WN* wn)
+{
+  WN *first_stmt = wn;
+  WN *stmt = wn;
+  ST *rst;
+
+  while ((stmt !=NULL)&&((WN_operator(stmt)!=OPR_STID)
+                           ||(WN_operator(stmt) ==OPR_STID)
+                             &&strcmp(ST_name(WN_st(stmt)),ST_name(st))))
+                                                                                               
+   stmt = WN_next(stmt);
+
+   if(stmt){
+     rst = WN_st(WN_kid0(stmt));
+     if(ST_is_temp_var(rst))
+          stmt = find_stmt(rst,first_stmt);
+     }
+     
+   if(stmt)
+        return stmt;
+   else return NULL;
+
+}    
 
 static void
 TY2F_Append_Array_Bnd_Ph(TOKEN_BUFFER decl_tokens, 
@@ -190,10 +225,13 @@ TY2F_Append_Array_Bnd_Ph(TOKEN_BUFFER decl_tokens,
    } else
    Array_Bnd_Temp_Var=TRUE;
 
+  if (!ST_is_temp_var(ST_ptr(arbnd)))
+     Append_Token_String(decl_tokens, ST_name(arbnd));
+  else{
    wn= PU_Body;
    if (!GetTmpVarTransInfo(decl_tokens,arbnd,wn))
           Append_Token_String(decl_tokens, ST_name(arbnd));
-
+  }
 } /* TY2F_Append_Array_Bnd_Ph */
 
 
