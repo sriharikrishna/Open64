@@ -2956,7 +2956,9 @@ int fm;
                               i   == FMT_IDX &&
                               !(namelist_expected)){  
              IL_IDX(list_idx)=ATD_TMP_IDX(ATL_FORMAT_TMP(IL_IDX(list_idx))); 
-             IL_FLD(list_idx) = CN_Tbl_Idx;
+/*Sept try             IL_FLD(list_idx) = CN_Tbl_Idx; */
+             IL_FLD(list_idx) = AT_Tbl_Idx;
+
        }
       else if (i                == FMT_IDX &&
                IL_FLD(list_idx) == IL_Tbl_Idx) {
@@ -3227,7 +3229,6 @@ int fm;
          case Var_Only_Form :
 
             find_opnd_line_and_column(&opnd, &line, &col);
-
             if (exp_desc.reference) {
 
                default_kind = TRUE;

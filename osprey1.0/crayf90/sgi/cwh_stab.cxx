@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.10 $
- * $Date: 2002-09-20 08:47:42 $
+ * $Revision: 1.11 $
+ * $Date: 2002-09-25 21:53:57 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.10 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.11 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -199,8 +199,7 @@ fei_proc(char         *name_string,
 {
   INTPTR p;
 
-  if (test_flag(flags, FEI_PROC_DEFINITION)||
-       test_flag(flags, FEI_PROC_IN_INTERFACE)) {
+  if (test_flag(flags, FEI_PROC_DEFINITION)){
      p = fei_proc_def(name_string,
                       lineno,
                       Sym_class_arg,
@@ -216,6 +215,23 @@ fei_proc(char         *name_string,
                       proc_idx,
                       flags);
   }
+
+  if (test_flag(flags, FEI_PROC_IN_INTERFACE)) {
+     p = fei_proc_interface(name_string,
+                      lineno,
+                      Sym_class_arg,
+                      Class_arg,
+                      0,
+                      0,
+                      num_dum_args,
+                      parent_stx,
+                      first_st_idx,
+                      alt_entry_idx,
+                      result_type,
+                      0,
+                      proc_idx,
+                      flags);
+   }
 
 
   if (test_flag(flags, FEI_PROC_PARENT)) {
@@ -450,6 +466,104 @@ fei_proc_def(char         *name_string,
   p = cwh_stab_packet(st, is_ST);
   return(cast_to_int(p));
 }
+
+/**************************************************************************/
+INTPTR
+fei_proc_interface(char         *name_string,
+	     INT32         lineno,
+	     INT32         Sym_class_arg,
+	     INT32         Class_arg,
+	     INT32         unused1,
+	     INT32         unused2,
+	     INT32         num_dum_args,
+	     INT32         parent_stx,
+	     INT32         first_st_idx,
+	     INT32         alt_entry_idx,
+	     TYPE          result_type,
+	     INT32         cmcs_node,
+	     INT32         proc_idx,
+             INT64         flags )
+{
+  ST * st    ;
+  TY_IDX  ty    ;
+  STB_pkt *p ;
+  FUNCTION_SYM  sym_class;
+  PROC_CLASS    Class;
+  BOOL is_inline_func = FALSE;
+  ST_EXPORT eclass;
+  TY_IDX ret_ty;
+
+  still_in_preamble = TRUE;
+
+  sym_class = (FUNCTION_SYM) Sym_class_arg;
+  Class = (PROC_CLASS) Class_arg;
+
+  /* fn result type - void for results by formal */
+
+  ret_ty = cast_to_TY(t_TY(result_type)) ;
+  ty = cwh_types_mk_procedure_TY(ret_ty,num_dum_args,TRUE,FALSE); 
+
+
+  st = cwh_auxst_find_item(Top_Text,name_string);
+
+  if (st == NULL) {
+
+    PU_IDX idx = cwh_stab_mk_pu(ty, CURRENT_SYMTAB);
+    st = New_ST(GLOBAL_SYMTAB);   
+    cwh_auxst_clear(st);
+    ST_Init (st, Save_Str(name_string), CLASS_FUNC, SCLASS_TEXT, eclass, (TY_IDX) idx);
+    Set_ST_ofst(st,0);
+    cwh_auxst_add_to_list(&Top_Text,st,FALSE);
+    
+   }
+
+  /* if fei_proc_imp made ST, then ST has a default void return */
+  /* which should be replaced with the correct return type/args */
+
+  
+
+  cwh_stab_set_linenum(st,lineno);
+   PU_IDX pu_idx = ST_pu(st);
+  PU& pu = Pu_Table[pu_idx];
+
+
+  if (test_flag(flags, FEI_PROC_RECURSE))
+    Set_PU_recursive(pu);
+
+  cwh_auxst_alloc_proc_entry(st,num_dum_args, ret_ty);
+
+  if (test_flag(flags, FEI_PROC_HASRSLT))
+    Set_ST_auxst_has_rslt_tmp(st,TRUE);
+
+  if (test_flag(flags, FEI_PROC_ELEMENTAL))
+    Set_ST_auxst_is_elemental(st,TRUE);
+
+  if (test_flag(flags, FEI_PROC_MODULE))
+    Set_ST_is_in_module(st);
+
+  if (test_flag(flags, FEI_PROC_ENTRY)) {
+
+    Set_ST_auxst_is_altentry(st,TRUE);
+    cwh_auxst_add_item(Procedure_ST,st,l_ALTENTRY);
+
+  } else {
+
+    Procedure_ST = st  ;
+
+     if (test_flag(flags, FEI_PROC_HAS_ALT_ENTRY)) 
+           Set_PU_has_altentry(pu);
+  }
+
+
+  st_for_distribute_temp=NULL;
+  preg_for_distribute.preg=-1;
+
+  entry_point_count++ ;
+
+  p = cwh_stab_packet(st, is_ST);
+  return(cast_to_int(p));
+}
+
 
 /*===================================================
  *
