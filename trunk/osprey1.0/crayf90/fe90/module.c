@@ -259,13 +259,12 @@ static	int	save_const_tbl_idx;
 static	boolean	search_for_duplicate_attrs;
 
 extern	char	compiler_gen_date[];
-
 # if (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
 # pragma inline set_mod_link_tbl_for_typ
 # pragma inline set_mod_link_tbl_for_cn
 # pragma inline set_mod_link_tbl_for_ir
 # pragma inline set_mod_link_tbl_for_bd
-# else
+# else 
 # pragma _CRI inline set_mod_link_tbl_for_typ
 # pragma _CRI inline set_mod_link_tbl_for_cn
 # pragma _CRI inline set_mod_link_tbl_for_ir
@@ -2578,7 +2577,12 @@ static void  compress_tbls(int		al_idx,
    /* mod_idx	= (only_update_new_tbl_entries) ? bd_idx + 1 : 1; */
    mod_idx	= 1;
 
-   while (mod_idx <= bd_idx) {
+ while (mod_idx <= bd_idx && BD_NTRY_SIZE(mod_idx)!= 0) {
+
+/* for some reason some deferred shape array BD_NTRY_SIZE(mod_idx)
+   is 0; need to read the code
+   fzhao
+ */
 
       if (!BD_USED_NTRY(mod_idx)) {  /* Entry from the free list */
          BD_NEXT_FREE_NTRY(mod_idx)	= ML_BD_IDX(BD_NEXT_FREE_NTRY(mod_idx));
@@ -3885,7 +3889,6 @@ void	use_stmt_semantics(void)
    attr_list_free_list		= AL_NEXT_IDX(NULL_IDX);
    interface_list		= NULL_IDX;
 
- printf("USE STMT:::::\n");
    keep_module_procs = (opt_flags.inline_lvl > Inline_Lvl_0) ||
                         ATP_MAY_INLINE(SCP_ATTR_IDX(MAIN_SCP_IDX));
 
