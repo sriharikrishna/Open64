@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 
 # This script runs a few simple tests on a set of *.f and *.f90 files:
 #   mfef90 <file>.f<90>
@@ -174,7 +174,7 @@ sub run_test() {
   open(OLDERR, ">&STDERR");
 
   # Redirect STDOUT and STDERR to log file
-  open(STDOUT, '>', $logfile) || die "can't redirect STDOUT: $!";
+  open(STDOUT, ">$logfile") || die "can't redirect STDOUT: $!";
   open(STDERR, ">&STDOUT") || die "can't dup STDOUT: $!";
 
   select(STDERR); $| = 1;
