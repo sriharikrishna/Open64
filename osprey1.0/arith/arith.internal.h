@@ -40,24 +40,18 @@
 
 #include <limits.h>
 
-/* Solaris cc porting */
-
-#ifdef _SOLARIS_SOLARIS
- #if !defined __STDC__ 
- #error Must be compiled with a Standard C compiler.
+/* eraxxon: disable because C++ compilers do not necessarily define __STDC__!
+ #if (!defined(__STDC__) || (defined(__STDC__) && __STDC__ == 0))
+ # error Must be compiled with a Standard C compiler.
  #endif
-#else
- #if !defined __STDC__ || __STDC__ == 0
- #error Must be compiled with a Standard C compiler.
- #endif
-#endif
+*/
 
 #if UINT_MAX < 0177777
-#error The size of an int must be at least 16 bits.
+# error The size of an int must be at least 16 bits.
 #endif
 
 #if ULONG_MAX < 017777777777
-#error The size of a long must be at least 32 bits.
+# error The size of a long must be at least 32 bits.
 #endif
 
 /* Internal AR_TYPE specifications (originally in arith.h) */
