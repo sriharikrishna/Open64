@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: tracing.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:09 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-08-05 13:21:06 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/tracing.c,v $
  *
  * Revision history:
@@ -56,7 +56,9 @@
  */
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/tracing.c,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/tracing.c,v $ $Revision: 1.2 $";
+
+#include <errno.h>
 
 #include "defs.h"
 #include "tracing.h"
