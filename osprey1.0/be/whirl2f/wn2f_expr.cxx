@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.18.2.1 $
- * $Date: 2004-07-16 15:26:53 $
+ * $Revision: 1.18.2.2 $
+ * $Date: 2004-07-27 22:40:25 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.18.2.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.18.2.2 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -629,29 +629,32 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
    if (parenthesize)
       Append_Token_Special(tokens, '(');
   
-   if (OPCODE_operator(opcode) == OPR_ADD ||
-       OPCODE_operator(opcode) == OPR_SUB)
+   if (OPCODE_operator(opcode) == OPR_ADD)
          priori_p = 1;
-   else if (OPCODE_operator(opcode) == OPR_MPY)
+   else if (OPCODE_operator(opcode) == OPR_SUB)
          priori_p = 2;
+   else if (OPCODE_operator(opcode) == OPR_MPY)
+         priori_p = 3;
 
    if (binary_op) {
       if (WN_operator(wn0) == OPR_ADD ||
           WN_operator(wn0) == OPR_SUB)
-              priori_k0 = 1;
-      else if (WN_operator(wn0) == OPR_MPY)
               priori_k0 = 2;
+      else if (WN_operator(wn0) == OPR_MPY)
+              priori_k0 = 3;
    }
 
    if (WN_operator(wn1) == OPR_ADD ||
        WN_operator(wn1) == OPR_SUB)
         priori_k1 = 1;
    else if (WN_operator(wn1) == OPR_MPY)
-        priori_k1 = 2;
+        priori_k1 = 3;
 
    if (priori_p && priori_k0 &&
        priori_p <= priori_k0)
          set_WN2F_CONTEXT_subexp_no_parenthesis(context);
+   else
+         reset_WN2F_CONTEXT_subexp_no_parenthesis(context);
 
    /* First operand */
    if (binary_op) {
@@ -711,7 +714,9 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
    /* Second operand, or only operand for unary operation */
    if (priori_p && priori_k1 &&
        priori_p <= priori_k1)
-      set_WN2F_CONTEXT_subexp_no_parenthesis(context);
+       set_WN2F_CONTEXT_subexp_no_parenthesis(context);
+   else
+       reset_WN2F_CONTEXT_subexp_no_parenthesis(context);
 
    WN2F_Translate_Arithmetic_Operand(tokens, wn1, wn1_ty, 
 				     TRUE/*call-by-value*/,
