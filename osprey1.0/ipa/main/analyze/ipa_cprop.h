@@ -101,10 +101,12 @@ struct OFFSET_SIZE
   UINT32 size;
 };
 
+namespace std {
 template<> struct hash<OFFSET_SIZE> 
 {
   size_t operator()(OFFSET_SIZE x) const { return x.offset + x.size; }
 };
+}
 
 struct OFFSET_SIZE_EQ
 {

@@ -42,9 +42,9 @@
  * ====================================================================
  *
  * Module: doacross.cxx
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:38 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-09-15 18:46:25 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/lno/doacross.cxx,v $
  *
  * Revision history:
@@ -70,6 +70,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
+#include <float.h>
 #include "pu_info.h"
 #include "defs.h"
 #include "glob.h"
