@@ -33,23 +33,23 @@
 */
 
 
-/* $Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/include/stamp.h,v 1.1.1.1 2002-05-22 20:09:05 dsystem Exp $ */
+/* $Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/include/stamp.h,v 1.2 2003-11-04 16:18:58 eraxxon Exp $ */
 
 #ifndef __STAMP_H__
 #define __STAMP_H__
 
-#ifdef __cplusplus
+#ifdef __cplusplus 
 extern "C" {
 #endif
 
 #ifdef __linux
-#define	MS_STAMP 0
-#define	LS_STAMP 9
-#define INCLUDE_STAMP "0.01.0-13"
+# define MS_STAMP 0
+# define LS_STAMP 9
+# define INCLUDE_STAMP "0.01.0-13"
 #else
-#define	MS_STAMP 7
-#define	LS_STAMP 40
-#define INCLUDE_STAMP "7.40"
+# define MS_STAMP 7
+# define LS_STAMP 40
+# define INCLUDE_STAMP "7.40"
 #endif
 
 #ifdef __cplusplus
