@@ -53,6 +53,9 @@
  *
  */
 
+#define DISABLE_NL_TYPES_SYMBOL_RENAMING 1 /* for our <nl_types.h> */
+#define catgets my_catgets /* hack to refer to our own catgets() */
+
 #ifdef	_LITTLE_ENDIAN
 #include <nl_types.h>
 #include <cray/nlcatmsg.h>
@@ -67,6 +70,7 @@
 #undef __NLS_INTERNALS
 #include <string.h>
 #endif				/* End _LITTLE_ENDIAN */
+
 
 /*
  * catgetmsg -- retrieves a message to a user supplied buffer from a catalog

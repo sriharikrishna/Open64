@@ -55,6 +55,9 @@
  * but I put its definition NL_MSGSET = NL_SEFD into compiler
  * command line
  */
+
+#define DISABLE_NL_TYPES_SYMBOL_RENAMING 1 /* for our <nl_types.h> */
+
 #ifdef _SOLARIS_SOLARIS
 #define MSG_FORMAT	"MSG_FORMAT"
 #define D_MSG_FORMAT	"%G-%N %C: %S %P\n  %M\n"
