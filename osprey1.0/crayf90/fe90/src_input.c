@@ -80,10 +80,6 @@ static boolean	get_nxt_line(void);
 static void	pp_get_stmt (void);
 static void	shift_to_line_size(int);
 
-
-# pragma _CRI align fixed_get_char
-# pragma _CRI inline scan_thru_close_paren
-
 static boolean	issue_classify_msg = TRUE;
 
 # ifdef _DEBUG
@@ -678,7 +674,8 @@ void fixed_get_char (void)
       else if (stmt_buf_idx == stmt_line_end_idx[stmt_line_idx]) {
 
          if (stmt_line_idx < lines_in_buf) {	        /* stmt continues     */
-            stmt_buf_idx = stmt_line_start_idx[++stmt_line_idx] 
+	    ++stmt_line_idx;
+            stmt_buf_idx = stmt_line_start_idx[stmt_line_idx] 
                            + stmt_line_offset[stmt_line_idx];
 
 	    ich = blank;				/* loop again	      */
@@ -761,7 +758,8 @@ void fixed_get_char_literal (void)
    if (stmt_buf_idx == stmt_line_end_idx[stmt_line_idx]) {
 
       if (stmt_line_idx < lines_in_buf) {               /* check for cont line*/
-         stmt_buf_idx = stmt_line_start_idx[++stmt_line_idx]
+	 ++stmt_line_idx;
+         stmt_buf_idx = stmt_line_start_idx[stmt_line_idx]
                         + stmt_line_offset[stmt_line_idx];
 
 	 ich = stmt_buf[++stmt_buf_idx];		/* next src character */
@@ -985,7 +983,8 @@ void free_get_char (void)
    else if (stmt_buf_idx == stmt_line_end_idx[stmt_line_idx]) {
 
       if (stmt_line_idx < lines_in_buf) {         /* stmt continues     */
-         stmt_buf_idx = stmt_line_start_idx[++stmt_line_idx]
+	 ++stmt_line_idx;
+         stmt_buf_idx = stmt_line_start_idx[stmt_line_idx]
                         + stmt_line_offset[stmt_line_idx];
          ich = stmt_buf[++stmt_buf_idx];
       }
@@ -1089,7 +1088,8 @@ void free_get_char_literal (void)
    if (stmt_buf_idx == stmt_line_end_idx[stmt_line_idx]) {
 
       if (stmt_line_idx < lines_in_buf) {
-         stmt_buf_idx = stmt_line_start_idx[++stmt_line_idx]
+	 ++stmt_line_idx;
+         stmt_buf_idx = stmt_line_start_idx[stmt_line_idx]
                         + stmt_line_offset[stmt_line_idx];
 
          ich = stmt_buf[++stmt_buf_idx];
@@ -1171,7 +1171,6 @@ static void fixed_get_stmt (void)
    label_ok = FALSE;
 
    /* loop while stmt continues */
-# pragma _CRI align
    do {
 
       save_idx = 0;
@@ -1703,7 +1702,6 @@ boolean read_line (boolean	cc_continuation_line)
    else {						/* return next line   */
       if (source_form == Fixed_Form) {
          /* pad to continue col*/
-/* # pragma _CRI shortloop  KAY This causes problems on the PVP */
          while (nxt_line_idx < 
               (nxt_line_start_idx[nxt_line_num_lines] - 1) + CONTINUE_COLUMN) {	
 	    nxt_line[++nxt_line_idx] = blank; 
@@ -2700,7 +2698,6 @@ START:
          /* is the string delimiter, or negative the hollerith */
          /* count.                                             */
 
-# pragma _CRI align
          do {
             while (char_delim == 0) {
                ich = nxt_line[++idx];
@@ -3077,7 +3074,6 @@ static void free_get_stmt (void)
    label_ok = TRUE;
 
    /* loop while stmt continues */
-# pragma _CRI align
    do {
 
       save_idx = 0;
@@ -4393,7 +4389,6 @@ START:
       prev_char_delim = 0;
 
 
-# pragma _CRI align
       do {
          while (char_delim == 0) {
             ich = nxt_line[++idx];
@@ -5385,7 +5380,8 @@ char	scan_thru_close_paren(int idx, int line_idx, int cnt)
                   if (idx == stmt_line_end_idx[line_idx]) {
 
                      if (line_idx < lines_in_buf) {
-                        idx = stmt_line_start_idx[++line_idx] +
+		        ++line_idx;
+                        idx = stmt_line_start_idx[line_idx] +
                               stmt_line_offset[line_idx];
                         ich = blank;
                      }
@@ -5405,7 +5401,8 @@ char	scan_thru_close_paren(int idx, int line_idx, int cnt)
          else if (idx == stmt_line_end_idx[line_idx]) {
 
             if (line_idx < lines_in_buf) {
-               idx = stmt_line_start_idx[++line_idx] + 
+	       ++line_idx;
+               idx = stmt_line_start_idx[line_idx] + 
                         stmt_line_offset[line_idx];
             }
             else {
@@ -5476,7 +5473,6 @@ boolean set_stmt_type_known(void)
 
 BACK:
 
-# pragma _CRI align
    while ((ich != EOF) &&
           ((ch_class[ich] == Ch_Class_Letter) |
            (ch_class[ich] == Ch_Class_Digit)  |
@@ -5492,7 +5488,8 @@ BACK:
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
          }
          else {
@@ -5510,7 +5507,8 @@ BACK:
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+ 	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
          }
          else {
@@ -5535,7 +5533,8 @@ BACK:
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
          }
          else {
@@ -5552,7 +5551,8 @@ BACK:
          if (idx == stmt_line_end_idx[line_idx]) {
 
             if (line_idx < lines_in_buf) {
-               idx = stmt_line_start_idx[++line_idx]
+	       ++line_idx;
+               idx = stmt_line_start_idx[line_idx]
                      + stmt_line_offset[line_idx];
             }
             else {
@@ -5780,7 +5780,6 @@ boolean next_arg_is_kwd_equal (void)
       lamp = -1;
    }
 
-# pragma _CRI align
    while ((ich != EOF) &&
           (ch_class[(char)ich] == Ch_Class_Letter) |
           (ch_class[(char)ich] == Ch_Class_Digit)  |
@@ -5796,7 +5795,8 @@ boolean next_arg_is_kwd_equal (void)
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
          }
          else {
@@ -5818,7 +5818,8 @@ boolean next_arg_is_kwd_equal (void)
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
          }
          else {
@@ -5849,7 +5850,8 @@ boolean next_arg_is_kwd_equal (void)
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
          }
          else {
@@ -5936,7 +5938,8 @@ boolean stmt_is_DATA_stmt (void)
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
          }
          else {
@@ -6011,7 +6014,8 @@ boolean stmt_has_double_colon (void)
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
             continue;
          }
@@ -6104,7 +6108,8 @@ boolean  stmt_is_DO_stmt (void)
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
          }
          else {
@@ -6179,8 +6184,9 @@ void  format_line_n_col (int *line,
          else {
             format_col -= stmt_line_end_idx[line_idx] - idx;
             if (line_idx < lines_in_buf) {
-               idx = stmt_line_start_idx[++line_idx]
-                                 + stmt_line_offset[line_idx] + 1;
+	       ++line_idx;
+               idx = stmt_line_start_idx[line_idx]
+		 + stmt_line_offset[line_idx] + 1;
             }
             else {
                idx = stmt_line_end_idx[line_idx] - 1;
@@ -6198,7 +6204,8 @@ void  format_line_n_col (int *line,
          if (idx == stmt_line_end_idx[line_idx]) {
 
             if (line_idx < lines_in_buf) {
-               idx = stmt_line_start_idx[++line_idx]
+	       ++line_idx;
+               idx = stmt_line_start_idx[line_idx]
                      + stmt_line_offset[line_idx];
                ich = stmt_buf[++idx];
             }
@@ -6305,7 +6312,8 @@ int  put_char_const_in_tbl (char holler,	/* In  */
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
             ich = stmt_buf[++idx];
          }
@@ -6369,7 +6377,8 @@ int  put_char_const_in_tbl (char holler,	/* In  */
       if (stmt_buf_idx == stmt_line_end_idx[stmt_line_idx]) {
 
          if (stmt_line_idx < lines_in_buf) {
-            stmt_buf_idx = stmt_line_start_idx[++stmt_line_idx]
+	    ++stmt_line_idx;
+            stmt_buf_idx = stmt_line_start_idx[stmt_line_idx]
                   + stmt_line_offset[stmt_line_idx];
             ich = stmt_buf[++stmt_buf_idx];
          }
@@ -6448,7 +6457,8 @@ int  put_format_in_tbl (void)
          }
          else {
             length -= stmt_line_end_idx[stmt_line_idx] - stmt_buf_idx;
-            stmt_buf_idx = stmt_line_start_idx[++stmt_line_idx]
+	    ++stmt_line_idx;
+            stmt_buf_idx = stmt_line_start_idx[stmt_line_idx]
                            + stmt_line_offset[stmt_line_idx] + 1;
          }
       }
@@ -6463,7 +6473,8 @@ int  put_format_in_tbl (void)
       if (idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx];
             continue;
          }
@@ -6526,7 +6537,8 @@ int  put_format_in_tbl (void)
       if (stmt_buf_idx == stmt_line_end_idx[stmt_line_idx]) {
 
          if (stmt_line_idx < lines_in_buf) {
-            stmt_buf_idx = stmt_line_start_idx[++stmt_line_idx]
+	    ++stmt_line_idx;
+            stmt_buf_idx = stmt_line_start_idx[stmt_line_idx]
                   + stmt_line_offset[stmt_line_idx];
             continue;
          }
@@ -6625,7 +6637,8 @@ boolean  is_implied_do (void)
       if (++idx == stmt_line_end_idx[line_idx]) {
          
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx] + 1;
          }
          else {
@@ -6704,7 +6717,8 @@ boolean  is_substring_ref (void)
       if (++idx == stmt_line_end_idx[line_idx]) {
          
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx] + 1;
          }
          else {
@@ -6783,7 +6797,8 @@ boolean next_id_is_imp_control(void)
       if (++idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx] + 1;
          }
          else {
@@ -7040,7 +7055,8 @@ boolean	digit_is_format_label(void)
       if (++idx == stmt_line_end_idx[line_idx]) {
 
          if (line_idx < lines_in_buf) {
-            idx = stmt_line_start_idx[++line_idx]
+	    ++line_idx;
+            idx = stmt_line_start_idx[line_idx]
                   + stmt_line_offset[line_idx] + 1;
          }
          else {
@@ -7142,7 +7158,8 @@ boolean next_tok_is_paren_slash(void)
          if (idx == stmt_line_end_idx[line_idx]) {
 
             if (line_idx < lines_in_buf) {
-               idx = stmt_line_start_idx[++line_idx]
+	       ++line_idx;
+               idx = stmt_line_start_idx[line_idx]
                      + stmt_line_offset[line_idx] + 1;
             }
             else {
