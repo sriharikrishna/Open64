@@ -481,10 +481,26 @@ Print_INITV (const INITV& initv)
 } // Print_INITV
 
 
+// eraxxon: we need this functor for use with the 'For_all_initv'
+// template.  The template was being instatiated with Print_INITV (a
+// function pointer type), but one cannot generally template accross
+// an object and a function pointer.
+class Print_INITV_fnctr
+{
+public:
+  Print_INITV_fnctr() { }
+  ~Print_INITV_fnctr() { }
+  
+  void operator()(const INITV& initv) const {
+    Print_INITV(initv);
+  }
+};
+
+
 void
 Print_INITVs (INITV_IDX idx)
 {
-    For_all_initv (idx, Print_INITV);
+   For_all_initv (idx, Print_INITV_fnctr());
 }
 
 void
