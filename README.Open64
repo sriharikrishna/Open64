@@ -1,0 +1,128 @@
+$Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/README.Open64,v 1.1 2004-11-23 20:25:53 eraxxon Exp $
+
+=============================================================================
+==
+== README
+==
+=============================================================================
+
+This is the README for Open64.
+
+Contents:
+  0. Overview of Open64
+  1. Getting started with Open64
+  2. For More Information
+
+=============================================================================
+
+0. Overview of Open64:
+--------------------
+
+Rice University's Open64 is a multi-platform version of the SGI
+Pro64/Open64 compiler suite that includes new support for
+source-to-source transformation.  
+
+We are presently working on reconnecting this source-to-source
+translation infrastructure into the back-end analysis to support
+analysis-based transformations.
+
+Open64 runs on the following platforms:
+  *-Linux (x86, IA64, Opteron)
+  alpha-Tru64
+  mips-IRIX
+  sparc-Solaris
+  x86-cygwin
+
+The Open64 web site is at:
+  http://www.hipersoft.rice.edu/open64
+
+=============================================================================
+
+1. Getting started with Open64:
+--------------------
+
+Prerequisites:
+  * CVS, for obtaining the sources
+  * Recent version of GCC (e.g. 3.3.3) on Linux or vendor compiler on
+    IRIX, Solaris, Tru64.  GCC should generally work on non-Linux
+    systems, but will at least require a small change in the makefiles.
+  * GNU make
+
+Probably the most pain-free platform to build on is Linux with a
+recent version of GCC.
+
+
+1.1. Obtaining the Source
+----
+
+In order to reduce maintenance time, we distribute the source via CVS.
+Please wee the instructions on our web site for obtaining the source
+code.
+
+
+1.2. Building Instructions
+----
+
+Unfortunately, within a multi-platform context, the build system
+leaves quite a lot to be desired.
+
+1. Choose an appropriate target directory depending on your platform
+
+  targ_alpha_tru64/
+  targ_ia32_ia64_linux/  (32-bit Linux and 32-bit Cygwin)
+  targ_ia64_ia64_linux/  (64-bit Linux)
+  targ_mips_irix/
+  targ_sparc_solaris/
+
+(N.B.: We do not support the other target directories!)
+
+The rest of these instructions are relative to your target directory.
+
+2. You may modify 'Makefile.platform' to:
+  select compiler (BUILD_COMPILER is GNU or VENDOR)
+
+3. Compile by running 'make' within the target directory.  Or, you can
+individual compile components:
+
+  F90 front end (mfef90):
+    cd crayf90/sgi && make
+
+  WHIRL IR tools (e.g., ir_b2a):
+    cd ir_tools && make
+
+  WHIRL-to-Fortran unparser (whirl2f)
+    cd whirl2f && make
+
+  WHIRL-to-C unparser (whirl2c)
+    cd whirl2c && make
+
+
+1.3. Installation Instructions.
+----
+
+There is currently no packaged installation procedure.  Running 'make
+install' is not supported.  You should generally treat the top-level
+INSTALL script the same as you would a lie.
+
+
+=============================================================================
+
+2. For More Information:
+--------------------
+
+You can find more information on our web site.
+
+Here is a list of some important documentation:
+  documentation/pro64-docs/*
+    This directory contains overviews of Pro64, which are helpful for
+    understanding the big picture.
+
+  documentation/open64.ps 
+    A reference on the WHIRL abstract syntax tree and the WHIRL
+    symbol table, including Rices changes.  Although it is not
+    completely up to date, the good news is that it is very accurate
+    (i.e. while it does not contain some new details, it does not
+    generally mislead).
+ 
+See our webpage for information on the OPEN64 mailing list.
+
