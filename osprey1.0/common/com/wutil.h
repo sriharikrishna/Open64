@@ -57,14 +57,24 @@ extern "C" {
  * ====================================================================
  */
 
-char *get_intrinsic_name(INTRINSIC opcode);
-char *get_iostatement_name(IOSTATEMENT opcode);
-char *get_ioitem_name(IOITEM opcode);
-char *get_iolibrary_name(IOLIB opcode);
+const char *get_intrinsic_name(INTRINSIC opcode);
+const char *get_iostatement_name(IOSTATEMENT opcode);
+const char *get_ioitem_name(IOITEM opcode);
+const char *get_iolibrary_name(IOLIB opcode);
+
+INTRINSIC   get_intrinsic_from_name(const char* name);
+IOSTATEMENT get_iostatement_from_name(const char* name);
+IOITEM      get_ioitem_from_name(const char* name);
+
 
 #define INTRINSIC_name(op) get_intrinsic_name(op)
 #define IOSTATEMENT_name(op) get_iostatement_name(op)
 #define IOITEM_name(op) get_ioitem_name(op)
+
+#define Name_To_INTRINSIC(nm) get_intrinsic_from_name(nm)
+#define Name_To_IOSTATEMENT(nm) get_iostatement_from_name(nm)
+#define Name_To_IOITEM(nm) get_ioitem_from_name(nm)
+
 
 #ifdef __cplusplus
 }
