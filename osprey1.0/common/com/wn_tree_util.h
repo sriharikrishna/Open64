@@ -507,7 +507,7 @@ template <class WHIRL>
 void
 WN_TREE_ITER<PRE_ORDER, WHIRL>::WN_TREE_next ()
 {
-  Is_True(_wn != 0, ("Bad tree node"));
+  Is_True(this->_wn != 0, ("Bad tree node"));
   if (WN_operator(this->_wn) == OPR_BLOCK) {
     if (WN_first(this->_wn)) // go down
       this->Push();  
@@ -576,7 +576,7 @@ template <class WHIRL>
 void
 WN_TREE_ITER<POST_ORDER, WHIRL>::Wind ()
 {
-  Is_True(_wn != 0,("Bad tree node"));
+  Is_True(this->_wn != 0,("Bad tree node"));
   BOOL done = FALSE;
   while (!done) {
 
@@ -603,7 +603,7 @@ template <class WHIRL>
 void
 WN_TREE_ITER<POST_ORDER, WHIRL>::WN_TREE_next ()
 {
-  Is_True(_wn != 0, ("Bad tree node"));
+  Is_True(this->_wn != 0, ("Bad tree node"));
   
   WHIRL parent_wn = this->Get_parent_wn();
   if (parent_wn == NULL) {
