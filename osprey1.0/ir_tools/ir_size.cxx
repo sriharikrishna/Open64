@@ -42,7 +42,11 @@
 #include <errno.h>		    /* for sys_errlist */
 #include <sys/stat.h>
 #include <sys/elf_whirl.h>
-#include <libgen.h>		    /* for basename() */
+
+#if !defined(__CYGWIN__)
+  // Cygwin doesn't yet have libgen.h or basename(). Sigh.
+# include <libgen.h>		    /* for basename() */
+#endif
 
 // Solaris CC workaround
 #if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
@@ -182,7 +186,11 @@ main (INT argc, char *argv[])
     Set_Error_File(NULL);
     Set_Error_Line(ERROR_LINE_UNKNOWN);
 
+#if defined(__CYGWIN__) 
+    progname = argv[0]; // FIXME: see <libgen.h> above
+#else
     progname = basename (argv[0]);
+#endif
 
     if (argc < 2)
 	usage(progname);
