@@ -420,6 +420,7 @@ public:
 	    UINT32	    io_flag;
 	    UINT32	    asm_flag;
 	    UINT32          asm_operand_num;
+	    UINT32          eq_logical_flag;
 	    struct {
 		mUINT16	    trip_est;
 		mUINT16	    loop_depth;
@@ -538,6 +539,10 @@ public:
   friend inline INT32       WN_label_number (const WN *);
   friend inline UINT32&     WN_call_flag (WN *);
   friend inline UINT32      WN_call_flag (const WN *);
+
+  friend inline UINT32&     WN_eq_logical_flag (WN *);
+  friend inline UINT32      WN_eq_logical_flag (const WN *);
+
   friend inline UINT32&     WN_if_flag (WN *);
   friend inline UINT32      WN_if_flag (const WN *);
   friend inline UINT32&     WN_io_flag (WN *);
@@ -687,6 +692,10 @@ inline INT32 WN_label_number (const WN* wn) { return wn->u1u2.uu.ua.label_number
 inline INT32& WN_label_number (WN* wn) { return wn->u1u2.uu.ua.label_number; }
 inline UINT32 WN_call_flag (const WN* wn) { return wn->u1u2.uu.ua.call_flag; }
 inline UINT32& WN_call_flag (WN* wn) { return wn->u1u2.uu.ua.call_flag; }
+
+inline UINT32 WN_eq_logical_flag (const WN* wn) { return wn->u1u2.uu.ua.eq_logical_flag; }
+inline UINT32& WN_eq_logical_flag (WN* wn) { return wn->u1u2.uu.ua.eq_logical_flag; }
+
 inline UINT32 WN_if_flag (const WN* wn) { return wn->u1u2.uu.ua.if_flag; }
 inline UINT32& WN_if_flag (WN* wn) { return wn->u1u2.uu.ua.if_flag; }
 inline UINT32 WN_io_flag (const WN* wn) { return wn->u1u2.uu.ua.io_flag; }
@@ -805,6 +814,9 @@ inline void WN_Copy_u3 (WN* dst, const WN* src) { dst->u3 = src->u3; }
 #define WN_cvtl_bits(x)         ((x)->u1u2.uu.ua.cvtl_bits)
 #define WN_label_number(x)      ((x)->u1u2.uu.ua.label_number)
 #define WN_call_flag(x)         ((x)->u1u2.uu.ua.call_flag)
+
+#define WN_eq_logical_flag(x)   ((x)->u1u2.uu.ua.eq_logical_flag)
+
 #define WN_if_flag(x)           ((x)->u1u2.uu.ua.if_flag)
 #define WN_io_flag(x)           ((x)->u1u2.uu.ua.io_flag)
 #define WN_asm_flag(x)          ((x)->u1u2.uu.ua.asm_flag)
@@ -1176,6 +1188,11 @@ inline UINT32 WN_flag(const WN *wn)
     return (WN_io_flag(wn));
   case OPR_ASM_STMT:
     return (WN_asm_flag(wn));
+
+  case OPR_EQ:
+  case OPR_NE:
+    return (WN_eq_logical_flag(wn));
+
   default:
     return(WN_label_flag(wn));
   }
@@ -1209,6 +1226,10 @@ inline void WN_set_flag(WN *wn, UINT32 flag)
   case OPR_LOOP_INFO:
     WN_loop_flag(wn) = flag;
     break;
+  case OPR_EQ:
+  case OPR_NE:
+    WN_eq_logical_flag(wn) =flag;
+
   default:
     WN_label_flag(wn) = flag;
     break;
@@ -1435,6 +1456,10 @@ inline BOOL WN_Is_Volatile_Mem(const WN *wn)
 #define WN_Parm_Check_Contig_Flag(x)         (WN_parm_flag(x) & WN_PARM_CHECK_CONTIG_FLAG)
 #define WN_Set_Parm_Check_Contig_Flag(x)     (WN_parm_flag(x) |= WN_PARM_CHECK_CONTIG_FLAG)
 
+#define WN_EQ_IS_LOGICAL        0x01 /*OPR_EQ or OPR_NE is logical opr */
+#define WN_Eq_Is_Logical(x)       (WN_eq_logical_flag(x) & WN_EQ_IS_LOGICAL)
+#define WN_Set_Eq_Is_Logical(x)   (WN_eq_logical_flag(x) |= WN_EQ_IS_LOGICAL)
+#define WN_Reset_Eq_Is_Logical(x) (WN_eq_logical_flag(x) &= WN_EQ_IS_LOGICAL)
 
 #define WN_CALL_NEVER_RETURN	0x01 /* call will never return */
 #define WN_CALL_NON_DATA_MOD	0x02 /* modifies data not present in program */
