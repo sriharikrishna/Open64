@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_expr
- * $Revision: 1.4 $
- * $Date: 2003-03-04 20:08:53 $
+ * $Revision: 1.5 $
+ * $Date: 2003-03-04 21:08:03 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1122,7 +1122,7 @@ fei_multiply_high(TYPE type)
    rhs = cwh_convert_to_ty(rhs,ot);
   
    wn = WN_CreateExp2 ( opc, lhs, rhs) ;
-  
+
    wn = cwh_expr_restore_arrayexp(wn,ae);
    cwh_stk_push(wn,WN_item);
 }
