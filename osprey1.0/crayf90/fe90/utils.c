@@ -36,6 +36,8 @@
 
 static char USMID[] = "\n@(#)5.0_pl/sources/utils.c	5.9	10/14/99 12:53:57\n";
 
+# include <stdio.h>             /* for tempnam */
+
 # include "defines.h"           /* Machine dependent ifdefs */
 
 # include "host.m"              /* Host machine dependent macros.*/
