@@ -42,7 +42,7 @@
 
 
 #ifdef _KEEP_RCS_ID
-static char *dwarf_DST_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST.h,v $ $Revision: 1.3 $";
+static char *dwarf_DST_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST.h,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 /* The version number will be accessible through the routines in
@@ -265,13 +265,9 @@ typedef enum DST_const_form
    DST_FORM_DATA1, 
    DST_FORM_DATA2, 
    DST_FORM_DATA4, 
-#ifndef KEY
-   DST_FORM_DATA8
-#else
    DST_FORM_DATA8, 
    DST_FORM_DATAC4,
    DST_FORM_DATAC8
-#endif // KEY
 } DST_CONST_FORM;
 
 typedef struct DST_const_value
@@ -284,7 +280,6 @@ typedef struct DST_const_value
       UINT16  form_data2;
       UINT32  form_data4;
       UINT64  form_data8;
-#ifdef KEY
       struct {
 	UINT32 form_crdata4;
 	UINT32 form_cidata4;
@@ -293,7 +288,6 @@ typedef struct DST_const_value
 	UINT64 form_crdata8;
 	UINT64 form_cidata8;
       } cdata8;
-#endif // KEY
    } value;
 } DST_CONST_VALUE;
 
@@ -303,12 +297,10 @@ typedef struct DST_const_value
 #define DST_CONST_VALUE_form_data2(c) ((c).value.form_data2)
 #define DST_CONST_VALUE_form_data4(c) ((c).value.form_data4)
 #define DST_CONST_VALUE_form_data8(c) ((c).value.form_data8)
-#ifdef KEY
 #define DST_CONST_VALUE_form_crdata4(c) ((c).value.cdata4.form_crdata4)
 #define DST_CONST_VALUE_form_cidata4(c) ((c).value.cdata4.form_cidata4)
 #define DST_CONST_VALUE_form_crdata8(c) ((c).value.cdata8.form_crdata8)
 #define DST_CONST_VALUE_form_cidata8(c) ((c).value.cdata8.form_cidata8)
-#endif // KEY
 
 
 
@@ -611,9 +603,7 @@ typedef struct DST_var_decl
    USRCPOS      decl;  /* Source location */
    DST_STR_IDX  name;  /* Name of variable */
    DST_INFO_IDX type;  /* Type of variable */
-#ifdef KEY
    DST_STR_IDX    linkage_name;  /* Mangled name of variable */
-#endif
 } DST_VAR_DECL;
 
 typedef struct DST_var_def
@@ -627,9 +617,7 @@ typedef struct DST_var_def
 				  * field decl */
    DST_INFO_IDX abstract_origin;
    DST_INFO_IDX dopetype;   /* Type of dope vector */
-#ifdef KEY
    DST_STR_IDX    linkage_name;  /* Mangled name of variable */
-#endif
 }  DST_VAR_DEF;
 
 typedef struct DST_var_const
@@ -673,9 +661,7 @@ typedef union DST_variable
 #define DST_VARIABLE_decl_decl(attr) ((attr)->decl.decl)
 #define DST_VARIABLE_decl_name(attr) ((attr)->decl.name)
 #define DST_VARIABLE_decl_type(attr) ((attr)->decl.type)
-#ifdef KEY
 #define DST_VARIABLE_decl_linkage_name(attr) ((attr)->decl.linkage_name)
-#endif
 
 #define DST_VARIABLE_def_decl(attr) ((attr)->def.decl)
 #define DST_VARIABLE_def_name(attr) ((attr)->def.name)
@@ -683,9 +669,7 @@ typedef union DST_variable
 #define DST_VARIABLE_def_st(attr) ((attr)->def.st)
 #define DST_VARIABLE_def_offs(attr) ((attr)->def.offs)
 #define DST_VARIABLE_def_specification(attr) ((attr)->def.specification)
-#ifdef KEY
 #define DST_VARIABLE_def_linkage_name(attr) ((attr)->def.linkage_name)
-#endif
 #define DST_VARIABLE_def_abstract_origin(attr) ((attr)->def.abstract_origin)
 #define DST_VARIABLE_def_dopetype(attr) ((attr)->def.dopetype)
 

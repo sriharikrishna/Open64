@@ -545,10 +545,7 @@ public:
 	TY_IDX etype;			// type of array element (array only)
 	TY_IDX pointed;			// pointed-to type (pointers only)
 	mUINT32 pu_flags;		// attributes for KIND_FUNCTION
-#ifdef KEY
         ST_IDX copy_constructor;        // copy constructor X(X&) (record only)
-#endif
-
     } u2;
 
     mUINT32 block_size;                 // block size for UPC shared data
@@ -579,7 +576,6 @@ public:
       }
     void Set_pointed (TY_IDX idx)	{ u2.pointed = idx; }
    
-#ifdef KEY
     ST_IDX Copy_constructor () const
       {
         Is_True(kind == KIND_STRUCT,
@@ -587,7 +583,6 @@ public:
         return u2.copy_constructor;
       }
     void Set_copy_constructor (ST_IDX idx)      { u2.copy_constructor = idx; }
-#endif  // KEY
  
     PU_IDX Pu_flags () const		{ return u2.pu_flags; }
     void Set_pu_flag (TY_PU_FLAGS f)	{ u2.pu_flags |= f; }
@@ -651,10 +646,8 @@ public:
 #define PU_IS_THUNK		0x0000000400000000LL // pu is a C++ thunk
 #define PU_DECL_VIEW		0x0000000800000000LL // pu is a multiply copy for declare "external" 
 #define PU_NEED_UNPARSED	0x0000001000000000LL // pu flag for unparser to discard some unwanted PU
-#ifdef KEY
 #define PU_NEEDS_MANUAL_UNWINDING       0x0000000800000000LL // PU has cleanups in outermost scope and
                                                              //hence needs to call _Unwind_Resume itself
-#endif
 #ifdef TARG_X8664
 #define PU_FF2C_ABI             0x0000001000000000LL 
                                                // PU use g77 linkage convention for returns of complex and float

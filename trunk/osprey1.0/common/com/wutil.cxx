@@ -860,7 +860,6 @@ static const struct {
   INTRN_SETNULL_S_R, "SETNULL_S_R",
   INTRN_SETNULL_P_R, "SETNULL_P_R",
   INTRN_SUB_PI, "SUB_PI",
-#ifdef KEY
   INTRN_U4READFRAMEPOINTER,     "U4READFRAMEPOINTER",
   INTRN_U8READFRAMEPOINTER,     "U8READFRAMEPOINTER",
   INTRN_APPLY_ARGS,             "APPLY_ARGS",
@@ -878,7 +877,6 @@ static const struct {
                                                                                    
   INTRN_SUBSU2,                 "INTRN_SUBSU2",
   INTRN_SUBSV16I2,              "INTRN_SUBSV16I2",
-#endif
   INTRINSIC_LAST,		"INTRINSIC_LAST"
 
 };
