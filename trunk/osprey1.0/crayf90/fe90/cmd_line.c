@@ -4932,7 +4932,7 @@ static void set_prog_file_names (char *argv[])
 }  /* set_prog_file_names */
 
 
-# ifdef _DEBUG
+/* # ifdef _DEBUG */
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -5018,7 +5018,7 @@ static	void	dump_help_screen(void)
 
 }  /* dump_help_screen */
 
-# endif
+/* # endif */
 
 
 /******************************************************************************\
