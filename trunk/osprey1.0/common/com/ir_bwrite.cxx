@@ -125,8 +125,12 @@ extern void Depgraph_Write (void *depgraph, Output_File *fl, WN_MAP off_map);
 #define OPEN(path, flag, mode)						\
     open((const char *)(path), (int)(flag), (mode_t)(mode))
 
-static void (*old_sigsegv) (int);   /* the previous signal handler */
-static void (*old_sigbus) (int);   /* the previous signal handler */
+
+
+extern "C" typedef void (*SIG_HANDLER)(int);
+
+static SIG_HANDLER old_sigsegv;   /* the previous signal handler */
+static SIG_HANDLER old_sigbus;    /* the previous signal handler */
 
 Output_File *Current_Output = 0;
 
@@ -159,10 +163,10 @@ cleanup (Output_File *fl)
  * to be handled differently. We keep the old signal handler in
  * "old_sigsegv/old_sigbus", to which we pass the non-mmap related SIGSEGV.
  */
-static void
+extern "C" void
 ir_bwrite_signal_handler (int sig, int err_num)
 {
-    void (*old_handler) (int) = 0;
+    SIG_HANDLER old_handler = 0;
 
     if (Doing_mmapped_io && err_num > 0) {
 	Fatal_Error ("I/O error in %s: %s", Current_Output ?
@@ -235,7 +239,7 @@ get_section (Elf64_Word sh_info, char *name, Output_File *fl)
 
 
 template <class Shdr>
-static UINT64
+UINT64
 layout_sections (Shdr& strtab_sec, Output_File *fl)
 {
     UINT64 e_shoff;
@@ -548,7 +552,7 @@ create_temp_file (Output_File *fl)
  */
 
 Output_File *
-WN_open_output (char *file_name)
+WN_open_output (const char *file_name)
 {
     Output_File *fl;
     Section *cur_section;
@@ -560,19 +564,19 @@ WN_open_output (char *file_name)
 
     if (old_sigsegv == 0)
 #ifdef _SOLARIS_SOLARIS
-	old_sigsegv = std::signal (SIGSEGV, reinterpret_cast<void (*)(int)>
+	old_sigsegv = std::signal (SIGSEGV, reinterpret_cast<SIG_HANDLER>
 			      (ir_bwrite_signal_handler));
 #else
-        old_sigsegv = signal (SIGSEGV, reinterpret_cast<void (*)(int)>
+        old_sigsegv = signal (SIGSEGV, reinterpret_cast<SIG_HANDLER>
                               (ir_bwrite_signal_handler));
 #endif
 
     if (old_sigbus == 0)
 #ifdef _SOLARIS_SOLARIS
-	old_sigbus = std::signal (SIGBUS, reinterpret_cast<void (*)(int)>
+	old_sigbus = std::signal (SIGBUS, reinterpret_cast<SIG_HANDLER>
 			     (ir_bwrite_signal_handler)); 
 #else
-        old_sigbus = signal (SIGBUS, reinterpret_cast<void (*)(int)>
+        old_sigbus = signal (SIGBUS, reinterpret_cast<SIG_HANDLER>
                              (ir_bwrite_signal_handler));
 #endif
 
@@ -1507,7 +1511,7 @@ Write_PU_Info (PU_Info *pu)
 
 
 Output_File *
-Open_Output_Info (char *output_file)
+Open_Output_Info (const char *output_file)
 {
     Set_Error_Phase ("Writing WHIRL file" );
     ir_output = WN_open_output (output_file);

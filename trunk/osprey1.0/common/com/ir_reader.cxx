@@ -359,7 +359,7 @@ extern void IR_reader_finish(void)
 }
 
 
-extern FILE *IR_open(char *filename)
+extern FILE *IR_open(const char *filename)
 {
    char prefix_check[6];
    ir_file = fopen(filename, "r");
@@ -386,7 +386,7 @@ extern void IR_close(void)
 /*
  *  Write the IR into a file in ascii form.
  */
-extern BOOL IR_open_output(char *filename)
+extern BOOL IR_open_output(const char *filename)
 {
   if (filename == NULL)
     ir_ofile = stdout;
@@ -2059,7 +2059,7 @@ extern void fdump_dep_tree( FILE *f, WN *wn, struct ALIAS_MANAGER *alias)
 }
 #endif /* BACK_END */
 
-extern void Check_for_IR_Dump(INT phase, WN *pu, char *phase_name)
+extern void Check_for_IR_Dump(INT phase, WN *pu, const char *phase_name)
 {
     BOOL dump_ir;
     BOOL dump_symtab;

@@ -68,7 +68,7 @@ typedef struct section {
 
 
 typedef struct output_file {
-    char *file_name;
+    const char *file_name;
     INT output_fd;		    /* file id for output file */
     char *map_addr; 		    /* base address of the mapped region */
     off_t mapped_size;		    /* max. size of the mapped region */
@@ -83,7 +83,7 @@ typedef struct output_file {
 extern Output_File *Current_Output;
 
 /* Call these once at the beginning and end, respectively. */
-extern Output_File *WN_open_output (char *file_name);
+extern Output_File *WN_open_output (const char *file_name);
 extern void WN_close_output (Output_File *fl);
 extern void WN_close_file (void *fl);
 
@@ -146,7 +146,7 @@ extern void WN_write_voidptr_map(PU_Info     *pu,
  * These routines use the standard compiler error reporting mechanism.
  */
 
-extern Output_File *Open_Output_Info (char *output_file);
+extern Output_File *Open_Output_Info (const char *output_file);
 extern void Write_PU_Info (PU_Info *pu);
 extern void Write_Global_Info (PU_Info *pu_tree);
 extern void Close_Output_Info (void);
