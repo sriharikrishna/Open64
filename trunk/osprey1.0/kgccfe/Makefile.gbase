@@ -341,6 +341,7 @@ first:
 	cd $(TARG_GNU_DIR) && $(MAKE)
 	cd $(TARG_CMPLRS_DIR) && $(MAKE)
 	cd $(TARG_COMUTIL_DIR) && $(MAKE)
+	cd $(TARG_LIBIBERTY_DIR) && $(MAKE)
 
 
 CXXFLAGS +=-DHAVE_DECL_ASPRINTF
