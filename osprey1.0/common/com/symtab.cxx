@@ -705,26 +705,26 @@ static void INTRINSIC_LIST_add(ST *st)
 	intrinsic_list.push_back(st);
 }
 
-ST *
+static ST *
 INTRINSIC_LIST_lookup(TY_IDX  ty,
-		      char   *function_name)
+		      const char *function_name)
 {
-/*
- * GNU g++-3.0 STL workaround
- * g++-3.0 has a new implementation of STL - a container's 
- * iterator is no longer a simple pointer, but a smart pointer
- * defined as __normal_iterator<Pointer, Container> in stl_algo.h.
- * And begin() end() return the smart pointers. To ensure 
- * compatibility, we use type "iterator" instead of an explicit
- * pointer.
- */
+  /*
+   * GNU g++-3.0 STL workaround
+   * g++-3.0 has a new implementation of STL - a container's 
+   * iterator is no longer a simple pointer, but a smart pointer
+   * defined as __normal_iterator<Pointer, Container> in stl_algo.h.
+   * And begin() end() return the smart pointers. To ensure 
+   * compatibility, we use type "iterator" instead of an explicit
+   * pointer.
+   */
   
-    std::vector<ST *>::iterator result =
-		std::find_if(intrinsic_list.begin(),
-                             intrinsic_list.end(),
-                             matches_pu_ty_and_name(ty, function_name));
-
-   if (result == intrinsic_list.end()) {
+  std::vector<ST *>::iterator result =
+    std::find_if(intrinsic_list.begin(),
+		 intrinsic_list.end(),
+		 matches_pu_ty_and_name(ty, function_name));
+  
+  if (result == intrinsic_list.end()) {
     return NULL;
   }
   else {
@@ -734,7 +734,7 @@ INTRINSIC_LIST_lookup(TY_IDX  ty,
 
 ST *
 Gen_Intrinsic_Function(TY_IDX  ty,
-		       char   *function_name)
+		       const char *function_name)
 {
   ST *st = INTRINSIC_LIST_lookup(ty, function_name);
 
