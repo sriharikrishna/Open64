@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.13 $
- * $Date: 2003-06-19 19:22:35 $
- * $Author: broom $
+ * $Revision: 1.14 $
+ * $Date: 2003-06-23 20:44:44 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -171,8 +171,8 @@ TY2F_Append_Array_Bnd_Ph(TOKEN_BUFFER decl_tokens,
    WN  * wn;
 
    if (purple_assumed_size)
-     if ((ST_class(arbnd)==SCLASS_FORMAL)||
-                (ST_class(arbnd)==SCLASS_FORMAL_REF))
+     if ((ST_sclass(arbnd)==SCLASS_FORMAL)||
+                (ST_sclass(arbnd)==SCLASS_FORMAL_REF))
      {
       /* We are already within a placeholder for an assumed-sized array */
 
@@ -1235,15 +1235,36 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
        * but we are lenient and treat them as the signed equivalent.
        */
    case MTYPE_I1:
+      base_name = "INTEGER";
+      kind_spec = "(w2f__i1)"; 
+      break;
+     
    case MTYPE_I2:
+      base_name = "INTEGER";
+      kind_spec = "(w2f__i2)"; 
+      break;
    case MTYPE_I4:
+      base_name = "INTEGER";
+      kind_spec = "(w2f__i4)"; 
+      break;
    case MTYPE_I8:
       base_name = "INTEGER";
+      kind_spec = "(w2f__i8)"; 
+      break;
       break;
       
-   case MTYPE_F4:
+  case MTYPE_F4:
+     kind_spec = "(w2f__4)"; 
+     base_name = "REAL";
+     break;
+
    case MTYPE_F8:
+     kind_spec = "(w2f__8)";
+     base_name = "REAL";
+     break;
+
    case MTYPE_FQ:
+      kind_spec = "(w2f__16)";
       base_name = "REAL";
       break;
       
@@ -1272,7 +1293,11 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 	 } else {
 	    kind_type = TY_size(ty);
 	 }
-	 kind_spec = Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
+
+//fzhao-working around
+         if (mt!= MTYPE_F4 && mt!=MTYPE_F8 && mt!= MTYPE_FQ &&
+             mt!=MTYPE_I1 && mt!=MTYPE_I2 && mt!=MTYPE_I4 && mt!=MTYPE_I8) 
+	       kind_spec = Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
 	 Prepend_Token_String(decl_tokens,Concat2_Strings(base_name,kind_spec));
       } else {
 	 Prepend_Token_String(
