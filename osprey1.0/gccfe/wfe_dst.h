@@ -38,9 +38,9 @@
  *
  *
  * Module: wfe_dst.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:08:30 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-10-21 17:38:06 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/gccfe/wfe_dst.h,v $
  *
  * Revision history:
@@ -96,12 +96,35 @@
 #define wfe_dst_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *wfe_dst_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/gccfe/wfe_dst.h,v $ $Revision: 1.1.1.1 $";
+static char *wfe_dst_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/gccfe/wfe_dst.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifdef __cplusplus
 
+#include <vector>
+#include <string>
 #include "dwarf_DST.h"
+
+#if defined(__GNUC__) && (__GNUC__ == 3) 
+#include <ext/hash_set>
+using namespace __gnu_cxx;
+#elif defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
+#include <set>
+#else
+#include <hash_set>
+#endif
+
+/* stores all of the top-level h files */
+extern vector<string> h_files;
+
+/* stores the list of files not to be put back */
+struct eqstr {
+  bool operator()(const char* s1, const char* s2) const
+  {
+    return strcmp(s1, s2) == 0;
+  }
+};
+extern hash_set<const char*, hash<const char*>, eqstr> no_includes;
 
 extern void 
 DST_build(int num_copts, /* Number of options passed to fec(c) */
@@ -125,6 +148,10 @@ extern "C" {
 
 /* set current line number and current file */
 extern void WFE_Set_Line_And_File (unsigned int line, char *file);
+
+extern int get_TY_wrapper(tree type);
+
+extern void debug_type_wrapper(int ty, char * s);
 
 #ifdef __cplusplus
 }

@@ -249,7 +249,6 @@ void WFE_Set_Consistency (char *descriptor, int action)
     }
   } else 
     Is_True(0,("Unsupported consistency descriptor",""));
-  
   WN *wn = WN_CreatePragma(prdesc,(ST_IDX) 0,0,0);
   WFE_Stmt_Append(wn,Get_Srcpos());
   
@@ -539,6 +538,10 @@ WFE_Finish_Function (void)
 void
 WFE_Start_Aggregate_Init (tree decl)
 {
+/* needed for variables with array initializers */
+    if (keep_decl_for_w2c)
+    DECL_LANG_FLAG_5(decl) = 1;
+
   if (TREE_STATIC(decl)) {
 	ST *st = Get_ST(decl);
 	Set_ST_is_initialized(st);
@@ -1595,6 +1598,9 @@ WFE_Initialize_Decl (tree decl)
 	return;
   }
 
+    if (keep_decl_for_w2c)
+    DECL_LANG_FLAG_5(decl) = 1;
+
   ST *st = Get_ST(decl);
   tree init = DECL_INITIAL(decl);
 
@@ -1655,6 +1661,29 @@ WFE_Initialize_Decl (tree decl)
 void
 WFE_Decl (tree decl)
 {
+  TY_IDX ty_idx;
+                                                                                        
+  if (keep_decl_for_w2c)
+    DECL_LANG_FLAG_5(decl) = 1;
+  switch (TREE_CODE(decl)) {
+  case TYPE_DECL:
+    if(DECL_LANG_FLAG_5(decl)) {
+      ty_idx = Get_TY(DECL_ORIGINAL_TYPE(decl));
+      Set_TY_is_written(ty_idx);
+      ty_idx = Get_TY(TREE_TYPE(decl));
+      Set_TY_is_written(ty_idx);
+    }
+    break;
+  case VAR_DECL:
+     break;
+  case PARM_DECL:
+     break;
+  case FUNCTION_DECL:
+    break;
+  default:
+    break;
+  }
+
   if (DECL_INITIAL (decl) != 0) return; // already processed
   if (DECL_IGNORED_P(decl)) return;
   if (TREE_CODE(decl) != VAR_DECL) return;
@@ -1915,3 +1944,12 @@ WFE_Weak_Finish ()
     }
   }
 } /* WFE_Weak_Finish */
+
+
+extern "C" void Mark_TY_Written(tree type) {
+                                                                                        
+  TY_IDX ty_idx = Get_TY(type);
+  Set_TY_is_written(ty_idx);
+                                                                                        
+}
+

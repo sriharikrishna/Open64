@@ -1180,6 +1180,19 @@ Set_TY_is_relaxed (TY_IDX tyi)       { Set_TY_is_relaxed(Ty_Table[tyi]); }
 inline void
 Clear_TY_is_relaxed (TY_IDX tyi)     { Clear_TY_is_relaxed(Ty_Table[tyi]); }
 
+inline BOOL
+TY_is_written (const TY& ty)            { return ty.flags & TY_IS_WRITTEN; }
+inline void
+Set_TY_is_written (TY& ty)              { ty.flags |= TY_IS_WRITTEN; }
+inline void
+Clear_TY_is_written (TY& ty)            { ty.flags &= ~TY_IS_WRITTEN; }
+inline BOOL
+TY_is_written (const TY_IDX tyi)     { return TY_is_written(Ty_Table[tyi]); }
+inline void
+Set_TY_is_written (TY_IDX tyi)       { Set_TY_is_written(Ty_Table[tyi]); }
+inline void
+Clear_TY_is_written (TY_IDX tyi)     { Clear_TY_is_written(Ty_Table[tyi]); }
+                                                                                        
 //------------------------------------------------------------------------------
 // UPC specific functions end
 //------------------------------------------------------------------------------

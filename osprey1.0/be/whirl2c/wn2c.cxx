@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.13 $
- * $Date: 2003-10-14 20:08:16 $
+ * $Revision: 1.14 $
+ * $Date: 2003-10-21 17:38:04 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.14 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -5637,9 +5637,16 @@ WN2C_ldid(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
    if (TY_kind(ST_type(WN_st(wn))) == KIND_POINTER &&
           TY_kind(TY_pointed(ST_type(WN_st(wn))))==KIND_VOID &&
 	  TY_kind(TY_pointed(WN_ty(wn))) != KIND_VOID) {
-        Prepend_Token_String(expr_tokens,"*)");
-        Prepend_Token_String(expr_tokens,
+
+      Prepend_Token_String(expr_tokens,"*)");
+
+      if (!TY_Is_Structured(TY_pointed(WN_ty(wn))))
+           Prepend_Token_String(expr_tokens,
                            Scalar_C_Names[TY_mtype(TY_pointed(WN_ty(wn)))].pseudo_name);
+       else {
+            Prepend_Token_String(expr_tokens,TY_name(TY_pointed(WN_ty(wn))));
+            Prepend_Token_String(expr_tokens,"struct ");
+        }
         Prepend_Token_Special(expr_tokens, '(');
      }
   }

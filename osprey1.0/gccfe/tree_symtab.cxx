@@ -750,14 +750,33 @@ static string getTypeStr(TY_IDX idx) {
     }
     type_str += getTypeStr(TY_etype(idx));
     break;
-  case KIND_STRUCT:
+
+  case KIND_STRUCT: {
+#if 0 //fzhao
     type_str = (TY_is_union(idx) ? "union " : "struct ") + (string) TY_name(idx);
     //we need to remove the "." from the TY_name.  This should match with whatever WHIRL2C_make_valid_c_name
     //returns as long as anonymous structs have names like ".anonymous.i"
     for (int i = type_str.find("."); i >= 0; i = type_str.find(".")) { 
       type_str = type_str.replace(i, 1, "");
       }
+#endif
+    char * name = TY_name(idx);
+    if (strncmp(name, "T ", 2) == 0) {
+      /* We have an anonymous struct, use its typedef name */
+      type_str = (string) (name + 2);
+    } else {
+      type_str = (TY_is_union(idx) ? "union " : "struct ") + (string) name;
+      //we need to remove the "." from the TY_name.  This should match with whatever WHIRL2C_make_valid_c_name
+      //returns as long as anonymous structs have names like ".anonymous.i"
+      for (int i = type_str.find("."); i >= 0; i = type_str.find(".")) {
+        // for anonymous struct (defined via typedefs), we always output their definition
+        Set_TY_is_written(idx);
+        type_str = type_str.replace(i, 1, "");
+      }
+    }
     break;
+  }
+
   default:
     Is_True(false, ("IN TREE_SYMTAB, getTypeStr:  UNEXPECTED TYPE"));    
   }

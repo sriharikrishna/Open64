@@ -37,12 +37,12 @@
  * ====================================================================
  *
  * Module: dst.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:08:30 $
- * $Author: dsystem $
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:08:30 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-10-21 17:38:06 $
+ * $Author: fzhao $
+ * $Revision: 1.2 $
+ * $Date: 2003-10-21 17:38:06 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/gccfe/wfe_dst.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/gccfe/wfe_dst.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/gccfe/wfe_dst.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <values.h>
@@ -82,7 +82,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 extern "C" {
 #include "gnu/system.h"
 #include "gnu/tree.h"
-// #include "gnu/toplev.h"
+#include "gnu/input.h"
+#include "gnu/toplev.h"
 }
 
 #include "wfe_misc.h"
@@ -97,7 +98,20 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <map>
+#include <stack>
 
+typedef struct fws {
+  char fname[512];
+  int state;
+} file_with_state;
+
+
+stack<file_with_state*> linedirs;
+vector<string> h_files;
+vector<string> all_files;
+hash_set<const char*, hash<const char*>, eqstr> no_includes;
+
+static string last_file = "", pragma_file = "";
 
 extern FILE *tree_dump_file; //for debugging only
 
@@ -1566,33 +1580,160 @@ DST_build(int num_copts, /* Number of options passed to fec(c) */
    WFE_Set_Line_And_File (0, Orig_Src_File_Name);
 }
 
+/* A quick hack, probably want to move names into a config file later... */
+static bool is_upc_header(string file) {
+  
+  int index = file.rfind("/");
+  string file_name = file.substr(index+1, file.size());
+  return  file_name == "upc.h" || file_name == "upc_relaxed.h" || 
+    file_name == "upc_strict.h";
+}
+
+
+static bool has_uphext(char *file_name) {
+  
+  int dotpos = strlen(file_name)-1;
+  while(file_name[dotpos] != '.')
+    dotpos--;
+  if(strcmp(file_name+dotpos,".uph") == 0 ||
+     strcmp(file_name+dotpos,".upc") == 0 ||
+     strcmp(file_name+dotpos,".c") == 0) {
+     
+    return TRUE;
+   
+  } else if (strcmp(file_name+dotpos, ".h") == 0) {
+    
+  
+    return FALSE;
+    
+  } 
+  
+  return FALSE;
+
+}
+
 void
 WFE_Set_Line_And_File (UINT line, char *file)
 {
-	if (!dst_initialized) return;
+  
+  file_with_state *top, *onedown, *twodown, *tmptop, *tmponedown;
+  if (!dst_initialized) return;
+  
+  // split file into directory path and file name
+  char *dir;
+  char *file_name = drop_path(file);
+  char buf[256];
+  static int state = 0; /* start with default = ignore decls */
+  int dotpos;
+  bool uphext = FALSE;
+ 
+  if (file_name == file) {
+    // no path
+    dir = current_working_dir;
+  }
+  else if (strncmp(file, "./", 2) == 0) {
+    // current dir
+    dir = current_working_dir;
+  }
+  else {
+    // copy specified path
+    strcpy (buf, file);
+    dir = drop_path(buf);	// points inside string, after slash
+    --dir;			// points before slash
+    *dir = '\0';		// terminate path string
+    dir = buf;
+  }
+  
+  current_dir = Get_Dir_Dst_Info (dir);
+  current_file = Get_File_Dst_Info (file_name, current_dir);
+  dotpos = strlen(file_name)-1;
+  while(file_name[dotpos] != '.')
+    dotpos--;
 
-	// split file into directory path and file name
-	char *dir;
-	char *file_name = drop_path(file);;
-	char buf[256];
-	if (file_name == file) {
-		// no path
-		dir = current_working_dir;
+  // all_files.push_back(file);
+  // printf("LIST: %s %d\n", file, line);
+  //this is the original src file
+  // don't know what the extension would be since it's a mess right now
+  if(linedirs.empty()) {
+    file_with_state *p = new file_with_state;
+    strcpy(p->fname, file);
+    p->state = 1; //assume upc always                  
+    linedirs.push(p);
+    //printf("SRC: %s\n", file);
+  }
+  
+  if(strcmp(file_name+dotpos,".uph") == 0 ||
+     strcmp(file_name+dotpos,".upc") == 0 ||
+     strcmp(file_name+dotpos,".c") == 0) {
+    
+    // keep_decl_for_w2c = 1;
+    uphext = TRUE;
+       
+    last_file == "";
+  } else if (strcmp(file_name+dotpos, ".h") == 0) {
+    
+   //  keep_decl_for_w2c = 0;
+    uphext = FALSE;
+    last_file = (string) file;
+    
+  } else {
+    
+  }
+  
+  top = linedirs.top();
+  if (strcmp(top->fname, file) != 0) {
+    top = linedirs.top();
+    linedirs.pop();
+    if(linedirs.empty()) {
+      //first include file
+      linedirs.push(top);
+      tmptop = new file_with_state;
+      //printf("FIRST: %s\n", file);
+      strcpy(tmptop->fname, file);
+      keep_decl_for_w2c = (uphext) ? 1 : 0;
+      tmptop->state = keep_decl_for_w2c;
+      linedirs.push(tmptop);
+    } else {
+      //deep in the include chain
+      onedown = linedirs.top();
+      if(strcmp(onedown->fname, file) == 0) {
+	//finish one file
+	if(top->state == 0 && top->state != keep_decl_for_w2c) {
+	  //saw a pragma uph_file somewhere
+	  top->state = 1;
 	}
-	else if (strncmp(file, "./", 2) == 0) {
-		// current dir
-		dir = current_working_dir;
+	if(!has_uphext(top->fname)  && onedown->state && !is_upc_header(top->fname) && !top->state) {
+	  if (no_includes.find(top->fname) == no_includes.end()) {
+	    h_files.push_back(top->fname);
+	    //printf("FINISH: %s\n", top->fname);
+	  }
 	}
-	else {
-		// copy specified path
-		strcpy (buf, file);
-		dir = drop_path(buf);	// points inside string, after slash
-		--dir;			// points before slash
-		*dir = '\0';		// terminate path string
-		dir = buf;
-	}
+	keep_decl_for_w2c = onedown->state;
+      } else {
+	//new file
+	// here is a boundary where need to check for pragma uph
+	if(top->state == 0 && keep_decl_for_w2c)
+	  top->state = 1;
+	linedirs.push(top);
+	tmptop = new file_with_state;
+	strcpy(tmptop->fname, file);
+	keep_decl_for_w2c = uphext ? 1 : 0;
+	tmptop->state = keep_decl_for_w2c;
+	linedirs.push(tmptop);
+      }
+    }
 
-	current_dir = Get_Dir_Dst_Info (dir);
-	current_file = Get_File_Dst_Info (file_name, current_dir);
+  } else { //same file 
+    // check here that we did not see a pragma uph_file
+    if (top->state != keep_decl_for_w2c && !top->state)
+      top->state = keep_decl_for_w2c;
+  }
+  
+  
+  
 }
+
+
+
+
 
