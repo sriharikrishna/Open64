@@ -3793,10 +3793,11 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
          case COPY_IN_COPY_OUT     :
 
-
+# if 0 /*Oct*/
             if (arg_info_list[info_idx].ed.section) {
                save_array_syntax_subscripts(list_idx);
             }
+# endif
 
             intent = Intent_Inout;
 
@@ -3828,7 +3829,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
                PRINTMSG(line, 1438, Caution, col, "copy in");
             }
-
+# if 0 /*Oct*/
             COPY_OPND(opnd, IL_OPND(list_idx));
             tmp_idx = create_tmp_asg(&opnd,
                               (expr_arg_type *)&(arg_info_list[info_idx].ed),
@@ -3892,6 +3893,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
 # endif
             }
 
+# endif /*Oct*/
             
             break;
 
@@ -4147,10 +4149,11 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
                PRINTMSG(line, 1438, Caution, col, "possible copy in and out");
             }
-
+# if 0 /*Oct*/
             if (arg_info_list[info_idx].ed.section) {
                save_array_syntax_subscripts(list_idx);
             }
+# endif /*Oct*/
 
             /* generate address temp */
 
