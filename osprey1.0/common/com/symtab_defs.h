@@ -529,9 +529,8 @@ public:
 	TY_IDX pointed;			// pointed-to type (pointers only)
 	mUINT32 pu_flags;		// attributes for KIND_FUNCTION
     } u2;
-#ifdef COMPILE_UPC
+
     mUINT32 block_size;                 // block size for UPC shared data
-#endif 
     // access function for unions
 
     FLD_IDX Fld () const		{ return u1.fld; }

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.3 $
- * $Date: 2003-03-14 21:46:49 $
- * $Author: fzhao $
+ * $Revision: 1.4 $
+ * $Date: 2003-03-26 21:38:27 $
+ * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.4 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -1238,20 +1238,6 @@ W2F_Outfile_Translate_Pu(WN *pu)
       Increment_Indentation();
    } else
       WN2F_Emit_End_Stmt(tokens,FALSE);
-
-  xDEBUG(DEB_Whirl2f_IR_TY_W2F_Outfile_Translate_Pu,
-	 TY_TAB::iterator it;
-	 int i;
-  
-	 for(i=0, it=Ty_tab.begin(); it != Ty_tab.end(); it++, i++) {
-	   if (i==0) continue;
-	   TY &ty = *it;
-	   printf("[%d]: ", i);
-	   ty.Print(stdout);
-	 }
-  );
-
-   
 
    (void)WN2F_translate(tokens, pu, Global_Context);
    Write_And_Reclaim_Tokens(W2F_File[W2F_FTN_FILE], 
