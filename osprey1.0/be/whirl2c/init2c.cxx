@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: init2c.c
- * $Revision: 1.3 $
- * $Date: 2003-06-30 22:20:55 $
+ * $Revision: 1.4 $
+ * $Date: 2003-09-09 19:23:52 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $
  *
@@ -56,7 +56,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -263,6 +263,7 @@ INITV2C_val(TOKEN_BUFFER tokens,
     */
    TOKEN_BUFFER tmp_tokens;
    TCON tcon = TCON_For_Initv(initv);
+   INITV_IDX  next_initv;
 
 // "struct" and "union" variables appeared in the Tcons if declared as "static" variables
 
@@ -282,13 +283,27 @@ INITV2C_val(TOKEN_BUFFER tokens,
    }
 
    /* Translate the constant value */
-   if (TY_Is_Structured(ty))
-       Append_Token_Special(tokens,'{');
 
-   TCON2C_translate(tokens, tcon);
-   
-   if (TY_Is_Structured(ty))
-       Append_Token_Special(tokens,'}');
+   /* If  the type is struct,then there might be more than 
+      one constant values in this INITO table entry,dumpout
+      all the values-----fzhao
+     */
+   if (TY_Is_Structured(ty)) {
+        Append_Token_Special(tokens,'{');
+        TCON2C_translate(tokens, tcon);
+        next_initv = INITV_next(initv);
+        while(next_initv !=0){
+          if(INITV_kind (next_initv)== INITVKIND_VAL)  {
+                 Append_Token_Special(tokens,',');
+                 tcon = TCON_For_Initv(next_initv);
+                 TCON2C_translate(tokens, tcon);
+           }
+           next_initv = INITV_next(next_initv);
+         }
+         Append_Token_Special(tokens,'}');
+      }
+    else
+      TCON2C_translate(tokens, tcon);
 
 } /* INITV2C_val */
 
