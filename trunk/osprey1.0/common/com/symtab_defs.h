@@ -725,7 +725,7 @@ private:
 
 public:
 
-	BLK () : size (0), section_idx(0), scninfo_idx(0), flags (0) {}
+	BLK () : size (0), flags (0), section_idx(0), scninfo_idx(0) {}
 
 	void Init (void)	{ memset (this, '\0', sizeof(BLK)); }
 
