@@ -262,6 +262,8 @@ ir_b_create_map (Output_File *fl)
 } /* ir_b_create_map */
 
 
+WN *staticNode;
+
 /* Walk the tree and copy it to contiguous memory block in the temp. file */
 extern Elf64_Word
 ir_b_write_tree (WN *node, off_t base_offset, Output_File *fl, WN_MAP off_map)
@@ -269,6 +271,9 @@ ir_b_write_tree (WN *node, off_t base_offset, Output_File *fl, WN_MAP off_map)
     register OPCODE opcode;
     Elf64_Word node_offset;
     char *real_addr;
+
+    if (node == staticNode) abort();
+
     INT32 size = WN_Size_and_StartAddress (node, (void **) &real_addr);
 
 #define WN_ADDR(offset) ((WN *)(fl->map_addr + offset))
