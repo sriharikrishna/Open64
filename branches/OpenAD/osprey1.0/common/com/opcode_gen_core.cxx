@@ -2040,6 +2040,7 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       case OPR_GOTO_OUTER_BLOCK:
       case OPR_USE: 
       case OPR_NAMELIST:
+      case OPR_IMPLICIT_BND: 
       case OPR_NULLIFY:
       case OPR_INTERFACE:
 
