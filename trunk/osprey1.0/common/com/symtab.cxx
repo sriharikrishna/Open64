@@ -1919,6 +1919,21 @@ ST::Print (FILE *f, BOOL verbose) const
 	    break;
 	}
 
+
+       mUINT64 flags_ext = St_Table[st_idx].flags_ext;
+       fprintf (f, "\n\t\tFlags_ext:\t0x%016x", flags_ext);
+       if (flags_ext) {
+         if (flags_ext & ST_IS_POINTER)  	 fprintf (f, " pointer");
+         if (flags_ext & ST_IS_ALLOCATABLE)  	 fprintf (f, " allocatable ");
+         if (flags_ext & ST_IS_IN_MODULE)    	 fprintf (f, " in_module");
+         if (flags_ext & ST_IS_BLOCK_DATA)  	 fprintf (f, " block_Data");
+         if (flags_ext & ST_IS_INTENT_IN_ARGUMENT)	 fprintf (f, " intent_in_arg");
+         if (flags_ext & ST_IS_INTENT_OUT_ARGUMENT)  	 fprintf (f, " intent_out_arg ");
+         if (flags_ext & ST_IS_EXTERNAL)		 fprintf (f, " external");
+         if (flags_ext & ST_IS_PRIVATE)   		 fprintf (f, " private");
+       }
+
+
 	fprintf (f, "\n\t\tSclass: %s\n", Sclass_Name (storage_class));
     }
 } // ST::Print
