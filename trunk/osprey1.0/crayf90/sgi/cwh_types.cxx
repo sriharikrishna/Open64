@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.12 $
- * $Date: 2003-05-09 23:10:31 $
+ * $Revision: 1.13 $
+ * $Date: 2003-05-10 00:27:41 $
  * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.12 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.13 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -242,16 +242,12 @@ fei_descriptor (INT32        flag_matrix,
   return(t);
 }  
 
-extern "C" {
-void fei_init_global_vars();
-};
 
 void fei_init_global_vars()
 {
   top_of_decl_bounds = ANULL;
   co_top_decl_bounds = ANULL;
 }
-
 
 
 /*===================================================
@@ -1258,14 +1254,14 @@ cwh_types_mk_array_TY(ARB_HANDLE bounds,INT16 n,TY_IDX base_idx, INT64 size)
 
   // Step 2, set the first, last and dimension bits
 if (co_top_decl_bounds != ANULL) {
-  for (i = 0; i <= co_top_decl_bounds ; i++) {
+  for (i = 0; i < co_top_decl_bounds ; i++) {
      Clear_ARB_first_dimen(bounds[i]);
      Clear_ARB_last_dimen(bounds[i]);
      Set_ARB_dimension(bounds[i],n-i);
      Set_ARB_co_dimension(bounds[i],co_top_decl_bounds);
      const_str = const_str && ARB_const_stride(bounds[i]);
   }
-  for (i = co_top_decl_bounds+1; i < n ; i++) {
+  for (i = co_top_decl_bounds; i < n ; i++) {
      Clear_ARB_first_dimen(bounds[i]);
      Clear_ARB_last_dimen(bounds[i]);
      Set_ARB_dimension(bounds[i],n-i);

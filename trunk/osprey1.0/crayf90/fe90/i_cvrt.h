@@ -1663,6 +1663,7 @@ extern void PDGCS_mpp_init                ( char        *src_fname,
                                             INT32        partition_type );
 extern void fei_nullify (INT32 listnum);
 
+extern void fei_init_global_vars();
 
 typedef struct		type_descriptor	pdg_type_tbl_type;
 
