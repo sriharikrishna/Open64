@@ -26,6 +26,6 @@ BUILD_SB       = NO
 #
 #-----------------------------------------------------------------------
 #STL_EXT_PATH = /scratch/gcc-3.0.4/inst/include/g++-v3/ext
-STL_EXT_PATH = /local/gcc-3.0.4/inst/include/g++-v3/ext
+#STL_EXT_PATH = /local/gcc-3.0.4/inst/include/g++-v3/ext
 
 MAKE = gmake

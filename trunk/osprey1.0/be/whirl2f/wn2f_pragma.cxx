@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_pragma.c
- * $Revision: 1.3 $
- * $Date: 2002-09-12 13:06:10 $
+ * $Revision: 1.4 $
+ * $Date: 2002-09-19 16:25:58 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $
  *
@@ -56,7 +56,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $ $Revision: 1.4 $";
 #endif
 
 #include "alloca.h"
@@ -195,6 +195,23 @@ WN2F_Append_Pragma_Preamble(TOKEN_BUFFER tokens,WN * apragma)
   else
     Append_Token_String(tokens, "PAR");
 }
+
+
+/* we use this function instead WN2F_Append_Pragma_Preamble to generate OMP and PAR directives */
+/* the directive prefix needs to be C$OMP or C$PAR, otherwise the continuation line prefix is wrong */
+/* e.g. continuation line prefix is $& instead of $OMP& (radu@par.univie.ac.at) */
+static void
+WN2F_OMP_or_PAR_Directive_Newline(TOKEN_BUFFER tokens,WN * apragma)
+{
+  if (WN2F_is_omp(apragma))
+    WN2F_Directive_Newline(tokens, "C$OMP", WN_Get_Linenum(apragma));
+  else
+    WN2F_Directive_Newline(tokens, "C$PAR", WN_Get_Linenum(apragma));
+  /* force a space after the directive prefix (radu@par.univie.ac.at) */
+  /* this is not automatically emited because of MIPSpro C$ directive prefix */
+  //Append_Token_String(tokens, " ");
+}
+
 
 static void 
 Append_Reduction_Operator(TOKEN_BUFFER tokens,OPERATOR op)
@@ -1610,8 +1627,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
    case WN_PRAGMA_BARRIER:
       if (W2F_Prompf_Emission)
 	 WN2F_Start_Prompf_Construct(tokens, apragma);
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       Append_Token_String(tokens, "BARRIER");
       if (W2F_Prompf_Emission)
 	 WN2F_End_Prompf_Construct(tokens, apragma);
@@ -1620,7 +1638,8 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
    case WN_PRAGMA_COPYIN:
       WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
       if (WN2F_is_omp(apragma))
-	WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+        WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       Append_Token_String(tokens, "COPYIN");
       if (WN_operator(apragma) == OPR_XPRAGMA)
          Append_Clause_Expressions(tokens,
@@ -1638,8 +1657,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
    case WN_PRAGMA_CRITICAL_SECTION_BEGIN:
       if (W2F_Prompf_Emission)
 	 WN2F_Start_Prompf_Construct(tokens, apragma);
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       if (WN2F_is_omp(apragma))
 	  Append_Token_String(tokens, "CRITICAL");
       else
@@ -1651,8 +1671,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
       break;
 
    case WN_PRAGMA_CRITICAL_SECTION_END:
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       if (WN2F_is_omp(apragma))
 	  Append_Token_String(tokens, "END CRITICAL");
       else
@@ -1664,8 +1685,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
    case WN_PRAGMA_ORDERED_BEGIN:
       if (W2F_Prompf_Emission)
 	 WN2F_Start_Prompf_Construct(tokens, apragma);
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       Append_Token_String(tokens, "ORDERED");
       if (WN_operator(apragma) == OPR_XPRAGMA)
 	 Append_Clause_Expressions(tokens,
@@ -1674,8 +1696,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
       break;
 
    case WN_PRAGMA_ORDERED_END:
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       Append_Token_String(tokens, "END ORDERED");
       if (W2F_Prompf_Emission)
 	 WN2F_End_Prompf_Construct(tokens, apragma);
@@ -1684,8 +1707,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
    case WN_PRAGMA_ATOMIC:
       if (W2F_Prompf_Emission)
 	 WN2F_Start_Prompf_Construct(tokens, apragma);
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       Append_Token_String(tokens, "ATOMIC");
       if (WN_operator(apragma) == OPR_XPRAGMA)
 	 Append_Clause_Expressions(tokens,
@@ -1703,9 +1727,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
 	 surrounding_region = W2CF_Get_Parent(W2CF_Get_Parent(apragma));
 	 first_clause = WN_next(apragma);
       
-	 WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-
-	 WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+	 WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+	 //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+	 //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
 	 Append_Token_String(tokens, "PARALLEL");
 	 apragma = first_clause;
 	 Append_Pragma_Clauses(tokens, &apragma, context);
@@ -1724,8 +1748,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
       {
 	 surrounding_region = W2CF_Get_Parent(W2CF_Get_Parent(apragma));
 	 first_clause = WN_next(apragma);
-	 Put_Pragma_Start_With_Caveats(tokens,apragma,TRUE);
-	 WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+	 WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+	 //Put_Pragma_Start_With_Caveats(tokens,apragma,TRUE);
+	 //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
          Append_Token_String(tokens, "PARALLEL DO");
 
 	 if (WN_max_nest_level(apragma) > 1)
@@ -1756,8 +1781,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
 	 surrounding_region = W2CF_Get_Parent(W2CF_Get_Parent(apragma));
 	 first_clause = WN_next(apragma);
 
-	 Put_Pragma_Start_With_Caveats(tokens,apragma,TRUE);
-	 WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+	 WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+	 //Put_Pragma_Start_With_Caveats(tokens,apragma,TRUE);
+	 //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
 	 if (WN2F_is_omp(apragma)) 
 	   Append_Token_String(tokens, "DO");
 	 else
@@ -1792,8 +1818,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
 
    case WN_PRAGMA_PARALLEL_SECTIONS:
    case WN_PRAGMA_PSECTION_BEGIN:
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma);
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma);
       if (WN2F_is_omp(apragma)) 
 	 Append_Token_String(tokens, "PARALLEL SECTIONS");
       else
@@ -1814,22 +1841,25 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
 	 WN2F_Prompf_Subsection = apragma;
 	 WN2F_Start_Prompf_Construct(tokens, apragma);
       }
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma);
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma);
       Append_Token_String(tokens, "SECTION");
       break;
 
    case WN_PRAGMA_PARALLEL_WORKSHARE:
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma);
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma);
       Append_Token_String(tokens, "PARALLEL WORKSHARE");
       apragma = WN_next(apragma);
       Append_Pragma_Clauses(tokens, &apragma, context);
       break;
 
    case WN_PRAGMA_WORKSHARE:
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       Append_Token_String(tokens, "WORKSHARE");
       break;
 
@@ -1838,8 +1868,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
    case WN_PRAGMA_SINGLE_PROCESS_BEGIN:
       if (!Ignore_Synchronized_Construct(apragma, context))
       {
-	 WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-	 WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+	 WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+	 //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+	 //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
 	 if (WN2F_is_omp(apragma))
 	   Append_Token_String(tokens, "SINGLE");
 	 else
@@ -1854,8 +1885,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
     case WN_PRAGMA_MASTER_BEGIN:
       if (!Ignore_Synchronized_Construct(apragma, context))
       {
-	 WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-	 WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+         WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+	 //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+	 //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
 	 if (WN2F_is_omp(apragma))
 	   Append_Token_String(tokens, "MASTER");
 	 else
@@ -1864,8 +1896,9 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
       break;
 
     case WN_PRAGMA_FLUSH:
-      WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
-      WN2F_Append_Pragma_Preamble(tokens,apragma) ;
+      WN2F_OMP_or_PAR_Directive_Newline(tokens,apragma);
+      //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(apragma));
+      //WN2F_Append_Pragma_Preamble(tokens,apragma) ;
       Append_Token_String(tokens, "FLUSH");
       apragma = WN_next(apragma);
       Append_Pragma_Clauses(tokens, &apragma, context);
@@ -2089,8 +2122,9 @@ WN2F_pragma_list_end(TOKEN_BUFFER tokens,
       case WN_PRAGMA_PARALLEL_BEGIN:
 	 if (!Ignore_Synchronized_Construct(first_pragma, context))
 	 {
-	    WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
-	    WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+            WN2F_OMP_or_PAR_Directive_Newline(tokens,first_pragma);
+	    //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
+	    //WN2F_Append_Pragma_Preamble(tokens,first_pragma);
 	    Append_Token_String(tokens, "END PARALLEL");
 	 }
          break;
@@ -2103,8 +2137,9 @@ WN2F_pragma_list_end(TOKEN_BUFFER tokens,
 	 if (WN_pragma_nest(first_pragma) <= 0 &&
 	     !Ignore_Synchronized_Construct(first_pragma, context))
 	 {
-	    Put_Pragma_Start_With_Caveats(tokens,first_pragma,FALSE);
-	    WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+            WN2F_OMP_or_PAR_Directive_Newline(tokens,first_pragma);
+	    //Put_Pragma_Start_With_Caveats(tokens,first_pragma,FALSE);
+	    //WN2F_Append_Pragma_Preamble(tokens,first_pragma);
 	    if (WN2F_is_omp(first_pragma)) 
 	      Append_Token_String(tokens, "END DO");
 	    else
@@ -2114,8 +2149,9 @@ WN2F_pragma_list_end(TOKEN_BUFFER tokens,
 
       case WN_PRAGMA_PARALLEL_SECTIONS:
       case WN_PRAGMA_PSECTION_BEGIN:
-         WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
-	 WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+         WN2F_OMP_or_PAR_Directive_Newline(tokens,first_pragma);
+         //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
+	 //WN2F_Append_Pragma_Preamble(tokens,first_pragma);
          // correctly end the OpenMP PARALLEL SECTIONS (radu@par.univie.ac.at)
 	 if (WN2F_is_omp(first_pragma))
 	 {
@@ -2133,22 +2169,25 @@ WN2F_pragma_list_end(TOKEN_BUFFER tokens,
          break;
 
       case WN_PRAGMA_PARALLEL_WORKSHARE:
-	 WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
-	 WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+         WN2F_OMP_or_PAR_Directive_Newline(tokens,first_pragma);
+	 //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
+	 //WN2F_Append_Pragma_Preamble(tokens,first_pragma);
 	 Append_Token_String(tokens, "END PARALLEL WORKSHARE");
          break;
 
       case WN_PRAGMA_WORKSHARE:
-	 WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
-	 WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+         WN2F_OMP_or_PAR_Directive_Newline(tokens,first_pragma);
+	 //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
+	 //WN2F_Append_Pragma_Preamble(tokens,first_pragma);
 	 Append_Token_String(tokens, "END WORKSHARE");
          break;
 
       case WN_PRAGMA_SINGLE_PROCESS_BEGIN:
 	 if (!Ignore_Synchronized_Construct(first_pragma, context))
 	 {
-	    WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
-	    WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+            WN2F_OMP_or_PAR_Directive_Newline(tokens,first_pragma);
+	    //WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
+	    //WN2F_Append_Pragma_Preamble(tokens,first_pragma);
 	    if (WN2F_is_omp(first_pragma)) 
 	      Append_Token_String(tokens, "END SINGLE");
 	    else 
@@ -2171,8 +2210,9 @@ WN2F_pragma_list_end(TOKEN_BUFFER tokens,
 	 if (!Ignore_Synchronized_Construct(first_pragma, context))
 	 {
 	    WN2F_Directive_Newline(tokens, "C$", WN_Get_Linenum(first_pragma));
-	    WN2F_Append_Pragma_Preamble(tokens,first_pragma);
-	    Append_Token_String(tokens, "END MASTER");
+            WN2F_OMP_or_PAR_Directive_Newline(tokens,first_pragma);
+	    //WN2F_Append_Pragma_Preamble(tokens,first_pragma);
+	    //Append_Token_String(tokens, "END MASTER");
 	 }
          break;
 

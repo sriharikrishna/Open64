@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_io.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:08 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-09-19 16:25:58 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_io.cxx,v $
  *
  * Revision history:
@@ -57,7 +57,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-  static char *rcs_id = " $Id: cwh_io.cxx,v 1.2 2002-07-12 16:45:08 fzhao Exp $ ";
+  static char *rcs_id = " $Id: cwh_io.cxx,v 1.3 2002-09-19 16:25:58 open64 Exp $ ";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -1289,8 +1289,7 @@ fei_open(void)
 
 	case OPEN_RECL:
 	case OPEN_IOSTAT:
-	case OPEN_UNIT:
-
+     /* case OPEN_UNIT: // handle this as a special case below (radu@par.univie.ac.at) */
            ts = cwh_stk_get_TY();
 	   switch(cwh_stk_get_class()) {
 	     case ADDR_item:
@@ -1309,17 +1308,47 @@ fei_open(void)
 	         wn = WN_CreateIoItem1(IOC_RECL, addr, ty);
                else if (item == OPEN_IOSTAT)
 		 wn = WN_CreateIoItem1(IOC_IOSTAT, addr, ty);
-               else if (item == OPEN_UNIT) 
-                 unit = WN_CreateIoItem1(IOU_EXTERNAL, addr, NIL);
+               //else if (item == OPEN_UNIT) 
+	       //unit = WN_CreateIoItem1(IOU_EXTERNAL, addr, NIL);
 
-               if (item != OPEN_UNIT)
-	         open_list[num_items++] = wn;
+               //if (item != OPEN_UNIT)
+	       open_list[num_items++] = wn;
 	       break;
              default:
 	       cwh_stk_pop_whatever(); 
 	       break;
            }
            break;
+
+	/* handle OPEN_UNIT as a stand-alone case (radu@par.univie.ac.at) */
+	/* WN_item, ST_item cases were forgotten */
+	case OPEN_UNIT:
+           ts = cwh_stk_get_TY();
+	   switch(cwh_stk_get_class()) {
+	     case ADDR_item:
+	       addr = cwh_expr_address(f_NONE);
+	       if (cwh_io_null_address(addr)) break;
+
+               if (ts != NIL) {
+                 ty = cwh_types_array_TY(ts);
+                 ty = cwh_types_scalar_TY(ty);
+               } else {
+                 ty = cwh_io_scalar_type(addr);
+               }
+	       unit = WN_CreateIoItem1(IOU_EXTERNAL, addr, NIL);
+	       break;
+	     case WN_item:
+	       unit = WN_CreateIoItem1(IOU_EXTERNAL, cwh_expr_operand(NULL), NIL);
+	       break;
+	   case ST_item:
+	       wn = cwh_addr_address_ST(cwh_stk_pop_ST());
+	       unit = WN_CreateIoItem1(IOU_EXTERNAL, wn, NIL);
+	       break;
+             default:
+	       cwh_stk_pop_whatever(); 
+	       break;
+	   }
+	   break;
 
 	case OPEN_ERRFLAG:
            switch(cwh_stk_get_class()) {
@@ -1596,7 +1625,7 @@ fei_close(void)
 	   break;
 
 	case CLOSE_IOSTAT:
-	case CLOSE_UNIT:
+     /* case CLOSE_UNIT: // handle this as a special case below (radu@par.univie.ac.at) */
 
            ts = cwh_stk_get_TY();
 
@@ -1604,7 +1633,6 @@ fei_close(void)
 	     TY_IDX ty;
 
 	     case ADDR_item:
-
 	       addr = cwh_expr_address(f_NONE);
 	       if (cwh_io_null_address(addr)) break;
 
@@ -1617,17 +1645,50 @@ fei_close(void)
 
                if (item == CLOSE_IOSTAT)
 		 wn = WN_CreateIoItem1(IOC_IOSTAT, addr, ty);
-               else if (item == CLOSE_UNIT) 
-                 unit = WN_CreateIoItem1(IOU_EXTERNAL, addr, NIL);
+               //else if (item == CLOSE_UNIT) 
+	       //unit = WN_CreateIoItem1(IOU_EXTERNAL, addr, NIL);
 
-               if (item != CLOSE_UNIT)
-	         close_list[num_items++] = wn;
+               //if (item != CLOSE_UNIT)
+	       close_list[num_items++] = wn;
 	       break;
              default:
 	       cwh_stk_pop_whatever(); 
 	       break;
            }
            break;
+
+	/* handle CLOSE_UNIT as a stand-alone case (radu@par.univie.ac.at) */
+	/* WN_item, ST_item cases were forgotten */
+	case CLOSE_UNIT:
+
+           ts = cwh_stk_get_TY();
+
+	   switch(cwh_stk_get_class()) {
+	     TY_IDX ty;
+	     case ADDR_item:
+	       addr = cwh_expr_address(f_NONE);
+	       if (cwh_io_null_address(addr)) break;
+
+               if (ts != NIL) {
+                 ty = cwh_types_array_TY(ts);
+                 ty = cwh_types_scalar_TY(ty);
+               } else {
+                 ty = cwh_io_scalar_type(addr);
+               }
+	       unit = WN_CreateIoItem1(IOU_EXTERNAL, addr, NIL);
+	       break;
+	     case WN_item:
+	       unit = WN_CreateIoItem1(IOU_EXTERNAL, cwh_expr_operand(NULL), NIL);
+	       break;
+	   case ST_item:
+	       wn = cwh_addr_address_ST(cwh_stk_pop_ST());
+	       unit = WN_CreateIoItem1(IOU_EXTERNAL, wn, NIL);
+	       break;
+             default:
+	       cwh_stk_pop_whatever(); 
+	       break;
+	   }
+	   break;
 
 	case CLOSE_ERRFLAG:
            switch(cwh_stk_get_class()) {
