@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: flags.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:08 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-12-12 17:39:43 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/flags.c,v $
  *
  * Revision history:
@@ -55,7 +55,7 @@
 
 #ifdef _KEEP_RCS_ID
 static const char source_file[] = __FILE__;
-static const char rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/flags.c,v $ $Revision: 1.1.1.1 $";
+static const char rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/flags.c,v $ $Revision: 1.2 $";
 #endif
 
 #include <string.h>
@@ -316,67 +316,39 @@ typedef struct ogroup_aux {
 static INT
 Copy_option(OPTION_DESC *odesc, char *container, BOOL save)
 {
+  size_t sz = 0;
   void *var = ODESC_variable(odesc);
   Is_True(ODESC_can_change_by_pragma(odesc),
 	  ("Copy_option, trying to copy option that cannot change"));
-
-  if (save) {
-    switch (ODESC_kind(odesc)) {
-      case OVK_NONE:
-      case OVK_BOOL:
-        *((BOOL *)container) = *((BOOL *)var);
-	return sizeof(BOOL);
-      case OVK_INT32:
-	*((INT32 *)container) = *((INT32 *)var);
-	return sizeof(INT32);
-      case OVK_UINT32:
-	*((UINT32 *)container) = *((UINT32 *)var);
-	return sizeof(UINT32);
-      case OVK_INT64:
-	*((INT64 *)container) = *((INT64 *)var);
-	return sizeof(INT64);
-      case OVK_UINT64:
-	*((UINT64 *)container) = *((UINT64 *)var);
-	return sizeof(UINT64);
-      case OVK_NAME:
-      case OVK_SELF:
-	*((char **)container) = *((char **)var);
-	return sizeof(char *);
-      case OVK_LIST:
-	*((OPTION_LIST **)container) = *((OPTION_LIST **)var);
-	return sizeof(OPTION_LIST *);
-      default: /* INVALID, OBSOLETE, REPLACED, UNIMPLEMENTED */
-	return 0;
-    }
-  } else { /* restore */
-    switch (ODESC_kind(odesc)) {
-      case OVK_NONE:
-      case OVK_BOOL:
-        *((BOOL *)var) = *((BOOL *)container);
-	return sizeof(BOOL);
-      case OVK_INT32:
-	*((INT32 *)var) = *((INT32 *)container);
-	return sizeof(INT32);
-      case OVK_UINT32:
-	*((UINT32 *)var) = *((UINT32 *)container);
-	return sizeof(UINT32);
-      case OVK_INT64:
-	*((INT64 *)var) = *((INT64 *)container);
-	return sizeof(INT64);
-      case OVK_UINT64:
-	*((UINT64 *)var) = *((UINT64 *)container);
-	return sizeof(UINT64);
-      case OVK_NAME:
-      case OVK_SELF:
-	*((char **)var) = *((char **)container);
-	return sizeof(char *);
-      case OVK_LIST:
-	*((OPTION_LIST **)var) = *((OPTION_LIST **)container);
-	return sizeof(OPTION_LIST *);
-      default: /* INVALID, OBSOLETE, REPLACED, UNIMPLEMENTED */
-	return 0;
-    }
+  
+  switch (ODESC_kind(odesc)) {
+  case OVK_NONE:
+  case OVK_BOOL:
+    sz = sizeof(BOOL); break;
+  case OVK_INT32:
+    sz = sizeof(INT32); break;
+  case OVK_UINT32:
+    sz = sizeof(UINT32); break;
+  case OVK_INT64:
+    sz = sizeof(INT64); break;
+  case OVK_UINT64:
+    sz = sizeof(UINT64); break;
+  case OVK_NAME:
+  case OVK_SELF:
+    sz = sizeof(char *); break;
+  case OVK_LIST:
+    sz = sizeof(OPTION_LIST *); break;
+  default: /* INVALID, OBSOLETE, REPLACED, UNIMPLEMENTED */
+    sz = 0; break;
   }
+  
+  if (save) {
+    memcpy((void*)container, var, sz); // container <= var
+  } else { /* restore */
+    memcpy(var, (void*)container, sz); // var <= container
+  }
+  
+  return (INT)sz;
 }
 
 
