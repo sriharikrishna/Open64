@@ -1975,6 +1975,11 @@ PU::Print (FILE *f) const
     fprintf (f, ", flags 0x%016llx,\n"
 	     "\tlexical level %d, LANG 0x%02x, TARGET_INFO %d\n",
 	     flags, lexical_level, src_lang, target_idx); 
+    if (flags & PU_DECL_VIEW) {
+        fprintf(f,"Attention!!!: this pu represents only information for a  declaration !");
+        fprintf(f,"\n");
+    }
+
 } // PU::Print
 
 void
