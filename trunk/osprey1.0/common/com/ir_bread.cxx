@@ -32,23 +32,6 @@
 
 */
 
-// Solaris workaround
-// the following symbols belongs to IRIX elf.h
-#ifdef _SOLARIS_SOLARIS
-#define EI_MAG0		0		/* e_ident[] indexes */
-#define EI_MAG1		1
-#define EI_MAG2		2
-#define EI_MAG3		3
-#define IS_ELF(ehdr)	((ehdr).e_ident[EI_MAG0] == ELFMAG0 && \
-			(ehdr).e_ident[EI_MAG1] == ELFMAG1 && \
-			(ehdr).e_ident[EI_MAG2] == ELFMAG2 && \
-			(ehdr).e_ident[EI_MAG3] == ELFMAG3)
-#define ET_IR            1 
-#define ELF_COMMENT      ".comment"
-#define SHT_MIPS_WHIRL   1
-#endif
-
-
 #ifdef USE_PCH
 #include "common_com_pch.h"
 #endif /* USE_PCH */
@@ -57,13 +40,16 @@
 #include <sys/stat.h>		    /* for fstat() */
 #include <sys/mman.h>		    /* for mmap() */
 #include <fcntl.h>		    /* for open() */
-#include <libelf.h>		    /* for all Elf stuff */
+#include <elf.h>                    /* Open64 version */
 #include <sys/elf_whirl.h>	    /* for WHIRL sections */
 #include <errno.h>		    /* for error code */
 
-#define USE_STANDARD_TYPES	    /* override unwanted defines in "defs.h" */
+#ifndef USE_STANDARD_TYPES
+# define USE_STANDARD_TYPES	    /* override unwanted defines in "defs.h" */
+#endif
 
 #include "defs.h"		    /* for wn_core.h */
+#include "alignof.h"                /* for ALIGNOF() */
 #ifdef OWN_ERROR_PACKAGE
 /* Turn off assertion in the opcode handling routines, we assume the tree
  * is clean.  Also, this removes the dependency on "errors.h", which is not
@@ -102,6 +88,7 @@
 #if defined(BACK_END) || defined(BUILD_WNPREFETCH)
 #include "pf_cg.h"
 #endif
+
 
 #ifdef BACK_END
 extern "C" {
@@ -145,7 +132,7 @@ Error_Return_Func (void)
 
 
 template <class Shdr>
-static const Shdr*
+const Shdr*
 get_section_header (const Shdr* shdr, UINT n, Elf64_Word type, Elf64_Word info)
 {
     for (INT i = 1; i < n; ++i) {
@@ -517,7 +504,7 @@ Set_Verbose_Info (BOOL val)
 
 
 template <class ELF>
-static INT
+INT
 check_elf_header (char* baseaddr, Elf64_Word size, const ELF& tag)
 {
     typename ELF::Elf_Ehdr* ehdr = (typename ELF::Elf_Ehdr*) baseaddr;
@@ -525,7 +512,6 @@ check_elf_header (char* baseaddr, Elf64_Word size, const ELF& tag)
 	ehdr->e_version != EV_CURRENT) {
         return ERROR_RETURN; 
     }
-
     if (ehdr->e_type != ET_IR || ehdr->e_shentsize != sizeof(ELF::Elf_Shdr)) {
 	return ERROR_RETURN;
     }
@@ -547,17 +533,7 @@ check_elf_header (char* baseaddr, Elf64_Word size, const ELF& tag)
     }
     typename ELF::Elf_Shdr* shdr =
 	(typename ELF::Elf_Shdr *) (baseaddr + ehdr->e_shoff);
-    if ((long) shdr & (
-
-// Solaris CC workaround
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                __alignof(ELF::Elf_Shdr)
-#elif !defined(__GNUC__)
-		__builtin_alignof(ELF::Elf_Shdr)
-#else
-		__alignof__(ELF::Elf_Shdr)
-#endif
-		       - 1)) {
+    if ((long) shdr & (ALIGNOF(ELF::Elf_Shdr) - 1)) {
 	return ERROR_RETURN;
     }
     return tag.Elf_class();
@@ -567,7 +543,6 @@ check_elf_header (char* baseaddr, Elf64_Word size, const ELF& tag)
 static INT
 check_elf_header (char *baseaddr, Elf64_Word size)
 {
-
     if (size < sizeof(Elf64_Ehdr))
 	return ERROR_RETURN;
     Elf64_Ehdr* ehdr = (Elf64_Ehdr *) baseaddr;
@@ -586,7 +561,7 @@ check_elf_header (char *baseaddr, Elf64_Word size)
 
 
 template <class ELF>
-static INT
+INT
 check_section_headers (char *baseaddr, Elf64_Word size, char* file_revision, 
 		       const ELF& tag) 
 {
@@ -1113,17 +1088,7 @@ WN_get_prefetch (void *handle, PU_Info *pu)
 
 	if (node_offset == -1) break;
 
-	cur_addr = (char *)ir_b_align((off_t)cur_addr,
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                                      __alignof(PF_POINTER),
-#elif !defined(__GNUC__)
-				      __builtin_alignof(PF_POINTER),
-#else
-				      __alignof__(PF_POINTER),
-#endif
+	cur_addr = (char *)ir_b_align((off_t)cur_addr, ALIGNOF(PF_POINTER),
 				      0);
 	pf_ptr = (PF_POINTER *)cur_addr;
 	cur_addr += (sizeof(PF_POINTER));
@@ -1282,9 +1247,8 @@ WN_free_input (void *handle, off_t mapped_size)
     if (handle == 0 || handle == (void *)(-1))
 	return;
 
-// Solaris workaround
-// explicit cast (char *) is added to avoid compilation error
-    munmap ((char *)handle, mapped_size);
+    // Solaris CC, against UNIX standard, wants first arg to be char*.
+    munmap ((char*)handle, mapped_size);
 } /* WN_free_input */
 
 

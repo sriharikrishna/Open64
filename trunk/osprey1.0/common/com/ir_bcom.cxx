@@ -51,6 +51,7 @@
 #endif
 
 #include "defs.h"
+#include "alignof.h"                /* for ALIGNOF() */
 #include "erglob.h"
 #include "errors.h"		    /* for ErrMsg() */
 #include "opcode.h"
@@ -86,17 +87,6 @@ WN **ac_internals;
 INT num_ac_internal_nodes;
 INT max_ac_internal_nodes;
 #endif
-
-
-// Solaris CC workaround
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-#define __ALIGNOF(x) __alignof(x)
-
-#elif !defined(__GNUC__)
-#define __ALIGNOF(x) __builtin_alignof(x)
-#else
-#define __ALIGNOF(x) __alignof__(x)
-#endif // __GNUC__
 
 
 char *Whirl_Revision = WHIRL_REVISION;
@@ -256,7 +246,7 @@ ir_b_write_tree (WN *node, off_t base_offset, Output_File *fl, WN_MAP off_map)
 
 #define WN_ADDR(offset) ((WN *)(fl->map_addr + offset))
 
-    node_offset = ir_b_save_buf (real_addr, size, __ALIGNOF(WN),
+    node_offset = ir_b_save_buf (real_addr, size, ALIGNOF(WN),
 				 (char *)(node) - real_addr, fl); 
 
     opcode = (OPCODE) WN_opcode (node);
@@ -413,7 +403,7 @@ struct WRITE_TABLE_OP
     Output_File *fl;
 
     void operator () (UINT, T *t, UINT size) const {
-	(void) ir_b_save_buf (t, size * sizeof(T), __ALIGNOF(T), 0, fl); 
+	(void) ir_b_save_buf (t, size * sizeof(T), ALIGNOF(T), 0, fl); 
     }
 
     WRITE_TABLE_OP (Output_File *_fl) : fl (_fl) {}
@@ -426,9 +416,9 @@ write_table (TABLE& fld, off_t base_offset,
 	     Output_File *fl)
 {
 
-    off_t cur_offset = ir_b_align (fl->file_size, __ALIGNOF(TABLE::base_type),
+    off_t cur_offset = ir_b_align (fl->file_size, ALIGNOF(TABLE::base_type),
 				   0);
-    fl->file_size = ir_b_align (fl->file_size, __ALIGNOF(TABLE::base_type), 0);
+    fl->file_size = ir_b_align (fl->file_size, ALIGNOF(TABLE::base_type), 0);
 
 #ifndef __GNUC__
     const WRITE_TABLE_OP<TABLE::base_type> write_table_op(fl);
@@ -444,9 +434,9 @@ write_table (TABLE& fld, off_t base_offset,
 static Elf64_Word
 write_file_info (off_t base_offset, Output_File *fl)
 {
-    off_t cur_offset = ir_b_align (fl->file_size, __ALIGNOF(FILE_INFO), 0);
+    off_t cur_offset = ir_b_align (fl->file_size, ALIGNOF(FILE_INFO), 0);
 
-    ir_b_save_buf (&File_info, sizeof(File_info), __ALIGNOF(FILE_INFO), 0, fl);
+    ir_b_save_buf (&File_info, sizeof(File_info), ALIGNOF(FILE_INFO), 0, fl);
 
     return cur_offset - base_offset;
 } // write_file_info
@@ -469,40 +459,40 @@ ir_b_write_global_symtab (off_t base_offset, Output_File *fl)
 
     cur_offset = write_file_info (symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset, sizeof(FILE_INFO),
-			      sizeof(FILE_INFO), __ALIGNOF(FILE_INFO),
+			      sizeof(FILE_INFO), ALIGNOF(FILE_INFO),
 			      SHDR_FILE);
 
     cur_offset = write_table (*(Scope_tab[idx].st_tab), symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset,
 			      Scope_tab[idx].st_tab->Size () * sizeof(ST),
-			      sizeof(ST), __ALIGNOF(ST), SHDR_ST);
+			      sizeof(ST), ALIGNOF(ST), SHDR_ST);
 
     // call fix_array_ty?
 
     cur_offset = write_table (Ty_tab, symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset, Ty_tab.Size () * sizeof(TY),
-			      sizeof(TY), __ALIGNOF(TY), SHDR_TY);
+			      sizeof(TY), ALIGNOF(TY), SHDR_TY);
 
     cur_offset = write_table (Pu_Table, symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset, Pu_Table.Size () * sizeof(PU),
-			      sizeof(PU), __ALIGNOF(PU), SHDR_PU);
+			      sizeof(PU), ALIGNOF(PU), SHDR_PU);
 
     cur_offset = write_table (Fld_Table, symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset, Fld_Table.Size () * sizeof(FLD),
-			      sizeof(FLD), __ALIGNOF(FLD), SHDR_FLD);
+			      sizeof(FLD), ALIGNOF(FLD), SHDR_FLD);
 
     cur_offset = write_table (Arb_Table, symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset, Arb_Table.Size () * sizeof(ARB),
-			      sizeof(ARB), __ALIGNOF(ARB), SHDR_ARB);
+			      sizeof(ARB), ALIGNOF(ARB), SHDR_ARB);
 
     cur_offset = write_table (Tylist_Table, symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset,
 			      Tylist_Table.Size () * sizeof(TYLIST),
-			      sizeof(TYLIST), __ALIGNOF(TYLIST), SHDR_TYLIST); 
+			      sizeof(TYLIST), ALIGNOF(TYLIST), SHDR_TYLIST); 
 
     cur_offset = write_table (Tcon_Table, symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset, Tcon_Table.Size () * sizeof(TCON),
-			      sizeof(TCON), __ALIGNOF(TCON), SHDR_TCON); 
+			      sizeof(TCON), ALIGNOF(TCON), SHDR_TCON); 
 
     cur_offset = ir_b_save_buf (TCON_strtab_buffer (), TCON_strtab_size (),
 				1, 0, fl) - symtab_offset;
@@ -511,20 +501,20 @@ ir_b_write_global_symtab (off_t base_offset, Output_File *fl)
     cur_offset = write_table (*(Scope_tab[idx].inito_tab), symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset,
 			      Scope_tab[idx].inito_tab->Size () * sizeof(INITO),
-			      sizeof(INITO), __ALIGNOF(INITO), SHDR_INITO);
+			      sizeof(INITO), ALIGNOF(INITO), SHDR_INITO);
 
     cur_offset = write_table (Initv_Table, symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset, Initv_Table.Size () * sizeof(INITV),
-			      sizeof(INITV), __ALIGNOF(INITV), SHDR_INITV); 
+			      sizeof(INITV), ALIGNOF(INITV), SHDR_INITV); 
 
     cur_offset = write_table (Blk_Table, symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset, Blk_Table.Size () * sizeof(BLK),
-			      sizeof(BLK), __ALIGNOF(BLK), SHDR_BLK); 
+			      sizeof(BLK), ALIGNOF(BLK), SHDR_BLK); 
 
     cur_offset = write_table (*(Scope_tab[idx].st_attr_tab), symtab_offset, fl);
     gsymtab.header[i++].Init (cur_offset,
 			      Scope_tab[idx].st_attr_tab->Size () * sizeof(ST_ATTR),
-			      sizeof(ST_ATTR), __ALIGNOF(ST_ATTR), SHDR_ST_ATTR);
+			      sizeof(ST_ATTR), ALIGNOF(ST_ATTR), SHDR_ST_ATTR);
 
     save_buf_at_offset (&gsymtab, sizeof(gsymtab), symtab_offset, fl);
 
@@ -545,23 +535,23 @@ ir_b_write_local_symtab (const SCOPE& pu, off_t base_offset, Output_File *fl)
     Elf64_Word cur_offset;
     cur_offset = write_table (*pu.st_tab, symtab_offset, fl);
     symtab.header[i++].Init (cur_offset, pu.st_tab->Size () * sizeof(ST),
-			     sizeof(ST), __ALIGNOF(ST), SHDR_ST);
+			     sizeof(ST), ALIGNOF(ST), SHDR_ST);
 
     cur_offset = write_table (*pu.label_tab, symtab_offset, fl);
     symtab.header[i++].Init (cur_offset, pu.label_tab->Size () * sizeof(LABEL),
-			     sizeof(LABEL), __ALIGNOF(LABEL), SHDR_LABEL); 
+			     sizeof(LABEL), ALIGNOF(LABEL), SHDR_LABEL); 
 
     cur_offset = write_table (*pu.preg_tab, symtab_offset, fl);
     symtab.header[i++].Init (cur_offset, pu.preg_tab->Size () * sizeof(PREG),
-			     sizeof(PREG), __ALIGNOF(PREG), SHDR_PREG);
+			     sizeof(PREG), ALIGNOF(PREG), SHDR_PREG);
 
     cur_offset = write_table (*pu.inito_tab, symtab_offset, fl);
     symtab.header[i++].Init (cur_offset, pu.inito_tab->Size () * sizeof(INITO),
-			     sizeof(INITO), __ALIGNOF(INITO), SHDR_INITO);
+			     sizeof(INITO), ALIGNOF(INITO), SHDR_INITO);
     
     cur_offset = write_table (*pu.st_attr_tab, symtab_offset, fl);
     symtab.header[i++].Init (cur_offset, pu.st_attr_tab->Size () * sizeof(ST_ATTR),  
-				sizeof(ST_ATTR), __ALIGNOF(ST_ATTR), SHDR_ST_ATTR);
+				sizeof(ST_ATTR), ALIGNOF(ST_ATTR), SHDR_ST_ATTR);
 
     save_buf_at_offset (&symtab, sizeof(symtab), symtab_offset, fl);
 
@@ -583,17 +573,17 @@ ir_b_write_dst (DST_TYPE dst, off_t base_offset, Output_File *fl)
     FOREACH_DST_BLOCK(i) {
 	/* may have 64-bit data fields, so align at 8 bytes */
 	cur_offset = ir_b_save_buf (dst_blocks[i].offset, 
-		dst_blocks[i].size, __ALIGNOF(INT64), 0, fl);
+		dst_blocks[i].size, ALIGNOF(INT64), 0, fl);
 	dst_blocks[i].offset = (char*)(cur_offset - base_offset);
     } 
     FOREACH_DST_BLOCK(i) {
 	cur_offset = ir_b_save_buf
 	    ((char*)&dst_blocks[i], sizeof(block_header),
-	     __ALIGNOF(block_header), 0, fl);
+	     ALIGNOF(block_header), 0, fl);
     } 
     cur_offset = ir_b_save_buf
 	((char*)&((DST_Type *)dst)->last_block_header, sizeof(mINT32), 
-	 __ALIGNOF(INT32), 0, fl);
+	 ALIGNOF(INT32), 0, fl);
     return cur_offset - base_offset;
 }
 
