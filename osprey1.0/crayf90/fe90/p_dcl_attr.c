@@ -647,9 +647,7 @@ void parse_intrinsic_stmt (void)
 
 {
    TRACE (Func_Entry, "parse_intrinsic_stmt", NULL);
-
    parse_attrs(merge_intrinsic);
-
    TRACE (Func_Exit, "parse_intrinsic_stmt", NULL);
 
    return;

@@ -291,7 +291,7 @@ enum    language        {Pdgcs_Ansi_C = 1,      Pdgcs_Fortran_77,
 	boolean			disregard_open_mp
                                    [Tok_Open_Mp_Dir_End-Tok_Open_Mp_Dir_Start];
 	dump_flags_type		dump_flags;
-
+	
 	int			expanded_intrinsic_list = NULL_IDX;
         expr_mode_type		expr_mode		= Regular_Expr;
 

@@ -116,8 +116,8 @@
 ***
 **/
 
-/** $Revision: 1.3 $
-*** $Date: 2003-04-28 16:47:06 $
+/** $Revision: 1.4 $
+*** $Date: 2003-06-03 20:16:04 $
 *** $Author: fzhao $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/cxx_memory.h,v $
 **/

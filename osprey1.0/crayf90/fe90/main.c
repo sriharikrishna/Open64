@@ -87,7 +87,7 @@ static void check_enums_for_change(void);
 # endif
 
 static void	get_machine_chars (void);
-static void	init_compiler (int, char *[]);
+static int      init_compiler (int, char *[]);
 static void	init_date_time_info (void);
 static void	init_release_level (void);
 static void	make_table_changes (void);
@@ -216,7 +216,8 @@ int main (int	 argc,
    comp_phase = Pass1_Parsing;
    stmt_start_line = 1;			/* Set in case mem problems */
 
-   init_compiler(argc, argv);			/* init and process cmd line */
+   if (init_compiler(argc, argv))	/* init and process cmd line */
+         return 1; /* -h option */
 
    if (on_off_flags.preprocess_only) {
       goto PREPROCESS_ONLY_SKIP;
@@ -594,14 +595,14 @@ PREPROCESS_ONLY_SKIP:
 |*									      *|
 \******************************************************************************/
 
-static void init_compiler (int	 argc,
+static int  init_compiler (int	 argc,
 			   char *argv[])
 {
    extern void	init_lex (void);
    extern void	init_msg_processing (char *[]);
    extern void	init_src_input (void);
    extern void	init_type (void);
-   extern void	process_cmd_line (int, char *[]);
+   extern int process_cmd_line (int, char *[]);
    extern void	init_cond_comp(void);
    extern void	enter_predefined_macros(void);
    extern void	init_parse_prog_unit(void);
@@ -708,7 +709,8 @@ static void init_compiler (int	 argc,
  *
  */
 
-   process_cmd_line (argc, argv);	/* pass input args		      */
+   if (process_cmd_line (argc, argv))  /* pass input args   */
+             return 1; /*option is -h*/
 
 # if defined(_INTEGER_1_AND_2)
 
@@ -795,7 +797,7 @@ static void init_compiler (int	 argc,
 
       TRACE (Func_Exit, "init_compiler", NULL);
 
-      return;
+      return 0;
    }
 
    init_lex ();
@@ -835,7 +837,7 @@ static void init_compiler (int	 argc,
 
    TRACE (Func_Exit, "init_compiler", NULL);
 
-   return;
+   return 0;
  
 }  /* init_compiler */
 

@@ -1,4 +1,3 @@
-
 /*
 
   Copyright (C) 2000, 2001 Silicon Graphics, Inc.  All Rights Reserved.
@@ -5147,10 +5146,8 @@ void    ichar_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
-# endif
 
    if ((OPND_FLD(arg_info_list[info_idx1].ed.char_len) == CN_Tbl_Idx) &&
        (CN_INT_TO_C(OPND_IDX(arg_info_list[info_idx1].ed.char_len)) != 1)) {
@@ -5158,7 +5155,6 @@ void    ichar_intrinsic(opnd_type     *result_opnd,
                IR_COL_NUM(ir_idx));
    }
 
-# if 0
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx && 
        folder_driver((char *)&CN_CONST(IL_IDX(list_idx1)),
@@ -5185,9 +5181,6 @@ void    ichar_intrinsic(opnd_type     *result_opnd,
       COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
       IR_OPND_R(ir_idx) = null_opnd;
    }
-#endif
-      res_exp_desc->constant = FALSE;
-      res_exp_desc->foldable = FALSE;
 
    TRACE (Func_Exit, "ichar_intrinsic", NULL);
 
@@ -5254,8 +5247,6 @@ void    char_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 
-
    res_exp_desc->char_len.fld = CN_Tbl_Idx;
    res_exp_desc->char_len.idx = CN_INTEGER_ONE_IDX;
    res_exp_desc->type_idx = type_idx;
@@ -5298,10 +5289,6 @@ void    char_intrinsic(opnd_type     *result_opnd,
       io_item_must_flatten = TRUE;
    }
 
-# endif
-
-     res_exp_desc->constant = FALSE;
-     res_exp_desc->foldable = FALSE;
 
    TRACE (Func_Exit, "char_intrinsic", NULL);
 
@@ -7553,7 +7540,6 @@ void    huge_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = arg_info_list[info_idx1].ed.type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Real_4:
@@ -7608,11 +7594,6 @@ void    huge_intrinsic(opnd_type     *result_opnd,
    OPND_COL_NUM((*result_opnd)) = IR_COL_NUM(ir_idx);
    res_exp_desc->constant = TRUE;
    res_exp_desc->foldable = TRUE;
-
-# endif
-
-   res_exp_desc->foldable = FALSE;
-   res_exp_desc->will_fold_later = FALSE;
 
 
    TRACE (Func_Exit, "huge_intrinsic", NULL);
@@ -17343,7 +17324,7 @@ void    repeat_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-/* # if 0   */
+/*# if 0    */
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx &&
        IL_FLD(list_idx2) == CN_Tbl_Idx &&
@@ -17369,6 +17350,8 @@ void    repeat_intrinsic(opnd_type     *result_opnd,
       res_exp_desc->foldable = TRUE;
       ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
    }
+
+# if 0
    else {
       COPY_OPND(opnd, arg_info_list[info_idx1].ed.char_len);
       copy_subtree(&opnd, &opnd);
@@ -17391,11 +17374,18 @@ void    repeat_intrinsic(opnd_type     *result_opnd,
    cast_to_cg_default(&opnd, &(arg_info_list[info_idx2].ed));
    COPY_OPND(IL_OPND(list_idx2), opnd);
 
-/*# endif */
+# endif 
+  
+   else{
+        res_exp_desc->constant = FALSE;
+        res_exp_desc->foldable = FALSE;
+        ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
+       }
 
    res_exp_desc->type_idx = type_idx;
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
+  
 
    TRACE (Func_Exit, "repeat_intrinsic", NULL);
 
@@ -18625,7 +18615,7 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
    }
    else {
 
-#if 0
+/* #if 0 */
 
       if (fold_it) {
          valu2 = 1;
@@ -18651,7 +18641,7 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
          }
       }
 
-#endif
+/* #endif */
    }
 
 
@@ -18667,7 +18657,7 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
       }
    }
 
-# if 0 
+/* # if 0  */
 
    if (fold_it) { 
 
@@ -18948,7 +18938,7 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
       ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
    }
 
-#endif
+/* #endif */
 
   IR_TYPE_IDX(ir_idx) = type_idx;
   IR_RANK(ir_idx) = res_exp_desc->rank;
@@ -18958,8 +18948,8 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
       res_exp_desc->char_len.idx = TYP_IDX(type_idx);
    }
 
-      res_exp_desc->foldable = FALSE;  
-      res_exp_desc->will_fold_later = FALSE;
+/*      res_exp_desc->foldable = FALSE;   */
+/*      res_exp_desc->will_fold_later = FALSE; */
 
    TRACE (Func_Exit, "reshape_intrinsic", NULL);
 
