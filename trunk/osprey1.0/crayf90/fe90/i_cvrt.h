@@ -240,6 +240,12 @@ typedef unsigned long          INTPTR;
 #define FEI_ARRAY_DIMEN_EMPTY_UB                         14 
 #define FEI_ARRAY_DIMEN_STAR_UB                          15 
 
+/* for different kinds of array*/
+#define FEI_ASSUMED_SIZE_ARRAY				 16
+#define FEI_ASSUMD_SHAPE_ARRAY				 17
+#define FEI_DEFERRED_SHAPE_ARRAY			 18
+
+
 #define FEI_DESCRIPTOR_CONST_C      	 	  	 0
 #define FEI_DESCRIPTOR_SIGN_C       	 	 	 1
 #define FEI_DESCRIPTOR_VOLAT_C      	 	 	 2

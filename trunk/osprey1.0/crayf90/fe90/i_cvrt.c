@@ -6204,7 +6204,8 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
            break;
         }
 
-       if (IR_OPR(ir_idx) == Whole_Subscript_Opr) {
+       if (IR_OPR(ir_idx) == Whole_Subscript_Opr &&
+    		       processing_call) {
              is_subscript = FALSE; 
              nested_array = FALSE;
              break;  /* fzhao */
@@ -11403,6 +11404,7 @@ static TYPE get_type_desc(int	input_idx)
 
          flag |= (BD_FLOW_DEPENDENT(bd_idx) << FEI_ARRAY_DIMEN_FLOW_DEPENDENT);
 
+
          temp_attr_idx = attr_idx;
          if (ATD_CLASS(attr_idx) == CRI__Pointee &&
              ATD_PTR_IDX(attr_idx) != NULL_IDX) {
@@ -11469,6 +11471,31 @@ static TYPE get_type_desc(int	input_idx)
             PDG_DBG_PRINT_D("(6) alignment",pdg_align[ATD_ALIGNMENT(attr_idx)]);
             PDG_DBG_PRINT_END
 # ifdef _ENABLE_FEI
+
+/*
+* add flags for different type of array---fzhao
+ */
+      if (ATD_ARRAY_IDX(attr_idx) != NULL_IDX) {
+
+         switch (BD_ARRAY_CLASS(ATD_ARRAY_IDX(attr_idx))) {
+         case Assumed_Size:
+            type_flag = type_flag | ( 1 << FEI_ASSUMED_SIZE_ARRAY);
+            break;
+
+         case Assumed_Shape:
+            type_flag = type_flag | ( 1 << FEI_ASSUMD_SHAPE_ARRAY);
+            break;
+
+         case Deferred_Shape1:
+            type_flag = type_flag | (1 << FEI_DEFERRED_SHAPE_ARRAY);
+            break;
+
+         case Deferred_Shape:
+            type_flag = type_flag | (1 << FEI_DEFERRED_SHAPE_ARRAY);
+            break;
+         }
+      }
+
             type_idx = fei_descriptor(type_flag,
                                       Array,
                                       pdg_array_idx,
@@ -11750,6 +11777,31 @@ if (i == BD_RANK(pe_bd_idx)) {
       PDG_DBG_PRINT_D("(6) alignment", pdg_align[ATD_ALIGNMENT(attr_idx)]);
       PDG_DBG_PRINT_END
 # ifdef _ENABLE_FEI
+
+/*
+* add flags for different type of array---fzhao
+ */
+      if (ATD_ARRAY_IDX(attr_idx) != NULL_IDX) {
+
+         switch (BD_ARRAY_CLASS(ATD_ARRAY_IDX(attr_idx))) {
+         case Assumed_Size:
+            type_flag = type_flag | ( 1 << FEI_ASSUMED_SIZE_ARRAY);
+            break;
+
+         case Assumed_Shape:
+            type_flag = type_flag | ( 1 << FEI_ASSUMD_SHAPE_ARRAY);
+            break;
+
+         case Deferred_Shape1:
+            type_flag = type_flag | (1 << FEI_DEFERRED_SHAPE_ARRAY);
+            break;
+
+         case Deferred_Shape:
+            type_flag = type_flag | (1 << FEI_DEFERRED_SHAPE_ARRAY);
+            break;
+         }
+      }
+
       type_idx = fei_descriptor(type_flag,
                                 Array,
                                 pdg_array_idx,
