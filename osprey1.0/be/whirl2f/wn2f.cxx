@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.5 $
- * $Date: 2002-09-10 18:20:32 $
+ * $Revision: 1.6 $
+ * $Date: 2002-09-12 21:15:52 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.6 $";
 #endif
 
 #include <alloca.h>
@@ -362,9 +362,12 @@ WN2F_Find_And_Mark_Nested_Address(WN * addr)
   /* fld, and belongs to the address ST, then return that   */
   /* ARRAY.                                                 */
 
+ OPERATOR ffmm = WN_operator(addr); /*Sept test*/
   switch (WN_operator(addr))
   {
   case OPR_ARRAY: 
+  case OPR_ARRAYEXP: //Sept test
+  case OPR_ARRSECTION:
     {
       WN * kid = WN_kid0(addr);
       WN2F_Find_And_Mark_Nested_Address(kid);
@@ -1081,7 +1084,8 @@ const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
     * we are entering a context where we expect this expression
     * to be a logically valued argument.
     */
-
+if (wn ==NULL)
+    return;
 
    if (OPCODE_is_boolean(WN_opcode(wn)) && 
        WN2F_expr_has_boolean_arg(WN_opcode(wn)))  /* expect logical args */

@@ -1338,6 +1338,14 @@ inline void
 Clear_FLD_equivalence (FLD_HANDLE fld)	{ fld.Entry()->flags &= ~FLD_EQUIVALENCE; }
 
 inline BOOL
+FLD_is_pointer (FLD_HANDLE fld)        { return fld.Entry()->flags & FLD_IS_POINTER; }
+inline void
+Set_FLD_is_pointer (FLD_HANDLE fld)    { fld.Entry()->flags |= FLD_IS_POINTER; }
+inline void
+Clear_FLD_is_pointer (FLD_HANDLE fld)  { fld.Entry()->flags &= ~FLD_IS_POINTER; }
+
+
+inline BOOL
 FLD_begin_union (FLD_HANDLE fld)	{ return fld.Entry()->flags & FLD_BEGIN_UNION; }
 inline void
 Set_FLD_begin_union (FLD_HANDLE fld)	{ fld.Entry()->flags |= FLD_BEGIN_UNION; }
