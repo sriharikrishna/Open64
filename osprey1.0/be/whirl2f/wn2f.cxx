@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.18 $
- * $Date: 2004-02-13 21:24:30 $
+ * $Revision: 1.19 $
+ * $Date: 2004-04-26 21:44:52 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.18 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.19 $";
 #endif
 
 #include <alloca.h>
@@ -1160,21 +1160,19 @@ WN2F_dump_context( WN2F_CONTEXT c)
 
 WN2F_STATUS 
 WN2F_translate(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
-{   OPERATOR op ;  
-const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+{   
+   const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
 
    /* Determine whether we are in a context where we expect this
     * expression to have logically valued arguments, or whether
     * we are entering a context where we expect this expression
     * to be a logically valued argument.
     */
-
    if (OPCODE_is_boolean(WN_opcode(wn)) && 
        WN2F_expr_has_boolean_arg(WN_opcode(wn)))  /* expect logical args */
    {
-      /* Note that this may also be a logical argument, so 
-       * WN2F_CONTEXT_is_logical_arg(context) may also hold
-       * TRUE.
+      /* Note that this may also be a logical argument, so
+       * WN2F_CONTEXT_is_logical_arg(context) may also hold TRUE.
        */
       set_WN2F_CONTEXT_has_logical_arg(context);
    }
@@ -1187,19 +1185,22 @@ const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
        */
       reset_WN2F_CONTEXT_has_logical_arg(context);
       set_WN2F_CONTEXT_is_logical_arg(context);
-    ;
    }
    else
    {
-
       reset_WN2F_CONTEXT_has_logical_arg(context);
-
       reset_WN2F_CONTEXT_is_logical_arg(context);
    }
-  op=WN_opc_operator(wn);  
+   
    /* Dispatch to the appropriate handler for this construct.
     */
-   return WN2F_Handler[WN_opc_operator(wn)](tokens, wn, context);
+   OPERATOR op = WN_opc_operator(wn);
+   WN2F_STATUS ret = WN2F_Handler[WN_opc_operator(wn)](tokens, wn, context);
+   
+   /* reset: this flag should only affect children of 'wn', not any siblings */
+   reset_WN2F_CONTEXT_has_logical_arg(context);
+   
+   return ret;
 } /* WN2F_translate */
 
 WN2F_STATUS 
