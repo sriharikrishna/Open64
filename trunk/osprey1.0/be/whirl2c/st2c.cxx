@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2c.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:16 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $
  *
  * Revision history:
@@ -72,7 +72,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -327,9 +327,10 @@ ST2C_Get_Common_Ty2c_List(COMMON_BLOCK *common,
       TY2C_LIST_tokens(ty2c_list) = New_Token_Buffer();
       Reset_TY_is_translated_to_c(ty);
       STR_IDX name_idx = TY_name_idx(Ty_Table[ty]);
-      Set_TY_name_idx(Ty_Table[ty], 0);
+      //WTH is this for???
+      //Set_TY_name_idx(Ty_Table[ty], 0);
       TY2C_translate(TY2C_LIST_tokens(ty2c_list), ty, context);
-      Set_TY_name_idx(Ty_Table[ty], name_idx);
+      //Set_TY_name_idx(Ty_Table[ty], name_idx);
       Set_TY_is_translated_to_c(ty);
       Set_Current_Indentation(indentation);
 
@@ -346,7 +347,7 @@ ST2C_Get_Common_Ty2c_List(COMMON_BLOCK *common,
       {
 	 INITO_IDX inito = Find_INITO_For_Symbol(common_st);
 
-	 if (inito != 0)
+	 if (inito != 0 && ty != shared_ptr_idx && ty != pshared_ptr_idx) 
 	 {
 	    Is_True(!COMMON_BLOCK_initialized(common),
 		    ("Common block (%s) is initialized twice",
@@ -382,44 +383,47 @@ ST2C_Define_A_Common_Block(TOKEN_BUFFER  tokens,
     * to put the initializing member before any other member.
     */
    union_tokens = New_Token_Buffer();
-   Increment_Indentation();
+   //Increment_Indentation();
    ordinal = 0;
    for (ty2c_list = COMMON_BLOCK_variations(common);
 	ty2c_list != NULL;
 	ty2c_list = TY2C_LIST_next(ty2c_list), ordinal++)
    {
-      variation_name = COMMON_BLOCK_MEMBER_NAME(ordinal);
-      if (COMMON_BLOCK_initialized(common) == ty2c_list)
-      {
-	 if (ordinal > 0)
-	    Prepend_Indented_Newline(union_tokens, 1/*Lines between decls*/);
+     variation_name = COMMON_BLOCK_MEMBER_NAME(ordinal);
+     //WEI: WE DON'T WANT TO PUT GLOBAL TYPE DECLS IN A UNION, CODE
+     //COMMMENTED OUT
+
+     if (COMMON_BLOCK_initialized(common) == ty2c_list)
+       {
+	 //if (ordinal > 0)
+	 //  Prepend_Indented_Newline(union_tokens, 1);
 	 Prepend_Token_Special(union_tokens, ';');
-	 Prepend_Token_String(union_tokens, variation_name);
+	 //Prepend_Token_String(union_tokens, variation_name);
 	 Prepend_And_Reclaim_Token_List(union_tokens, 
 					&TY2C_LIST_tokens(ty2c_list));
-      }
-      else
-      {
+       }
+     else
+       {
 	 Append_And_Reclaim_Token_List(union_tokens, 
 				       &TY2C_LIST_tokens(ty2c_list));
-	 Append_Token_String(union_tokens, variation_name);
+	 //Append_Token_String(union_tokens, variation_name);
 	 Append_Token_Special(union_tokens, ';');
-	 if (TY2C_LIST_next(ty2c_list) != NULL)
-	    Append_Indented_Newline(union_tokens, 1/*Lines between decls*/);
-      }
+	 //if (TY2C_LIST_next(ty2c_list) != NULL)
+	 //  Append_Indented_Newline(union_tokens, 1);
+       }
    }
 
    /* Prepend the union declaration before the members */
-   Prepend_Indented_Newline(union_tokens, 1/*Lines between decls*/);
-   Prepend_Token_Special(union_tokens, '{');
-   Prepend_Token_String(union_tokens, base_name);
-   Prepend_Token_String(union_tokens, "union");
-   Decrement_Indentation();
+   //Prepend_Indented_Newline(union_tokens, 1/*Lines between decls*/);
+   //Prepend_Token_Special(union_tokens, '{');
+   //Prepend_Token_String(union_tokens, base_name);
+   //Prepend_Token_String(union_tokens, "union");
+   //Decrement_Indentation();
 
    /* Append the union definition after the members */
-   Append_Indented_Newline(union_tokens, 1/*Lines between decls*/);
-   Append_Token_Special(union_tokens, '}');
-   Append_Token_String(union_tokens, base_name);
+   //Append_Indented_Newline(union_tokens, 1/*Lines between decls*/);
+   //Append_Token_Special(union_tokens, '}');
+   //Append_Token_String(union_tokens, base_name);
 
    /* Do initialization */
    if (COMMON_BLOCK_initialized(common) != NULL)
@@ -428,7 +432,7 @@ ST2C_Define_A_Common_Block(TOKEN_BUFFER  tokens,
 				    &COMMON_BLOCK_initializer(common));
    }
    
-   Append_Token_Special(union_tokens, ';');
+   //Append_Token_Special(union_tokens, ';');
    Append_And_Reclaim_Token_List(tokens, &union_tokens);
 } /* ST2C_Define_A_Common_Block */
 
@@ -450,15 +454,22 @@ ST2C_Get_Common_Block_Name(const ST *st)
 					 st, ST_type(st));
    base_name = WHIRL2C_make_valid_c_name(COMMON_BLOCK_name(common));
 
-   ordinal = 0;
-   for (ty2c_list_iter = COMMON_BLOCK_variations(common);
-	ty2c_list_iter != ty2c_list;
-	ty2c_list_iter = ty2c_list_iter->next)
-   {
-      ordinal++;
-   }
-   return Concat3_Strings(base_name, ".", 
-			  COMMON_BLOCK_MEMBER_NAME(ordinal));
+   //WEI: Since we're not putting global type decls in unions anymore, 
+   //name should be identical to the symbol's name(no need to append ".u0")
+   return base_name;
+
+   /*
+     ordinal = 0;
+     for (ty2c_list_iter = COMMON_BLOCK_variations(common);
+     ty2c_list_iter != ty2c_list;
+     ty2c_list_iter = ty2c_list_iter->next)
+     {
+     ordinal++;
+     }
+
+     return Concat3_Strings(base_name, ".", 
+  		  COMMON_BLOCK_MEMBER_NAME(ordinal));
+   */
 } /* ST2C_Get_Common_Block_Name */
 
 
@@ -488,6 +499,20 @@ ST2C_basic_decl(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
    
    Append_Token_String(decl_tokens, 
 		       W2CF_Symtab_Nameof_St(st));    /* name */
+   
+   //WEI:
+   //If type of st is struct, make it incomplete because the complete type will be 
+   //declared in w2c.h (see WN2C_Append_Symtab_Types)
+   TY_IDX ty = ST_class(st) == CLASS_FUNC ? ST_pu_type(st) : ST_type(st);
+
+   if (Compile_Upc) {
+     if (TY_kind(ty) == KIND_STRUCT ||
+	 (TY_kind(ty) == KIND_FUNCTION && 
+	  TY_kind(Func_Return_Type(ty)) == KIND_STRUCT)) {
+       CONTEXT_set_incomplete_ty2c(context);
+     }
+   }
+
    TY2C_translate(decl_tokens,
                   ST_sym_class(st) == CLASS_FUNC ? ST_pu_type(st) : ST_type(st),
                   context); /* type */
@@ -632,16 +657,18 @@ ST2C_use_var(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
 {
    Is_True(ST_sym_class(st)==CLASS_VAR, ("expected CLASS_VAR ST"));
 
-   if (Stab_Is_Common_Block(st))
+   //WEI: when compiling UPC, don't output the initialization expression of DGLOBAL vars 
+   if (Stab_Is_Common_Block(st) && !(Compile_Upc && ST_sclass(st) == SCLASS_DGLOBAL))
    {
-      /* Do not mark the variable as referenced, since we do not
-       * want to declare it in the local scope.
-       */
-      Append_Token_String(tokens, ST2C_Get_Common_Block_Name(st));
+     /* Do not mark the variable as referenced, since we do not
+      * want to declare it in the local scope.
+      */
+     Append_Token_String(tokens, ST2C_Get_Common_Block_Name(st));
+
    }
    else
    {
-      Append_Token_String(tokens, W2CF_Symtab_Nameof_St(st));
+     Append_Token_String(tokens, W2CF_Symtab_Nameof_St(st));
       /* Mark the variable as referenced, unless it is an external
        * defining variable.
        */
@@ -799,6 +826,11 @@ ST2C_func_header(TOKEN_BUFFER  tokens,
 	    Append_Token_Special(header_tokens, ',');
       }
       Append_Token_Special(header_tokens, ')');
+
+      //WEI:  If a struct appears in the function return type, it must be declared as incomplete
+      if (Compile_Upc) {
+	CONTEXT_set_incomplete_ty2c(context);
+      }
       TY2C_translate(header_tokens, Func_Return_Type(funtype), context);
 
       /* Emit parameter declarations, indented and on a new line */

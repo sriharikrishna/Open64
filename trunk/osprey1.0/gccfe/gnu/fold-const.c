@@ -1912,11 +1912,32 @@ size_binop (code, arg0, arg1)
      tree arg0, arg1;
 {
   tree type = TREE_TYPE (arg0);
+  int upcdebug =1;
+  tree tmp ;
+  
+  //WEI: I believe "type != TREE_TYPE (arg1))" is wrong,
+  //should check arg1 is a INTEGER_TYPE instead
 
   if (TREE_CODE (type) != INTEGER_TYPE || ! TYPE_IS_SIZETYPE (type)
-      || type != TREE_TYPE (arg1))
+      // || type != TREE_TYPE (arg1)) {
+      || TREE_CODE(TREE_TYPE (arg1)) != INTEGER_TYPE) {
+    if(upcdebug) {
+      if(TREE_CODE (type) != INTEGER_TYPE) 
+	printf("Not int \n");
+      else if (! TYPE_IS_SIZETYPE (type)) {
+	printf("Not sizetype.\n");
+	tmp = TYPE_CHECK(type);
+      if(tmp->type.no_force_blk_flag) 
+	printf("%c\n", TREE_CODE_CLASS(TREE_CODE(type)));
+      debug_tree(arg0);
+      debug_tree(type);
+      }
+      //else if (type != TREE_TYPE (arg1))
+      else if (TREE_CODE(TREE_TYPE (arg1)) != INTEGER_TYPE)
+	printf("Different types");
+    } 
     abort ();
-
+  }
   /* Handle the special case of two integer constants faster.  */
   if (TREE_CODE (arg0) == INTEGER_CST && TREE_CODE (arg1) == INTEGER_CST)
     {
@@ -4898,6 +4919,26 @@ fold (expr)
 	return build (COMPOUND_EXPR, type, TREE_OPERAND (arg1, 0),
 		      fold (build (code, type,
 				   arg0, TREE_OPERAND (arg1, 1))));
+      else if (TREE_CODE (TREE_TYPE (arg0)) == POINTER_TYPE
+	       && TYPE_SHARED (TREE_TYPE (TREE_TYPE (arg0))))
+	{
+	  if (TREE_CODE (TREE_TYPE (TREE_OPERAND (expr, 1))) == INTEGER_TYPE)
+	    {
+	      arg1 = fold (TREE_OPERAND (expr, 1));
+	      TREE_OPERAND (expr, 1) = arg1;
+	    }
+	  return expr;
+	}
+      else if (TREE_CODE (TREE_TYPE (arg1)) == POINTER_TYPE
+	       && TYPE_SHARED (TREE_TYPE (TREE_TYPE (arg1))))
+	{
+	  if (TREE_CODE (TREE_TYPE (TREE_OPERAND (expr, 0))) == INTEGER_TYPE)
+	    {
+	      arg0 = fold (TREE_OPERAND (expr, 0));
+	      TREE_OPERAND (expr, 0) = arg0;
+	    }
+	  return expr;
+	}
       else if ((TREE_CODE (arg1) == COND_EXPR
 		|| (TREE_CODE_CLASS (TREE_CODE (arg1)) == '<'
 		    && TREE_CODE_CLASS (code) != '<'))

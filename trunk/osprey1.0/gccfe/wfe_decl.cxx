@@ -48,6 +48,7 @@ extern "C" {
 #include "gnu/toplev.h"
 #include "function.h"
 #include "c-pragma.h"
+#include "c-tree.h"
 }
 #ifdef TARG_IA32
 // the definition in gnu/config/i386/i386.h causes problem
@@ -90,6 +91,9 @@ static int __ctors = 0;
 static int __dtors = 0;
 
 extern "C" tree lookup_name (tree);
+extern WN *last_ptr_arith_wn;
+extern WN* WFE_Convert_Shared_To_Local (TYPE_ID rtype, WN_OFFSET offset, ST *st, 
+					TY_IDX ty, WN *init_wn, UINT field_id);
 
 /* Generate WHIRL representing an asm at file scope (between
   functions). This is an awful hack. */
@@ -208,6 +212,48 @@ WFE_Assemble_Asm(char *asm_string)
     --CURRENT_SYMTAB;
 }
 
+extern WN_MAP _upc_struct_map;
+extern int compiling_upc;
+
+extern "C" void WFE_Set_Consistency(char *, int);
+
+void WFE_Set_Consistency (char *descriptor, int action)
+{
+  
+  WN_PRAGMA_ID prdesc;
+  
+  if (strcmp(descriptor, "relaxed") == 0) {
+    switch (action) {
+    case START_CONSISTENCY_SCOPE:
+      prdesc = WN_PRAGMA_UPC_RELAXED_CONSISTENCY_START;
+      break;
+    case END_CONSISTENCY_SCOPE:
+      prdesc = WN_PRAGMA_UPC_RELAXED_CONSISTENCY_STOP;
+      break;
+    default:
+      Is_True(0,("Unsupported consistency action",""));
+    }
+  } else if (strcmp(descriptor, "strict") == 0) {
+    switch (action) {
+    case START_CONSISTENCY_SCOPE:
+      prdesc = WN_PRAGMA_UPC_STRICT_CONSISTENCY_START;
+      break;
+    case END_CONSISTENCY_SCOPE:
+      prdesc = WN_PRAGMA_UPC_STRICT_CONSISTENCY_STOP;
+      break;
+    default:
+      Is_True(0,("Unsupported consistency action",""));
+    }
+  } else 
+    Is_True(0,("Unsupported consistency descriptor",""));
+  
+  WN *wn = WN_CreatePragma(prdesc,(ST_IDX) 0,0,0);
+  WFE_Stmt_Append(wn,Get_Srcpos());
+  
+}
+
+
+
 extern void
 WFE_Start_Function (tree fndecl)
 {
@@ -236,6 +282,10 @@ WFE_Start_Function (tree fndecl)
 
     /* create the map table for the next PU */
     (void)WN_MAP_TAB_Create(&Map_Mem_Pool);
+
+    if (compiling_upc) { 
+      _upc_struct_map = WN_MAP_Create(&Map_Mem_Pool);
+    }
 
     New_Scope (CURRENT_SYMTAB + 1, Malloc_Mem_Pool, TRUE);
 
@@ -381,12 +431,44 @@ WFE_Start_Function (tree fndecl)
       Set_TY_is_varargs (ty_idx);
       Set_PU_prototype (pu, ty_idx);
     }
+
+    WFE_Set_Consistency(IDENTIFIER_POINTER (current_consistency_stack->value), 
+			START_CONSISTENCY_SCOPE);
+}
+
+/* functions for the initialization of global data */
+extern void add_shared_symbol(ST_IDX st, TY_IDX ty, int thread_dim);
+extern void add_TLD_symbol(ST_IDX st, tld_pair_p info);
+
+void add_symbols() {
+
+  /**
+   *  This seems like a good spot to add the global symbols...
+   */
+  if (compiling_upc) {
+    std::map<ST_IDX,bs_pair_p>::iterator i = upc_st_orig_ty.begin();
+    for(;i != upc_st_orig_ty.end(); i++) {
+      add_shared_symbol(i->first, ST_type(i->first), i->second->thread_dim);
+    }
+    for (std::map<ST_IDX, tld_pair_p>::iterator i = upc_tld.begin(); i!= upc_tld.end(); i++) {
+      add_TLD_symbol(i->first, i->second);
+    }
+    //clear the two maps...
+    upc_st_orig_ty.clear();
+    upc_tld.clear();
+  }
 }
 
 extern void
 WFE_Finish_Function (void)
 {
     WFE_Check_Undefined_Labels ();
+
+    /**
+     *  This seems like a good spot to add the global symbols...
+     */
+    add_symbols();
+
     PU_Info *pu_info = PU_Info_Table [CURRENT_SYMTAB];
     wfe_save_expr_stack_last = Save_Expr_Table [CURRENT_SYMTAB];
 
@@ -397,6 +479,8 @@ WFE_Finish_Function (void)
       Set_PU_no_inline (Get_Current_PU ());
     }
 
+    WFE_Set_Consistency(IDENTIFIER_POINTER (current_consistency_stack->value),
+			END_CONSISTENCY_SCOPE);
     // write out all the PU information
     WN *wn = WFE_Stmt_Pop (wfe_stmk_func_body);
 
@@ -421,6 +505,11 @@ WFE_Finish_Function (void)
 */
     }
 
+    if(compiling_upc) {
+      WN_MAP_Delete(_upc_struct_map);
+    }
+
+    
     /* deallocate the old map table */
     if (Current_Map_Tab) {
         WN_MAP_TAB_Delete(Current_Map_Tab);
@@ -464,7 +553,12 @@ void
 WFE_Add_Aggregate_Init_Padding (INT size)
 {
   if (aggregate_inito == 0) return;
-  if (size < 0) return;	// actually happens from assemble_zeroes
+  //if (size < 0) return;	// actually happens from assemble_zeroes
+  if (size < 0) {
+    //WEI: We still need to pad here (ow the init program will break), but make the size of pad to 0
+    size = 0;
+  }
+
   INITV_IDX inv = New_INITV();
   INITV_Init_Pad (inv, size);
   if (last_aggregate_initv != 0)
@@ -992,8 +1086,25 @@ Gen_Assign_Of_Init_Val (ST *st, tree init, UINT offset, UINT array_elem_offset,
 	} else
 	    field_id = 0;	// uses offset instead
 	WFE_Set_ST_Addr_Saved (init_wn);
-	WN *wn = WN_Stid (mtype, ST_ofst(st) + offset, st,
-		ty, init_wn, field_id);
+	WN *wn;
+	// UPC specific 
+	// distinguish intializers  
+	//           T *p = shared T *p1
+	if (compiling_upc && shared_ptr_idx && 
+	    (TYPE_SHARED(TREE_TYPE(init)) || init_wn == last_ptr_arith_wn)) 
+	  {
+	    if((ty != shared_ptr_idx && TY_kind(ty) == KIND_POINTER) || 
+	       init_wn == last_ptr_arith_wn || 
+	       WN_ty(init_wn) == shared_ptr_idx) {
+	      wn = WFE_Convert_Shared_To_Local (mtype, ST_ofst(st) + offset, st, 
+						ty, init_wn, field_id);
+	    } else {
+	      wn = WN_Stid (mtype, ST_ofst(st) + offset, st, ty, init_wn, field_id);
+	    } 
+	    
+	} else 
+	  wn = WN_Stid (mtype, ST_ofst(st) + offset, st,
+			    ty, init_wn, field_id);
 	WFE_Stmt_Append(wn, Get_Srcpos());
 	if (! is_bit_field) 
 	  bytes += TY_size(ty);
@@ -1301,6 +1412,15 @@ Add_Inito_For_Tree (tree init, tree decl, ST *st)
 {
   tree kid;
   last_aggregate_initv = 0;
+  TY_IDX ty;
+  //WEI: don't think we need this anymore
+  //  if (TY_is_shared(ST_type(st))) {
+    // get the original type
+    //ty = decl->common.type->type.orig_ty_idx;
+  //ty = TYPE_SHARE_ORIG_TY_IDX(decl);
+  //} else {
+  ty = ST_type(st);
+
   switch (TREE_CODE(init)) {
   case INTEGER_CST:
 	UINT64 val;
@@ -1314,20 +1434,21 @@ Add_Inito_For_Tree (tree init, tree decl, ST *st)
 	}
 	aggregate_inito = New_INITO (st);
 	not_at_root = FALSE;
-	WFE_Add_Aggregate_Init_Integer (val, TY_size(ST_type(st)));
+
+	WFE_Add_Aggregate_Init_Integer (val, TY_size(ty));
 	return;
   case REAL_CST:
 	aggregate_inito = New_INITO (st);
 	not_at_root = FALSE;
 	WFE_Add_Aggregate_Init_Real (TREE_REAL_CST(init), 
-		TY_size(ST_type(st)));
+		TY_size(ty));
 	return;
   case COMPLEX_CST:
 	aggregate_inito = New_INITO (st);
 	not_at_root = FALSE;
 	WFE_Add_Aggregate_Init_Complex (TREE_REAL_CST(TREE_REALPART(init)), 
 					TREE_REAL_CST(TREE_IMAGPART(init)), 
-					TY_size(ST_type(st)));
+					TY_size(ty));
 	return;
   case STRING_CST:
 	aggregate_inito = New_INITO (st);
@@ -1335,7 +1456,7 @@ Add_Inito_For_Tree (tree init, tree decl, ST *st)
 	WFE_Add_Aggregate_Init_String (TREE_STRING_POINTER(init), 
                                        TREE_STRING_LENGTH(init));
 	if (TY_size (ST_type(st)) > TREE_STRING_LENGTH(init))
-		WFE_Add_Aggregate_Init_Padding ( TY_size (ST_type(st)) -
+		WFE_Add_Aggregate_Init_Padding ( TY_size (ty) -
 						 TREE_STRING_LENGTH(init));
 	return;
   case NOP_EXPR:
@@ -1470,6 +1591,7 @@ WFE_Initialize_Decl (tree decl)
 	// e.g. FUNCTION and PRETTY_FUNCTION
 	return;
   }
+
   ST *st = Get_ST(decl);
   tree init = DECL_INITIAL(decl);
 
@@ -1535,7 +1657,14 @@ WFE_Decl (tree decl)
   if (TREE_CODE(decl) != VAR_DECL) return;
   if (DECL_CONTEXT(decl) != 0) return;  // local
   if ( ! TREE_PUBLIC(decl)) return;     // local
-  if ( ! TREE_STATIC(decl)) return;     // extern
+  
+  /* if we're compiling upc, then we want to process an external decl
+   * to make sure it's output in the correct order by the init program 
+   * This is important if the decl's address is used to initialize other global variables
+   */
+  if (!compiling_upc) {
+    if ( ! TREE_STATIC(decl)) return;     // extern
+  }
   // is something that we want to put in symtab
   // (a global var defined in this file).
   (void) Get_ST(decl);

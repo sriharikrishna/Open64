@@ -43,9 +43,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: glob.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:31 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:42 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/glob.h,v $
  *
  * Revision history:
@@ -209,4 +209,7 @@ extern BOOL Regcopies_Translated;
 #ifdef __cplusplus
 }
 #endif
+
+extern BOOL Compile_Upc;
+
 #endif /* glob_INCLUDED */

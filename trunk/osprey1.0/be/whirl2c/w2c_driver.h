@@ -40,9 +40,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: w2c_driver.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.h,v $
  *
  * Description:
@@ -259,6 +259,7 @@ typedef enum W2C_File_Kind
    W2C_DOTH_FILE, /* W2C generated .h file */
    W2C_DOTC_FILE, /* W2C generated .c file */
    W2C_LOC_FILE,  /* W2C generated source-to-source location mapping file */
+   W2C_DATA_FILE, /* Initailization file for shared and TLD variables */
    W2C_NUM_FILES  /* Number of elements in this enumeration */
 } W2C_FILE_KIND;
 

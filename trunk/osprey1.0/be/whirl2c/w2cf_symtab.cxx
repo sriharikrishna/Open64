@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
  * Revision history:
@@ -76,7 +76,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
@@ -416,6 +416,14 @@ W2CF_Avoid_Suffix(W2CF_SYMBOL *symbol )
 	avoid = TRUE;
     }
 #endif
+
+  //WEI: shouldn't suffixs  be avoided for TY entries???
+  if (Compile_Upc) {
+    if (W2CF_SYMBOL_kind(symbol) == SYMKIND_TY) {
+      avoid = TRUE;
+    }
+  }
+
   return avoid;
 }
 
@@ -876,6 +884,12 @@ W2CF_Symtab_Nameof_St(const ST *st)
    {
       valid_name = W2CF_Get_Ftn_St_Name(st, valid_name);
    }
+
+   //WEI: again, don't think there's any reason to rename function names
+   if (ST_sym_class(st) == CLASS_FUNC) {
+     return valid_name;
+   }
+
    symname = Get_Name_Buf_Slot(strlen(valid_name) + 32);
    W2CF_Get_Basename(valid_name, symname, &symid);
    
@@ -955,6 +969,15 @@ W2CF_Symtab_Nameof_Ty(TY_IDX ty)
    W2CF_SYMBOL_kind(&match_symbol)  = SYMKIND_TY;
    W2CF_SYMBOL_ty(&match_symbol)    = ty;
    W2CF_Get_Symbol(&symtab, &symhdr, &symbol, &match_symbol, symname);
+
+   //WEI: for anonymous structs, we output the valid_name directly
+   //(so different structs will have different names)
+   if (Compile_Upc) {
+     if (strncmp(valid_name, "anonymous", 9) == 0) {
+       //cout << valid_name << " " << ty << endl;
+       return valid_name;
+     }
+   }
    
    /* Return the resultant disambiguated name */
 //   return W2CF_SYMBOL_name_string(symtab, symbol);
@@ -985,7 +1008,13 @@ W2CF_Symtab_Nameof_Fld(FLD_HANDLE fld)
    }
    symname = Get_Name_Buf_Slot(strlen(valid_name) + 32);
    W2CF_Get_Basename(valid_name, symname, &symid);
-   
+
+   if (Compile_Upc) {
+     return valid_name;
+   }
+   //WEI: is this really necessary? I think there's no need to rename fields in a struct
+   //(How could you possibly get conflicts?)
+
    /* Get the associated symbol entry (with a possibly modified symid).
     */
    W2CF_SYMBOL_symid(&match_symbol) = symid;

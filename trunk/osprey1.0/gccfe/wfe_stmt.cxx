@@ -53,6 +53,7 @@
 #include "wfe_stmt.h"
 #include "targ_sim.h"
 #include <ctype.h>
+#include "upc_symtab_utils.h"
 
 extern "C" int decode_reg_name (char*);
 
@@ -82,6 +83,9 @@ typedef struct loop_info_t {
 static LOOP_INFO *loop_info_stack;
 static INT32      loop_info_i;
 static INT32      loop_info_max;
+static INT32      affinity_control_idx = -1;
+WN*    affinity_control_wn = 0;
+WN* affinity_test = 0;
 
 typedef struct case_info_t {
   INT64     case_lower_bound_value;
@@ -201,6 +205,7 @@ WFE_Expand_Start_Loop (int exitflag, struct nesting *whichloop)
 
   while_body = WN_CreateBlock ();
   WFE_Stmt_Push (while_body, wfe_stmk_while_body, Get_Srcpos());
+ 
 } /* WFE_Expand_Start_Loop */
 
 void
@@ -225,6 +230,7 @@ WFE_Expand_Start_Loop_Continue_Elsewhere (int exitflag, struct nesting *whichloo
 void
 WFE_Expand_Loop_Continue_Here (void)
 {
+  WN *while_body;
   FmtAssert (loop_info_i >= 0,
              ("WFE_Expand_Loop_Continue_Here: no loops"));
   if (loop_info_stack [loop_info_i].continue_info == CONTINUE_NONE)
@@ -234,6 +240,15 @@ WFE_Expand_Loop_Continue_Here (void)
     loop_info_stack [loop_info_i].continue_info = CONTINUE_ELSEWHERE_HERE;
   else
     Fail_FmtAssertion ("WFE_Expand_Loop_Continue_Here: unexpected state"); 
+  
+  // forall loops - the label gets added at the end of the current block,
+  // which in this case is the body of the afinity test. Need to recuperate 
+  // the if_stmt here and push it on the stmt stack. Code from here on is the
+  // loop epilogue and it should not be inside the if_stmt.
+  if(affinity_control_idx == loop_info_i) {
+    while_body = WFE_Stmt_Pop(wfe_stmk_while_body);
+    WFE_Stmt_Push(affinity_test, wfe_stmk_while_body, Get_Srcpos());
+  }
   WFE_Stmt_Append (
     WN_CreateLabel ((ST_IDX) 0,
                     loop_info_stack [loop_info_i].continue_label_idx,
@@ -246,17 +261,33 @@ void
 WFE_Expand_End_Loop (void)
 {
   LABEL_IDX exit_label_idx;
+  WN *while_body;
+
   FmtAssert (loop_info_i >= 0,
              ("WFE_Expand_End_Loop: no loops"));
   if (!loop_info_stack [loop_info_i].exit_loop_if_false) {
-    WN *while_body;
+   
     WN *while_stmt;
     WN *test = WN_Intconst (MTYPE_I4, 1);
     while_body = WFE_Stmt_Pop (wfe_stmk_while_body);
+
+   
     switch (loop_info_stack [loop_info_i].continue_info) {
       case CONTINUE_NONE:
       case CONTINUE_ELSEWHERE:
-        while_stmt = WN_CreateWhileDo (test, while_body);
+        if(affinity_control_wn) {
+	  if (loop_info_i > affinity_control_idx) 
+	    while_stmt = WN_CreateWhileDo (test, while_body);
+	  else if (loop_info_i < affinity_control_idx) 
+	    Is_True(0,("",""));
+	  else { /* affinity_control_idx == loop_info_i 
+		    controlling loop */
+	    Is_True(0,("",""));
+	    affinity_control_wn = 0;
+	    affinity_control_idx = 0;
+	  }
+	} else 
+	  while_stmt = WN_CreateWhileDo (test, while_body);
         break;
       case CONTINUE_ELSEWHERE_HERE:
         while_stmt = WN_CreateDoWhile (test, while_body);
@@ -276,14 +307,25 @@ WFE_Expand_End_Loop (void)
                       0, NULL),
       Get_Srcpos());
   }
-  WFE_Stmt_Pop (wfe_stmk_while_body);
+  
+  while_body = WFE_Stmt_Pop (wfe_stmk_while_body);
   exit_label_idx = loop_info_stack [loop_info_i].exit_label_idx;
   if (exit_label_idx) {
     WFE_Stmt_Append (
       WN_CreateLabel ((ST_IDX) 0, exit_label_idx, 0, NULL),
       Get_Srcpos());
   }
+
+  if(affinity_control_idx == loop_info_i) {
+    while_body = WN_then(WN_first(while_body));
+    WFE_Stmt_Push(while_body, wfe_stmk_while_body, Get_Srcpos());
+    WFE_Stmt_Pop (wfe_stmk_while_body);
+  }
   --loop_info_i;
+  if (loop_info_i < 0) {
+    affinity_control_wn = 0;
+    affinity_control_idx = -1;
+  }
 } /* WFE_Expand_End_Loop */
 
 void
@@ -322,10 +364,28 @@ WFE_Expand_Exit_Loop_If_False (struct nesting *whichloop, tree cond)
   loop_info_stack [loop_info_i].exit_loop_if_false = TRUE;
   test       = WFE_Expand_Expr_With_Sequence_Point (cond, Boolean_type);
   while_body = WFE_Stmt_Pop (wfe_stmk_while_body);
+  WN* forall_prag = WN_CreatePragma(WN_PRAGMA_UPC_FORALL, (ST_IDX) 0, 0, 0);
+
   switch (loop_info_stack [loop_info_i].continue_info) {
     case CONTINUE_NONE:
     case CONTINUE_ELSEWHERE:
-      while_stmt = WN_CreateWhileDo (test, while_body);
+       if(affinity_control_wn) {
+	 if (loop_info_i > affinity_control_idx) //act as if continue 
+	    while_stmt = WN_CreateWhileDo (test, while_body);
+	  else if (loop_info_i < affinity_control_idx) 
+	    Is_True(0,("",""));
+	  else { /* affinity_control_idx == loop_info_i 
+		    controlling loop */
+	    while_body = WFE_Add_Affinity_Test(while_body, affinity_control_wn);
+	    while_stmt = WN_CreateWhileDo (test, while_body);
+	    // recuperate the while body from the if created by Add_Aff
+	    // this will be later pushed on the statement stack
+	    affinity_test = while_body;
+	    while_body = WN_then(WN_first(while_body));
+	  }
+	 WFE_Stmt_Append (forall_prag, Get_Srcpos());
+	} else 
+	  while_stmt = WN_CreateWhileDo (test, while_body);
       break;
     case CONTINUE_ELSEWHERE_HERE:
       while_stmt = WN_CreateDoWhile (test, while_body);
@@ -334,7 +394,12 @@ WFE_Expand_Exit_Loop_If_False (struct nesting *whichloop, tree cond)
       Fail_FmtAssertion ("WFE_Expand_Exit_Loop_If_False: unexpected state");
       break;
   }
+
+  //WFE_Stmt_Append (forall_prag, Get_Srcpos());
   WFE_Stmt_Append (while_stmt, Get_Srcpos());
+
+
+  
   WFE_Stmt_Push (while_body, wfe_stmk_while_body, Get_Srcpos());
 } /* WFE_Expand_Exit_Loop_If_False */
 
@@ -516,6 +581,9 @@ WFE_Expand_Exit_Something (struct nesting *n,
       }
       wn = WN_CreateGoto (exit_label_idx);
       WFE_Stmt_Append (wn, Get_Srcpos ());
+      //add pragma to mark the break
+      //      WN* prag = WN_CreatePragma(WFE_UPC_FORALL_BREAK, (ST_IDX) 0, 0, 0);
+      //WFE_Stmt_Append (prag, Get_Srcpos());
     }
   }
 } /* WFE_Expand_Exit_Something */
@@ -1150,3 +1218,148 @@ WFE_Check_Undefined_Labels (void)
   }
   undefined_labels_i = i;
 } /* WFE_Check_Undefined_Labels */
+
+
+/* Values for sync:  1 == notify; 2 == wait; 3 == barrier. See c-parse.y */
+void WFE_Expand_Upc_Sync (int syncop, tree arg) {
+  WN *call, *arg0, *arg1;
+  INTRINSIC iop;
+  switch(syncop) {
+  case 1:
+    iop = INTRN_UPCNTFY;
+    break;
+  case 2:
+    iop = INTRN_UPCWAIT;
+    break;
+  case 3:
+    iop = INTRN_UPCBAR;
+    break;
+  case 4:
+    iop = INTRN_UPCFENCE;
+    break;
+  default:
+    Is_True(0,("Unknown intrinsic",""));
+  }
+  call = WN_Create(OPR_INTRINSIC_CALL, MTYPE_V, MTYPE_V, (syncop == 4) ? 0 : 2);
+  WN_intrinsic(call) = iop;
+  
+  if(syncop != 4) {
+    if(arg) {
+      arg0 = WFE_Expand_Expr (arg, true, 0, 0, 0, 0, false);
+    } else {
+      arg0 = WN_Intconst(MTYPE_I4, UPCR_BARRIERVAL_ANONYMOUS);
+    }
+    
+    arg1 = WN_Intconst(MTYPE_I4, arg ? !UPCR_BARRIERFLAG_ANONYMOUS : UPCR_BARRIERFLAG_ANONYMOUS);
+    
+    WN_kid0(call) = WN_CreateParm (MTYPE_I4, arg0, MTYPE_To_TY(MTYPE_I4), WN_PARM_BY_VALUE);
+    WN_kid1(call) = WN_CreateParm (MTYPE_I4, arg1, MTYPE_To_TY(MTYPE_I4), WN_PARM_BY_VALUE);
+  }
+  
+  WFE_Stmt_Append(call, Get_Srcpos());
+}
+
+
+void
+WFE_Expand_Affinity_Test(tree exp) 
+{ 
+  if (! affinity_control_wn && affinity_control_idx == -1) {
+    affinity_control_wn = WFE_Expand_Expr(exp, true,  0, 0, 0, 0, false);
+    affinity_control_idx = loop_info_i;
+  } else 
+    Is_True(loop_info_i > affinity_control_idx,("",""));
+}
+
+
+
+WN*
+WFE_Add_Affinity_Test(WN *while_body, WN* affinity_control_wn)
+{
+  WN *ltest, *rtest;
+
+  WN* myval;
+  WN *tblock;
+  tblock = WN_CreateBlock();
+  TY_IDX ty = WN_ty(affinity_control_wn);
+  if (TY_kind(ty) == KIND_POINTER) {
+    //Case when aff expression is an address
+    Is_True(TY_is_shared(TY_pointed(ty)), ("affinity expression is not address to shared data", ""));
+    WN* threadof= WN_Create(OPR_INTRINSIC_CALL, MTYPE_I4, MTYPE_V, 1);
+    //WN_intrinsic(threadof) = INTRN_UPCIAFFT;
+    WN_intrinsic(threadof) = TY_is_pshared(TY_pointed(ty)) ? INTRN_AFF_P : INTRN_AFF_S;
+    //WN_kid0(threadof) = affinity_control_wn;
+    WN_kid0(threadof) = WN_CreateParm(Pointer_Mtype, affinity_control_wn, ty, WN_PARM_BY_VALUE);
+    WN_INSERT_BlockLast(tblock, threadof);
+    threadof = WN_Ldid (MTYPE_I4, -1, Return_Val_Preg, MTYPE_To_TY(MTYPE_I4));
+    ltest = WN_CreateComma(OPR_COMMA, MTYPE_I4, MTYPE_V, tblock, threadof);
+    tblock = WN_CreateExp2(OPC_I4I4NE, ltest, WN_CreateIntconst(OPR_INTCONST, MTYPE_I4, MTYPE_V, 0));
+    
+    /*
+      ltest = WN_Create(OPR_CALL, MTYPE_I4, MTYPE_V, 1);
+      Is_True(upc_threadof_st,("UPC runtime not initialized.",""));
+      WN_st_idx(ltest) = ST_st_idx(upc_threadof_st); 
+      WN_kid0(ltest) = WN_CreateParm(MTYPE_M, affinity_control_wn, shared_ptr_idx, WN_PARM_BY_VALUE);
+    */
+      
+  } else {
+    //WEI: affinity test is MYTHREAD == pmod(affinity_control_wn, THREADS).  See the UPC spec for more details
+    Is_True( MTYPE_is_integral(WN_rtype(affinity_control_wn)),("Affinity expression is not an integer",""));
+
+    WN* threads = WN_Create(OPR_INTRINSIC_CALL, MTYPE_I4, MTYPE_V, 0);
+    WN_intrinsic(threads) = INTRN_THREADS;
+    WN_INSERT_BlockLast(tblock, threads);
+    ST* tmp = Gen_Temp_Symbol(MTYPE_To_TY(MTYPE_I4), ".Tthreads");
+    threads = WN_Stid(MTYPE_I4, 0, tmp, ST_type(tmp), WN_Ldid (MTYPE_I4, -1, Return_Val_Preg, MTYPE_To_TY(MTYPE_I4)));
+    WN_INSERT_BlockLast(tblock, threads);
+    threads = WN_Ldid(MTYPE_I4, 0, tmp, ST_type(tmp));
+
+    //now build the pmod expression
+    WN* exp1 = WN_CreateExp2(OPC_I4I4GE, WN_COPY_Tree(affinity_control_wn), WN_CreateIntconst(OPR_INTCONST, MTYPE_I4, MTYPE_V, 0));
+    WN* exp2 = WN_CreateExp2(OPC_I4MOD, affinity_control_wn, threads);
+    //need to copy tree because cselect optimization may delete one of the kids if cond exp is constant
+    WN* exp3 = WN_CreateExp2(OPC_I4ADD, WN_COPY_Tree(exp2), WN_COPY_Tree(threads));
+    exp3 = WN_CreateExp2 (OPC_I4MOD, exp3, WN_COPY_Tree(threads));
+    WN* pmod = WN_CreateExp3(OPC_I4CSELECT, exp1, exp2, exp3);
+    ltest = WN_CreateComma(OPR_COMMA, MTYPE_I4, MTYPE_V, tblock, pmod); 
+
+    //now get MYTHREAD
+    WN* mythread = WN_Create(OPR_INTRINSIC_CALL, MTYPE_I4, MTYPE_V, 0);
+    WN_intrinsic(mythread) = INTRN_MYTHREAD;
+    myval = WN_Ldid (MTYPE_I4, -1, Return_Val_Preg, MTYPE_To_TY(MTYPE_I4));
+    rtest = WN_CreateBlock();
+    WN_INSERT_BlockLast(rtest, mythread);
+    rtest= WN_CreateComma(OPR_COMMA, MTYPE_I4, MTYPE_V, rtest, myval);
+    tblock = WN_CreateExp2(OPC_I4I4EQ, ltest, rtest); 
+
+
+    /*
+      ltest = WN_Create(OPR_CALL, MTYPE_I4, MTYPE_V, 1);
+      WN_st_idx(ltest) = ST_st_idx(upc_threadof_st);
+      
+      Is_True(upc_threadof_st,("UPC runtime not initialized.",""));
+      ltest = WN_Create(OPR_INTRINSIC_CALL, WN_rtype(affinity_control_wn), MTYPE_V, 1);
+      WN_intrinsic(ltest) = INTRN_UPCIAFFT;
+      WN_kid0(ltest) = WN_CreateParm(MTYPE_I4, affinity_control_wn, 
+      WN_ty(affinity_control_wn), WN_PARM_BY_VALUE);
+    */
+  }
+
+  //WN_INSERT_BlockLast(tblock, ltest);
+  
+  //tblock = WN_CreateComma(OPR_COMMA, MTYPE_I4, MTYPE_V, tblock, ltest);
+  
+  
+  //rtest = WN_Ldid(MTYPE_I4, 0, upc_mythread_st, ST_type(upc_mythread_st), 0);
+  //rtest = WN_Create_Intrinsic(OPR_INTRINSIC_OP, MTYPE_I4, MTYPE_V, INTRN_MYTHREAD, 0, NULL);
+  //tblock = WN_CreateExp2(OPC_I4I4EQ, tblock, rtest);
+  //tblock = WN_CreateExp2(OPC_I4I4EQ, tblock, myval);
+  tblock = WN_CreateIf(tblock, while_body, WN_CreateBlock());
+  ltest = WN_CreateBlock();
+  WN_INSERT_BlockLast(ltest, tblock);
+
+  //add pragma
+  WN* aff_pragma = WN_CreatePragma(WN_PRAGMA_UPC_FORALL_AFFINITY, (ST_IDX) 0, 0, 0);
+  WN_INSERT_BlockLast(ltest, aff_pragma);
+
+  return ltest;
+}

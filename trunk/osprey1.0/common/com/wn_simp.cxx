@@ -67,6 +67,7 @@
 #endif
 
 #include "wn_simp.h"
+#include "upc_symtab_utils.h"
 
 BOOL WN_Simp_Fold_ILOAD = FALSE;
 
@@ -370,10 +371,15 @@ WN *WN_Simplify_Rebuild_Expr_Tree(WN *t,ALIAS_MANAGER *alias_manager)
    } else if (numkids == 1) {
       k0 = WN_kid0(t);
 
-      if (WN_operator(t) != OPR_CVTL) {
+      if (WN_operator(t) != OPR_CVTL && WN_operator(t) != OPR_TAS) {
 	 r = WN_SimplifyExp1(op, k0);
       } else {
-	 r = WN_SimplifyCvtl(op, WN_cvtl_bits(t),k0);
+	if(WN_operator(t) == OPR_CVTL)
+	  r = WN_SimplifyCvtl(op, WN_cvtl_bits(t),k0);
+	else { //TAS
+	  if(!Type_Is_Shared_Ptr(WN_ty(t)))
+	    r = WN_SimplifyExp1(op, k0);
+	} 	  
       }
       if (r) {
 	 WN_Delete(t);

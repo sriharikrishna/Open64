@@ -53,6 +53,7 @@
 #include <cmplrs/rcodes.h>
 #include <dirent.h>
 #include <libgen.h>
+#include <iostream>
 
 #include "defs.h"
 #include "dso.h"		    /* for load_so() */
@@ -113,6 +114,7 @@
 #include "wb_anl.h"		    /* whirl browser for prompf static anal */ 
 #include "wn_instrument.h"          /* whirl instrumenter */
 #include "mem_ctr.h"
+#include "upc_symtab_utils.h"
 
 extern void Initialize_Targ_Info(void);
 
@@ -357,6 +359,9 @@ extern BOOL   Whirl2c_loaded;    /* Defined in cleanup.c */
 
 extern void *Current_Dep_Graph;
 FILE *DFile = stderr;
+
+//Default Sizes (in bytes) for shared ptr, reg, memory handle, etc.
+int s_size = 16, p_size = 16, r_size = 4, m_size = 4;
 
 static void
 load_components (INT argc, char **argv)
@@ -1024,19 +1029,25 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
       Save_Cur_PU_Name (ST_name(PU_Info_proc_sym(current_pu)), 
 		RID_id(REGION_get_rid(rwn)));
 
+      //cout << "in driver" << endl;
       /* Add instrumentation here for cg. */
       if (Instrumentation_Enabled
 	  && Instrumentation_Phase_Num == PROFILE_PHASE_BEFORE_CG) {
-// fzhao	rwn = WN_Lower(rwn, LOWER_SCF, NULL, 
-//		       "Lower structured control flow");
-// 	WN_Instrument(rwn, PROFILE_PHASE_BEFORE_CG);
+        //cout << "do lower" << endl;
+        if (!Run_w2f) {
+          rwn = WN_Lower(rwn, LOWER_SCF, NULL, 
+                         "Lower structured control flow");
+ 	  WN_Instrument(rwn, PROFILE_PHASE_BEFORE_CG);
+        }
 #if 0
 	extern void wb_gwe(WN*); // hack to check __profile calls.
 	wb_gwe(rwn);
 #endif
       } else if (Feedback_Enabled[PROFILE_PHASE_BEFORE_CG]) {
-// fzhao	rwn = WN_Lower(rwn, LOWER_SCF, NULL, 
-//		       "Lower structured control flow");
+        if (!Run_w2f) {
+          rwn = WN_Lower(rwn, LOWER_SCF, NULL, 
+                         "Lower structured control flow");
+        }
 	WN_Annotate(rwn, PROFILE_PHASE_BEFORE_CG, &MEM_pu_pool);
       }
       Set_Error_Phase ( "Before CG" );
@@ -1044,7 +1055,10 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
       if (Run_cg) { /* lower for cg */
 	Set_Error_Phase ("Lowering");
         WB_LWR_Initialize(rwn, alias_mgr);
-// fzhao	rwn = WN_Lower(rwn, LOWER_TO_CG, alias_mgr, "Lowering to CG");
+        //cout << "do lower3" << endl;
+        if (!Run_w2f) {
+          rwn = WN_Lower(rwn, LOWER_TO_CG, alias_mgr, "Lowering to CG");
+        }
 	if (Only_Unsigned_64_Bit_Ops && ! Run_wopt)
 	  U64_lower_wn(rwn, FALSE);
         WB_LWR_Terminate();
@@ -1233,8 +1247,10 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
         
 //	printf("before WN_Lower==================\n");
 //        fdump_tree(stdout,pu);
-//	pu = WN_Lower (pu, LOWER_RETURN_VAL | LOWER_MLDID_MSTID, NULL,  
-//		       "RETURN_VAL & MLDID/MSTID lowering");
+      if (!Run_w2f) {
+        pu = WN_Lower (pu, LOWER_RETURN_VAL | LOWER_MLDID_MSTID, NULL,  
+                       "RETURN_VAL & MLDID/MSTID lowering");
+      }
 //        printf("after WN_Lower------------------\n");
 //        fdump_tree(stdout,pu);
 
@@ -1249,7 +1265,9 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
 
 	Set_Error_Phase ( "MP Lowering" );
         WB_LWR_Initialize(pu, NULL);
-// fzhao	pu = WN_Lower (pu, LOWER_MP, NULL, "Before MP Lowering");
+        if (!Run_w2f) {
+	  pu = WN_Lower (pu, LOWER_MP, NULL, "Before MP Lowering");
+        }
         WB_LWR_Terminate();
     }
 
@@ -1266,6 +1284,25 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
 	pu = LNO_Processing (current_pu, pu);/* make -O0, -O1, -O2 a bit faster*/
 	if (Run_autopar)
 	    Rewrite_Pragmas_On_Structs (NULL, WN_func_body(pu));
+    }
+
+    /* UPC specific - post-LNO is the last place where we can get 
+       legal C output.
+       Lower UPC constructs here. */
+    if (Compile_Upc ) {
+      Set_Error_Phase ( "UPC Lowering" );
+      // keep the symtab lowering and LOWER_UPC_TO_INTRINSIC 
+      // sequential. Symtab lowering creates illegal code that
+      // gets patched by the UPC_To_INTR lowering
+      if (!Run_w2c) {
+	need_lno_output = TRUE;
+	pu = WN_Lower (pu, LOWER_UPC_FORALL, NULL, "UPC Forall Lowering");
+	pu = WN_Lower (pu, LOWER_UPC_TO_INTR | LOWER_ARRAY, NULL, "UPC Lowering");
+	//Upc_Lower_SymbolTable();
+	pu = WN_Lower (pu, LOWER_UPC_INTRINSIC | LOWER_INTRINSIC , NULL, "UPC Intrinsic lowering");
+      }
+      pu = WN_Lower (pu, LOWER_RETURN_VAL | LOWER_MLDID_MSTID | LOWER_UPC_MFIELD, NULL, "UPC RETVAL Lowering");
+     
     }
 
     /* First round output (.N file, w2c, w2f, etc.) */
@@ -1289,7 +1326,9 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
     if (has_mp && !Early_MP_Processing) {
 	Set_Error_Phase ( "MP Lowering" );
         WB_LWR_Initialize(pu, NULL);
-// fzhao	pu = WN_Lower (pu, LOWER_MP, NULL, "Before MP Lowering");
+        if (!Run_w2f) {
+          pu = WN_Lower (pu, LOWER_MP, NULL, "Before MP Lowering");
+        }
         WB_LWR_Terminate();
     }
 
@@ -1450,6 +1489,10 @@ Preprocess_PU (PU_Info *current_pu)
     Lowering_Initialize();
   }
 
+  //if (Compile_Upc) {
+  //  pu = WN_Lower(pu, LOWER_UPC_CONSISTENCY, 0, "UPC Lower Consistency");
+  //}
+
   if (Run_prompf && 
       !Is_Set_PU_Info_flags(current_pu, PU_IS_COMPILER_GENERATED)) {
     Prompf_Id_Map = Anl_Init_Map(MEM_pu_pool_ptr); 
@@ -1475,10 +1518,17 @@ Preprocess_PU (PU_Info *current_pu)
     WN_Annotate(pu, PROFILE_PHASE_BEFORE_VHO, &MEM_pu_pool);
   }
 
-// fzhao   pu = VHO_Lower_Driver (current_pu, pu); 
+  //WEI: This needs to be called before anything so the forall would work
+  if (!Run_w2f) {
+    pu = VHO_Lower_Driver (current_pu, pu); 
+  }
 
   if ( Cur_PU_Feedback ) {
     Cur_PU_Feedback->Verify("after VHO lower");
+  }
+
+  if (Compile_Upc) {
+    pu = WN_Lower(pu, LOWER_UPC_CONSISTENCY, 0, "UPC Lower Consistency");
   }
 
   pu = Adjust_Opt_Level (current_pu, pu, ST_name(PU_Info_proc_sym(current_pu)));
@@ -1712,6 +1762,7 @@ main (INT argc, char **argv)
 {
   INT local_ecount, local_wcount;
   PU_Info *pu_tree;
+
   
   setlinebuf (stdout);
   setlinebuf (stderr);
@@ -1722,14 +1773,23 @@ main (INT argc, char **argv)
   Set_Error_Line ( ERROR_LINE_UNKNOWN );
   Set_Error_File ( NULL );
   Set_Error_Phase ( "Back End Driver" );
-
   Preconfigure ();
   Process_Command_Line (argc, argv);
+  
+  /*For UPC - lie and pretend we run LNO */
+  if (Compile_Upc) {
+    if(Run_cg) {
+      Run_lno = 1;
+      Run_cg = 0;
+    }
+  }
+
   if (Inhibit_EH_opt && Opt_Level > 1) Opt_Level = 1;
   Reset_Timers ();
   Start_Timer(T_BE_Comp);
   Prepare_Source ();
   Initialize_Stats ();
+
   Configure ();
   Configure_Source(NULL); /* Most configuration variables are set here */
 #ifdef Is_True_On
@@ -1743,7 +1803,9 @@ main (INT argc, char **argv)
   }
 
   Init_Operator_To_Opcode_Table();
-    
+
+  
+ 
   /* decide which phase to call */
   load_components (argc, argv);
   be_debug();
@@ -1762,6 +1824,7 @@ main (INT argc, char **argv)
   Options_Stack->Push_Current_Options();
 
   Start_Timer (T_ReadIR_Comp);
+  
   if (Read_Global_Data) {
 	// get input from two separate files
   	Irb_File = (FILE *)Open_Global_Input (Global_File_Name);
@@ -1789,6 +1852,45 @@ main (INT argc, char **argv)
       Process_Feedback_Options (Feedback_Option);
   }
 
+  if (Compile_Upc && !Run_w2c) {
+    Initialize_Upc_Vars();
+    FILE* config_file;
+    if (strcmp(Config_File_Name, "") == 0) {
+      //cout << "Config file missing, use the following default values instead:" << endl;
+    } else {
+      config_file = fopen(Config_File_Name, "r");
+      if (config_file == NULL) {
+	fprintf(stderr, "CANNOT OPEN CONFIGURATION FILE: %s\n", Config_File_Name);
+	exit(1);
+      }
+      char line[MAX_LINE_LEN];
+      int size;
+      char param[MAX_LINE_LEN];
+      while (fgets(line, MAX_LINE_LEN, config_file) != NULL) {
+	if (sscanf(line, "%s\t%d", param, &size) != 2) {
+	  cerr << "Malformed Line in config file: " << line << endl;
+	  continue;
+	}
+	if (strcmp(param, "shared_ptr") == 0) {
+	  s_size = size;
+	} else if (strcmp(param, "pshared_ptr") == 0) {
+	  p_size = size;
+	} else if (strcmp(param, "reg_handle") == 0) {
+	  r_size = size;
+	} else if (strcmp(param, "mem_handle") == 0) {
+	  m_size = size;
+	} else {
+	  cerr << "Unknown parameter in config file, ignored: " << param << endl;
+	}
+      }
+    }
+    Initialize_Upc_Types ("shared_ptr_struct", s_size, "pshared_ptr_struct", p_size,
+			  "reg_handle_t", r_size, "mem_handle_t", m_size);
+    Initialize_Upc_Metadata();
+    Verify_Upc_Metadata();
+  }
+
+ 
   //
   // Ordinarily DRA_Initialize() would run as part of Phase_Init(),
   // but we need to run it early, right here. 
@@ -1847,11 +1949,19 @@ main (INT argc, char **argv)
   }
 
   Phase_Init ();
-
+ 
   if (Run_preopt || Run_wopt || Run_lno || Run_Distr_Array || Run_autopar 
 	|| Run_cg) {
     Set_Error_Descriptor (EP_BE, EDESC_BE);
     Set_Error_Descriptor (EP_CG, EDESC_CG);
+  }
+ /* For UPC - disable  optimizations for the time being */
+  if (Compile_Upc) {
+    Run_lno = 0;
+    if (Run_w2c) {
+      //the symbols should already be in the symbol table, need to find them
+      Find_Upc_Vars();
+    }
   }
 
   if (Tlog_File)
@@ -1864,6 +1974,8 @@ main (INT argc, char **argv)
     Preorder_Process_PUs(current_pu);
   }
 
+  if(Compile_Upc && !Run_w2c) 
+    Upc_Lower_SymbolTable();
 
   /* Terminate stdout line if showing PUs: */
   if (Show_Progress) {
@@ -1938,7 +2050,9 @@ main (INT argc, char **argv)
   /* Close and delete files as necessary: */
   Cleanup_Files ( TRUE, FALSE );
 
+  
   exit ( RC_OKAY );
   /*NOTREACHED*/
 
+  
 } /* main */

@@ -69,6 +69,18 @@ extern WN * WFE_Expand_Expr (tree exp,
 extern WN  *WFE_Rcomma_Block;
 extern int  WFE_Disable_Rcomma;
 extern WN* WFE_Expand_Expr_With_Sequence_Point (tree exp, TYPE_ID mtype);
+extern WN*
+WFE_Patch_Shared_Get (TYPE_ID mtype, WN_OFFSET offset, ST *st, TY_IDX ty_idx, WN* call_wn, 
+		     UINT32 field_id);
+
+extern WN*
+WFE_Create_Shared_Load(tree exp, TY_IDX rtype, TY_IDX desc,
+		       WN_OFFSET offset, ST* st, TY_IDX ty_idx, UINT field_id,
+		       TY_IDX component_ty_idx, TY_IDX nop_ty_idx,
+		       INT64 component_offset, bool is_bit_field, WN* kid0 = 0);
+extern WN*
+WFE_Shared_Ptr_Arithmetic (tree exp, tree top1, WN *op1, WN* op2, 
+			   tree_code assign_code = ERROR_MARK);
 
 /* rhs is the WN representing the rhs of a MODIFY_EXPR node; this routine
  * processes the lhs of the node and generate the appropriate form of store
@@ -83,10 +95,11 @@ extern WN * WFE_Lhs_Of_Modify_Expr (tree_code assign_code,
 				    WN *rhs_wn,
 				    PREG_NUM rhs_preg_num,
 				    bool is_realpart,
-				    bool is_imagpart);
+				    bool is_imagpart/*,*/
+				    /*tree rhs = 0*/);
 
 /* get integer value from INTEGER_CST node */
-extern UINT64 Get_Integer_Value (tree exp);
+extern  UINT64 Get_Integer_Value (tree exp);
 
 /* traverse the tree and addr_saved if address of a variable is taken */
 extern void WFE_Set_ST_Addr_Saved (WN *);
@@ -99,6 +112,7 @@ extern "C" {
 
 extern void WFE_Expand_Start_Stmt_Expr (tree);
 extern void WFE_Expand_End_Stmt_Expr (tree);
+
 
 
 #ifdef __cplusplus

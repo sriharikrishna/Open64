@@ -71,9 +71,9 @@
 ***
 **/
 
-/** $Revision: 1.2 $
-*** $Date: 2002-07-12 16:48:33 $
-*** $Author: fzhao $
+/** $Revision: 1.3 $
+*** $Date: 2003-02-21 21:13:43 $
+*** $Author: jle $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wintrinsic.h,v $
 **/
 
@@ -1062,7 +1062,178 @@ typedef enum {
   INTRN_SINCOS    = 761,
   INTRN_SINCOSL   = 762,
 
-  INTRINSIC_LAST  = 762
+  /* UPC specific */
+  /* UPC blocking loads */
+  
+  INTRN_SILD     = 763,
+  INTRN_SF4LD     = 764,
+  INTRN_SF8LD     = 765,
+  INTRN_SMLD      = 766,
+  
+  /* UPC blocking stores */
+  INTRN_SIST     = 767,
+  INTRN_SF4ST     = 768,
+  INTRN_SF8ST     = 769,
+  INTRN_SMST      = 770,
+  
+  /* UPC non-blocking loads */
+  INTRN_SILD_NB = 771,
+  INTRN_SF4LD_NB = 772,
+  INTRN_SF8LD_NB = 773,
+  INTRN_SMLD_NB = 774,
+
+  /* UPC non-blocking strores */
+  INTRN_SIST_NB = 775,
+  INTRN_SF4ST_NB = 776,
+  INTRN_SF8ST_NB = 777,
+  INTRN_SMST_NB = 778,
+
+  /* UPC put/get syncs */
+  INTRN_WAIT_SYNC_MEM = 779,
+  INTRN_WAIT_SYNC_REG = 780,
+  INTRN_WAIT_SYNC_FLOAT = 781,
+  INTRN_WAIT_SYNC_DOUBLE = 782,
+
+  /* UPC pointer arithmetic */
+  INTRN_SPTRADD   = 783,
+  INTRN_SPTRDIFF  = 784,
+  INTRN_SCVTADDR  = 785,
+
+  /* UPC sync */
+  INTRN_UPCBAR    = 786,
+  INTRN_UPCWAIT   = 787,
+  INTRN_UPCNTFY   = 788,
+
+  
+  INTRN_UPCIAFFT  = 789, 
+
+  INTRN_EXIT   = 790,
+  INTRN_MYTHREAD = 791,
+  INTRN_THREADS = 792,
+
+  /* UPC alloc */
+  INTRN_ALL_ALLOC = 793,
+  INTRN_GLOBAL_ALLOC = 794,
+  INTRN_LOCAL_ALLOC = 795,
+  INTRN_FREE = 796,
+
+  /* various ***OF functions for shared data */
+  INTRN_THREADOF_S = 797,
+  INTRN_THREADOF_P = 798,
+  INTRN_PHASEOF_S = 799,
+  INTRN_PHASEOF_P = 800,
+  INTRN_ADDROF_S = 801,
+  INTRN_ADDROF_P = 802,
+
+  /* UPC lock functions */
+  INTRN_G_LOCK_ALLOC = 803,
+  INTRN_A_LOCK_ALLOC = 804,
+  INTRN_LOCK_FREE = 805,
+  INTRN_LOCK = 806,
+  INTRN_LOCK_ATTEMPT = 807,
+  INTRN_LOCK_UNLOCK = 808,
+
+  /* UPC bulk mem operations */
+  INTRN_UPC_MEMCPY = 809,
+  INTRN_UPC_MEMGET = 810,
+  INTRN_UPC_MEMPUT = 811,
+  INTRN_UPC_MEMSET = 812,
+
+  /* UPC pointer conversion/test functions */
+  INTRN_S_TO_L = 813,
+  INTRN_P_TO_L = 814,
+  INTRN_S_RESET = 815,
+  INTRN_S_RESET_REF = 816,
+  INTRN_ISNULL_S = 817,
+  INTRN_ISNULL_P = 818,
+
+  /* UPC pointer arithmetic */
+  INTRN_ADD_S = 819,
+  INTRN_INC_S = 820,
+  INTRN_ADD_P1 = 821,
+  INTRN_INC_P1 = 822,
+  INTRN_EQ_S_S = 823,
+  INTRN_EQ_S_P = 824,
+  INTRN_EQ_P_P = 825,
+  INTRN_SUB_S = 826,
+  INTRN_SUB_P1 = 827,
+
+  /* UPC shared pointer affinity check */ 
+  INTRN_AFF_S = 828,
+  INTRN_AFF_P = 829,
+
+  /* UPC shared memory accesses */
+  INTRN_PUT_S = 830,
+  INTRN_PUT_P = 831,
+  INTRN_GET_S = 832,
+  INTRN_GET_P = 833,
+
+  /* UPC non-blocking shared memory accesses */
+  INTRN_PUT_NB_S = 834,
+  INTRN_GET_NB_S = 835,
+  INTRN_PUT_NB_P = 836,
+  INTRN_GET_NB_P = 837,
+  INTRN_WAIT_SYN = 838,
+  INTRN_TRY_SYN = 839,
+
+  /* UPC non-blocking shared memory accesses, implicit handle */ 
+  INTRN_PUT_NBI_S = 840,
+  INTRN_GET_NBI_S = 841,
+  INTRN_PUT_NBI_P = 842,
+  INTRN_GET_NBI_P = 843,
+
+  /* UPC implicit handle synchronization */
+  INTRN_WAIT_SYN_GET = 844,
+  INTRN_WAIT_SYN_PUT = 845,
+  INTRN_WAIT_SYN_ALL = 846,
+  INTRN_TRY_SYN_GET = 847,
+  INTRN_TRY_SYN_PUT = 848,
+  INTRN_TRY_SYN_ALL = 849,
+
+  /* UPC implicit region synchronization */
+  INTRN_BEGIN_REGION = 850,
+  INTRN_END_REGION = 851,
+
+  /* UPC register memory operations */
+  INTRN_PUT_S_VAL = 852,
+  INTRN_PUT_NB_S_VAL = 853,
+  INTRN_PUT_NBI_S_VAL = 854,
+  INTRN_PUT_P_VAL = 855,
+  INTRN_PUT_NB_P_VAL = 856,
+  INTRN_PUT_NBI_P_VAL = 857,
+  INTRN_GET_S_VAL = 858,
+  INTRN_GET_P_VAL = 859,
+  INTRN_GET_NB_S_VAL = 860,
+  INTRN_GET_NB_P_VAL = 861,
+
+  /* UPC float/double memory operations */
+  INTRN_PUT_S_FVAL = 862,
+  INTRN_PUT_S_DVAL = 863,
+  INTRN_GET_S_FVAL = 864,
+  INTRN_GET_S_DVAL = 865,
+  INTRN_PUT_P_FVAL = 866,
+  INTRN_PUT_P_DVAL = 867,
+  INTRN_GET_P_FVAL = 868,
+  INTRN_GET_P_DVAL = 869,
+  INTRN_WAIT_SYN_VAL = 870,
+
+  /* UPC TLD addr macro */
+  INTRN_TLD_ADDR = 871,
+  INTRN_ADD_PI = 872,
+  INTRN_INC_PI = 873,
+  INTRN_UPCFENCE = 874,
+  INTRN_S_TO_P = 875,
+  INTRN_P_TO_S = 876,
+  
+  /* UPC set ptr to NULL */
+  INTRN_SETNULL_S = 877,
+  INTRN_SETNULL_P = 878,
+  INTRN_SETNULL_S_R = 879,
+  INTRN_SETNULL_P_R = 880,
+  
+  /* this one somehow gets missing */
+  INTRN_SUB_PI = 881,
+  INTRINSIC_LAST  = 882,
 
 } INTRINSIC;
 

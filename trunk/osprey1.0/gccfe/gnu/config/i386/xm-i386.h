@@ -23,8 +23,12 @@ Boston, MA 02111-1307, USA.  */
 #endif
 
 /* #defines that need visibility everywhere.  */
+#ifndef FALSE
 #define FALSE 0
+#endif
+#ifndef TRUE
 #define TRUE 1
+#endif
 
 /* This describes the machine the compiler is hosted on.  */
 #define HOST_BITS_PER_CHAR 8

@@ -63,9 +63,12 @@ typedef enum INTRN_RETKIND {
   IRETURN_DA1,               /* Dereference argument 1 */
   IRETURN_SZT,               /* size_t */
   IRETURN_PC,                /* pointer to char */
-  IRETURN_F10               /* MTYPE_F10 */
+  IRETURN_F10,               /* MTYPE_F10 */
+  IRETURN_A4,                /* MTYPE_A4 */
+  IRETURN_A8,                /* MTYPE_A8 */
+  IRETURN_M
 } INTRN_RETKIND;
-#define INTRN_RETKIND_LAST IRETURN_F10
+#define INTRN_RETKIND_LAST IRETURN_A8
 
 // some defines to make parameters more readable
 #define BYVAL		TRUE

@@ -30,6 +30,9 @@ Boston, MA 02111-1307, USA.  */
 #include "convert.h"
 #include "toplev.h"
 
+extern int compiling_upc;
+
+
 /* Convert EXPR to some pointer or reference type TYPE.
 
    EXPR must be pointer, reference, integer, enumeral, or literal zero;
@@ -78,6 +81,20 @@ tree
 convert_to_real (type, expr)
      tree type, expr;
 {
+
+  /* For UPC, for assignments to shared vbls i.e. 
+     shared float c = 255;
+     we get here with type = type_of(c) (which is shared)
+     The rest of the code assigns type_of(c) to the type
+     of the constant node. This breaks gfec ..
+     
+     Copy the type here */
+  if (compiling_upc && CST_CHECK(expr) && TYPE_SHARED(type)) {
+    type = copy_node(type);
+    TYPE_SHARED(type) = 0;
+    TYPE_TY_IDX(type) = TYPE_ORIG_TY_IDX(type);
+  }
+
   switch (TREE_CODE (TREE_TYPE (expr)))
     {
     case REAL_TYPE:
@@ -147,11 +164,24 @@ convert_to_integer (type, expr)
     case ENUMERAL_TYPE:
     case BOOLEAN_TYPE:
     case CHAR_TYPE:
+      
+      /* For UPC, for assignments to shared vbls i.e. 
+	 shared char c = 255;
+	 we get here with type = type_of(c) (which is shared)
+	 The rest of the code assigns type_of(c) to the type
+	 of the constant node. This breaks gfec ..
+
+	 Copy the type here */
+      if (compiling_upc && CST_CHECK(expr) && TYPE_SHARED(type)) {
+	type = copy_node(type);
+	TYPE_SHARED(type) = 0;
+	TYPE_TY_IDX(type) = TYPE_ORIG_TY_IDX(type);
+      }
+      
       /* If this is a logical operation, which just returns 0 or 1, we can
 	 change the type of the expression.  For some logical operations,
 	 we must also change the types of the operands to maintain type
 	 correctness.  */
-
       if (TREE_CODE_CLASS (ex_form) == '<')
 	{
 	  TREE_TYPE (expr) = type;

@@ -53,7 +53,6 @@ c_int_model.c -- c data type models
 
 TARGET_INT_MODEL Target_Int_Model = TARGET_INT_ILP32;
 
-
 #if defined(CFE) || defined(FFE)
 /* New variables */
 
@@ -147,8 +146,8 @@ TYPE_ID FE_int_To_Mtype( void )
 
 void Make_Int_Model_Consistent( void )
 {
-   Use_32_Bit_Pointers =
-     MTYPE_size_reg(CIM_pointer(Target_Int_Model)) == 32;
+  Use_32_Bit_Pointers =
+      MTYPE_size_reg(CIM_pointer(Target_Int_Model)) == 32;
 }
 
 #endif /* if defined(CFE) || defined(FFE) */

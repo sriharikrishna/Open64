@@ -203,11 +203,16 @@ struct TABLE_INDEXED_BY_LEVEL8_AND_INDEX24 {
 //     UINT _align : 5;
 // };
 
+
+
+
+
 const UINT32 TY_RESTRICT	= 0x00000080; // restrict type qualifier
 const UINT32 TY_VOLATILE	= 0x00000040; // volatile type qualifier
 const UINT32 TY_CONST		= 0x00000020; // const type qualifier
 const UINT32 TY_ALIGN		= 0x0000001f; // bit mask for alignment field
 
+/* Old TY_IDX accessors */
 inline UINT32 TY_IDX_index (TY_IDX ty_idx)	{ return ty_idx >> 8; }
 inline void Set_TY_IDX_index (TY_IDX &ty_idx, UINT32 index)
 {
@@ -217,6 +222,19 @@ inline void Set_TY_IDX_index (TY_IDX &ty_idx, UINT32 index)
 inline TY_IDX
 make_TY_IDX (UINT32 index)	{ return index << 8; }
 
+
+/* inline UINT32 TY_IDX_index (TY_IDX ty_idx)	{ return ty_idx >> 9; } */
+/* inline void Set_TY_IDX_index (TY_IDX &ty_idx, UINT32 index) */
+/* { */
+/*     ty_idx = (ty_idx & 0x1ff) | (index << 9); */
+/* } */
+
+/* inline TY_IDX */
+/* make_TY_IDX (UINT32 index)	{ return index << 9; } */
+/* inline BOOL TY_is_shared (TY_IDX ty_idx)         { return ty_idx & TY_SHARED; } */
+/* inline void Set_TY_is_shared (TY_IDX &ty_idx)    { ty_idx |= TY_SHARED; } */
+/* inline void Cleart_TY_is_shared (TY_IDX &ty_idx) { ty_idx &= ~TY_SHARED; }  */
+ 
 inline BOOL TY_is_const (TY_IDX ty_idx)          { return ty_idx & TY_CONST; }
 inline void Set_TY_is_const (TY_IDX &ty_idx)     { ty_idx |= TY_CONST; }
 inline void Clear_TY_is_const (TY_IDX &ty_idx)   { ty_idx &= ~TY_CONST; }

@@ -386,7 +386,10 @@ INITO_IDX
 Find_INITO_For_Symbol (const ST *st)
 {
     ST_IDX idx = ST_st_idx (st);
-
+    if (TY_is_shared(ST_type(st))) {
+      //we don't need init exp for shared variables
+      return 0;
+    }
     return For_all_until (Inito_Table, ST_IDX_level (idx),
 			  find_inito_predicate (st));
 

@@ -147,6 +147,10 @@ struct tree_common
   unsigned permanent_flag : 1;
   unsigned addressable_flag : 1;
   unsigned volatile_flag : 1;
+  unsigned shared_flag : 1;		/* UPC: shared  qualified */
+  unsigned strict_flag : 1;		/* UPC: strict  qualified */
+  unsigned relaxed_flag : 1;		/* UPC: relaxed qualified */
+
   unsigned readonly_flag : 1;
   unsigned unsigned_flag : 1;
   unsigned asm_written_flag: 1;
@@ -561,6 +565,11 @@ extern void tree_class_check_failed PARAMS ((const tree, char,
 
    If this bit is set in an expression, so is TREE_SIDE_EFFECTS.  */
 #define TREE_THIS_VOLATILE(NODE) ((NODE)->common.volatile_flag)
+#define TREE_THIS_SHARED(NODE)   ((NODE)->common.shared_flag)
+
+#define TREE_SHARED(NODE) ((NODE)->common.shared_flag)
+#define TREE_STRICT(NODE) ((NODE)->common.strict_flag)
+#define TREE_RELAXED(NODE) ((NODE)->common.relaxed_flag)
 
 /* In a VAR_DECL, PARM_DECL or FIELD_DECL, or any kind of ..._REF node,
    nonzero means it may not be the lhs of an assignment.
@@ -568,6 +577,14 @@ extern void tree_class_check_failed PARAMS ((const tree, char,
    (but the macro TYPE_READONLY should be used instead of this macro
    when the node is a type).  */
 #define TREE_READONLY(NODE) ((NODE)->common.readonly_flag)
+
+/* Convert tree flags to type qualifiers. */
+#define TREE_QUALS(NODE)			\
+  ((TREE_READONLY(NODE) * TYPE_QUAL_CONST) |	\
+   (TREE_THIS_VOLATILE(NODE) * TYPE_QUAL_VOLATILE) |	\
+   (TREE_SHARED(NODE) * TYPE_QUAL_SHARED) |	\
+   (TREE_STRICT(NODE) * TYPE_QUAL_STRICT) |	\
+   (TREE_RELAXED(NODE) * TYPE_QUAL_RELAXED))
 
 /* Value of expression is constant.
    Always appears in all ..._CST nodes.
@@ -876,6 +893,7 @@ struct tree_block
 #define TYPE_UID(NODE) (TYPE_CHECK (NODE)->type.uid)
 #define TYPE_SIZE(NODE) (TYPE_CHECK (NODE)->type.size)
 #define TYPE_SIZE_UNIT(NODE) (TYPE_CHECK (NODE)->type.size_unit)
+#define TYPE_BLOCK_SIZE(NODE) (TYPE_CHECK (NODE)->type.block_size)
 #define TYPE_MODE(NODE) (TYPE_CHECK (NODE)->type.mode)
 #define TYPE_VALUES(NODE) (TYPE_CHECK (NODE)->type.values)
 #define TYPE_DOMAIN(NODE) (TYPE_CHECK (NODE)->type.values)
@@ -928,6 +946,8 @@ struct tree_block
 #ifdef SGI_MONGOOSE
 /* WHIRL TY idx */
 #define TYPE_TY_IDX(NODE) (TYPE_CHECK (NODE)->type.ty_idx)
+#define TYPE_ORIG_TY_IDX(NODE) (TYPE_CHECK (NODE)->type.orig_ty_idx)
+#define TYPE_SHARE_ORIG_TY_IDX(NODE) (TYPE_CHECK (NODE)->common.type->type.orig_ty_idx)
 #define TYPE_FIELD_IDS_USED(NODE) (TYPE_CHECK (NODE)->type.field_ids_used)
 /* Because we are using a local struct (no DST directly visible)
    (forced because DST id is a POD struct)
@@ -976,6 +996,15 @@ struct tree_block
 /* Nonzero in a type considered volatile as a whole.  */
 #define TYPE_VOLATILE(NODE) ((NODE)->common.volatile_flag)
 
+/* Means this type is shared */
+#define TYPE_SHARED(NODE) ((NODE)->common.shared_flag)
+
+/* Means this type is strict */
+#define TYPE_STRICT(NODE) ((NODE)->common.strict_flag)
+
+/* Means this type is relaxed */
+#define TYPE_RELAXED(NODE) ((NODE)->common.relaxed_flag)
+
 /* Means this type is const-qualified.  */
 #define TYPE_READONLY(NODE) ((NODE)->common.readonly_flag)
 
@@ -997,13 +1026,19 @@ struct tree_block
 #define TYPE_QUAL_VOLATILE 0x2
 #define TYPE_QUAL_RESTRICT 0x4
 #define TYPE_QUAL_BOUNDED  0x8
+#define TYPE_QUAL_SHARED   0x10
+#define TYPE_QUAL_STRICT   0x20
+#define TYPE_QUAL_RELAXED  0x40
 
 /* The set of type qualifiers for this type.  */
 #define TYPE_QUALS(NODE)					\
   ((TYPE_READONLY (NODE) * TYPE_QUAL_CONST)			\
    | (TYPE_VOLATILE (NODE) * TYPE_QUAL_VOLATILE)		\
-   | (TYPE_RESTRICT (NODE) * TYPE_QUAL_RESTRICT)		\
-   | (BOUNDED_INDIRECT_TYPE_P (NODE) * TYPE_QUAL_BOUNDED))
+   | (TYPE_RESTRICT (NODE) * TYPE_QUAL_RESTRICT)	       \
+   | (BOUNDED_INDIRECT_TYPE_P (NODE) * TYPE_QUAL_BOUNDED)\
+   | (TYPE_SHARED(NODE) * TYPE_QUAL_SHARED) |	\
+   (TYPE_STRICT(NODE) * TYPE_QUAL_STRICT) |	\
+   (TYPE_RELAXED(NODE) * TYPE_QUAL_RELAXED))
 
 /* The set of qualifiers pertinent to an expression node.  */
 #define TREE_EXPR_QUALS(NODE)				\
@@ -1113,6 +1148,7 @@ struct tree_type
   union tree_node *size_unit;
   union tree_node *attributes;
   unsigned int uid;
+  union tree_node *block_size;   /* UPC: for block-distributed arrays */
 
   unsigned int precision : 9;
 #ifndef linux
@@ -1155,6 +1191,7 @@ struct tree_type
   struct lang_type *lang_specific;
 #ifdef SGI_MONGOOSE
   unsigned int ty_idx;  /* whirl type idx */
+  unsigned int orig_ty_idx; /* for upc shared vbles */
   unsigned int field_ids_used;  /* for structs and unions only; 0 otherwise */
   struct mongoose_gcc_DST_IDX dst_id; /* whirl DST */
 #endif /* SGI_MONGOOSE */

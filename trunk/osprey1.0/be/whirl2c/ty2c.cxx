@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2c.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:16 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $
  *
  * Revision history:
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -171,7 +171,7 @@ static const TY2C_HANDLER_FUNC
  */
 const char *TY2C_Complex_Realpart_Name = "realpart";
 const char *TY2C_Complex_Imagpart_Name = "imagpart";
-
+extern int compiling_upc_flag ;
 
 /*--------------------- hidden utility routines -----------------------*/
 /*---------------------------------------------------------------------*/
@@ -476,8 +476,20 @@ TY2C_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
    }
    else
    {
-      Prepend_Token_String(decl_tokens, 
+     //WEI:
+     //For shared_ptr_idx, we want to print the name directly
+     if (ty == shared_ptr_idx) {
+       Prepend_Token_String(decl_tokens, "upcr_shared_ptr_t");
+     } else if (ty == pshared_ptr_idx) {
+       Prepend_Token_String(decl_tokens, "upcr_pshared_ptr_t");
+     } else if (Type_Is_Shared_Ptr(ty)) {
+       //WEI: sometimes we may see a shared variable whose type is not changed
+       //to {p}shared_ptr_idx (usually happens with a function parameter).  We fix them here
+       Prepend_Token_String(decl_tokens, (TY_To_Sptr_Idx(ty) == pshared_ptr_idx) ? "upcr_pshared_ptr_t" : "upcr_shared_ptr_t");
+     } else {
+       Prepend_Token_String(decl_tokens, 
 			   Scalar_C_Names[TY_mtype(ty)].pseudo_name);
+     }
    }
    TY2C_prepend_qualifiers(decl_tokens, ty, context);
 } /* TY2C_scalar */
@@ -556,6 +568,11 @@ TY2C_array(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
        */
       CONTEXT_reset_incomplete_ty2c(context);
    }
+
+   //WEI: if elt type is a struct, make sure it's output as incomplete
+   if (TY_kind(TY_AR_etype(ty)) == KIND_STRUCT) {
+     CONTEXT_set_incomplete_ty2c(context);
+   }
    
    /* Add the element type tokens and combine the array and element
     * qualifiers.
@@ -564,11 +581,12 @@ TY2C_array(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
    TY2C_prepend_qualifiers(decl_tokens, ty, context);
 } /* TY2C_array */
 
+//static std::hash_set<const char*, hash<const char*>, eqstr> struct_decl;
 
-static void 
-TY2C_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
-{
-   /* We need to get the alignment right for structs containing
+static void TY2C_complete_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context) {
+
+   /* 
+    *  We need to get the alignment right for structs containing
     * equivalence fields; i.e. overlapping fields, only one of which
     * will be declared by whirl2f.  One way to accomplish this is
     * to wrap the whole struct within a union and give the union the
@@ -591,46 +609,38 @@ TY2C_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
     * Access expressions to this struct must accordingly denote
     * the "__block" portion of the union.
     */
-   CONTEXT fld_context;
-   BOOL    declare_incomplete = (CONTEXT_incomplete_ty2c(context) ||
-				 TY_is_translated_to_c(ty));
-   BOOL    is_equivalenced = Stab_Is_Equivalenced_Struct(ty);
-   
-   if (!declare_incomplete) /* flag it as having been translated to C */
-      Set_TY_is_translated_to_c(ty);
 
-   /* Declare all the struct fields, unless the incomplete type is all
-    * that is needed.
-    */
-   if (!declare_incomplete && !TY_flist(Ty_Table[ty]).Is_Null ())
-   {
+    CONTEXT fld_context;
+    BOOL    is_equivalenced = Stab_Is_Equivalenced_Struct(ty);
+
+    if (!TY_flist(Ty_Table[ty]).Is_Null ()) {
       fld_context = context;
       CONTEXT_reset_unqualified_ty2c(fld_context);
       CONTEXT_reset_incomplete_ty2c(fld_context);
-
+      
       if (is_equivalenced)
-      {
-	 /* Prepend the end-of-union character, on a new line following
-	  * the list of its two fields, and force the alignment
-	  * with a new field.
-	  */
-	 Prepend_Token_Special(decl_tokens, '}');
-	 Prepend_Indented_Newline(decl_tokens, 1);
-	 Increment_Indentation();
-	 Prepend_Token_Special(decl_tokens, ';');
-	 Prepend_Token_String(decl_tokens, "__align");
-	 TY2C_Prepend_Alignment_Type(decl_tokens, TY_align(ty));
-	 Prepend_Indented_Newline(decl_tokens, 1);
-	 Prepend_Token_Special(decl_tokens, ';');
-	 Prepend_Token_String(decl_tokens, TY2C_Aligned_Block_Name);
-      }
+	{
+	  /* Prepend the end-of-union character, on a new line following
+	   * the list of its two fields, and force the alignment
+	   * with a new field.
+	   */
+	  Prepend_Token_Special(decl_tokens, '}');
+	  Prepend_Indented_Newline(decl_tokens, 1);
+	  Increment_Indentation();
+	  Prepend_Token_Special(decl_tokens, ';');
+	  Prepend_Token_String(decl_tokens, "__align");
+	  TY2C_Prepend_Alignment_Type(decl_tokens, TY_align(ty));
+	  Prepend_Indented_Newline(decl_tokens, 1);
+	  Prepend_Token_Special(decl_tokens, ';');
+	  Prepend_Token_String(decl_tokens, TY2C_Aligned_Block_Name);
+	}
       
       /* Prepend the end-of-struct character, on a new line following
        * the list of fields.
        */
       Prepend_Token_Special(decl_tokens, '}');
       Prepend_Indented_Newline(decl_tokens, 1);
-
+      
       /* prepend fields, where each field is preceeded by a newline 
        * and is indented.
        */
@@ -657,36 +667,99 @@ TY2C_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
 	 Prepend_Token_Special(decl_tokens, '{');
       }
       Prepend_Token_String(decl_tokens, W2CF_Symtab_Nameof_Ty(ty));
-   }
-   else if (!declare_incomplete && TY_size(ty) == 1)
-   {
+    } else if (TY_size(ty) == 1) {
       /* A special struct with no fields, which may sometimes
        * occur for C++ lowered into C.
        */
       Prepend_Token_Special(decl_tokens, '}');
       Prepend_Indented_Newline(decl_tokens, 1);
-
+      
       Prepend_Token_Special(decl_tokens, ';');
       Prepend_Token_String(decl_tokens, W2CF_Symtab_Unique_Name("dummy"));
       TY2C_translate(decl_tokens, Stab_Mtype_To_Ty(MTYPE_U1), context);
-
+      
       Increment_Indentation();
       Prepend_Indented_Newline(decl_tokens, 1);
       Prepend_Token_Special(decl_tokens, '{');
       Prepend_Token_String(decl_tokens, W2CF_Symtab_Nameof_Ty(ty));
       Decrement_Indentation();
-   }
-   else
-   {
-      Prepend_Token_String(decl_tokens, W2CF_Symtab_Nameof_Ty(ty));
-   }
-   
-   if (TY_is_union(ty) || is_equivalenced)
-      Prepend_Token_String(decl_tokens, "union");
-   else
-      Prepend_Token_String(decl_tokens, "struct");
+    }
 
-   TY2C_prepend_qualifiers(decl_tokens, ty, context);
+    if (TY_is_union(ty) || is_equivalenced)
+      Prepend_Token_String(decl_tokens, "union");
+    else
+      Prepend_Token_String(decl_tokens, "struct");
+}
+
+//If the given type is a user-defined struct, 
+//This function outputs it complete declaration to the w2c.h file
+static void TY2C_Output_Struct_Type(TY_IDX ty,
+			     INT lines_between_decls,
+			     CONTEXT context) {
+
+  if (TY_is_translated_to_c(ty)) {
+    //don't output duplicate struct definitions
+    return;
+  }
+
+  if (TY_kind(ty) == KIND_STRUCT && !is_upcr_ptr(ty)) {
+    //First go through all of its fields and see if there are any struct types we need to output
+    for (FLD_HANDLE fld = TY_fld(ty); ;fld = FLD_next(fld)) {
+      TY2C_Output_Struct_Type(FLD_type(fld), lines_between_decls, context);
+      if (FLD_last_field(fld)) {
+	break;
+      }
+    }
+
+    TOKEN_BUFFER tmp_tokens = New_Token_Buffer(); 
+    CONTEXT_reset_incomplete_ty2c(context); 
+    Set_TY_is_translated_to_c(ty);  //need to force all later struct type decl to be incomplete
+    TY2C_complete_struct(tmp_tokens, ty, context);
+    Append_Token_Special(tmp_tokens, ';'); 
+    Append_Indented_Newline(tmp_tokens, lines_between_decls);
+    Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE], 
+			     NULL,
+			     &tmp_tokens);
+  }
+}
+
+
+/*
+ * WEI: This function is modified to output only incomplete struct types.
+ * Complete struct type will be output by TY2C_complete_struct, through TY2C_Output_Struct_Type
+ */
+static void 
+TY2C_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
+{
+  
+  if (!TY_is_translated_to_c(ty)) {
+    //Add this struct type to the global w2c.h
+    CONTEXT_reset_incomplete_ty2c (context);
+    TY2C_Output_Struct_Type(ty, 1, context);
+  }
+  
+  if (Compile_Upc) {
+    //WEI: special case for shared types
+    if (strcmp(W2CF_Symtab_Nameof_Ty(ty),"pshared_ptr_struct") == 0) {
+      Prepend_Token_String(decl_tokens, "upcr_pshared_ptr_t");
+      TY2C_prepend_qualifiers(decl_tokens, ty, context);
+      return;
+    }
+    if (strcmp(W2CF_Symtab_Nameof_Ty(ty),"shared_ptr_struct") == 0) {
+      Prepend_Token_String(decl_tokens, "upcr_shared_ptr_t");
+      TY2C_prepend_qualifiers(decl_tokens, ty, context);
+      return;
+    }
+  }
+  Prepend_Token_String(decl_tokens, W2CF_Symtab_Nameof_Ty(ty));
+  
+  BOOL    is_equivalenced = Stab_Is_Equivalenced_Struct(ty);
+  if (TY_is_union(ty) || is_equivalenced)
+    Prepend_Token_String(decl_tokens, "union");
+  else
+    Prepend_Token_String(decl_tokens, "struct");
+  
+  TY2C_prepend_qualifiers(decl_tokens, ty, context);
 } /* TY2C_struct */
 
 
@@ -697,7 +770,10 @@ TY2C_function(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
 
    /* A function cannot be qualified! */
    CONTEXT_reset_unqualified_ty2c(context);
-   
+
+   /* WEI: struct types in a function had better be incomplete */
+   CONTEXT_set_incomplete_ty2c(context);
+
    /* Append the parameter type list to the right of the decl_tokens */
    Append_Token_Special(decl_tokens, '(');
    if (TY_has_prototype(ty))
@@ -719,18 +795,34 @@ TY2C_function(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
 static void 
 TY2C_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
 {
+
+  TY_IDX sptr_idx = 0;
    /* Add qualifiers to the rhs of the '*' and to the left of the
     * decl_tokens.
     */
    TY2C_prepend_qualifiers(decl_tokens, ty, context);
-   Prepend_Token_Special(decl_tokens, '*');
+
+   //WEI: If ty is a local pointer to shared, don't output *
+   //i.e., we want shared_ptr_t, not shared_ptr_t*
+   if (!TY_is_shared(TY_pointed(ty))) {
+     Prepend_Token_Special(decl_tokens, '*');
+   } else
+     //Shouldn't see shared ptr types in this stage - BE bug
+     //However, until we fix it, patch these here.
+     if(Type_Is_Shared_Ptr(ty)) {
+       sptr_idx = TY_To_Sptr_Idx(ty);
+     }
+
 
    if (TY_Is_Array_Or_Function(TY_pointed(ty)))
       WHIRL2C_parenthesize(decl_tokens);
    
    CONTEXT_reset_unqualified_ty2c(context); /* Always qualify pointee type */
    CONTEXT_set_incomplete_ty2c(context); /* Pointee can be incomplete */
-   TY2C_translate(decl_tokens, TY_pointed(ty), context);
+   if(!sptr_idx)
+     TY2C_translate(decl_tokens, TY_pointed(ty), context);
+   else 
+     TY2C_translate(decl_tokens, sptr_idx, context);
 } /* TY2C_pointer */
 
 
@@ -804,6 +896,11 @@ TY2C_translate_unqualified(TOKEN_BUFFER decl_tokens, TY_IDX ty)
 
    CONTEXT_reset(context);
    CONTEXT_set_unqualified_ty2c(context);
+   //WEI: in this cast the struct type should definitely be incomplete
+   if (Compile_Upc && TY_kind(ty) == KIND_STRUCT) {
+     CONTEXT_set_incomplete_ty2c(context);
+   }
+
    TY2C_translate(decl_tokens, ty, context);
 } /* TY2C_translate_unqualified */
 

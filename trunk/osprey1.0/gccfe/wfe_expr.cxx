@@ -66,7 +66,6 @@ extern tree c_strlen_exported (tree);
 #include "wfe_stmt.h"
 #include <cmplrs/rcodes.h>
 
-// #define WFE_DEBUG
 
 extern void dump_ty_idx (TY_IDX);
 
@@ -295,6 +294,12 @@ struct operator_from_tree_t {
 #endif /* GPLUSPLUSFE */
 };
 
+
+WN *last_ptr_arith_wn = 0;
+WN *last_ptr_disp_wn = 0; 
+extern BOOL WN_Simp_Fold_LDA;
+WN_MAP _upc_struct_map;
+
 // check whether the WHIRL operator has subsumed cvtl in its semantics
 // (intended only for integer operations)
 bool
@@ -338,6 +343,60 @@ Widen_Mtype (TYPE_ID t)
     return t;
   return Mtype_TransferSize(MTYPE_I4, t);
 }
+
+
+WN*
+WFE_Convert_Shared_To_Local (TYPE_ID rtype, WN_OFFSET offset, ST *st, 
+			     TY_IDX ty, WN *init_wn, UINT field_id)
+{
+  int st0 = 0;
+// #ifdef WFE_DEBUG
+//   fprintf (stderr, "{(WFE_Convert_Shared_To_Local\n");
+// #endif /* WFE_DEBUG */
+
+  Is_True(TY_kind(ty) == KIND_POINTER, ("",""));
+  
+  if(!st) {
+    // cast to local in the middle of an expression
+    st = Gen_Temp_Symbol(ty, (char*) ".Mcvtptr.");
+    st0 = 1;
+  }
+
+
+  WN *call_wn  = WN_Create (OPR_INTRINSIC_CALL, TY_mtype(ty), MTYPE_V, 1);
+  WN_intrinsic(call_wn) = INTRN_SCVTADDR;
+
+ 
+  WN_kid0 (call_wn) = WN_CreateParm(Mtype_comparison(WN_rtype(init_wn)), init_wn, 
+				    shared_ptr_idx, WN_PARM_BY_VALUE);
+
+  WN *wn0 = WN_CreateBlock();
+  WN_INSERT_BlockLast (wn0, call_wn);
+  WN *wn1 = WN_Ldid(TY_mtype(ty), -1, Return_Val_Preg, ty);
+  call_wn  = WN_CreateComma (OPR_COMMA, WN_rtype (wn1), MTYPE_V, wn0, wn1);
+  call_wn = WN_CreateStid(OPR_STID, MTYPE_V, rtype, offset, st, ty, call_wn, field_id);
+
+  if(st0) {
+    wn0 = WN_CreateBlock();
+    WN_INSERT_BlockLast(wn0, call_wn);
+    wn1 = WN_Ldid(TY_mtype(ty), 0, st, ty, 0);
+    call_wn = WN_CreateComma(OPR_COMMA, TY_mtype(ty), MTYPE_V, wn0, wn1);
+    
+  }
+
+// #ifdef WFE_DEBUG
+//   if (call_wn)
+//     fdump_tree (stderr, call_wn);
+  
+//   fprintf (stderr, // "{("
+//            ")} WFE_Convert_Shared_To_Local\n");
+// #endif /* WFE_DEBUG */
+
+  return call_wn;
+}
+
+
+
 
 // Traverse the tree to see if the address of a variable is being taken
 
@@ -605,8 +664,12 @@ WFE_Array_Expr(tree exp,
     TY_IDX ty_idx0;
     tree arg0 = TREE_OPERAND(exp, 0); 
     tree arg1 = TREE_OPERAND(exp, 1); 
-    if (component_ty_idx == 0)
-      ty_idx0 = Get_TY(TREE_TYPE(exp));
+    if (component_ty_idx == 0) {
+      if(TYPE_SHARED(TREE_TYPE(arg0))) {
+	ty_idx0 = Make_Shared_Type(Get_TY(TREE_TYPE(exp)), 1);
+      } else
+	ty_idx0 = Get_TY(TREE_TYPE(exp));
+    }
     else ty_idx0 = component_ty_idx;
     Is_True(! DECL_BIT_FIELD(arg1),
 	    ("WFE_Array_Expr: address arithmetic cannot use bitfield addresses"));
@@ -725,7 +788,6 @@ WFE_Array_Expr(tree exp,
     return NULL;
   }
 }
-
 
 /* rhs_wn is the WN representing the rhs of a MODIFY_EXPR node; this
  * routine processes the lhs of the node and generate the appropriate
@@ -924,7 +986,19 @@ WFE_Lhs_Of_Modify_Expr(tree_code assign_code,
         TY_size (hi_ty_idx) == 0) {
       // ignore zero length structs
     }
-    else {
+    else {   
+
+      if(Type_Is_Shared_Ptr(hi_ty_idx) && !Type_Is_Shared_Ptr(WN_ty(rhs_wn))) {
+	wn  = WN_Create(OPR_TAS, field_id ? TY_mtype(component_ty_idx) : TY_mtype(hi_ty_idx), 
+			MTYPE_V, 1);
+	//update conflict 
+	//  if(Type_Is_Shared_Ptr(hi_ty_idx) && !WN_Type_Is_Shared_Ptr(rhs_wn)) {
+	// 	wn  = WN_Create(OPR_TAS, TY_mtype(hi_ty_idx), MTYPE_V, 1);
+
+	WN_kid0(wn) = rhs_wn;
+	WN_set_ty(wn,hi_ty_idx);
+	rhs_wn = wn;
+      }
       wn = WN_Stid (desc, ST_ofst(st) + component_offset + lhs_preg_num, st,
 		    hi_ty_idx, rhs_wn, field_id);
       WFE_Stmt_Append(wn, Get_Srcpos());
@@ -938,14 +1012,19 @@ WFE_Lhs_Of_Modify_Expr(tree_code assign_code,
       if (is_realpart)
 	wn = WN_Unary (OPR_REALPART, Mtype_complex_to_real (rtype), wn);
       else
-      if (is_imagpart)
-	wn = WN_Unary (OPR_IMAGPART, Mtype_complex_to_real (rtype), wn);
+	if (is_imagpart)
+	  wn = WN_Unary (OPR_IMAGPART, Mtype_complex_to_real (rtype), wn);
     }
     else wn = NULL;
   }
   else if (code == INDIRECT_REF) {
     WN *addr_wn = WFE_Expand_Expr (TREE_OPERAND (lhs, 0));
     TY_IDX hi_ty_idx = Get_TY(TREE_TYPE(lhs));
+    //For structure field accesses we need to change the block size 
+    // of the pointer thru which the indirection is made.
+    // For this case the addr_wn is a TAS with the right type
+    if(WN_operator(addr_wn) == OPR_TAS && field_id)
+       hi_ty_idx = WN_ty(addr_wn);
     if (TREE_THIS_VOLATILE(lhs)) {
       Set_TY_is_volatile(hi_ty_idx);
       volt = TRUE;
@@ -1035,7 +1114,8 @@ WFE_Lhs_Of_Modify_Expr(tree_code assign_code,
 	  assign_code == PREDECREMENT_EXPR) {
         wn = WN_CreateIload (OPR_ILOAD, rtype, desc, component_offset,
 			     field_id != 0 ? hi_ty_idx : desc_ty_idx,
-			     Make_Pointer_Type(hi_ty_idx, FALSE),
+			     //Make_Pointer_Type(hi_ty_idx, FALSE),
+			     Make_Pointer_Type(field_id != 0 ? desc_ty_idx : hi_ty_idx, FALSE),
 			     WN_COPY_Tree (addr_wn),
 			     field_id);
         rhs_wn = WN_Binary(Operator_From_Tree [assign_code].opr,
@@ -1046,7 +1126,8 @@ WFE_Lhs_Of_Modify_Expr(tree_code assign_code,
 	       assign_code == POSTDECREMENT_EXPR) {
 	result_wn = WN_CreateIload (OPR_ILOAD, rtype, desc, component_offset,
 				    field_id != 0 ? hi_ty_idx : desc_ty_idx,
-				    Make_Pointer_Type(hi_ty_idx, FALSE),
+				    //Make_Pointer_Type(hi_ty_idx, FALSE),
+				    Make_Pointer_Type(field_id != 0 ? desc_ty_idx : hi_ty_idx, FALSE),
 				    WN_COPY_Tree (addr_wn),
 				    field_id);
       }
@@ -1087,15 +1168,38 @@ WFE_Lhs_Of_Modify_Expr(tree_code assign_code,
       wn = NULL;
     }
     else {
+      TY_IDX hi_ty_idx1 = hi_ty_idx;
+      if (TYPE_SHARED(TREE_TYPE(lhs))) {
+	if(code == INDIRECT_REF && WN_operator(addr_wn) == OPR_TAS &&  field_id) 
+	  Is_True(Type_Is_Shared_Ptr(hi_ty_idx) && 
+		  (TY_kind(hi_ty_idx) == KIND_POINTER ||
+		   TY_kind(hi_ty_idx) == KIND_ARRAY ) , ("",""));
+	
+	else {
+	  int bsize =  TY_block_size(hi_ty_idx);
+	  if(code==INDIRECT_REF  && WN_operator(addr_wn) == OPR_TAS) {
+	    // Ty_Table[hi_ty_idx].Print(stderr);
+// 	    Ty_Table[WN_ty(addr_wn)].Print(stderr);
+	  }
+	  hi_ty_idx1 = Make_Shared_Type(hi_ty_idx, bsize, 
+				       TY_is_strict(hi_ty_idx) ?  STRICT_CONSISTENCY :
+				       NO_CONSISTENCY );
+	  hi_ty_idx1 =  Make_Pointer_Type (hi_ty_idx1, FALSE);
+	}
+      } else 
+	hi_ty_idx1 =  Make_Pointer_Type (hi_ty_idx, FALSE);
+      
+      
       wn = WN_CreateIstore(OPR_ISTORE, MTYPE_V, desc, component_offset, 
-			   Make_Pointer_Type (hi_ty_idx, FALSE),
+			   hi_ty_idx1,
 			   rhs_wn, addr_wn, field_id);
       WFE_Stmt_Append(wn, Get_Srcpos());
       if (need_result) {
 	if (! result_in_temp)
           wn = WN_CreateIload(OPR_ILOAD, rtype, desc, component_offset,
 			      field_id != 0 ? hi_ty_idx : desc_ty_idx,
-			      Make_Pointer_Type (hi_ty_idx, FALSE),
+			      //Make_Pointer_Type (hi_ty_idx, FALSE),
+			      Make_Pointer_Type (field_id != 0 ? desc_ty_idx : hi_ty_idx, FALSE),
 			      WN_COPY_Tree (addr_wn),
 			      field_id);
 	else wn = WN_Ldid(rtype, result_preg, result_preg_st, desc_ty_idx, 0);
@@ -1198,7 +1302,8 @@ WFE_Lhs_Of_Modify_Expr(tree_code assign_code,
           assign_code == PREDECREMENT_EXPR) {
         wn = WN_CreateIload (OPR_ILOAD, rtype, desc, component_offset,
                              field_id != 0 ? elem_ty_idx : desc_ty_idx,
-                             Make_Pointer_Type(elem_ty_idx, FALSE),
+                             //Make_Pointer_Type(elem_ty_idx, FALSE),
+			     Make_Pointer_Type(field_id != 0 ? desc_ty_idx : elem_ty_idx, FALSE),
                              WN_COPY_Tree (addr_wn),
                              field_id);
         rhs_wn = WN_Binary(Operator_From_Tree [assign_code].opr,
@@ -1209,7 +1314,7 @@ WFE_Lhs_Of_Modify_Expr(tree_code assign_code,
 	       assign_code == POSTDECREMENT_EXPR) {
         result_wn = WN_CreateIload (OPR_ILOAD, rtype, desc, component_offset,
 				    field_id != 0 ? elem_ty_idx : desc_ty_idx,
-				    Make_Pointer_Type(elem_ty_idx, FALSE),
+				    Make_Pointer_Type (field_id != 0 ? desc_ty_idx : elem_ty_idx, FALSE),
 				    WN_COPY_Tree (addr_wn),
 				    field_id);
       }
@@ -1258,7 +1363,8 @@ WFE_Lhs_Of_Modify_Expr(tree_code assign_code,
         if (! result_in_temp)
 	  wn = WN_CreateIload (OPR_ILOAD, rtype, desc, component_offset,
 			       field_id != 0 ? elem_ty_idx : desc_ty_idx,
-                               Make_Pointer_Type (elem_ty_idx, FALSE),
+			       Make_Pointer_Type (field_id != 0 ? desc_ty_idx : elem_ty_idx, FALSE),
+                               //Make_Pointer_Type (elem_ty_idx, FALSE),
 			       WN_COPY_Tree (addr_wn),
 			       field_id);
 	else wn = WN_Ldid(rtype, result_preg, result_preg_st, desc_ty_idx, 0);
@@ -1656,23 +1762,134 @@ WFE_Expand_Expr (tree exp,
 
 	  case COMPONENT_REF:
 	    {
+	      ST *st;
+	      UINT tmp_field_id = 0;
+	      TY_IDX spill_ty;
 	      wn = WFE_Expand_Expr (arg0);
               ty_idx = Get_TY(TREE_TYPE(arg0));
 	      if (WN_operator (wn) == OPR_LDID) {
-		WN_set_operator (wn, OPR_LDA);
-		WN_set_desc (wn, MTYPE_V);
-//		wn = WN_Lda (Pointer_Mtype, WN_offset (wn), WN_st (wn));
-	      }
-	      else
+		if (Type_Is_Shared_Ptr(WN_ty(wn))) {
+		  
+		  // we have here a load of a struct field of a
+		  // shared struct 
+		  spill_ty = WN_ty(wn);
+		  //spill the expr that computes the struct addr
+		  // otherwise can't tell in the backend which part
+		  // contributes to the ptr arith and which part
+		  // contributes to the offset
+		  
+		  //If the type of the field is T, the type of the temp
+		  // is shared [] T ;
+		  spill_ty = FLD_type(FLD_get_to_field(WN_ty(wn), 
+						       WN_field_id(wn), tmp_field_id));
+		  switch(TY_kind(spill_ty)) {
+		  case KIND_SCALAR:
+		  case KIND_STRUCT:
+		    spill_ty = Make_Pointer_Type(Make_Shared_Type(spill_ty, 0));
+		    break;
+		  case KIND_POINTER:
+		    spill_ty = Make_Shared_Type(spill_ty, 0);
+		    break;
+		  case KIND_ARRAY:
+		    spill_ty = Make_Pointer_Type(Make_Shared_Type(TY_etype(spill_ty),0));
+		    break;
+		  default:
+		    Is_True(0,("",""));
+		  }
+
+		  
+		  st =  Gen_Temp_Symbol(spill_ty,
+					    Index_To_Str(Save_Str2((char*)".Mspillstruct.",
+								   (char*)".Mspillstruct.")));
+		  wn = WN_Lda (Pointer_Mtype, WN_offset (wn), WN_st (wn));
+		  if (WN_offset(wn)) {
+		    wn1  = WN_Create(OPR_TAS, TY_mtype(spill_ty), MTYPE_V, 1);
+		    WN_kid0(wn1) = wn;
+		    WN_set_ty(wn1,spill_ty);
+		    wn0 = WN_Intconst (Pointer_Mtype, WN_offset (wn));
+		    wn  = WN_Binary (OPR_ADD, Pointer_Mtype, wn1, wn0);
+		  }
+
+		  wn2 = WN_CreateBlock();
+		  wn1  = WN_Create(OPR_TAS, TY_mtype(spill_ty), MTYPE_V, 1);
+		  
+		  WN_kid0(wn1) = wn;
+		  WN_set_ty(wn1,spill_ty);
+		  WN_INSERT_BlockLast (wn2, WN_Stid (TY_mtype(spill_ty), 0, st, spill_ty, wn1));
+		  wn0 = WN_CreateComma (OPR_COMMA, TY_mtype(spill_ty), MTYPE_V, wn2,
+					WN_Ldid(TY_mtype(spill_ty), 0, st, spill_ty));
+		  	
+		  wn1  = WN_Create(OPR_TAS, TY_mtype(spill_ty), MTYPE_V, 1);
+		  WN_kid0(wn1) = wn0;
+		  WN_set_ty(wn1,spill_ty);
+		  wn = wn1;
+	
+		}  else {
+		  WN_set_operator (wn, OPR_LDA);
+		  WN_set_desc (wn, MTYPE_V);
+		}	
+	      } else
 	      if (WN_operator (wn) == OPR_ILOAD) {
 		wn0 = WN_kid0 (wn);
+		spill_ty = WN_load_addr_ty(wn);
+		if (// WN_operator(wn0) != OPR_LDID &&
+		    Type_Is_Shared_Ptr(spill_ty)) {
+		  //spill the expr that computes the struct addr
+		  // otherwise can't tell in the backend which part
+		  // contributes to the ptr arith and which part
+		  // contributes to the offset
+		  
+		  //If the type of the field is T, the type of the temp
+		  // is shared [] T ;
+		  tmp_field_id = 0;
+		  spill_ty = FLD_type(FLD_get_to_field(WN_object_ty(wn), 
+						       WN_field_id(wn), tmp_field_id));
+		  switch(TY_kind(spill_ty)) {
+		  case KIND_SCALAR:
+		  case KIND_STRUCT:
+		    spill_ty = Make_Pointer_Type(Make_Shared_Type(spill_ty, 0));
+		    break;
+		  case KIND_POINTER:
+		    spill_ty = Make_Shared_Type(spill_ty, 0);
+		    break;
+		  case KIND_ARRAY:
+		    spill_ty = Make_Pointer_Type(Make_Shared_Type(TY_etype(spill_ty),0));
+		    break;
+		  default:
+		    Is_True(0,("",""));
+		  }
+
+		 		  
+		  ST *st =  Gen_Temp_Symbol(spill_ty,
+					    Index_To_Str(Save_Str2((char*)".Mspillstruct.",
+								   (char*)".Mspillstruct.")));
+		  wn2 = WN_CreateBlock();
+		  wn1  = WN_Create(OPR_TAS, TY_mtype(spill_ty), MTYPE_V, 1);
+		  WN_kid0(wn1) = wn0;
+		  WN_set_ty(wn1,spill_ty);;
+		  WN_INSERT_BlockLast (wn2, WN_Stid (TY_mtype(spill_ty), 0, st, spill_ty, wn1));
+		  wn0 = WN_CreateComma (OPR_COMMA, TY_mtype(spill_ty), MTYPE_V, wn2,
+					  WN_Ldid(TY_mtype(spill_ty), 0, st, spill_ty));
+
+		}
+		
+		
 		wn1 = WN_Intconst (Pointer_Mtype, WN_offset (wn));
-	        wn  = WN_Binary (OPR_ADD, Pointer_Mtype, wn0, wn1);
+	        wn0  = WN_Binary (OPR_ADD, Pointer_Mtype, wn0, wn1);
+		if(Type_Is_Shared_Ptr(spill_ty)) {
+		  wn1  = WN_Create(OPR_TAS, TY_mtype(spill_ty), MTYPE_V, 1);
+		  WN_kid0(wn1) = wn0;
+		  WN_set_ty(wn1,spill_ty);
+		  wn = wn1;
+		} else 
+		  wn = wn0;
+		   
 	      }
 	      else
 	        Fail_FmtAssertion ("WFE_Expand_Expr: ADDR_EXPR has unhandled %s",
 				   Operator_From_Tree [code0].name);
 	    }
+
 	    break;
 
 	  default:
@@ -1766,6 +1983,8 @@ WFE_Expand_Expr (tree exp,
 	  ty_idx = nop_ty_idx;
 	  if (ty_idx == 0) 
 	    ty_idx = desc_ty_idx;
+	  else if(TY_is_shared(desc_ty_idx) && !TY_is_shared(ty_idx))
+	    ty_idx = desc_ty_idx;
 	}
 
 	UINT cvtl_size = 0; // if non-zero, need to generate CVTL with this size
@@ -1807,6 +2026,8 @@ WFE_Expand_Expr (tree exp,
 
 	Is_True(! is_bit_field || field_id <= MAX_FIELD_ID,
 		("WFE_Expand_Expr: field id for bit-field exceeds limit"));
+	// Is_True(!Type_Is_Shared_Ptr(nop_ty_idx) &&
+// 		!Type_Is_Shared_Ptr(hi_ty_idx), ("",""));
 	wn = WN_CreateLdid (OPR_LDID, rtype,
 			    is_bit_field ? MTYPE_BS : desc,
 			    ST_ofst(st)+component_offset+preg_num, st,
@@ -1948,11 +2169,79 @@ WFE_Expand_Expr (tree exp,
       {
 	ty_idx = Get_TY (TREE_TYPE(exp));
         TYPE_ID mtyp = TY_mtype(ty_idx);
+	
+	TY_IDX l_idx, r_idx;
+	r_idx = Get_TY(TREE_TYPE(TREE_OPERAND(exp,0)));
+	if(TY_kind(ty_idx) == KIND_POINTER && TY_kind(r_idx) == KIND_POINTER &&
+	   (Type_Is_Shared_Ptr(ty_idx) || Type_Is_Shared_Ptr(r_idx))) {
+	  ty_idx = 0;
+	}
+
+	tree lt, rt;
+	int blockl = -1, blockr = -1 ;
+// 	lt = TREE_TYPE(exp);
+// 	rt = TREE_TYPE(TREE_OPERAND(exp,0));
+// 	if(compiling_upc &&  
+// 	   TREE_CODE(lt) == POINTER_TYPE && TREE_CODE(rt) == POINTER_TYPE  &&
+// 	   TREE_SHARED(TREE_TYPE(lt)) && TREE_SHARED(TREE_TYPE(rt))) 
+// 	  {
+// 	    lt = TREE_TYPE(lt);
+// 	    rt = TREE_TYPE(rt);
+// 	    if(TYPE_BLOCK_SIZE(lt))
+// 	      blockl = Get_Integer_Value(TYPE_BLOCK_SIZE(lt));
+// 	    if(TYPE_BLOCK_SIZE(rt))
+// 	      blockr = Get_Integer_Value(TYPE_BLOCK_SIZE(rt));
+// 	    if((blockl != blockr)
+// 	       ||
+// 	       (TYPE_BLOCK_SIZE(lt) && !TYPE_BLOCK_SIZE(rt)) 
+// 	       ||
+// 	       (!TYPE_BLOCK_SIZE(lt) && TYPE_BLOCK_SIZE(rt)) ) 
+// 	      ty_idx = Get_TY(TREE_TYPE(TREE_OPERAND(exp,0)));
+// 	  }
+	
+
 	// do not pass struct type down because will cause rtype of MTYPE_M
         wn = WFE_Expand_Expr (TREE_OPERAND (exp, 0), TRUE, 
 			      (mtyp == MTYPE_M) ? 0 : ty_idx);
-	if (mtyp == MTYPE_M) 
+	// In UPC, for shared vbles, the rtype is MTYPE_M ...
+	if (mtyp == MTYPE_M || compiling_upc) {
+	  lt = TREE_TYPE(exp);
+	  rt = TREE_TYPE(TREE_OPERAND(exp,0));
+	  if(compiling_upc && 
+	     TREE_CODE(lt) == POINTER_TYPE && 
+	     TREE_CODE(rt) == POINTER_TYPE ) {
+	    if(TREE_SHARED(TREE_TYPE(lt)) && TREE_SHARED(TREE_TYPE(rt))) {
+	      lt = TREE_TYPE(lt);
+	      rt = TREE_TYPE(rt);
+	      if((blockl != blockr)
+		 ||
+		 (TYPE_BLOCK_SIZE(lt) && !TYPE_BLOCK_SIZE(rt)) 
+		 ||
+		 (!TYPE_BLOCK_SIZE(lt) && TYPE_BLOCK_SIZE(rt)) ) 
+		{
+		  WN *wn0  = WN_Create(OPR_TAS, mtyp, MTYPE_V, 1);
+		  WN_kid0(wn0) = wn;
+		  wn = wn0;
+		  WN_set_ty(wn, TYPE_TY_IDX(TREE_TYPE(exp)));
+		  goto sc;
+		}
+	    } else if(TREE_SHARED(TREE_TYPE(rt))) {
+	      // shared to local cast
+	      WN *wn0  = WN_Create(OPR_TAS, mtyp, MTYPE_V, 1);
+	      WN_kid0(wn0) = wn;
+ 	      wn = wn0;
+	      WN_set_ty(wn, TYPE_TY_IDX(TREE_TYPE(TREE_OPERAND(exp,0))));
+	      goto sc;
+	    }
+	  } else 
+	    goto cont;
+sc:	  
 	  break;
+cont:
+	  if(mtyp == MTYPE_M)
+	    break;
+	}
+
 	if (MTYPE_is_integral(mtyp) && MTYPE_is_integral(WN_rtype(wn))) {
 	  if (MTYPE_size_min(mtyp) < MTYPE_size_min(WN_rtype(wn))) {
 	    if (MTYPE_size_min(mtyp) != 32)
@@ -1989,9 +2278,20 @@ WFE_Expand_Expr (tree exp,
 	INT64 ofst;
 	arg0 = TREE_OPERAND (exp, 0);
 	arg1 = TREE_OPERAND (exp, 1);
-	if (component_ty_idx == 0)
-	  ty_idx = Get_TY (TREE_TYPE(exp));
-	else ty_idx = component_ty_idx;
+	ty_idx = Get_TY (TREE_TYPE(exp));
+	TY_IDX struct_ty = Get_TY(TREE_TYPE(arg0));
+	TY_IDX  shared_field_idx = 0;
+	if (component_ty_idx == 0) {
+	  //WEI: fields of a shared struct do not get mark as shared, so we need to check if the enclosing struct is shared
+	 
+	  if (!TY_is_shared(ty_idx) && TY_is_shared(struct_ty)) {
+	    ty_idx = Make_Shared_Type(ty_idx,  Get_Type_Block_Size(struct_ty), 
+				      TY_is_strict(struct_ty) ? STRICT_CONSISTENCY : NO_CONSISTENCY);
+	  } else if(!TY_is_shared(struct_ty) && Type_Is_Shared_Ptr(ty_idx, TRUE)) {
+	    //field of struct is shared ptr
+	    shared_field_idx = ty_idx;
+	  }
+	} else ty_idx = component_ty_idx;
 	if (DECL_BIT_FIELD(arg1)) 
 	  is_bit_field = TRUE;
 
@@ -2018,6 +2318,13 @@ WFE_Expand_Expr (tree exp,
 	else ofst = 0;
         wn = WFE_Expand_Expr (arg0, TRUE, nop_ty_idx, ty_idx, ofst+component_offset,
 			      field_id + DECL_FIELD_ID(arg1), is_bit_field);
+	if(shared_field_idx) {
+	  wn1  = WN_Create(OPR_TAS, TY_mtype(shared_field_idx), MTYPE_V, 1);
+	  WN_kid0(wn1) = wn;
+	  WN_set_ty(wn1,shared_field_idx);
+	  wn = wn1;
+	}
+	
       }
       break;
 
@@ -2109,11 +2416,20 @@ WFE_Expand_Expr (tree exp,
 	      }
 	    }
 	  }
+
+	  TY_IDX access_ty = WN_ty(wn0);
+	  if(Type_Is_Shared_Ptr(access_ty)) {
+	    hi_ty_idx = Make_Shared_Type(hi_ty_idx,
+					 Get_Type_Block_Size(access_ty), 
+					 TY_is_strict(access_ty) ? STRICT_CONSISTENCY : NO_CONSISTENCY);
+	  }
+
 	  wn = WN_CreateIload(OPR_ILOAD, rtype,
 			      is_bit_field ? MTYPE_BS : desc, 
 			      component_offset+xtra_BE_ofst,
 			      field_id != 0 ? hi_ty_idx : ty_idx, 
-			      Make_Pointer_Type (hi_ty_idx, FALSE),
+			      //Make_Pointer_Type (hi_ty_idx, FALSE),
+			      Make_Pointer_Type (field_id != 0 ? ty_idx : hi_ty_idx, FALSE),
 			      wn0, field_id);
 	}
       }
@@ -2154,9 +2470,32 @@ WFE_Expand_Expr (tree exp,
       }
       break;
       
+    case MINUS_EXPR: {
+      //special case for subtraction of shared pointers
+      // the tree is always minus ( nop(convert( arg1) , nop(convert(arg1)) )
+      tree arg1 = TREE_OPERAND(exp, 1);
+      tree arg0 = TREE_OPERAND(exp, 0);
+      if (TREE_CODE(arg1) == NOP_EXPR && TREE_CODE(arg0) == NOP_EXPR) {
+	arg0 = TREE_OPERAND(arg0, 0);
+	arg1 = TREE_OPERAND(arg1,0);
+	if (TREE_CODE(arg1) == CONVERT_EXPR && TREE_CODE(arg0) == CONVERT_EXPR) {
+	  arg0 = TREE_OPERAND(arg0,0);
+	  arg1 = TREE_OPERAND(arg1,0);
+	  if (Type_Is_Shared_Ptr(Get_TY(TREE_TYPE(arg0)), TRUE) && 
+	      Type_Is_Shared_Ptr(Get_TY( TREE_TYPE(arg1)), TRUE) ) {
+	    // shared ptr - shared ptr
+	    TYPE_ID etype = TY_mtype(Get_TY(TREE_TYPE(exp)));
+	    WN *wn0 = WFE_Expand_Expr (arg0);
+	    WN *wn1 = WFE_Expand_Expr (arg1);
+	    return WN_Binary (Operator_From_Tree [code].opr, Widen_Mtype(etype), wn0, wn1);
+	    
+	  }
+	}
+      }
+    }  // fall thru for regular subtractions
+
     // binary ops
     case PLUS_EXPR:
-    case MINUS_EXPR:
     case MULT_EXPR:
     case MAX_EXPR:
     case MIN_EXPR:
@@ -2177,7 +2516,25 @@ WFE_Expand_Expr (tree exp,
 	TYPE_ID etype = TY_mtype(Get_TY(TREE_TYPE(exp)));
         wn0 = WFE_Expand_Expr (TREE_OPERAND (exp, 0));
         wn1 = WFE_Expand_Expr (TREE_OPERAND (exp, 1));
+	
+	// fprintf(stderr, "Add kid0\n");
+// 	fdump_tree(stderr, wn0);
+// 	fprintf(stderr, "Add kid1\n");
+// 	fdump_tree(stderr, wn1);
+	BOOL fold_lda;
+	
+	
+	if(WN_Type_Is_Shared_Ptr(wn0) || WN_Type_Is_Shared_Ptr(wn1)) {
+	  fold_lda =  WN_Simp_Fold_LDA;
+	  WN_Simp_Fold_LDA = FALSE;
+	}
         wn  = WN_Binary (Operator_From_Tree [code].opr, Widen_Mtype(etype), wn0, wn1);
+
+	if(WN_Type_Is_Shared_Ptr(wn0) || WN_Type_Is_Shared_Ptr(wn1)) 
+	  WN_Simp_Fold_LDA =  fold_lda;
+
+// 	fprintf(stderr, "Add after simp\n");
+// 	fdump_tree(stderr, wn);
 
 	if ((MTYPE_is_integral(etype)) &&
 	    (Widen_Mtype(etype) != etype) &&
@@ -2185,7 +2542,61 @@ WFE_Expand_Expr (tree exp,
 	    (code == PLUS_EXPR || code == MINUS_EXPR || code == MULT_EXPR))
 	  wn = WN_CreateCvtl(OPR_CVTL, Widen_Mtype(etype), MTYPE_V,
 			     TY_size (Get_TY(TREE_TYPE(exp))) * 8, wn);
-
+	if(compiling_upc &&
+	   (TYPE_SHARED(TREE_TYPE(exp)) ||
+	    (POINTER_TYPE_P(TREE_TYPE(exp)) && TYPE_SHARED(TREE_TYPE(TREE_TYPE(exp)))) ) )  {
+	  
+	  if(TYPE_SHARED(TREE_TYPE(exp))) {
+	    if (TREE_CODE(TREE_TYPE(exp)) == POINTER_TYPE) {
+	      // create Tas
+	      wn0  = WN_Create(OPR_TAS, Pointer_Mtype, MTYPE_V, 1);
+	      WN_kid0(wn0) = wn;
+	      wn = wn0;
+	      tree el_type = TREE_TYPE(TREE_TYPE(exp));
+	      TY_IDX el_idx = Make_Shared_Type(TYPE_TY_IDX(el_type), 
+					       TYPE_BLOCK_SIZE(el_type) ? 
+					       Get_Integer_Value(TYPE_BLOCK_SIZE(el_type)) : 1,
+					       TYPE_STRICT(el_type) ? STRICT_CONSISTENCY : NO_CONSISTENCY);
+	      WN_set_ty(wn, Make_Pointer_Type(el_idx, FALSE));
+	    }
+	  } else {
+	    //create TAS
+	    wn0  = WN_Create(OPR_TAS, Pointer_Mtype, MTYPE_V, 1);
+	    WN_kid0(wn0) = wn;
+	    wn = wn0;
+	    tree el_type = TREE_TYPE(TREE_TYPE(exp));
+	    TY_IDX el_idx = TYPE_TY_IDX(el_type);
+	    int bsize;
+	    CONSISTENCY_class  consistency;
+	    
+	    if(!TY_is_shared(el_idx)) {
+	      //this happens only for the last structure field access
+	      //in a chain of field accesses 
+	      // need to fake here the block size for the inserted type
+	      // cast, otherwise the backend can't retrieve that information
+	      TY_IDX ptr_ty = WN_ty(WN_kid0(wn0));
+	      bsize = 1;
+	      if(!ptr_ty) 
+		if(WN_operator(WN_kid0(wn0)) == OPR_ADD) {
+		  ptr_ty = WN_ty(WN_kid0(WN_kid0(wn0)));
+		  if(!ptr_ty || !Type_Is_Shared_Ptr(ptr_ty, TRUE))
+		    ptr_ty = WN_ty(WN_kid1(WN_kid0(wn0)));
+		}
+	      
+	      if(ptr_ty && Type_Is_Shared_Ptr(ptr_ty)) {
+		bsize = Get_Type_Block_Size(ptr_ty);
+		consistency = TY_is_strict(ptr_ty) ? STRICT_CONSISTENCY : NO_CONSISTENCY;
+	      }
+	    } else {
+	      bsize =  Get_Type_Block_Size(el_idx);
+	      consistency = (TY_is_strict(el_idx) ? STRICT_CONSISTENCY : NO_CONSISTENCY);
+	    }
+	    
+	    
+	    el_idx = Make_Shared_Type(el_idx, bsize, consistency);
+	    WN_set_ty(wn, Make_Pointer_Type(el_idx, FALSE));
+	  }	 
+	}
       }
       break;
 
@@ -2243,17 +2654,34 @@ WFE_Expand_Expr (tree exp,
     case EQ_EXPR:
     case NE_EXPR:
       {
-        wn0 = WFE_Expand_Expr (TREE_OPERAND (exp, 0));
-        wn1 = WFE_Expand_Expr (TREE_OPERAND (exp, 1));
-
-	// check if conversion is needed
+	tree k0 = TREE_OPERAND (exp, 0);
+	tree k1 = TREE_OPERAND (exp, 1);
 	ty_idx = Get_TY (TREE_TYPE(exp));
         TYPE_ID mtyp = TY_mtype(ty_idx);
-	TY_IDX ty_idx0 = Get_TY(TREE_TYPE(TREE_OPERAND (exp, 0)));
+	TY_IDX ty_idx0 = Get_TY(TREE_TYPE(k0));
 	TYPE_ID mtyp0 = TY_mtype(ty_idx0);
-	TY_IDX ty_idx1 = Get_TY(TREE_TYPE(TREE_OPERAND (exp, 1)));
+	TY_IDX ty_idx1 = Get_TY(TREE_TYPE(k1));
 	TYPE_ID mtyp1 = TY_mtype(ty_idx1);
 
+	if (code == EQ_EXPR || code == NE_EXPR) {
+	  //when comparing 2 shared ptrs with the same elem type but
+	  //different block sizes the GNU front-end casts  one of them
+	  // to the other. Strip any NOPs since we get in trouble is
+	  // we compare shared with pshared and it happens that their
+	  // sizes (in the backend)  don't match.
+	  if(Type_Is_Shared_Ptr(ty_idx0, TRUE))
+	    while (TREE_CODE(k0) == NOP_EXPR)
+	      k0 = TREE_OPERAND(k0, 0);
+	  if(Type_Is_Shared_Ptr(ty_idx1, TRUE))
+	    while (TREE_CODE(k1) == NOP_EXPR)
+	      k1 = TREE_OPERAND(k1, 0);
+	} 
+	  
+     
+	wn0 = WFE_Expand_Expr (k0);
+	wn1 = WFE_Expand_Expr (k1);
+	// check if conversion is needed
+	
 	if (MTYPE_size_min(mtyp1) > MTYPE_size_min(mtyp0) &&
 	    ! Has_Subsumed_Cvtl(WN_operator(wn0)))
 	  wn0 = WN_CreateCvtl(OPR_CVTL, Widen_Mtype(mtyp0), MTYPE_V,
@@ -2407,11 +2835,17 @@ WFE_Expand_Expr (tree exp,
 
 	Is_True(! is_bit_field || field_id <= MAX_FIELD_ID,
 		("WFE_Expand_Expr: field id for bit-field exceeds limit"));
+	// if the elem_type is shared , the ty_idx we get from the
+	// tree lacks the shared qualifier.
+	if(TY_is_shared(elem_ty_idx) && !TY_is_shared(ty_idx))
+	  ty_idx = Make_Shared_Type(ty_idx, TY_block_size(elem_ty_idx));
 	wn = WN_CreateIload(OPR_ILOAD, rtype,
 			    is_bit_field ? MTYPE_BS : desc, 
 			    component_offset+xtra_BE_ofst,
 			    field_id != 0 ? hi_ty_idx : ty_idx,
-			    Make_Pointer_Type(elem_ty_idx, FALSE),
+			    //WEI: for field accesses(e.g., x[i].f), the 5th arg of createIload should be 
+			    //a pointer to the type of the field.  The same fix is applied to all other createiloads  
+			    Make_Pointer_Type (field_id != 0 ? ty_idx : elem_ty_idx, FALSE),
 			    wn0, field_id);
       }
       break;
@@ -2427,7 +2861,12 @@ WFE_Expand_Expr (tree exp,
         INT num_args = 0;
         INT i;
 	tree list;
+	char* name;
+	INTRINSIC iopc = INTRINSIC_NONE;
+
+	tree fun_decl;
 	arg0 = TREE_OPERAND (exp, 0);
+
 	enum tree_code code0 = TREE_CODE (arg0);
 	if (LANG_Ansi_Setjmp_On == FALSE) {
 	  if (current_function_calls_setjmp)
@@ -2438,7 +2877,8 @@ WFE_Expand_Expr (tree exp,
 	for (list = TREE_OPERAND (exp, 1); list; list = TREE_CHAIN (list)) {
 	  if (TREE_CODE(TREE_VALUE(list)) == ERROR_MARK)
 	    exit (RC_USER_ERROR);
-          arg_ty_idx = Get_TY(TREE_TYPE(TREE_VALUE(list)));
+          arg_ty_idx = MTYPE_To_TY(MTYPE_I4); 
+	    //Get_TY(TREE_TYPE(TREE_VALUE(list)));
           if (!WFE_Keep_Zero_Length_Structs    &&
               TY_mtype (arg_ty_idx) == MTYPE_M &&
               TY_size (arg_ty_idx) == 0) {
@@ -2447,6 +2887,8 @@ WFE_Expand_Expr (tree exp,
           else
             num_args++;
         }
+
+	//set return type
         ty_idx = Get_TY(TREE_TYPE(exp));
         if (need_result) {
           if (!WFE_Keep_Zero_Length_Structs  &&
@@ -2454,19 +2896,20 @@ WFE_Expand_Expr (tree exp,
               TY_size (ty_idx) == 0) {
             // zero length struct return
             ret_mtype = MTYPE_V;
-          }
-          else
+          } else {
             ret_mtype = TY_mtype (ty_idx);
-        }
-        else
+	  }
+        } else {
           ret_mtype = MTYPE_V;
+	}
+
         st = NULL;
         if (code0 == ADDR_EXPR                  &&
             TREE_CODE (TREE_OPERAND (arg0, 0))) {
 	  tree func = TREE_OPERAND (arg0, 0);
 	  BOOL intrinsic_op = FALSE;
           BOOL whirl_generated = FALSE;
-	  INTRINSIC iopc = INTRINSIC_NONE;
+	 
           
 	  if (DECL_BUILT_IN (func)) {
 
@@ -2827,6 +3270,35 @@ WFE_Expand_Expr (tree exp,
           if (whirl_generated) {
             break;
           }
+	
+
+	  fun_decl = TREE_OPERAND(arg0, 0);
+	  name = IDENTIFIER_POINTER(DECL_NAME(fun_decl));
+	  if(strcmp(name, "upc_threadof") == 0) {
+	    iopc = INTRN_THREADOF_S; 
+	  } else if (strcmp(name, "upc_phaseof") == 0) {
+	    iopc = INTRN_PHASEOF_S;
+	  } else if (strcmp(name, "upc_addrfield") == 0) {
+	    iopc = INTRN_ADDROF_S;
+	  } 
+	  /*
+	    if (strcmp(name, "upcr_global_exit") == 0) {
+	    
+	    iopc = INTRN_EXIT;
+	    } else if (strcmp(name, "upcr_global_alloc") == 0) {
+	    
+	    iopc = INTRN_GLOBAL_ALLOC;
+	    } else if (strcmp(name, "upcr_all_alloc") == 0) {
+	    
+	    iopc = INTRN_ALL_ALLOC;
+	    } else if (strcmp(name, "upcr_local_alloc") == 0) {
+	   
+	    iopc = INTRN_LOCAL_ALLOC;
+	    } else if (strcmp(name, "upcr_free") == 0) {
+	   
+	    iopc = INTRN_FREE;
+	    }
+	  */
 
 	  if (intrinsic_op) {
 	    WN *ikids [5];
@@ -2883,8 +3355,16 @@ WFE_Expand_Expr (tree exp,
 	for (list = TREE_OPERAND (exp, 1);
 	     list;
 	     list = TREE_CHAIN (list)) {
-          arg_wn     = WFE_Expand_Expr (TREE_VALUE (list));
-	  arg_ty_idx = Get_TY(TREE_TYPE(TREE_VALUE(list)));
+	  tree arg = TREE_VALUE(list);
+	  if (TREE_CODE(arg) == NOP_EXPR && 
+	      (iopc == INTRN_THREADOF_S || iopc == INTRN_PHASEOF_S || iopc ==INTRN_ADDROF_S)) {
+	    // 	    WEI: use the child instead
+ 	    arg = TREE_OPERAND(arg, 0);
+ 	  }
+	  arg_wn     = WFE_Expand_Expr (arg);
+	  arg_ty_idx = Get_TY(TREE_TYPE(arg));
+          //arg_wn     = WFE_Expand_Expr (TREE_VALUE (list));
+	  //arg_ty_idx = Get_TY(TREE_TYPE(TREE_VALUE(list)));
 	  arg_mtype  = TY_mtype(arg_ty_idx);
           if (!WFE_Keep_Zero_Length_Structs    &&
               TY_mtype (arg_ty_idx) == MTYPE_M &&
@@ -2906,6 +3386,46 @@ WFE_Expand_Expr (tree exp,
           }
         }
 
+	
+	//for UPC library calls determine here what is the correct intrinsic version
+	if(iopc == INTRN_THREADOF_S || iopc == INTRN_PHASEOF_S || iopc ==INTRN_ADDROF_S) {
+	  TY_IDX act_ty = WN_ty(WN_kid0(arg_wn));
+	  int bsize = Get_Type_Block_Size(act_ty);
+	  if(TY_is_shared(act_ty) && 
+	     (TY_kind(act_ty) == KIND_POINTER || TY_kind(act_ty) == KIND_ARRAY)) {
+	    switch(TY_kind(act_ty)) {
+	    case KIND_POINTER:
+	      bsize = Get_Type_Block_Size(TY_pointed(act_ty));
+	      break;
+	    case KIND_ARRAY:
+	      Is_True(0,("",""));
+	      break;
+	    }
+	  }
+	  switch(iopc) {
+	  case INTRN_THREADOF_S:
+	    if(bsize <= 1) {
+	      iopc = INTRN_THREADOF_P;
+	    }
+	    break;
+	  case INTRN_PHASEOF_S:
+	    if(bsize <= 1) {
+	      iopc = INTRN_PHASEOF_P; 
+	    }
+	    break;
+	  case INTRN_ADDROF_S:
+	    if(bsize <= 1) {
+	      iopc = INTRN_ADDROF_P;
+	    }
+	    break;
+	  }
+	  
+	  WN_intrinsic(call_wn) = iopc;
+	  //WEI: need to set the type of parm node, 
+	  //to avoid a unnecessary cast later
+	  WN_set_ty(arg_wn, act_ty);
+	}
+
         if (ret_mtype == MTYPE_V) {
 	  WFE_Stmt_Append (call_wn, Get_Srcpos());
         }
@@ -2916,7 +3436,7 @@ WFE_Expand_Expr (tree exp,
 
 	  wn1 = WN_Ldid (ret_mtype, -1, Return_Val_Preg, ty_idx);
 
-	  if (ret_mtype == MTYPE_M) { // copy the -1 preg to a temp area
+	  if (ret_mtype == MTYPE_M || Type_Is_Shared_Ptr(ty_idx)) { // copy the -1 preg to a temp area
 	    TY_IDX ret_ty_idx = ty_idx;
 	    if (Aggregate_Alignment > 0 &&
 		Aggregate_Alignment > TY_align (ret_ty_idx))
@@ -2940,7 +3460,7 @@ WFE_Expand_Expr (tree exp,
               ty_idx = desc_ty_idx;
             else { 
               ty_idx = nop_ty_idx;
-              if (ty_idx == 0)
+              if (ty_idx == 0 || Type_Is_Shared_Ptr(desc_ty_idx))
                 ty_idx = desc_ty_idx;
             }
 
@@ -3260,8 +3780,19 @@ void WFE_Null_Return (void)
 UINT64
 Get_Integer_Value (tree exp)
 {
-	FmtAssert (TREE_CODE(exp) == INTEGER_CST, 
-		("Get_Integer_Value unexpected tree"));
+
+  //WEI: this may happen if the block size is not a compile constant
+  //Instead of crashing, we lie about its block size so the compiler 
+  //can continue to run, since this error
+  //should be reported in upc-share.c (set_upc_blocksize)
+  if (TREE_CODE(exp) != INTEGER_CST) {
+    return 1;
+  }
+
+  /*
+    FmtAssert (TREE_CODE(exp) == INTEGER_CST, 
+    ("Get_Integer_Value unexpected tree"));
+  */
 #ifdef _LP64
 	return TREE_INT_CST_LOW (exp);
 #else

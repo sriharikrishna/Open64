@@ -52,9 +52,12 @@ main (
 {
 	INT error_count, sorry_count;
 	BOOL need_inliner;
-	
-	Orig_Src_File_Name = gnu_init (argc, argv, envp);
+
+	/* Order is important here: we must do WFE_Init first so we can set
+	   the correct POINTER_SIZE for gcc 
+	*/
 	WFE_Init (argc, argv, envp);	/* sgi initialization */
+	Orig_Src_File_Name = gnu_init (argc, argv, envp);
 	WFE_File_Init (argc, argv);	/* inits per source file */
 
 	compile_file (Orig_Src_File_Name);

@@ -489,7 +489,10 @@ enum TY_FLAGS
     TY_IS_F90_ASSUMED_SIZE   = 0x1000,
     TY_IS_F90_DEFERRED_SHAPE = 0x2000,
     TY_IS_EXTERNAL           = 0x4000,
-    TY_IS_SEQUENCE           = 0x8000
+    TY_IS_SEQUENCE           = 0x8000,
+    TY_IS_SHARED        = 0x10000,       // UPC shared type
+    TY_IS_STRICT        = 0x20000,
+    TY_IS_RELAXED       = 0x40000
 };
 
 
@@ -501,6 +504,9 @@ enum TY_PU_FLAGS
     TY_HAS_PROTOTYPE	= 0x00000004	// has ansi-style prototype
 };
 
+#define UPC_INDEFINITE_BLOCK_SIZE -1
+
+
 class TY
 {
 public:
@@ -508,7 +514,7 @@ public:
 
     TY_KIND kind : 8;			// kind of type
     mTYPE_ID mtype : 8;			// WHIRL data type
-    mUINT16 flags;			// misc. attributes
+    mUINT32 flags;			// misc. attributes
 
     union {
 	FLD_IDX fld;
@@ -523,7 +529,9 @@ public:
 	TY_IDX pointed;			// pointed-to type (pointers only)
 	mUINT32 pu_flags;		// attributes for KIND_FUNCTION
     } u2;
-
+#ifdef COMPILE_UPC
+    mUINT32 block_size;                 // block size for UPC shared data
+#endif 
     // access function for unions
 
     FLD_IDX Fld () const		{ return u1.fld; }

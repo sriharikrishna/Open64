@@ -62,6 +62,7 @@ static lang_info_t language_info[] = {
 	{'F',	0x00000010,	{"f90","sgif90"}},		/* f90 */
 	{'a',	0x00000020,	{"as","sgias","gas"}},		/* as */
 	{'l',	0x00000040,	{"ld","sgild"}},		/* ld */
+	{'u',   0x00000080,     {"upc", "sgiupc", "upc"}},
 	{'I',	0x80000000,	{"int"}},		/* Internal option */
 };
 
@@ -94,6 +95,8 @@ static lang_info_t language_info[] = {
 #define PHASEPATH	"/usr/lib32/cmplrs"
 #define GNUPHASEPATH	PHASEPATH
 #endif
+
+int upc_extensions = 0 ;
 
 typedef struct phase_struct {
 	char key;
@@ -221,6 +224,7 @@ static source_info_t source_info[] = {
 	{"N"},				/* N */
 	{"O"},				/* O */
 	{"o"},				/* o */
+	{"upc"}, 			/* upc */
 };
 
 languages_t invoked_lang;
@@ -413,9 +417,16 @@ get_named_language (string name)
 		/* look for language name at end of string */
 		p = name+strlen(name)-strlen(language_info[i].name[j]);
 		if (same_string(language_info[i].name[j], p)) {
-			/* as does not invoke ld */
-			if (i == L_as) last_phase = P_any_as;
-			return i;
+		  /* as does not invoke ld */
+		  switch(i) {
+		  case L_upc:
+		    upc_extensions = 1;
+		    break;
+		  case L_as:
+		    last_phase = P_any_as;
+		    break;
+		  }
+		  return i;
 		}
 	    }
 	}
@@ -454,6 +465,7 @@ get_source_kind (string src)
 			case L_f77: return S_f;
 			case L_f90: return S_f90;
 			case L_as: return S_s;
+			case L_upc: return S_u;
 			}
 		}
 	}
@@ -514,6 +526,9 @@ get_source_lang (source_kind_t sk)
 	case S_F90:
 		/* no f77 in linux release */
 		return L_f90;
+	case S_u:
+	case S_U:
+		return L_upc;
 	case S_o:
 		return invoked_lang;
 	}

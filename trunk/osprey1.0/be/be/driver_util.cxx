@@ -38,8 +38,8 @@
  *
  * Module: driver_util.c
  * $Revisionr: 1.34 $
- * $Date: 2002-05-22 20:06:20 $
- * $Author: dsystem $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/driver_util.cxx,v $
  *
  * Revision history:
@@ -72,6 +72,9 @@
 #include "wn_instrument.h"
 #include "driver_util.h"
 
+int compiling_upc_flag = 0;
+
+
 /* argc and argv for phase-specific flags */
 static UINT phase_argc[PHASE_COUNT];
 static STRING *phase_argv[PHASE_COUNT];
@@ -95,6 +98,7 @@ extern BOOL Run_autopar;
 extern BOOL Run_MemCtr;
 static BOOL Dsm_Recompile = FALSE;
 
+char* Config_File_Name = ""; 
 
 /*
  * Handle_Phase_Specific_Options
@@ -267,6 +271,11 @@ Process_Command_Line (INT argc, char **argv)
 			Global_File_Name = cp + 2;
 			break;
 
+		    case 'C':
+		      //WEI: new case for the config file
+		      Config_File_Name = cp + 2;
+		      break;
+
 		    default:
 			ErrMsg ( EC_File_Flag, *cp, argv[i] );
 			break;
@@ -338,6 +347,9 @@ Process_Command_Line (INT argc, char **argv)
 		if (strcmp (cp, "how") == 0) {
 		    Show_Progress = TRUE;
 		    break;
+		} else if( strcmp(cp, "td=upc") == 0) {
+		  Compile_Upc = TRUE;
+		  break;
 		}
 		/* else fall through */
 				    /* CG-specific flags */
@@ -373,7 +385,11 @@ Process_Command_Line (INT argc, char **argv)
 		} else 
 		  ErrMsg (EC_Unknown_Flag, *(cp-1), argv[i]); 
                 break;
-              
+           
+	    case 'l':
+	      if(strncmp(cp,"ang=upc",7) == 0)
+		compiling_upc_flag = 1;
+	      break;
 	    default:		    /* What's this? */
 		ErrMsg ( EC_Unknown_Flag, *(cp-1), argv[i] );
 		break;

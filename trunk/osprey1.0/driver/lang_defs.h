@@ -50,6 +50,7 @@ typedef enum {
 	L_f90,
 	L_as,
 	L_ld,
+	L_upc,
 	L_internal,	/* pseudo-language to mark internal options */
 	L_LAST
 } languages_t;
@@ -73,6 +74,8 @@ typedef enum {
 	S_N,
 	S_O,
 	S_o,
+	S_u, /* upc */ 
+	S_U, 
 	S_LAST
 } source_kind_t;
 
@@ -206,5 +209,6 @@ extern boolean ignore_suffix;	/* ignore suffix when determing source lang */
 extern boolean is_matching_language (mask_t lang_mask, languages_t l);
 /* whether the phase mask matches the specified phase */
 extern boolean is_matching_phase (mask_t phase_mask, phases_t p);
+
 
 #endif

@@ -92,16 +92,18 @@ HOSTDEFS += -DMONGOOSE_CIF
 
 HOSTDEFS += -DSGI_RAG_BACKEND
 HOSTDEFS += -DSGI_MONGOOSE
+HOSTDEFS += -DCOMPILE_UPC
 HOSTDEFS += -DHANDLE_PRAGMA_WEAK
 ifneq ($(BUILD_COMPILER), SGI)
 HOSTDEFS += -DMIPSEL
 endif
 
-ifeq ($(BUILD_OPTIMIZE), DEBUG)
+ifeq ($(BUILD_VARIANT), DEBUG)
 HOSTDEFS += -DIs_True_On
 HOSTDEFS += -DInsist_On 
 HOSTDEFS += -DDEBUG=1
 HOSTDEFS += -DCHECKING=1
+#HOSTDEFS += -DWFE_DEBUG
 else
 HOSTDEFS += -DDEBUG=0 
 HOSTDEFS += -DCHECKING=0 
@@ -184,7 +186,8 @@ FE_CXX_SRCS =		\
   wfe_dst.cxx           \
   wfe_expr.cxx		\
   wfe_misc.cxx          \
-  wfe_stmt.cxx
+  wfe_stmt.cxx		\
+  shared-alloc.cxx	
 
 COMMON_COM_CXX_SRCS =	\
   config.cxx		\
@@ -208,6 +211,7 @@ COMMON_COM_CXX_SRCS =	\
   symtab.cxx		\
   symtab_verify.cxx	\
   ttype.cxx		\
+	upc_symtab_utils.cxx	\
   wn.cxx		\
   wn_map.cxx		\
   wn_pragmas.cxx	\
@@ -296,7 +300,7 @@ endif
 endif
 endif
 
-default: first $(TARGETS) last
+default: first depends $(TARGETS) last
 
 #----------------------------------------------------------------------
 #  The commands in this section are done BEFORE any other target is 
@@ -306,6 +310,8 @@ first:
 	cd $(TARG_GNU_DIR) && $(MAKE)
 	cd $(TARG_CMPLRS_DIR) && $(MAKE)
 	cd $(TARG_COMUTIL_DIR) && $(MAKE)
+
+include $(BUILD_TOT)/Makeinclude
 
 #----------------------------------------------------------------------
 #  The commands in this section are done AFTER every other target is 
@@ -329,4 +335,41 @@ gfec :  $(OBJECTS) $(GNU_OBJS)
 #----------------------------------------------------------------------
 BUILD_SUBDIRS = gnu
 include $(COMMONRULES)
+
+
+
+
+# FIXME: copied from Ji's ../be/Makefile.gbase, not sure if needed.
+ifeq ($(BUILD_OS), IRIX)
+CFLAGS += -D_SGI_SGI
+CXXFLAGS += -D_SGI_SGI 
+ ifeq ($(BUILD_COMPILER), VENDOR)
+ CFLAGS += -woff 1174,1209,3201
+ CXXFLAGS += -woff 1174,1209,3201
+ else
+ CFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+ CXXFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+ endif
+endif
+
+ifeq ($(BUILD_OS), LINUX)
+CFLAGS  += -D_LINUX_LINUX
+CXXFLAGS += -D_LINUX_LINUX 
+endif
+
+ifeq ($(BUILD_OS), SOLARIS) 
+CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END -DMONGOOSE_BE \        -D_LONGLONG -Dlonglong -D_SVR4_SOURCE -D_NEW_SYMTAB -DTARG_SOLARIS \
+        $(LCINCS) $(OPTIMIZER)
+ ifeq ($(BUILD_COMPILER), VENDOR)
+ CFLAGS += -KPIC
+ ifeq ($(BUILD_SB), YES)
+ CFLAGS += -xsb
+ endif
+ endif
+ ifeq ($(BUILD_COMPILER), GNU)
+ CFLAGS +=  -D__GNU_BUG_WORKAROUND -fPIC
+ endif
+CXXFLAGS = $(CFLAGS) -w
+endif
+
 

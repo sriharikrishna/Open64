@@ -95,6 +95,7 @@ HOSTDEFS += -DFRONT_END
 HOSTDEFS += -DFRONT_F90
 HOSTDEFS += -D_PDGCS 
 HOSTDEFS += -DUSE_STANDARD_TYPES
+HOSTDEFS += -DCOMPILE_UPC
 ifeq ($(BUILD_OS), LINUX)
 HOSTDEFS += -D__MIPS_AND_IA64_ELF_H
 HOSTDEFS += -Dlinux
@@ -191,6 +192,7 @@ COMMON_COM_CXX_SRCS =	\
   symtab.cxx            \
   symtab_verify.cxx	\
   ttype.cxx		\
+  upc_symtab_utils.cxx	\
   wn.cxx		\
   wn_map.cxx		\
   wn_pragmas.cxx	\
@@ -284,7 +286,7 @@ endif
 ifeq ($(BUILD_OS), SOLARIS)
 CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_PDGCS \
 	-DUSE_STANDARD_TYPES -D_TARGET_MONGOOSE -D_SGI_WHIRLCONVERT \
-	-DFRONT_END -DFRONT_F90 $(LCINCS) $(OPTIMIZER)
+	-DFRONT_END -DFRONT_F90 -DCOMPILE_UPC $(LCINCS) $(OPTIMIZER)
 LLDLIBS += -lelf
  ifeq ($(BUILD_COMPILER), GNU)
  CFLAGS += -D__GNU_BUG_WORKAROUND

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: config_targ.c
- * $Revision: 1.2 $
- * $Date: 2003-02-17 23:51:59 $
- * $Author: dotsenko $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:43 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_targ.cxx,v $
  *
  *
@@ -369,6 +369,11 @@ Prepare_Target ( void )
       Target_ABI = ABI_I64;
       isa_default = TARGET_ISA_I1;
       targ_default = TARGET_ITANIUM;
+    } else if (strcmp ( ABI_Name, "ia32" ) == 0) {
+      //WEI: I hope this is correct...
+      Target_ABI = ABI_I32;
+      isa_default = TARGET_ISA_I1;
+      targ_default = TARGET_ITANIUM;
     } else {
       ErrMsg ( EC_Inv_TARG, "abi", ABI_Name );
     }
@@ -520,9 +525,9 @@ Configure_Target ( void )
 #endif
 #endif
 
-
   /* Initialize pointer information */
   if ( Use_32_Bit_Pointers ) {
+    //cout << "GOT HERE!!!!!" << endl;
     Pointer_Size = 4;
     Pointer_Mtype  = WHIRL_Mtype_A_On ? MTYPE_A4 : MTYPE_U4;
     Pointer_type   = Pointer_Mtype;

@@ -39,9 +39,40 @@
 #define tree_symtab_INCLUDED
 
 #include <cmplrs/rcodes.h>
+#include <map>
+#include <string>
+#include <upc_symtab_utils.h>
+
+#define MAX_PATH 500
+
+/* mark the "char" type, which should be distinct from MTYPE_I1 or MTYPE_U1 */
+extern TY_IDX char_ty;
+
+/* Calculate the block size of a type */
+extern int Type_Tree_Block_Size(tree type_tree);
 
 extern TY_IDX Create_TY_For_Tree (tree, TY_IDX idx = TY_IDX_ZERO);
 extern "C" ST* Create_ST_For_Tree (tree);
+
+typedef struct bs_pair {
+  TY_IDX  t_idx;
+  unsigned int thread_dim; //for arrays, it's the dimension that refers to THREADS
+  bs_pair(TY_IDX t, unsigned int d) : t_idx(t), thread_dim(d) {}
+}  bs_pair_t;
+typedef bs_pair_t * bs_pair_p;
+
+typedef struct tld_pair {
+  string type;
+  string init_exp;
+  int size;
+  tld_pair(string t, string i, int s) : type(t), init_exp(i), size(s) {}
+} tld_pair_t;
+typedef tld_pair_t* tld_pair_p;
+
+extern std::map<ST_IDX, bs_pair_p> upc_st_orig_ty;
+extern std::map<ST_IDX, tld_pair_p> upc_tld;
+
+extern unsigned int hash_val(string s);
 
 /* 
  * either return a previously created TY_IDX associated with a type,
@@ -50,20 +81,41 @@ extern "C" ST* Create_ST_For_Tree (tree);
 inline TY_IDX
 Get_TY (tree type_tree)
 {
-	if (TREE_CODE(type_tree) == ERROR_MARK)
-	    exit (RC_USER_ERROR);
-	TY_IDX idx = TYPE_TY_IDX(type_tree);
-        if (idx != 0) {
-	    if (TREE_CODE(type_tree) == RECORD_TYPE ||
-	        TREE_CODE(type_tree) == UNION_TYPE) {
-	      FLD_HANDLE elt_fld = TY_fld(idx);
-	      if (elt_fld.Is_Null()) 
-		return Create_TY_For_Tree (type_tree, idx); // forward declared
-	      else return idx;
-	    }
-	    else return idx;
-        }
-	return Create_TY_For_Tree (type_tree, TY_IDX_ZERO);
+  TY_IDX result = 0; 
+  
+  if (TREE_CODE(type_tree) == ERROR_MARK)
+    exit (RC_USER_ERROR);
+  TY_IDX idx = TYPE_TY_IDX(type_tree);
+  if (idx != 0) { 
+    bool shared_conflict = compiling_upc && TYPE_SHARED(type_tree) && !TY_is_shared(idx);
+    if (shared_conflict) {
+      //create the equivalent shared type
+      result = Make_Shared_Type (idx, Type_Tree_Block_Size(type_tree), 
+				 TYPE_STRICT(type_tree) ? STRICT_CONSISTENCY :
+				 TYPE_RELAXED(type_tree) ? RELAXED_CONSISTENCY : NO_CONSISTENCY);
+    } else {
+      if (TREE_CODE(type_tree) == RECORD_TYPE ||
+	  TREE_CODE(type_tree) == UNION_TYPE) {
+	FLD_HANDLE elt_fld = TY_fld(idx);
+	if (elt_fld.Is_Null()) 
+	  result = Create_TY_For_Tree (type_tree, idx); // forward declared
+	else 
+	  result = idx;
+      } else {
+	//can safely reuse the type entry
+	result = idx;
+      }
+    } 
+  } else { 
+    result = Create_TY_For_Tree (type_tree, TY_IDX_ZERO);
+    /* if(compiling_upc && shared_ptr_idx && TYPE_SHARED(type_tree) &&  */
+/*        result != shared_ptr_idx) {  */
+/*       TYPE_ORIG_TY_IDX(type_tree) = result; */
+/*       TYPE_TY_IDX(type_tree) = shared_ptr_idx; */
+/*       result = shared_ptr_idx; */
+/*     } */
+  }
+  return result;
 }
 
 /*

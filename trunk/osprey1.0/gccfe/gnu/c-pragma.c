@@ -24,10 +24,19 @@ Boston, MA 02111-1307, USA.  */
 #include "tree.h"
 #include "function.h"
 #include "defaults.h"
+#include "c-tree.h"
 #include "c-pragma.h"
 #include "flags.h"
 #include "toplev.h"
 #include "ggc.h"
+
+
+void push_consistency_value			PARAMS((tree, int));
+void pop_consistency_value			PARAMS((int));
+void push_consistency_nesting_level		PARAMS((int));
+void pop_consistency_nesting_level		PARAMS((int));
+
+extern void WFE_Set_Consistency PARAMS((const char *, int ));
 
 #ifdef HANDLE_GENERIC_PRAGMAS
 
@@ -461,4 +470,78 @@ init_pragma ()
   ggc_add_root (&alignment_stack, 1, sizeof(alignment_stack),
 		mark_align_stack);
 #endif
+}
+
+
+/* Manage consistency values for remote accesses. */
+void
+push_consistency_value (tree exp, int globalp)
+{
+  struct consistency_value *new = (struct consistency_value *) malloc (sizeof (struct consistency_value));
+  
+  new->value = exp;
+  if (globalp)
+    {
+      new->next = global_consistency_stack;
+      if (current_consistency_stack == global_consistency_stack) 
+	 current_consistency_stack = new;
+      global_consistency_stack = new;
+    }
+  else
+    {
+      new->next = stmt_consistency_stack;
+      stmt_consistency_stack = new;
+      current_consistency_stack = stmt_consistency_stack;
+      WFE_Set_Consistency (IDENTIFIER_POINTER (current_consistency_stack->value), 
+			START_CONSISTENCY_SCOPE);
+    }
+}
+
+void
+pop_consistency_value (int globalp)
+{
+  struct consistency_value *old;
+
+  if (globalp)
+    {
+      old = global_consistency_stack;
+      global_consistency_stack = global_consistency_stack->next;
+    }
+  else
+    {
+      old = stmt_consistency_stack;
+      WFE_Set_Consistency (IDENTIFIER_POINTER (stmt_consistency_stack->value), 
+			   END_CONSISTENCY_SCOPE);
+      stmt_consistency_stack = stmt_consistency_stack->next;
+    }
+  free (old);
+}
+
+void
+push_consistency_nesting_level (int compoundp)
+{
+  struct consistency_nesting_level *temp;
+
+  temp = (struct consistency_nesting_level *) malloc (sizeof (struct consistency_nesting_level));
+
+  temp->pragma = 0;
+
+  temp->next = stmt_consistency_nesting_level;
+  stmt_consistency_nesting_level = temp;
+}
+
+void
+pop_consistency_nesting_level(int compoundp)
+{
+  struct consistency_nesting_level *temp;
+
+  if (stmt_consistency_nesting_level->pragma)
+    {
+      pop_consistency_value (0);  /* for stmt_consistency_stack */
+      if (!stmt_consistency_stack)
+	current_consistency_stack = global_consistency_stack;
+    }
+  temp = stmt_consistency_nesting_level;
+  stmt_consistency_nesting_level = stmt_consistency_nesting_level->next;
+  free (temp);
 }

@@ -81,6 +81,10 @@ extern void Wfe_Expand_Asm_Operands (tree, tree, tree, tree,
 
 extern LABEL_IDX WFE_Get_LABEL (tree label, int def);
 
+extern void WFE_Expand_Upc_Sync(int syncop, tree arg);
+extern void WFE_Expand_Affinity_Test(tree);
+extern WN* WFE_Add_Affinity_Test(WN*, WN*);
+
 #ifdef __cplusplus
 }
 #endif
