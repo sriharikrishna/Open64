@@ -2128,7 +2128,7 @@ ST::Print (FILE *f, BOOL verbose) const
 	if (flags_ext) {
 	   const char* flgstr = ST_EXT_FLAGS_To_Str(flags_ext);
            fprintf (f, "\n\t\tFlags_ext:\t0x%016llx", flags_ext);
-	   fprintf (f, " %s", flags_ext);
+	   fprintf (f, " %s", flgstr);
 	}
 	
 	fprintf (f, "\n\t\tSclass: %s\n", Sclass_Name (storage_class));
