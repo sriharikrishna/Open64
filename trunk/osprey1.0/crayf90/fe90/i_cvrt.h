@@ -1034,7 +1034,8 @@ extern INTPTR fei_proc            	  ( char  *name_string,
                                  	    INT32 aux_idx,
                                  	    TYPE  type,
                                  	    INT32 st_idx,   
-                                 	    INT64 flags );
+                                 	    INT64 flags,
+					    INT32 in_interface );
 extern INTPTR fei_seg             	  ( char  *name_string,
                                  	    INT32 seg_type,
                                  	    INT32 owner,
