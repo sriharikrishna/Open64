@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.10 $
- * $Date: 2002-09-18 17:51:41 $
+ * $Revision: 1.11 $
+ * $Date: 2002-09-19 20:13:15 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.10 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.11 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -208,9 +208,40 @@ WN2F_Expr_Plus_Literal(TOKEN_BUFFER tokens,
    
    if (is_const)
    {
-      TCON2F_translate(tokens,
-		       Host_To_Targ(WN_opc_rtype(wn), value),
-		       FALSE /*is_logical*/);
+    if (WN_opc_operator(wn) == OPR_INTCONST) {
+     switch (TCON_ty(Host_To_Targ(WN_opc_rtype(wn), value)))
+      {
+            case MTYPE_I1:
+            case MTYPE_I2:
+            case MTYPE_I4:
+            case MTYPE_I8:
+              if (TCON_ival(Host_To_Targ(WN_opc_rtype(wn), value))<0)  {
+                  Append_Token_Special(tokens, '(');
+                  TCON2F_translate(tokens,
+                                   Host_To_Targ(WN_opc_rtype(wn), value),
+                                   FALSE /*is_logical*/);
+                   Append_Token_Special(tokens, ')');
+                 }
+               else
+                  TCON2F_translate(tokens,
+                                   Host_To_Targ(WN_opc_rtype(wn), value),
+                                   FALSE/*is_logical*/);
+               break;
+
+              default:
+                  TCON2F_translate(tokens,
+                                   Host_To_Targ(WN_opc_rtype(wn), value),
+                                   FALSE/*is_logical*/);
+
+                   break;
+
+             } /*switch*/
+
+    } else {  //WN_opc_operator(wn) == OPR_CONST
+     ; //Shouldn't be here
+    
+    }
+ 
    }
    else
    {
