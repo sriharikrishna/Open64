@@ -50,7 +50,7 @@
 #define altzone		_altzone
 #define daylight	_daylight
 #define sys_errlist	_sys_errlist
-#define sys_nerr	_sys_nerr
+/* #define sys_nerr	_sys_nerr : replaced by strerror() */
 #define timezone	_timezone
 #define tzname		_tzname
 #endif

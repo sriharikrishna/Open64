@@ -52,9 +52,7 @@ static char USMID[] = "@(#) libcif/ciferrstr.c	30.2	07/26/96 07:19:13";
 #endif
 
 #include <errno.h>
-
-extern int sys_nerr;
-extern char *sys_errlist[];
+#include <string.h>
 
 static char *strings[] = {
 	"",
@@ -86,8 +84,8 @@ int status;			/* cif error status code */
 	if (status >= 0 || status < CIF_MAXERROR)
 		return (unknown);
 	else if (status == CIF_SYSERR) {
-		if (errno >= 0 && errno <= sys_nerr)
-			return (sys_errlist[errno]);
+		if (errno >= 0)
+			return (strerror(errno));
 		else
 			return (unknown);
 	}
