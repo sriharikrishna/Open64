@@ -2002,7 +2002,8 @@ TY::Print (FILE *f) const
     fprintf (f, "%-14s:",
 	     name_idx ? &Str_Table[name_idx] : "(anon)");
 
-    fprintf (f, " (f: 0x%04x", flags);
+/*FMZH    fprintf (f, " (f: 0x%04x", flags);*/
+    fprintf (f, " (f: 0x%08x", flags);
     if (flags) {
 	if (flags & TY_IS_CHARACTER)	fprintf (f, " character");
 	if (flags & TY_IS_LOGICAL)	fprintf (f, " logical");
