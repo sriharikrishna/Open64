@@ -37,8 +37,8 @@
 /* ====================================================================
  *
  * Module: DaVinci.cxx
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:29 $
+ * $Revision: 1.2 $
+ * $Date: 2003-11-04 16:09:33 $
  *
  * Description:
  *	Interface to daVinci, a visualization system for displaying
@@ -54,9 +54,9 @@ extern char * sys_errlist[];
 #endif
 
 #include <sys/types.h>		    // for pid_t
+#include <sys/wait.h>		    // for waitpid()
 #include <unistd.h>		    // for fork(), pipe(), etc.
 #include <signal.h>		    // for SIGINT
-#include <wait.h>		    // for waitpid()
 #include <stdarg.h>                 // for varargs.
 #include <time.h>
 #include <string.h>
