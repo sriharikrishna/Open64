@@ -713,6 +713,21 @@ PROCESS_SIBLING:
    /* The innermost children go thru the interface first.  The external */
    /* procedure goes thru last.                                         */
 
+
+/* since in *.w2f.f we add an extra module "w2f__types"
+ * to fix real kind problems,we don't want to generate
+ * a PU in WHIRL representation,so if the PU is a module
+ * named "w2f__types" then igore it in cvrt-to-PDG processing
+ *  ---------fzhao
+ */
+    
+   pgm_attr_idx	= SCP_ATTR_IDX(curr_scp_idx);
+   name_ptr = &name_pool[ATP_EXT_NAME_IDX(pgm_attr_idx)].name_char;
+   if (ATP_PGM_UNIT(pgm_attr_idx)==Module &&
+        strncmp("w2f__types",name_ptr,10)==0)
+		goto HERE; 
+
+
    if (SCP_FIRST_CHILD_IDX(curr_scp_idx) != NULL_IDX) {
       save_curr_scp_idx	= curr_scp_idx;
       curr_scp_idx = SCP_FIRST_CHILD_IDX(curr_scp_idx);
@@ -731,14 +746,15 @@ PROCESS_SIBLING:
 
    allocate_pdg_link_tbls();
 
-   pgm_attr_idx	= SCP_ATTR_IDX(curr_scp_idx);
+/*   pgm_attr_idx	= SCP_ATTR_IDX(curr_scp_idx); */
+
    ATP_SCP_ALIVE(pgm_attr_idx) = TRUE;
    stmt_start_line = SH_GLB_LINE(SCP_FIRST_SH_IDX(curr_scp_idx));
    stmt_start_col = 0;
 
    cvrt_sytb_to_pdg();
 
-   name_ptr = &name_pool[ATP_EXT_NAME_IDX(pgm_attr_idx)].name_char;
+/*   name_ptr = &name_pool[ATP_EXT_NAME_IDX(pgm_attr_idx)].name_char; */
 
    PDG_DBG_PRINT_START
    PDG_DBG_PRINT_C("PDGCS_comp_unit");
@@ -840,7 +856,6 @@ PROCESS_SIBLING:
        ATP_PGM_UNIT(SCP_ATTR_IDX(curr_scp_idx)) == Module) {
 
       /* Cray and MPP go out in a special &%% module because of segldr. */
-
       send_mod_file_name();    /* Sends the file name */
       create_mod_info_tbl();   /* Creates the table.  */
       output_mod_info_file();  /* Writes the table.   */
@@ -886,6 +901,8 @@ PROCESS_SIBLING:
 # ifdef _ENABLE_FEI
    PDGCS_end_comp_unit();
 # endif
+
+HERE:
 
    if (check_scp && SCP_SIBLING_IDX(curr_scp_idx) != NULL_IDX) {
       curr_scp_idx = SCP_SIBLING_IDX(curr_scp_idx);
@@ -9239,6 +9256,17 @@ CONTINUE:
     
    case Use_Opr:
 
+      /* we add a use stmt "use w2f__types" in *.w2f.f files
+       * we don't want this stmt appearing in the WHIRL representation
+       * when recompile the generated code,so just igore the stmt
+       * "use w2f__types" in cvrt_to_PDG processing
+       *  ------fzhao
+       */
+
+        if (strncasecmp("w2f__types",AT_OBJ_NAME_PTR(IR_IDX_L(ir_idx)),10) == 0)
+                 break;
+
+
         if (ATP_USE_LIST(IR_IDX_L(ir_idx)) != NULL_IDX) {
            ro_idx = ATP_USE_LIST(IR_IDX_L(ir_idx));
                         while (ro_idx != NULL_IDX) {
@@ -12202,16 +12230,16 @@ static void  send_procedure(int			attr_idx,
           ATP_PROC(attr_idx) == Extern_Proc) {
          name_ptr = &name_pool[ATP_EXT_NAME_IDX(attr_idx)].name_char;
          if (strcmp(AT_OBJ_NAME_PTR(SCP_ATTR_IDX(curr_scp_idx)), 
-                    name_ptr) == 0) {
-            /*
-            We have a routine being USE associated that is
-            defined in an INTERFACE block only.   The backend must not
-            see this.
-            */
-            goto EXIT;
-         }
-      }
-   }
+			    name_ptr) == 0) {
+		    /*
+		    We have a routine being USE associated that is
+		    defined in an INTERFACE block only.   The backend must not
+		    see this.
+		    */
+		    goto EXIT;
+		 }
+	      }
+	   }
 
    pgm_unit = ATP_PGM_UNIT(attr_idx);
    name_ptr = &name_pool[ATP_EXT_NAME_IDX(attr_idx)].name_char;
