@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.14 $
- * $Date: 2003-06-23 20:44:44 $
+ * $Revision: 1.15 $
+ * $Date: 2003-06-26 19:52:33 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -1217,6 +1217,7 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 		    (DIAG_W2F_UNEXPECTED_TYPE_KIND, 
 		     TY_kind(ty), 
 		     "TY2F_scalar"));
+   kind_spec = "NULL";
    if (TY_is_character(ty))
    {
       base_name = "CHARACTER";
@@ -1224,29 +1225,44 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
    else if (TY_is_logical(ty))
    {
       base_name = "LOGICAL";
+      switch(mt)
+         {
+  	   case MTYPE_I1:
+            kind_spec = "(w2f__i1)";
+             break;
+  	   case MTYPE_I2:
+            kind_spec = "(w2f__i2)";
+             break;
+  	   case MTYPE_I4:
+            kind_spec = "(w2f__i4)";
+             break;
+  	   case MTYPE_I8:
+            kind_spec = "(w2f__i8)";
+             break;
+      }
    }
    else switch(mt)
    {
-   case MTYPE_U1:
-   case MTYPE_U2:
-   case MTYPE_U4:
-   case MTYPE_U8:
       /* Strictly speaking unsigned integers not supported in Fortran,
        * but we are lenient and treat them as the signed equivalent.
        */
+   case MTYPE_U1:
    case MTYPE_I1:
       base_name = "INTEGER";
       kind_spec = "(w2f__i1)"; 
       break;
      
+   case MTYPE_U2:
    case MTYPE_I2:
       base_name = "INTEGER";
       kind_spec = "(w2f__i2)"; 
       break;
+   case MTYPE_U4:
    case MTYPE_I4:
       base_name = "INTEGER";
       kind_spec = "(w2f__i4)"; 
       break;
+   case MTYPE_U8:
    case MTYPE_I8:
       base_name = "INTEGER";
       kind_spec = "(w2f__i8)"; 
@@ -1269,9 +1285,16 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
       break;
       
    case MTYPE_C4:
+      base_name = "COMPLEX";
+     kind_spec = "(w2f__4)"; 
+      break;
    case MTYPE_C8:
+      base_name = "COMPLEX";
+     kind_spec = "(w2f__8)";
+      break;
    case MTYPE_CQ:
       base_name = "COMPLEX";
+      kind_spec = "(w2f__16)";
       break;
       
    case MTYPE_M:
@@ -1294,10 +1317,8 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 	    kind_type = TY_size(ty);
 	 }
 
-//fzhao-working around
-         if (mt!= MTYPE_F4 && mt!=MTYPE_F8 && mt!= MTYPE_FQ &&
-             mt!=MTYPE_I1 && mt!=MTYPE_I2 && mt!=MTYPE_I4 && mt!=MTYPE_I8) 
-	       kind_spec = Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
+         if (!strcmp(kind_spec,"NULL"))
+             kind_spec = Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
 	 Prepend_Token_String(decl_tokens,Concat2_Strings(base_name,kind_spec));
       } else {
 	 Prepend_Token_String(
