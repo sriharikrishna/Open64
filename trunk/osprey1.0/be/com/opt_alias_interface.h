@@ -37,9 +37,9 @@
 * ====================================================================
 *
 * Module: opt_alias_interface.h
-* $Revision: 1.1.1.1 $
-* $Date: 2002-05-22 20:06:32 $
-* $Author: dsystem $
+* $Revision: 1.2 $
+* $Date: 2003-12-11 22:12:27 $
+* $Author: eraxxon $
 * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/opt_alias_interface.h,v $
 *
 * Revision history:
@@ -54,7 +54,7 @@
 #ifndef opt_alias_interface_INCLUDED
 #define opt_alias_interface_INCLUDED	"opt_alias_interface.h"
 #ifdef _KEEP_RCS_ID
-static char *opt_alias_interfacercs_id = 	opt_alias_interface_INCLUDED"$Revision: 1.1.1.1 $";
+static char *opt_alias_interfacercs_id = 	opt_alias_interface_INCLUDED"$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -343,9 +343,9 @@ void Delete_Restricted_Map(void);
 
 void Erase_Restricted_Mapping(WN *);
 
-void Verify_Restricted_Map(const WN *, const POINTS_TO *);
+void Verify_Restricted_Map(const WN * const, const POINTS_TO * const);
 
-BOOL Update_From_Restricted_Map(WN *, POINTS_TO *);
+BOOL Update_From_Restricted_Map(WN * const, POINTS_TO * const);
 
 void Note_Invalid_Based_Symbol(const ST *);
 
