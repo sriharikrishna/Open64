@@ -702,6 +702,7 @@ static void cvrt_proc_to_pdg (char	*compiler_gen_date)
    int		pgm_code	= 0;
    int		pgm_data	= 0;
    int		save_curr_scp_idx;
+   int w2f_types=0;
 
 extern void dim_reshape_pass_driver(void);
 extern void runtime_ptr_chk_driver(void);
@@ -720,13 +721,15 @@ PROCESS_SIBLING:
  * named "w2f__types" then igore it in cvrt-to-PDG processing
  *  ---------fzhao
  */
-    
+
    pgm_attr_idx	= SCP_ATTR_IDX(curr_scp_idx);
    name_ptr = &name_pool[ATP_EXT_NAME_IDX(pgm_attr_idx)].name_char;
-   if (ATP_PGM_UNIT(pgm_attr_idx)==Module &&
-        strncmp("w2f__types",name_ptr,10)==0)
-		goto HERE; 
 
+   if (ATP_PGM_UNIT(pgm_attr_idx)==Module &&
+        strncmp("w2f__types",name_ptr,10)==0){
+                w2f_types =1;
+		goto HERE1; 
+    }
 
    if (SCP_FIRST_CHILD_IDX(curr_scp_idx) != NULL_IDX) {
       save_curr_scp_idx	= curr_scp_idx;
@@ -851,12 +854,14 @@ PROCESS_SIBLING:
       check_scp = FALSE;   /* Tables are gone */
    }
 
+HERE1:
 # if !defined(_TARGET_OS_MAX) && !defined(_TARGET_OS_UNICOS)
    if (curr_scp_idx == MAIN_SCP_IDX  && 
        ATP_PGM_UNIT(SCP_ATTR_IDX(curr_scp_idx)) == Module) {
 
       /* Cray and MPP go out in a special &%% module because of segldr. */
-      send_mod_file_name();    /* Sends the file name */
+      if (!w2f_types)
+             send_mod_file_name();    /* Sends the file name */
       create_mod_info_tbl();   /* Creates the table.  */
       output_mod_info_file();  /* Writes the table.   */
       free_tables();
@@ -864,6 +869,8 @@ PROCESS_SIBLING:
    }
 # endif
 
+  if (w2f_types)
+      goto HERE;
 
    PDG_DBG_PRINT_START
    PDG_DBG_PRINT_C("PDGCS_do_proc");
