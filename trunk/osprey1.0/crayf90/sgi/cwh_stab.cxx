@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.20 $
- * $Date: 2003-07-25 18:11:55 $
+ * $Revision: 1.21 $
+ * $Date: 2003-09-18 20:38:49 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.21 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -666,8 +666,14 @@ fei_proc_imp(INT32 lineno,
     break;
   }
 
+BOOL input_form_module = (test_flag(flags,FEI_PROC_M_IMPORTED));
+BOOL declared_in_model = (test_flag(flags, FEI_PROC_MODULE) && !input_form_module);
+                            
+
 if (Class ==  PDGCS_Proc_Imported &&
-       !in_interface) {
+       !in_interface 		  &&
+       !input_form_module         &&
+        !(sym_class == F90_Module)) {
   st_local_cp = Copy_ST(st,CURRENT_SYMTAB);
   st_local_cp->storage_class = SCLASS_EXTERN;
   ret_cp_ty = cast_to_TY(t_TY(result_type)) ;
@@ -678,13 +684,15 @@ if (Class ==  PDGCS_Proc_Imported &&
  
   st_local_cp->u2.type =(TY_IDX)pu_cp_idx ;
   Set_ST_ofst(st_local_cp, 0);
+
+  if (!declared_in_model)
+      Set_ST_base(st_local_cp,st);
+  else Set_ST_is_in_module(st_local_cp);
 }
     
   if (sym_class == F90_Module){
     Set_ST_emit_symbol(st);
-    Set_ST_emit_symbol(st_local_cp);
     Set_ST_is_in_module(st);
-    Set_ST_is_in_module(st_local_cp);
    } 
 
   if (test_flag(flags, FEI_PROC_HASRSLT))
