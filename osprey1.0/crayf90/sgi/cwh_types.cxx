@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.15 $
- * $Date: 2003-06-24 22:11:54 $
+ * $Revision: 1.16 $
+ * $Date: 2003-06-25 16:27:49 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.15 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.16 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -354,11 +354,6 @@ fei_array_dimen(INT32  flag_bits,
   }
  }
 
-//   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_STAR_UB)) {
-//        Clear_ARB_const_ubnd(p);
-//     Set_ARB_star_ubnd(p);
-//    }  March
-
 
   /* set pragma on extent, for MP/LNO, doesn't go into ARB */
 
@@ -374,20 +369,13 @@ fei_array_dimen(INT32  flag_bits,
 	cwh_types_copyin_pragma(st);
     }
   }
-// else {
-//    if (test_flag(flag_bits,FEI_ARRAY_DIMEN_EMPTY_EXT)) 
-//      Set_ARB_empty_xt(p);
-//   }       
 
   /* update stride - the argument is the bitsize of the */
   /* current axis, but a TY has the size of an element  */
   /* so save the bitsize till next dimension. If stride */
   /* isn't constant bitsize becomes 0, and the TY tree  */
   /* seems to require the element size */
-// if (test_flag(flag_bits,FEI_ARRAY_DIMEN_EMPTY_UB)) {
-//     Set_ARB_empty_stride(p); 
-//     Clear_ARB_const_stride(p);
-//  } else {
+
   if (axis == 1) {
      
      ty_dim1 = cast_to_TY(t_TY(span_type)) ;
@@ -410,7 +398,6 @@ fei_array_dimen(INT32  flag_bits,
 	Set_ARB_stride_val(p, ARB_stride_val(decl_bounds[0]));
      }
   }
-//  }
   
   last_bitsize = bitsize ;
 
@@ -496,11 +483,6 @@ fei_co_array_dimen(INT32  flag_bits,
   }
 
   co_top_decl_bounds = axis;
-//  if (top_of_decl_bounds != ANULL)
-//     top_of_decl_bounds = top_of_decl_bounds + co_top_decl_bounds;
-//  else 
-//     top_of_decl_bounds = co_top_decl_bounds-1;
-
 
   flow_dependent = test_flag(flag_bits,FEI_ARRAY_DIMEN_FLOW_DEPENDENT);
 
@@ -1280,27 +1262,13 @@ if (co_top_decl_bounds != ANULL) {
       }
   }
 
-
-// June
-
   Set_ARB_first_dimen(bounds[0]);
- if (co_top_decl_bounds == ANULL)
-       Set_ARB_last_dimen(bounds[n-1]);
- else   
-       Set_ARB_last_dimen(bounds[n-1]);
-//       Set_ARB_last_dimen(bounds[top_of_decl_bounds-co_top_decl_bounds]);
+  Set_ARB_last_dimen(bounds[n-1]);
 
-//  if ( const_str ) {
-  if ( const_str && size!=0) {
-    
-    Set_TY_size(ty_idx, size);
-
-  } else {
-
-//    Set_TY_size(ty_idx, 0);
-    Set_TY_size(ty_idx, 4); //need handle pointer in derived type
-
-  }
+  if ( const_str && size!=0) 
+        Set_TY_size(ty_idx, size);
+  else 
+        Set_TY_size(ty_idx, 4); //need handle pointer in derived type
 
 /*
  * move the function call "cwh_types_unique_TY" to fei_descriptor
@@ -1310,7 +1278,6 @@ if (co_top_decl_bounds != ANULL) {
  * ----fzhao
  */
 //  ty_idx = cwh_types_unique_TY(ty_idx);
-
 
 
   return (ty_idx);
