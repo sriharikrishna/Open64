@@ -459,6 +459,7 @@ ARB_Init (ARB_HANDLE arb_h, INT64 lbnd, INT64 ubnd, INT64 stride)
    ARB * arb = arb_h.Entry();
    arb->flags = ARB_CONST_LBND | ARB_CONST_UBND | ARB_CONST_STRIDE;
    arb->dimension = 1;
+   arb->co_dimension = 0;
    arb->unused = 0;
    arb->u1.lbnd_val = lbnd;
    arb->u2.ubnd_val = ubnd;
