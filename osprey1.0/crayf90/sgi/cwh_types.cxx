@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.11 $
- * $Date: 2003-04-01 17:00:34 $
- * $Author: fzhao $
+ * $Revision: 1.12 $
+ * $Date: 2003-05-09 23:10:31 $
+ * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.12 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -242,6 +242,18 @@ fei_descriptor (INT32        flag_matrix,
   return(t);
 }  
 
+extern "C" {
+void fei_init_global_vars();
+};
+
+void fei_init_global_vars()
+{
+  top_of_decl_bounds = ANULL;
+  co_top_decl_bounds = ANULL;
+}
+
+
+
 /*===================================================
  *
  * fei_array_dimen
@@ -282,7 +294,6 @@ fei_array_dimen(INT32  flag_bits,
   hosted = test_flag(flag_bits,FEI_ARRAY_DIMEN_HOSTED_TYPE) || in_hosted_dtype ;
 
   top_of_decl_bounds = axis - 1 ;
-  co_top_decl_bounds = ANULL;
 
   if (top_of_decl_bounds == 0) {
      decl_bounds = New_ARB();
@@ -486,7 +497,7 @@ fei_co_array_dimen(INT32  flag_bits,
      p = New_ARB();
   }
 
-  co_top_decl_bounds = axis ;
+  co_top_decl_bounds = axis;
 //  if (top_of_decl_bounds != ANULL)
 //     top_of_decl_bounds = top_of_decl_bounds + co_top_decl_bounds;
 //  else 

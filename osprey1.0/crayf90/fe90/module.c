@@ -240,6 +240,8 @@ static	void	update_intrinsic (int);
 static	boolean	srch_elf_file_for_module_tbl(int, int);
 # endif
 
+static char * module_suffix_fix = ".mod-whirl";
+
 
 /***********************************\
 |* Globals used only in this file  *|
@@ -681,7 +683,7 @@ extern	void	create_mod_info_file(void)
          else {
             strcpy(&(mod_file_name[0]), AT_OBJ_NAME_PTR(module_attr_idx));
          }
-         strcat(mod_file_name, ".mod");
+         strcat(mod_file_name, module_suffix_fix);
          TBL_REALLOC_CK(file_path_tbl, 1);
          CLEAR_TBL_NTRY(file_path_tbl, file_path_tbl_idx);
 
@@ -9973,7 +9975,7 @@ static	void	find_files_in_directory(int	dir_idx)
  * that .mod file and retrieve that module ***.
  * So, we need to add -em flag even when compiling such files!
  */
-            else if (on_off_flags.module_to_mod && EQUAL_STRS(suffix, ".mod")) {
+            else if (on_off_flags.module_to_mod && EQUAL_STRS(suffix, module_suffix_fix)) {
                mod_file	= TRUE;
                okay	= TRUE;
             }
