@@ -2289,6 +2289,10 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
         break;
 
       case OPR_PAREN:
+	// [RTYPE] : f,i,z [DESC] : V
+        valid = Is_MTYPE_f_i_z [rtype] && desc == MTYPE_V;
+        break;
+	
       case OPR_RECIP:
       case OPR_RSQRT:
       case OPR_SQRT:
@@ -2613,6 +2617,10 @@ OPCODE_name (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       break;
 
     case OPR_PAREN:
+      // [RTYPE] : f,i,z [DESC] : V
+      sprintf (buffer, "OPC_%s%s", MTYPE_name(rtype), &OPERATOR_info [opr]._name [4]);
+      break;
+
     case OPR_RECIP:
     case OPR_RSQRT:
     case OPR_SQRT:
