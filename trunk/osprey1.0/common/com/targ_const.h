@@ -89,6 +89,7 @@
  * ====================================================================
  */
 
+#include <string.h> /* for memset() */
 
 #include "config_host.h"
 /* Include the target machine type IDs: */
@@ -225,7 +226,7 @@ typedef struct TCON TCON;
 #define TCON_add_null(c)	((c).flags & TCON_ADD_NULL)
 #define Set_TCON_add_null(c)	((c).flags |= TCON_ADD_NULL)
 
-#define TCON_clear(c)	bzero (&c, sizeof(TCON))
+#define TCON_clear(c)	memset (&c, '\0', sizeof(TCON))
 
 
 /* ====================================================================

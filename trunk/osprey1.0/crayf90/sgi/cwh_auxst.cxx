@@ -36,9 +36,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:07 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-11-28 23:04:08 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.cxx,v $
  *
  * Revision history:
@@ -66,8 +66,10 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
+
+#include <string.h> /* for memset() */
 
 /* general compiler includes */
 
@@ -173,7 +175,7 @@ cwh_auxst_find(ST *st, BOOL create)
     if (create) {
       o = (AUXST *) malloc(sizeof(AUXST));
 
-      bzero(o,sizeof(AUXST));
+      memset(o, '\0', sizeof(AUXST));
 
       AUXST_OwningST(o)= st ;
       AUXST_Next(o)    = Top_Auxst[ST_level(st)];
