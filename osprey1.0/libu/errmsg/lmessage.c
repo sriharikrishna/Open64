@@ -61,7 +61,7 @@
 
 # include <tapereq.h>
 
- extern	char	**_argv;
+  extern char	**_argv;
 # define CMDNAME (*_argv)
 
 #else
@@ -74,6 +74,7 @@
 # define CMDNAME ""
 
 #endif
+
 
 /*
  *	_lmessage - run-time library message processor
@@ -206,9 +207,9 @@ _lmessage(int errn, char *severity, va_list args)
 		/* not the lib message catalog, open catalog */
 		mcfd	= catopen(mcnm, 0);
 	}
-#else	/* __sgi */
+#else
 	mcfd	= catopen(mcnm, 0);
-#endif	/* __sgi */
+#endif
 
 	/* Retrieve the raw message text */
 
