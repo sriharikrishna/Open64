@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.14 $
- * $Date: 2002-09-25 21:47:22 $
+ * $Revision: 1.15 $
+ * $Date: 2002-10-09 18:40:02 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.14 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.15 $";
 #endif
 
 #include <alloca.h>
@@ -1259,7 +1259,7 @@ public:
 //     nomodulevar = (strstr(stbasename,scope_name)==NULL &&
 //                    strstr(scope_name,stbasename)==NULL );
 
-       nomodulevar = strcmp(stbasename,scope_name);
+       nomodulevar = !ST_is_in_module(st)||strcmp(stbasename,scope_name);
   
      if (ST_class(st)==CLASS_TYPE) 
         if (!TY_is_external(ST_type(st))){
@@ -1271,7 +1271,9 @@ public:
          }
         else
             return;
- 
+
+int ffmm1=BE_ST_w2fc_referenced(st);
+int ffmm2 = ST_has_nested_ref(st); 
 
      if (!BE_ST_w2fc_referenced(st) && !ST_has_nested_ref(st)
             && !ST_is_in_module(st)   
