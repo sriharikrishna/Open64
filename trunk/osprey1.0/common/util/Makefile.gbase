@@ -39,16 +39,18 @@
 include	$(COMMONDEFS)
 
 ifeq ($(BUILD_VARIANT), DEBUG)
-HOSTDEFS += -DIs_True_On
-HOSTDEFS += -DInsist_On 
+  HOSTDEFS += -DIs_True_On
+  HOSTDEFS += -DInsist_On 
 endif
 
 ifeq ($(BUILD_COMPILER), VENDOR)
-CVERSION = -xansi
-WOFF = -fullwarn
+  ifeq ($(BUILD_OS), IRIX)
+    CVERSION = -xansi
+    WOFF = -fullwarn
+  endif
 else
-CVERSION =
-WOFF =
+  CVERSION =
+  WOFF =
 endif
 
 LASOPTS = $(STD_COMPILE_OPTS)
@@ -57,9 +59,9 @@ LCDEFS += $(HOSTDEFS) $(TARGDEFS)
 LCXXOPTS = $(STD_COMPILE_OPTS)
 LCXXDEFS += $(HOSTDEFS) $(TARGDEFS)
 
-ifneq ($(BUILD_COMPILER), VENDOR)
-LCOPTS   += -fwritable-strings
-LCXXOPTS += -fwritable-strings
+ifeq ($(BUILD_COMPILER), GNU)
+  LCOPTS   += -fwritable-strings
+  LCXXOPTS += -fwritable-strings
 endif
 
 #--------------------------------------------------------------------------
@@ -73,7 +75,7 @@ LCINCS = -I$(BUILD_BASE) -I$(COMMON_COM_DIR) -I$(COMMON_COM_TARG_DIR) \
 	-I$(INCLUDE_DIR)
 
 ifeq ($(BUILD_OS), LINUX)
-LCINCS += -I$(BUILD_AREA)/include
+  LCINCS += -I$(BUILD_AREA)/include
 endif
 
 LCXXINCS = $(LCINCS)
@@ -84,7 +86,7 @@ TARGETS = $(LIBRARY)
 
 # only build mips3 version and install in default place
 ifeq ($(BUILD_TARGET), MIPS)
-STD_LIBRARY_LOC=$(DEF_LIBRARY_LOC)
+  STD_LIBRARY_LOC=$(DEF_LIBRARY_LOC)
 endif
 
 
@@ -161,27 +163,28 @@ CXXFILES = \
 #--------------------------------------------------------------------------
 
 ifeq ($(BUILD_OS), IRIX)
- ifeq ($(BUILD_COMPILER), VENDOR)
- WOFF = -woff 1164,1196,1174,1209,1233,1506,1552,3201
- endif
- CFLAGS += -D_SGI_SGI
- CXXFLAGS += -D_SGI_SGI
+  ifeq ($(BUILD_COMPILER), VENDOR)
+    WOFF = -woff 1164,1196,1174,1209,1233,1506,1552,3201
+  endif
+  CFLAGS += -D_SGI_SGI
+  CXXFLAGS += -D_SGI_SGI
 endif
 
-ifeq ($(BUILD_OS), LINUX)
- CFLAGS += -D_LINUX_LINUX
- CXXFLAGS += -D_LINUX_LINUX
+ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
+  CFLAGS += -D_LINUX_LINUX
+  CXXFLAGS += -D_LINUX_LINUX
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
-CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS $(LCINCS) $(OPTIMIZER)
- ifeq ($(BUILD_COMPILER), VENDOR)
- ifeq ($(BUILD_SB), YES)
- CFLAGS += -xsb
- endif
- endif
-CXXFLAGS := $(CFLAGS)
+  CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS $(LCINCS) $(OPTIMIZER)
+  ifeq ($(BUILD_COMPILER), VENDOR)
+  ifeq ($(BUILD_SB), YES)
+    CFLAGS += -xsb
+  endif
+  endif
+  CXXFLAGS := $(CFLAGS)
 endif
+
 #--------------------------------------------------------------------------
 
 VPATH =  $(BUILD_BASE) $(BUILD_BASE)/$(BUILD_TARGET_DIR)

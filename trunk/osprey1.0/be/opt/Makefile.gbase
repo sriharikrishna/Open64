@@ -250,7 +250,7 @@ BACK_END_OBJS = $(BACK_END_SRCS:.c=.o)
 BACK_END_CXX_OBJS   = $(BACK_END_CXX_SRCS:.cxx=.o)
 
 # extra files to be removed with make clobber
-LDIRT = ii_files *.pch
+LDIRT = *.pch
 
 VPATH    =  $(WOPT_DIRS)
 

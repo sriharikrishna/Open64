@@ -182,7 +182,7 @@ PROMPF_ANL_CXX_OBJS = $(PROMPF_ANL_CXX_SRCS:.cxx=.o)
 PROMPF_ANL_DSOS = $(TARGDIR)/be/be.so 
 
 # extra files to be removed with make clobber
-LDIRT += ii_files
+LDIRT += 
 
 
 VPATH    =  $(SRC_DIRS)

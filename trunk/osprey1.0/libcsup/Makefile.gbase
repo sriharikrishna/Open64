@@ -43,9 +43,9 @@
 include $(COMMONDEFS)
 
 ifeq ($(BUILD_COMPILER), EDG)
-CVERSION = -xansi
+  CVERSION = -xansi
 else
-CVERSION =
+  CVERSION =
 endif
 
 LCINCS   = -I$(BUILD_BASE)/include

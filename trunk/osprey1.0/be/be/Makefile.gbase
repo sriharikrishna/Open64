@@ -80,34 +80,38 @@ include $(COMMONDEFS)
 #----------------------------------------------------------------------
 
 ifeq ($(BUILD_COMPILER), VENDOR)
-CVERSION = -xansi
-WOFF     = -fullwarn
-WOFF2    = -woff 1172,3260
+  ifeq ($(BUILD_OS), IRIX)
+    CVERSION = -xansi
+    WOFF     = -fullwarn
+    WOFF2    = -woff 1172,3260
+    HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE # for compilation with -ansi
+  endif
 else
-CVERSION =
-WOFF     =
-WOFF2    =
+  CVERSION =
+  WOFF     =
+  WOFF2    =
+  HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE # for compilation with -ansi
 endif
 
 ifdef LOCAL_BE_DIR
-TARG_BE_DIR = $(TARGDIR)/$(LOCAL_BE_DIR)
+  TARG_BE_DIR = $(TARGDIR)/$(LOCAL_BE_DIR)
 else
-TARG_BE_DIR = $(TARGDIR)/be
+  TARG_BE_DIR = $(TARGDIR)/be
 endif
 ifdef LOCAL_WOPT_DIR
-TARG_WOPT_DIR = $(TARGDIR)/$(LOCAL_WOPT_DIR)
+  TARG_WOPT_DIR = $(TARGDIR)/$(LOCAL_WOPT_DIR)
 else
-TARG_WOPT_DIR = $(TARGDIR)/wopt
+  TARG_WOPT_DIR = $(TARGDIR)/wopt
 endif
 ifdef LOCAL_CG_DIR
-TARG_CG_DIR = $(TARGDIR)/$(LOCAL_CG_DIR)
+  TARG_CG_DIR = $(TARGDIR)/$(LOCAL_CG_DIR)
 else
-TARG_CG_DIR = $(TARGDIR)/cg
+  TARG_CG_DIR = $(TARGDIR)/cg
 endif
 ifdef LOCAL_TARG_INFO_DIR
-TARG_TARG_INFO_DIR = $(TARGDIR)/$(LOCAL_TARG_INFO_DIR)
+  TARG_TARG_INFO_DIR = $(TARGDIR)/$(LOCAL_TARG_INFO_DIR)
 else
-TARG_TARG_INFO_DIR = $(TARGDIR)/targ_info
+  TARG_TARG_INFO_DIR = $(TARGDIR)/targ_info
 endif
 
 TARG_COMUTIL_DIR = $(TARGDIR)/libcomutil
@@ -122,21 +126,19 @@ HOSTDEFS += -Dlonglong
 HOSTDEFS += -DSTD_MONGOOSE_LOC='"$(STD_MONGOOSE_LOC)"' 
 HOSTDEFS += -DMONGOOSE_BE
 
-# need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
-HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
 HOSTDEFS += -D_NEW_SYMTAB
 ifeq ($(BUILD_TARGET), IA64)
-HOSTDEFS += -D__MIPS_AND_IA64_ELF_H
+  HOSTDEFS += -D__MIPS_AND_IA64_ELF_H
 endif
 ifeq ($(BUILD_TARGET), IA32)
-HOSTDEFS += -D__MIPS_AND_IA64_ELF_H
+  HOSTDEFS += -D__MIPS_AND_IA64_ELF_H
 endif
 
 ifeq ($(BUILD_VARIANT), DEBUG)
-HOSTDEFS += -DIs_True_On
+  HOSTDEFS += -DIs_True_On
 endif
 ifeq ($(BUILD_PCH), USE_PCH)
-HOSTDEFS += -DUSE_PCH 
+  HOSTDEFS += -DUSE_PCH 
 endif
 
 TARG_INFO_INC_DIR = $(TARG_TARG_INFO_DIR)
@@ -154,9 +156,9 @@ BE_COM_DIR 		= $(BE_DIR)/com
 BE_COM_TARG_DIR		= $(BE_COM_DIR)/ia64
 BE_REGION_DIR 		= $(BE_DIR)/region
 ifdef LOCAL_OPT_DIR
-BE_OPT_DIR 		= $(BE_DIR)/$(LOCAL_OPT_DIR)
+  BE_OPT_DIR 		= $(BE_DIR)/$(LOCAL_OPT_DIR)
 else
-BE_OPT_DIR 		= $(BE_DIR)/opt
+  BE_OPT_DIR 		= $(BE_DIR)/opt
 endif
 BE_LNO_DIR		= $(BE_DIR)/lno
 BE_WHIRL2C_DIR		= $(BE_DIR)/whirl2c
@@ -305,9 +307,9 @@ COMMON_COM_PCH_CXX_SRCS = \
   xstats.cxx            
 
 ifeq ($(BUILD_PCH), USE_PCH)
-COMMON_COM_PCH_OBJS=$(COMMON_COM_PCH_CXX_SRCS:.cxx=.o)
+  COMMON_COM_PCH_OBJS=$(COMMON_COM_PCH_CXX_SRCS:.cxx=.o)
 else
-COMMON_COM_CXX_SRCS += $(COMMON_COM_PCH_CXX_SRCS)
+  COMMON_COM_CXX_SRCS += $(COMMON_COM_PCH_CXX_SRCS)
 endif 
 
 COMMON_COM_TARG_SRCS =	\
@@ -424,9 +426,9 @@ BE_COM_PCH_CXX_SRCS = 	\
   $(DERIVED_SRCS)
 
 ifeq ($(BUILD_PCH), USE_PCH)
-BE_COM_PCH_OBJS=$(BE_COM_PCH_CXX_SRCS:.cxx=.o)
+  BE_COM_PCH_OBJS=$(BE_COM_PCH_CXX_SRCS:.cxx=.o)
 else
-BE_COM_CXX_SRCS += $(BE_COM_PCH_CXX_SRCS)
+  BE_COM_CXX_SRCS += $(BE_COM_PCH_CXX_SRCS)
 endif 
 
 BE_COM_TARG_CXX_SRCS =  \
@@ -496,7 +498,7 @@ CFILES = $(BE_C_SRCS)
 CXXFILES = $(BE_CXX_SRCS) $(BE_DRIVER_CXX_SRCS)
 
 # extra files to be removed with make clobber
-LDIRT += ii_files so_locations  *.pch
+LDIRT += so_locations *.pch be.so.Exported
 
 
 #----------------------------------------------------------------------
@@ -507,11 +509,11 @@ HEADER_DIRS += $(BUILD_TOT)/include
 LCINCS = $(addprefix -I, $(HEADER_DIRS))
 
 ifeq ($(BUILD_OS), LINUX)
-LCINCS += -I$(BUILD_AREA)/include -I$(BUILD_AREA)/include/libelf
+  LCINCS += -I$(BUILD_AREA)/include -I$(BUILD_AREA)/include/libelf
 endif
 
 ifneq ($(STL_EXT_PATH),)
-LCINCS += -I$(STL_EXT_PATH)
+  LCINCS += -I$(STL_EXT_PATH)
 endif
 
 LCXXINCS := $(LCINCS)
@@ -522,8 +524,8 @@ LCXXINCS := $(LCINCS)
 #----------------------------------------------------------------------
 LCOPTS += $(STD_COMPILE_OPTS)
 ifneq ($(BUILD_COMPILER), VENDOR)
-LCOPTS += -fwritable-strings
-LC++OPTS += -fwritable-strings
+  LCOPTS += -fwritable-strings
+  LC++OPTS += -fwritable-strings
 endif
 LCDEFS = $(HOSTDEFS) $(TARGDEFS)
 
@@ -541,53 +543,65 @@ LASDEFS = $(HOSTDEFS) $(TARGDEFS)
 
 #DSOSTARTOPT = -update_registry $(TARG_BE_DIR)/so_locations -Wl,-no_unresolved
 ifeq ($(BUILD_COMPILER), VENDOR)
-DSOSTARTOPT = -check_registry $(TARG_BE_DIR)/so_locations -Wl,-no_unresolved
+ifeq ($(BUILD_OS), IRIX)
+  DSOSTARTOPT = -check_registry $(TARG_BE_DIR)/so_locations -Wl,-no_unresolved
+endif
 else
-DSOSTARTOPT = 
+  DSOSTARTOPT = 
 endif
 #DSOSTARTOPT = -Wl,-no_unresolved
 DSOSTARTOPT_N32 = $(DSOSTARTOPT)
 DSOSTARTOPT_32 = $(DSOSTARTOPT)
-ifeq ($(BUILD_OS), IRIX)
-BE_DSO_OPTS =  -none -lm -lgen
-else
-BE_DSO_OPTS =  -lm -ldl
+
+BE_SYS_LIBS = -lm
+ifeq ($(filter IRIX SOLARIS, $(BUILD_OS)), $(BUILD_OS))
+  BE_SYS_LIBS += -lgen
+endif
+ifeq ($(filter SOLARIS LINUX, $(BUILD_OS)), $(BUILD_OS))
+  # CYGWIN piggy-backs upon Linux
+  ifndef BUILD_OS_CYGWIN
+    BE_SYS_LIBS += -ldl
+  endif
+endif
+
+BE_DSO_OPTS = $(BE_SYS_LIBS)
 ifeq ($(BUILD_HOST), IA64)
 ifeq ($(BUILD_COMPILER), SGI)
-BE_DSO_OPTS += -Wl,-relax
-LDFLAGS += -Wl,-relax
-endif
+  BE_DSO_OPTS += -Wl,-relax
+  LDFLAGS += -Wl,-relax
 endif
 endif
 
+
 ifeq ($(BUILD_COMPILER), VENDOR)
-EXPORT_FILE_BE_SO = be.so.Exported
-EXPORT_FILE_BE_SO_SRCS = $(BE_BE_DIR)/be.so.Exported $(TARG_INFO_INC_DIR)/targinfo.Exported
-EXPORT_FILE_BE = $(BE_BE_DIR)/be.Exported
-LDIRT += $(EXPORT_FILE)
-EXPORT_LIST_BE_SO = -exports_file $(EXPORT_FILE_BE_SO)
-EXPORT_LIST_BE = -exports_file $(EXPORT_FILE_BE)
+  EXPORT_FILE_BE_SO = be.so.Exported
+  EXPORT_FILE_BE_SO_SRCS = $(BE_BE_DIR)/be.so.Exported \
+	$(TARG_INFO_INC_DIR)/targinfo.Exported
+  EXPORT_FILE_BE = $(BE_BE_DIR)/be.Exported
+  LDIRT += $(EXPORT_FILE)
+  EXPORT_LIST_BE_SO = -exports_file $(EXPORT_FILE_BE_SO)
+  EXPORT_LIST_BE = -exports_file $(EXPORT_FILE_BE)
 else
-EXPORT_FILE_BE_SO =
-EXPORT_FILE_BE_SO_SRCS =
-EXPORT_FILE_BE =
-EXPORT_LIST_BE_SO =
-EXPORT_LIST_BE =
+  EXPORT_FILE_BE_SO =
+  EXPORT_FILE_BE_SO_SRCS =
+  EXPORT_FILE_BE =
+  EXPORT_LIST_BE_SO =
+  EXPORT_LIST_BE =
 endif
 ifdef LOCAL_BE_LIBS
-BE_DSO_OPTS += $(LOCAL_BE_LIBS)
-LDFLAGS += $(LOCAL_BE_LIBS)
+  BE_DSO_OPTS += $(LOCAL_BE_LIBS)
+  LDFLAGS += $(LOCAL_BE_LIBS)
 endif
 
 ifeq ($(BUILD_VARIANT), MEM_STATS)
-BE_DSO_OPTS +=  -lmalloc
-LDFLAGS += -lmalloc
+  BE_DSO_OPTS +=  -lmalloc
+  LDFLAGS += -lmalloc
 endif
 
 ifeq ($(BUILD_VARIANT), LICENSING)
 ifeq ($(BUILD_OS), IRIX)
-LCDEFS += -DCOMPILER_LICENSING
-BE_DSO_OPTS +=  -llmsgi
+  LCDEFS += -DCOMPILER_LICENSING
+  BE_DSO_OPTS +=  -llmsgi
 endif
 endif
 
@@ -602,13 +616,13 @@ BE_DSO = $(addsuffix $(DSOext), be)
 
 
 ifeq ($(BUILD_VARIANT), BEDRIVER)
-TARGETS = $(BE_EXE)
+  TARGETS = $(BE_EXE)
 else
- ifeq ($(BUILD_OS), IRIX)
-TARGETS = $(BE_DSO)
- else
-TARGETS = $(BE_DSO)
- endif
+  ifeq ($(BUILD_OS), IRIX)
+    TARGETS = $(BE_DSO)
+  else
+    TARGETS = $(BE_DSO)
+  endif
 endif
 
 #----------------------------------------------------------------------
@@ -620,13 +634,13 @@ LLDLIBS =
 # while building cg.so . This is needed by the linker on linux.
 # So, arbitrarily pick one of the target .so's to define TARGET_SO.
 ifeq ($(BUILD_TARGET), MIPS)
-TARGET_SO = $(addsuffix $(DSOext), r10000)
+  TARGET_SO = $(addsuffix $(DSOext), r10000)
 endif
 ifeq ($(BUILD_TARGET), IA64)
-TARGET_SO = $(addsuffix $(DSOext), itanium)
+  TARGET_SO = $(addsuffix $(DSOext), itanium)
 endif
 ifeq ($(BUILD_TARGET), IA32)
-TARGET_SO = $(addsuffix $(DSOext), pentium)
+  TARGET_SO = $(addsuffix $(DSOext), pentium)
 endif
 
 
@@ -647,43 +661,52 @@ endif
 #endif
 
 ifeq ($(BUILD_OS), IRIX)
-CFLAGS += -D_SGI_SGI
-CXXFLAGS += -D_SGI_SGI 
- ifeq ($(BUILD_COMPILER), VENDOR)
- CFLAGS += -woff 1174,1209,3201
- CXXFLAGS += -woff 1174,1209,3201
- else
- CFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
- CXXFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
- endif
+  CFLAGS += -D_SGI_SGI
+  CXXFLAGS += -D_SGI_SGI 
+  ifeq ($(BUILD_COMPILER), VENDOR)
+    CFLAGS += -woff 1174,1209,3201
+    CXXFLAGS += -woff 1174,1209,3201
+  else
+    CFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+    CXXFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+  endif
 endif
 
 ifeq ($(BUILD_OS), LINUX)
-CFLAGS  += -D_LINUX_LINUX
-CXXFLAGS += -D_LINUX_LINUX 
+  CFLAGS  += -D_LINUX_LINUX
+  CXXFLAGS += -D_LINUX_LINUX 
 endif
 
 ifeq ($(BUILD_COMPILER), GNU)
-#Most of the files are using old C++ headers, and we do not warn about them for now
-#In the future we may want to change them to the new standard c++ headers
-#This is applied to all makefiles in the backend
-CXXFLAGS += -Wno-deprecated
+  # Most of the files are using old C++ headers, and we do not warn
+  # about them for now In the future we may want to change them to the
+  # new standard c++ headers This is applied to all makefiles in the
+  # backend
+  CXXFLAGS += -Wno-deprecated
 endif
 
 ifeq ($(BUILD_OS), SOLARIS) 
-CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END -DMONGOOSE_BE \
+  CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END \
+	-DMONGOOSE_BE \
 	-D_LONGLONG -Dlonglong -D_SVR4_SOURCE -D_NEW_SYMTAB -DTARG_SOLARIS \
 	$(LCINCS) $(OPTIMIZER)
- ifeq ($(BUILD_COMPILER), VENDOR)
- CFLAGS += -KPIC
- ifeq ($(BUILD_SB), YES)
- CFLAGS += -xsb
- endif
- endif
- ifeq ($(BUILD_COMPILER), GNU)
- CFLAGS += -D__GNU_BUG_WORKAROUND -fPIC 
- endif
-CXXFLAGS = $(CFLAGS) -w
+  ifeq ($(BUILD_COMPILER), VENDOR)
+    CFLAGS += -KPIC
+    ifeq ($(BUILD_SB), YES)
+      CFLAGS += -xsb
+    endif
+  endif
+  ifeq ($(BUILD_COMPILER), GNU)
+    CFLAGS += -D__GNU_BUG_WORKAROUND -fPIC 
+  endif
+  CXXFLAGS = $(CFLAGS) -w
+endif
+
+ifeq ($(BUILD_OS), TRU64)
+ifeq ($(BUILD_COMPILER), GNU)
+  CFLAGS += -D__GNU_BUG_WORKAROUND
+  CXXFLAGS += -D__GNU_BUG_WORKAROUND
+endif
 endif
 
 #------------------------------------------------------------------------
@@ -691,11 +714,15 @@ endif
 
 VPATH    =  $(SRC_DIRS)  
 
-ifeq ($(BUILD_COMPILER), VENDOR)   
-default: preg_list.h first depends so_locations derived_files $(TARGETS) last
-else
-default: preg_list.h first depends derived_files $(TARGETS) last
+DEFAULT_PREREQS = preg_list.h first depends 
+ifeq ($(BUILD_COMPILER), VENDOR)
+ifeq ($(filter IRIX SOLARIS, $(BUILD_OS)), $(BUILD_OS))
+  DEFAULT_PREREQS += so_locations
 endif
+endif
+DEFAULT_PREREQS += derived_files $(TARGETS) last
+
+default: $(DEFAULT_PREREQS)
 
 #----------------------------------------------------------------------
 #  The commands in this section are done BEFORE any other target is
@@ -809,13 +836,12 @@ endif
 #-----------------------------------------------------------------------
 WHIRL2F_DSO = $(addsuffix $(DSOext), whirl2f)
 
-ifdef BUILD_OS_CYGWIN
-LIB_DL =# cannot specify -ldl on cygwin
-else
-LIB_DL = -ldl
-endif
 
 ifeq ($(BUILD_COMPILER), VENDOR)
+
+ifeq ($(BUILD_OS), SOLARIS)
+  BE_SPECIAL_OPT = -R.
+endif
 
 #-------------------------------------------------
 # VENDOR
@@ -824,14 +850,9 @@ $(BE_EXE):  $(BE_DSO) $(BE_DRIVER_OBJS) $(LINK_DSO) $(EXPORT_FILE_BE)
 	if test ! -r $(WHIRL2F_DSO); then \
 	  ln -f -s $(TARGDIR)/whirl2f/$(WHIRL2F_DSO) $(WHIRL2F_DSO); \
 	fi
-ifeq ($(BUILD_OS), SOLARIS)
-	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) -R. $(BE_DSO) $(WHIRL2F_DSO) \
-	  $(LDFLAGS) $(LINK_DSO_OPTS) $(LINK_DSO) $(LIB_DL) -lgen
-endif
-ifeq ($(BUILD_OS), IRIX)
-	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) $(BE_DSO) $(WHIRL2F_DSO) \
-	  $(LDFLAGS) $(LINK_DSO_OPTS) $(LINK_DSO) $(LIB_DL) -lgen
-endif
+	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) $(BE_SPECIAL_OPT) \
+	  $(BE_DSO) $(WHIRL2F_DSO) $(LDFLAGS) $(LINK_DSO_OPTS) \
+	  $(LINK_DSO) $(BE_SYS_LIBS)
 	-rm -f bedriver
 #	if [ ! -l wopt.so ]; then ln -sf $(TARG_WOPT_DIR)/wopt.so .; fi
 #	if [ ! -l cg.so ]; then ln -sf $(TARG_CG_DIR)/cg.so .; fi
@@ -883,7 +904,7 @@ $(BE_EXE): $(BE_DRIVER_OBJS) $(LINK_DSO) $(EXPORT_FILE_BE)
 #	fi
 # endif
 	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) $(BE_DSO) $(WHIRL2F_DSO) \
-	  $(LDFLAGS) $(LINK_DSO_OPTS) $(LINK_DSO) $(LIB_DL)
+	  $(LDFLAGS) $(LINK_DSO_OPTS) $(LINK_DSO) $(BE_SYS_LIBS)
 endif
 
 
@@ -921,7 +942,13 @@ else
 # (which is "-export_file be.so.Exported", causing link error).
 #-------------------------------------------------
 
-BE_DSO_COMMON_LIBS = $(BE_C_OBJS) $(BE_CXX_OBJS) $(BE_AS_OBJS) \
+ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
+  # The addition of itanium.o below is a temporary measure to avoid the
+  # (dynamically) unresolved SI_* symbols. This way, the are pre-linked
+  # into the be.so. 
+  BE_DSO_COMMON_LIBS += ../targ_info/itanium.o
+endif
+BE_DSO_COMMON_LIBS += $(BE_C_OBJS) $(BE_CXX_OBJS) $(BE_AS_OBJS) \
                      $(TARG_COMUTIL_DIR)/libcomutil.a \
                      $(TARG_INFO_LIB_DIR)/libtarginfo.a \
                      $(LINK_TARGET_SO)
@@ -931,17 +958,9 @@ ifeq ($(BUILD_OS), SOLARIS)
 	$(C++F) $(STD_DSO_LOADOPTS) $(BE_DSO_COMMON_LIBS) \
 	  -G -o $@ $(BE_DSO_OPTS)
 else
-ifeq ($(BUILD_OS), IRIX)
-	$(C++F) $(BE_DSO_COMMON_LIBS) -shared -o $@ -lm -lgen
-else # linux
-#       The addition of itanium.o below is a temporary measure to avoid the
-#       (dynamically) unresolved SI_* symbols. This way, the are pre-linked
-#       into the be.so. 
-	$(C++F) ../targ_info/itanium.o $(BE_DSO_COMMON_LIBS) -shared -o $@ -lm
+	$(C++F) $(BE_DSO_COMMON_LIBS) -shared -o $@ $(BE_DSO_OPTS)
 endif
 endif
-endif
-
 
 #----------------------------------------------------------------------
 #  Include the usual commonrules
@@ -956,9 +975,9 @@ include $(COMMONRULES)
 	$(C++F) -c $(.IMPSRC)
 
 ifeq ($(BUILD_COMPILER), VENDOR)
-DSONAMEOPT = -soname $(BE_DSO)
+  DSONAMEOPT = -soname $(BE_DSO)
 else
-DSONAMEOPT = -o $(BE_DSO)
+  DSONAMEOPT = -o $(BE_DSO)
 endif
 
 ## Purify versions:
@@ -986,4 +1005,4 @@ whirl2f:  $(BE_DSO) $(BE_DRIVER_OBJS) $(LINK_DSO) $(EXPORT_FILE_BE)
 	fi
 	$(C++F) -o whirl2f $(BE_DRIVER_OBJS) -R. $(BE_DSO) \
 	  -R../whirl2f ../whirl2f/$(WHIRL2F_DSO) \
-	  $(LDFLAGS) -lgen $(LINK_DSO_OPTS) $(LINK_DSO) $(LIB_DL)
+	  $(LDFLAGS) -lgen $(LINK_DSO_OPTS) $(LINK_DSO) $(BE_SYS_LIBS)

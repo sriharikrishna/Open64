@@ -255,7 +255,7 @@ IPA_OBJS = $(IPA_SRCS:.c=.o)
 IPA_ALL_OBJS = $(IPA_LD_CXX_OBJS) $(IPA_LD_OBJS) $(IPA_OBJS) $(IPA_CXX_OBJS)
 
 # extra files to be removed with make clobber
-LDIRT = ii_files be.so ipl.so
+LDIRT = be.so ipl.so
 
 VPATH    =  $(SRC_DIRS)
 

@@ -233,7 +233,7 @@ GLDOPTS = $(STD_LOAD_OPTS) $(LD_QUICKSTART_INFO)
 
 TARGETS = inline
 
-LDIRT = be.so ii_files
+LDIRT = be.so
 
 LLDLIBS = -lmangle -lgen
 

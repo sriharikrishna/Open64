@@ -53,11 +53,13 @@ include $(COMMONDEFS)
 #  Set environment variables
 #----------------------------------------------------------------------
 ifeq ($(BUILD_COMPILER), VENDOR)
-CVERSION = -xansi
-WOFF = -fullwarn
+  ifeq ($(BUILD_OS), IRIX)
+    CVERSION = -xansi
+    WOFF = -fullwarn
+  endif
 else
-CVERSION =
-WOFF =
+  CVERSION =
+  WOFF =
 endif
 
 RUN =
@@ -110,7 +112,7 @@ SRC_DIRS = \
 # File containing the list of symbols exported outside of si.so
 #----------------------------------------------------------------------
 ifeq ($(BUILD_COMPILER), VENDOR)
-SI_EXPORT_LIST = $(TARGINFO_GENERATE_DIR)/si.Exported
+  SI_EXPORT_LIST = $(TARGINFO_GENERATE_DIR)/si.Exported
 endif
 
 VPATH    =  $(SRC_DIRS)
@@ -126,10 +128,10 @@ LCXXINCS = $(addprefix -I, $(SRC_DIRS))
 # Optionally remove "-MDupdate Makedepend" so executables don't get
 # rebuilt every time LATEST libC etc. changes
 ifdef BUILD_EXEC_NO_MAKEDEPEND
-CXXLDFLAGS1 = $(CXXFLAGS:N-MDupdate) $(LDFLAGS)
-CXXLDFLAGS = $(CXXLDFLAGS1:NMakedepend)
+  CXXLDFLAGS1 = $(CXXFLAGS:N-MDupdate) $(LDFLAGS)
+  CXXLDFLAGS = $(CXXLDFLAGS1:NMakedepend)
 else
-CXXLDFLAGS = $(CXXFLAGS) $(LDFLAGS)
+  CXXLDFLAGS = $(CXXFLAGS) $(LDFLAGS)
 endif
 
 # setup stuff to build shared
@@ -166,7 +168,7 @@ LDIRT += *.[ch] *.Exported $(ISA_GEN_EXE) $(ISA_SUBSET_GEN_EXE) \
 	 $(ISA_DECODE_GEN_EXE) $(ISA_PSEUDO_GEN_EXE) $(ISA_REGISTERS_GEN_EXE) \
 	 $(ISA_ENUMS_GEN_EXE) $(ISA_LITS_GEN_EXE) $(ABI_PROPERTIES_GEN_EXE) \
 	 $(PROC_GEN_EXE) $(PROC_PROPERTIES_GEN_EXE) \
-	 $(ISA_BUNDLE_GEN_EXE) $(SI_GEN_DSO) ii_files so_locations
+	 $(ISA_BUNDLE_GEN_EXE) $(SI_GEN_DSO) si_gen.a so_locations
 
 
 #------------------------------------------------------------------------
@@ -179,30 +181,30 @@ ITANIUM_DSO = $(addsuffix $(DSOext), itanium)
 PENTIUM_SI_GEN_EXE = $(addsuffix $(EXEext), pentium_si_gen)
 
 ifeq ($(BUILD_TARGET), MIPS)
-LDIRT += r10000_si_gen r8000_si_gen r5000_si_gen r4000_si_gen 
-SO_TARGETS = 
+  LDIRT += r10000_si_gen r8000_si_gen r5000_si_gen r4000_si_gen 
+  SO_TARGETS = 
 endif
 ifeq ($(BUILD_TARGET), IA64)
-LDIRT += $(ITANIUM_SI_GEN_EXE)
-# We are now building the target so for linux (for LNO).
-ifeq ($(BUILD_OS), LINUX)
-SO_TARGETS = $(ITANIUM_DSO)
-else
-SO_TARGETS = 
-endif
+  LDIRT += $(ITANIUM_SI_GEN_EXE)
+  # We are now building the target so for linux (for LNO).
+  ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
+    SO_TARGETS = $(ITANIUM_DSO)
+  else
+    SO_TARGETS = 
+  endif
 endif
 ifeq ($(BUILD_TARGET), IA32)
-LDIRT += $(PENTIUM_SI_GEN_EXE)
-SO_TARGETS = 
+  LDIRT += $(PENTIUM_SI_GEN_EXE)
+  SO_TARGETS = 
 endif
 
 HDRS_LOC = /usr/include/cmplrs
 
 TARG_INFO_LIB = libtarginfo.a
 ifeq ($(BUILD_OS), LINUX)
-LIB_LOC = $(STD_MONGOOSE_LINUX_LOC)
+  LIB_LOC = $(STD_MONGOOSE_LINUX_LOC)
 else
-LIB_LOC = $(STD_MONGOOSE_LOC)
+  LIB_LOC = $(STD_MONGOOSE_LOC)
 endif
 
 TARGINFO_ACCESS_SRCS = \
@@ -247,13 +249,13 @@ TARGETS = \
 	$(TARG_INFO_LIB)
 
 ifneq ($(BUILD_COMPILER), VENDOR)
-TARGETS +=	si_gen.a
+  TARGETS +=	si_gen.a
 endif
 
 ifeq ($(BUILD_COMPILER), VENDOR)
-TARG_INFO_EXPORTED = $(TARG_INFO_SRCS:.c=.Exported)
-EXPORT_FILE = targinfo.Exported
-TARGETS += \
+  TARG_INFO_EXPORTED = $(TARG_INFO_SRCS:.c=.Exported)
+  EXPORT_FILE = targinfo.Exported
+  TARGETS += \
 	$(TARG_INFO_EXPORTED)	\
 	$(EXPORT_FILE)
 endif
@@ -269,26 +271,26 @@ LLDLIBS =
 #----------------------------------------------------------------------
 
 ifeq ($(BUILD_OS), IRIX)
- ifeq ($(BUILD_COMPILER), VENDOR)
- CFLAGS += -woff 1209,1552,3201
- CXXFLAGS += -woff 1209,1552,3201 
- endif
+ifeq ($(BUILD_COMPILER), VENDOR)
+  CFLAGS += -woff 1209,1552,3201
+  CXXFLAGS += -woff 1209,1552,3201 
+endif
 endif
 
 ifeq ($(BUILD_OS), LINUX)
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
-CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS $(LCINCS) $(OPTIMIZER)
- ifeq ($(BUILD_COMPILER), VENDOR)
- ifeq ($(BUILD_SB), YES)
- CFLAGS += -xsb
- endif
- CFLAGS += -D__inline=
- endif
- ifeq ($(BUILD_COMPILER), GNU)
- endif
-CXXFLAGS := $(CFLAGS)
+  CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS $(LCINCS) $(OPTIMIZER)
+  ifeq ($(BUILD_COMPILER), VENDOR)
+    ifeq ($(BUILD_SB), YES)
+      CFLAGS += -xsb
+    endif
+    CFLAGS += -D__inline=
+  endif
+  ifeq ($(BUILD_COMPILER), GNU)
+  endif
+  CXXFLAGS := $(CFLAGS)
 endif
 
 #----------------------------------------------------------------------
@@ -676,19 +678,20 @@ si_gen.o: si_gen.cxx si_gen.h topcode.h targ_isa_properties.h \
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/si_gen.cxx 
 
 ifeq ($(BUILD_COMPILER), VENDOR)
-si_gen.so: si_gen.cxx topcode.h si_gen.h targ_isa_operands.h \
+$(SI_GEN_DSO): si_gen.cxx topcode.h si_gen.h targ_isa_operands.h \
 	targ_isa_subset.o targ_isa_properties.o
 	$(CXX) $(CXXLDFLAGS) $(TARGINFO_GENERATE_DIR)/si_gen.cxx \
 	targ_isa_subset.o targ_isa_properties.o \
-	-shared -o si_gen.so -rpath $(CWD)
+	-shared -o $(SI_GEN_DSO) -rpath $(CWD)
 else
-si_gen.so: si_gen.o topcode.h si_gen.h targ_isa_operands.h \
+$(SI_GEN_DSO): si_gen.o topcode.h si_gen.h targ_isa_operands.h \
         targ_isa_operands.o targ_isa_properties.o targ_isa_registers.o \
 	targ_isa_subset.o targ_isa_enums.o targ_isa_lits.o
 	$(CXX) $(CXXLDFLAGS) si_gen.o \
 	targ_isa_subset.o targ_isa_properties.o targ_isa_operands.o \
 	targ_isa_registers.o targ_isa_enums.o targ_isa_lits.o \
-	-shared -o si_gen.so
+	-shared -o $(SI_GEN_DSO)
+endif
 
 si_gen.a: si_gen.o topcode.h si_gen.h targ_isa_operands.h \
         targ_isa_operands.o targ_isa_properties.o targ_isa_registers.o \
@@ -696,7 +699,6 @@ si_gen.a: si_gen.o topcode.h si_gen.h targ_isa_operands.h \
 	$(AR) rc si_gen.a si_gen.o \
 	targ_isa_subset.o targ_isa_properties.o targ_isa_operands.o \
 	targ_isa_registers.o targ_isa_enums.o targ_isa_lits.o 
-endif
 
 
 ifeq ($(BUILD_TARGET), MIPS)
@@ -712,8 +714,8 @@ r10000.o: r10000.c ti_si.h
 r10000.c: r10000_si_gen
 	$(RUN) ./r10000_si_gen
 
-r10000_si_gen: si_gen.so r10000_si.o topcode.o
-	$(CXX) $(CXXLDFLAGS) r10000_si.o topcode.o si_gen.so -o r10000_si_gen
+r10000_si_gen: $(SI_GEN_DSO) r10000_si.o topcode.o
+	$(CXX) $(CXXLDFLAGS) r10000_si.o topcode.o $(SI_GEN_DSO) -o r10000_si_gen
 
 r10000_si.o: r10000_si.cxx targ_isa_subset.h topcode.h si_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_PROC_DIR)/r10000_si.cxx
@@ -731,8 +733,8 @@ r8000.o: r8000.c ti_si.h
 r8000.c: r8000_si_gen
 	$(RUN) ./r8000_si_gen
 
-r8000_si_gen: si_gen.so r8000_si.o topcode.o
-	$(CXX) $(CXXLDFLAGS) r8000_si.o topcode.o si_gen.so -o r8000_si_gen
+r8000_si_gen: $(SI_GEN_DSO) r8000_si.o topcode.o
+	$(CXX) $(CXXLDFLAGS) r8000_si.o topcode.o $(SI_GEN_DSO) -o r8000_si_gen
 
 r8000_si.o: r8000_si.cxx targ_isa_subset.h topcode.h si_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_PROC_DIR)/r8000_si.cxx
@@ -750,8 +752,8 @@ r5000.o: r5000.c ti_si.h
 r5000.c: r5000_si_gen
 	$(RUN) ./r5000_si_gen
 
-r5000_si_gen: si_gen.so r5000_si.o topcode.o
-	$(CXX) $(CXXLDFLAGS) r5000_si.o topcode.o si_gen.so -o r5000_si_gen
+r5000_si_gen: $(SI_GEN_DSO) r5000_si.o topcode.o
+	$(CXX) $(CXXLDFLAGS) r5000_si.o topcode.o $(SI_GEN_DSO) -o r5000_si_gen
 
 r5000_si.o: r5000_si.cxx targ_isa_subset.h topcode.h si_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_PROC_DIR)/r5000_si.cxx
@@ -769,8 +771,8 @@ r4000.o: r4000.c ti_si.h
 r4000.c: r4000_si_gen
 	$(RUN) ./r4000_si_gen
 
-r4000_si_gen: si_gen.so r4000_si.o topcode.o
-	$(CXX) $(CXXLDFLAGS) r4000_si.o topcode.o si_gen.so -o r4000_si_gen
+r4000_si_gen: $(SI_GEN_DSO) r4000_si.o topcode.o
+	$(CXX) $(CXXLDFLAGS) r4000_si.o topcode.o $(SI_GEN_DSO) -o r4000_si_gen
 
 r4000_si.o: r4000_si.cxx targ_isa_subset.h topcode.h si_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_PROC_DIR)/r4000_si.cxx
@@ -779,14 +781,16 @@ endif
 
 ifeq ($(BUILD_TARGET), IA64)
 
- ifeq ($(BUILD_COMPILER), VENDOR)
-$(ITANIUM_DSO): itanium.o $(SI_EXPORT_LIST)
-	$(CC) $(CFLAGS) $(STD_DSO_LOADOPTS) -exports_file $(SI_EXPORT_LIST) \
-               itanium.o -o $(ITANIUM_DSO)
- else
-$(ITANIUM_DSO): itanium.o
-	$(CC) $(CFLAGS) $(STD_DSO_LOADOPTS) itanium.o -shared -o $(ITANIUM_DSO)
- endif
+  ifeq ($(BUILD_COMPILER), VENDOR)
+  ifeq ($(BUILD_OS), IRIX)
+    ITANIUM_DSO_PREREQS = $(SI_EXPORT_LIST)
+    ITANIUM_DSO_OPTS = -exports_file $(SI_EXPORT_LIST)
+  endif
+  endif
+
+$(ITANIUM_DSO): itanium.o $(ITANIUM_DSO_PREREQS)
+	$(CC) $(CFLAGS) $(STD_DSO_LOADOPTS) $(ITANIUM_DSO_OPTS) \
+		itanium.o -shared -o $(ITANIUM_DSO)
 
 itanium.o: itanium.c ti_si.h
 	$(CC) $(CFLAGS) -c itanium.c

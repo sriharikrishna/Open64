@@ -115,27 +115,27 @@ PUBLIC_HFILES2= \
 	math62.h
 
 ifeq ($(BUILD_TARGET), MIPS)
-PUBLIC_STDARG=stdarg.h
-PUBLIC_VARARGS=varargs.h
-STD_LOC=/usr/include
+  PUBLIC_STDARG=stdarg.h
+  PUBLIC_VARARGS=varargs.h
+  STD_LOC=/usr/include
 endif
 ifeq ($(BUILD_TARGET), IA64)
-PUBLIC_STDARG=ia64/stdarg.h
-PUBLIC_VARARGS=ia64/varargs.h
-STD_LOC=/ia64/usr/include
+  PUBLIC_STDARG=ia64/stdarg.h
+  PUBLIC_VARARGS=ia64/varargs.h
+  STD_LOC=/ia64/usr/include
 endif
 
 ifdef BUILD_BASE
-CMPLRSROOT=../../targucode
+  CMPLRSROOT=../../targucode
 else
-CMPLRSROOT=../targucode
+  CMPLRSROOT=../targucode
 endif
 
 LDIRT = obj_ext.h
 ifndef NOTARGUCODE
-OBJEXTH	= obj_ext.h
+  OBJEXTH = obj_ext.h
 else
-OBJEXTH = 
+  OBJEXTH = 
 endif
 OBJEXTSED = $(CMPLRSROOT)/libmld/objext.sed
 LIBMLDSRC = $(CMPLRSROOT)/libmld
@@ -248,12 +248,12 @@ else # LINUX
 
 LINUX_HFILES = \
 	bstring.h \
-	elf.h \
-	limits.h \
 	sgidefs.h \
 	stddef.h \
 	stdio.h \
 	standards.h
+
+#FIXME: eraxxon: Please continue work on eliminating <bstring.h>.
 
 LINUX_SYS_HFILES = \
 	syssgi.h

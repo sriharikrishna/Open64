@@ -71,16 +71,15 @@ include $(COMMONDEFS)
 #  Set environment variables
 #----------------------------------------------------------------------
 ifeq ($(BUILD_COMPILER), VENDOR)
-CVERSION  =  -xansi
+ifeq ($(BUILD_OS), IRIX)
+  CVERSION  =  -xansi
+endif
 endif
 
 #----------------------------------------------------------------------
 #  Compiler Options
 #----------------------------------------------------------------------
 HOSTDEFS += -Dlonglong
-
-# need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
-HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
 
 ifeq ($(BUILD_VARIANT), DEBUG)
 HOSTDEFS += -DIs_True_On
@@ -188,17 +187,22 @@ VPATH    =  $(FE90_DIR)
 # Compiler Options
 #---------------------------------------------------------------------------
 ifneq ($(BUILD_COMPILER), VENDOR)
-LCDEFS = -ansi -funsigned-char
+ifeq ($(BUILD_OS), IRIX)
+  LCDEFS = -ansi -funsigned-char
+
+  # need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
+  HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
+endif
 endif
 
 ifeq ($(BUILD_OS), LINUX)
-LCDEFS += -D_LINUX_LINUX
+  LCDEFS += -D_LINUX_LINUX
 else
-LCDEFS += $(HOSTDEFS) $(TARGDEFS) -D_SGI_SGI
+  LCDEFS += $(HOSTDEFS) $(TARGDEFS) -D_SGI_SGI
 endif
 
 ifeq ($(BUILD_TARGET), MIPS)
-LCDEFS += -D_TARGET_MONGOOSE
+  LCDEFS += -D_TARGET_MONGOOSE
 endif
 
 LCOPTS += $(STD_COMPILE_OPTS)
