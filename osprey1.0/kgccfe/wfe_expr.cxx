@@ -3054,7 +3054,8 @@ WFE_Expand_Expr (tree exp,
 			    is_bit_field ? MTYPE_BS : desc, 
 			    component_offset+xtra_BE_ofst,
 			    field_id != 0 ? hi_ty_idx : ty_idx,
-			    Make_Pointer_Type(elem_ty_idx, FALSE),
+//bug--FMZ		    Make_Pointer_Type(elem_ty_idx, FALSE),
+		    Make_Pointer_Type(field_id!=0?ty_idx:elem_ty_idx, FALSE),
 			    wn0, field_id);
       }
       break;
