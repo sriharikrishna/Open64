@@ -47,8 +47,8 @@ extern "C" {
  * ====================================================================
  *
  * Module: errors.h
- * $Revision: 1.2 $
- * $Date: 2003-07-16 19:41:34 $
+ * $Revision: 1.3 $
+ * $Date: 2003-08-05 16:01:53 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/errors.h,v $
  *
@@ -558,8 +558,13 @@ extern BOOL Count_Limit_DevWarn( const char *const src_fname,
 /* Include definitions specific to the host program: */
 #include "err_host.h"
 
-/* The following contains Unix error code after system call errors: */
-extern INT errno;
+/* errno (of type int) contains Unix error code after system call errors: */
+/* Note: Nathan Tallent: errno should not be declared manually, but
+   only with <errno.h>.  This is because it does not have to be an
+   external symbol, but can be implemented with macros (e.g. for
+   threads) as long as it still acts as an lvalue. (Open Group Unix
+   standard.) */
+#include <errno.h>
 
 /* Control reporting by severity level: */
 extern INT Min_Error_Severity;
