@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.17 $
- * $Date: 2003-07-15 21:13:19 $
+ * $Revision: 1.18 $
+ * $Date: 2003-08-22 16:56:36 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.17 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.18 $";
 #endif
 
 #include <ctype.h>
@@ -836,10 +836,13 @@ ST2F_func_header(TOKEN_BUFFER tokens,
 
 /* add a use stmt corresponding to an added module in *.w2f.f
  * to solve the real kind problems
+ * if the block is alter entry,do nothing.
  *--------fzhao
  */
+   if (!is_altentry) {
      Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(header_tokens, "use w2f__types");
+    }
 
     while (stmt) {
       if (WN_operator(stmt)==OPR_USE){
