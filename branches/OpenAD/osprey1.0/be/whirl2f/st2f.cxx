@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.31.2.1 $
- * $Date: 2004-07-29 15:11:18 $
+ * $Revision: 1.31.2.2 $
+ * $Date: 2004-11-24 20:53:24 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.31.2.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.31.2.2 $";
 #endif
 
 #include <ctype.h>
@@ -915,6 +915,8 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    BOOL needcom=1;
    BOOL has_result = 0;
    BOOL add_rsl_type = 0;
+   BOOL is_module_program_unit = FALSE;
+
    const char * func_n_name= W2CF_Symtab_Nameof_St(st);
 
    ASSERT_DBG_FATAL(TY_kind(funtype) == KIND_FUNCTION,
@@ -1055,8 +1057,10 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       if (is_altentry)
 	 Prepend_Token_String(header_tokens, "ENTRY");
       else
-      if (ST_is_in_module(st) && !PU_is_nested_func(Pu_Table[ST_pu(st)]))
+      if (ST_is_in_module(st) && !PU_is_nested_func(Pu_Table[ST_pu(st)])){
          Prepend_Token_String(header_tokens, "MODULE");  
+         is_module_program_unit = TRUE;
+       }
       else
       if (ST_is_block_data(st))
          Prepend_Token_String(header_tokens, "BLOCK DATA");
@@ -1121,6 +1125,12 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       /* Emit parameter declarations, indented and on a new line */
       Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
       Append_Token_String(header_tokens, "IMPLICIT NONE");
+
+      if (is_module_program_unit){
+          Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+          Append_Token_String(header_tokens, "SAVE");
+          is_module_program_unit = FALSE;
+        } 
 
       for (param = first_param; param < num_params -implicit_parms; param++) {
 
