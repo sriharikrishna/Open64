@@ -1131,6 +1131,20 @@ static void ir_put_wn(WN * wn, INT indent)
 	if (flag & WN_PARM_PASSED_NOT_SAVED) fprintf(ir_ofile, "passed_not_saved ");
 	if (flag & WN_PARM_NOT_EXPOSED_USE) fprintf(ir_ofile, " not_euse ");
 	if (flag & WN_PARM_IS_KILLED) fprintf(ir_ofile, " killed ");
+
+/* following add for detail association information*/     
+	if (flag & WN_PARM_PASS_ADDRESS) fprintf(ir_ofile, "PASS_ADDRESS ");
+	if (flag & WN_PARM_PASS_ADDRESS_FROM_DV) fprintf(ir_ofile, "PASS_ADDRESS_FROM_DV ");
+	if (flag & WN_PARM_PASS_DV) fprintf(ir_ofile, "PASS_DV ");
+	if (flag & WN_PARM_PASS_DV_COPY) fprintf(ir_ofile, "PASS_DV_COPY ");
+	if (flag & WN_PARM_COPY_IN) fprintf(ir_ofile, "COPY_IN ");
+	if (flag & WN_PARM_COPY_IN_COPY_OUT ) fprintf(ir_ofile, "COPY_IN_COPY_OUT ");
+	if (flag & WN_PARM_MAKE_DV) fprintf(ir_ofile, "MAKE_DV ");
+	if (flag & WN_PARM_COPY_IN_MAKE_DV) fprintf(ir_ofile, "COPY_IN_MAKE_DV ");
+	if (flag & WN_PARM_MAKE_NEW_DV) fprintf(ir_ofile, "MAKE_NEW_DV ");
+	if (flag & WN_PARM_PASS_SECTION_ADDRESS) fprintf(ir_ofile, "PASS_SECTION_ADDRESS ");
+	if (flag & WN_PARM_CHECK_CONTIG_FLAG) fprintf(ir_ofile, "CHECK_CONTIG_FLAG ");
+        
     }
 
     if (IR_dump_map_info) {

@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.15 $
- * $Date: 2003-04-09 20:30:52 $
+ * $Revision: 1.16 $
+ * $Date: 2003-04-28 16:47:07 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -112,6 +112,8 @@ static char *source_file = __FILE__;
 #include "f90_utils.h"
 #include "targ_sim.h"
 
+#include "s_call.m"
+
 /* FE includes */
 
 #include "i_cvrt.h"
@@ -135,7 +137,16 @@ static char *source_file = __FILE__;
 #include "sgi_cmd_line.h"
 
 #include "cwh_stmt.i"
+#include <stack>
 
+typedef std::stack<int> STKT;
+STKT arg_association_info;
+
+extern void
+fei_arg_associate(INT32 association)
+{
+   arg_association_info.push(association);
+}
 
 /*===============================================
  *
@@ -876,7 +887,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   BOOL        backward_barrier = FALSE;
   WN * barrier_wn;
   WN * len;
-
+  INT32 association;
 
   /* figure # of args, including character lengths, clear return temp ST */
 
@@ -913,13 +924,16 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
       ta = cwh_stk_get_TY();
       keepty = ta;   //July
       wa = cwh_stk_pop_WN();
-      if (WNOPR(wa)==OPR_ARRAYEXP  ||
-             WNOPR(wa)==OPR_PAREN )
-           wa = cwh_intrin_wrap_value_parm(wa);  
-      else wa = cwh_intrin_wrap_ref_parm(wa,ta);
+      if (wa !=NULL) {
+         if   (WNOPR(wa)==OPR_ARRAYEXP  ||
+                     WNOPR(wa)==OPR_PAREN )
+                wa = cwh_intrin_wrap_value_parm(wa);  
+          else wa = cwh_intrin_wrap_ref_parm(wa,ta);
 
       if (keepty !=NULL)
-         WN_set_ty(wa,keepty); //July
+            WN_set_ty(wa,keepty); //July
+      }
+
       args[k] = wa;
   
       break ;
@@ -946,6 +960,50 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
     default:
       DevAssert((0),("Odd call actual")) ; 
     }
+
+/* set the dummy-actual arguments association flags*/
+
+    association = arg_association_info.top(); 
+    arg_association_info.pop();
+
+   if (args[k] != NULL)
+      switch (association) {
+ 
+ 	case PASS_ADDRESS:
+             WN_Set_Parm_Pass_Address(args[k]);
+            break; 
+	case PASS_ADDRESS_FROM_DV: 
+	    WN_Set_Parm_Pass_Address_From_Dv(args[k]);
+	    break;
+ 	case PASS_DV: 
+            WN_Set_Parm_Pass_Dv(args[k]);
+	    break;
+ 	case PASS_DV_COPY: 
+	    WN_Set_Parm_Pass_Dv_Copy(args[k]);
+	    break;
+ 	case COPY_IN: 
+	    WN_Set_Parm_Copy_In(args[k]);
+	    break;
+ 	case COPY_IN_COPY_OUT: 
+            WN_Set_Parm_Copy_In_Copy_out(args[k]);
+	    break;
+ 	case MAKE_DV: 
+            WN_Set_Parm_Make_Dv(args[k]);
+	    break;
+ 	case COPY_IN_MAKE_DV: 
+            WN_Set_Parm_Copy_In_Make_Dv(args[k]);
+	    break;
+ 	case MAKE_NEW_DV: 
+            WN_Set_Parm_Make_New_Dv(args[k]);
+	    break;
+ 	case PASS_SECTION_ADDRESS: 
+            WN_Set_Parm_Pass_Section_Address(args[k]);
+	    break;
+ 	case CHECK_CONTIG_FLAG: 
+           WN_Set_Parm_Check_Contig_Flag(args[k]);
+	    break;
+      }
+
   }
   
   /* Function returning character? Reorder to get   */
@@ -4680,6 +4738,7 @@ fei_nullify(INT32 listnum)
    OPCODE    opc;
    ST     * st  ;
    WN     * wn  ;
+   WN     * wa  ;
    int    i ;
 
 
@@ -4689,9 +4748,22 @@ fei_nullify(INT32 listnum)
 
    for (i=listnum-1; i>=0; i--)
     {
-     st = cwh_stk_pop_ST();
-     WN_kid(wn,i) = WN_CreateIdname ( 0, st);
+    switch(cwh_stk_get_class()) {
+     case ST_item: 
+        st = cwh_stk_pop_ST();
+        WN_kid(wn,i) = WN_CreateIdname ( 0, st);
+        break;
+     case WN_item:
+        wa = cwh_stk_pop_WN();
+        break;
+     default:
+        cwh_stk_pop_whatever() ;
+        wa = NULL;
+        break;
     }
+
+     WN_kid(wn,i) = wa ;
+   }
    cwh_block_append(wn);
    return;
   }

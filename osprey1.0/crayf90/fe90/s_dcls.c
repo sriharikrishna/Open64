@@ -1630,7 +1630,10 @@ void	array_dim_resolution(int 	attr_idx,
       }
 /* here add keep Deferred_Shape array in "array" form instead of 
    generating dope vector */
-   
+  else {  
+
+   if (BD_ARRAY_CLASS(bd_idx) == Deferred_Shape) {
+
       BD_RESOLVED(bd_idx)  = TRUE;
       BD_ARRAY_SIZE(bd_idx)      = Unknown_Size;
       BD_ARRAY_CLASS(bd_idx)=Deferred_Shape1;
@@ -1645,8 +1648,10 @@ void	array_dim_resolution(int 	attr_idx,
            
       }
     BD_LEN_FLD(bd_idx) = NO_Tbl_Idx;
-     
  
+     }
+     
+   } 
 
       goto EXIT;
    }

@@ -4069,6 +4069,57 @@ static void  print_list(FILE	*out_file,
       if (IL_ARG_DESC_VARIANT(idx)) {
          fprintf(out_file, "  IL_ARG_DESC_VARIANT ");
       }
+   
+      switch (IL_ARG_MULTI_FLAGS(idx)) {
+          case 1:
+             fprintf(out_file, "  PASS_ADDRESS ");
+          break;
+
+          case 2:
+             fprintf(out_file, " PASS_ADDRESS_FROM_DV ");
+          break;
+
+          case 3:
+             fprintf(out_file, " PASS_DV ");
+          break;
+
+          case 4:
+             fprintf(out_file, " PASS_DV_COPY ");
+          break;
+
+          case 5:
+             fprintf(out_file, " COPY_IN "); 
+          break;
+
+          case 6:
+             fprintf(out_file, " COPY_IN_COPY_OUT ");
+          break;
+
+	  case 7:
+	     fprintf(out_file, " MAKE_DV ");
+          break;
+
+          case 8:
+              fprintf(out_file, " COPY_IN_MAKE_DV ");
+          break;
+
+          case 9:
+              fprintf(out_file, "  MAKE_NEW_DV");
+	  break;
+
+          case 10:
+             fprintf(out_file, " PASS_SECTION_ADDRESS ");
+          break;
+
+          case 11:
+             fprintf(out_file, " CHECK_CONTIG_FLAG ");
+          break; 
+ 
+          default:
+      
+          break;
+      }          
+
 
       if (io_list) {
          if (IL_HAS_FUNCTIONS(idx)) {
