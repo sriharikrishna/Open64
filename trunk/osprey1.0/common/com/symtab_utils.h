@@ -300,6 +300,49 @@ TY_KIND
 Name_To_Kind (const char* nm);
 
 
+//----------------------------------------------------------------------
+// Flags <-> string
+//----------------------------------------------------------------------
+
+const char *
+ST_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_ST_FLAGS (const char* str);
+
+
+const char *
+ST_EXT_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_ST_EXT_FLAGS (const char* str);
+
+
+const char *
+TY_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_TY_FLAGS (const char* str);
+
+
+const char *
+PU_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_PU_FLAGS (const char* str);
+
+
+const char *
+PU_SRC_LANG_FLAGS_To_Str (UINT64 flags);
+
+UINT64
+Str_To_PU_SRC_LANG_FLAGS (const char* str);
+
+
+//----------------------------------------------------------------------
+// 
+//----------------------------------------------------------------------
+
 void
 Print_local_symtab (FILE *f, const SCOPE& scope);
 

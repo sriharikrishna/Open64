@@ -1509,14 +1509,14 @@ Base_Symbol_And_Offset (ST     *st,
 // conversion in both directions.
 
 // The type for enumeration value -> string tables
-struct EnumToStr_t : public ir_a2b::i2s_tbl_entry_t {
+struct EnumToStr_t : public ir_a2b::enum2str_tbl_entry_t {
   EnumToStr_t(INT val_ = 0, const char* str_ = 0) 
     : val(val_), str(str_) { }
 
   virtual ~EnumToStr_t() { }
 
-  virtual INT getEnumVal()     { return val; }
-  virtual const char* getStr() { return str; }
+  virtual INT getEnumVal() const     { return val; }
+  virtual const char* getStr() const { return str; }
 
   INT         val;
   const char* str;
@@ -1585,14 +1585,16 @@ const char *
 Class_Name (ST_CLASS cl)
 {
   using namespace ir_a2b;
-  return MapIntToString<EnumToStr_t>(STClassToNameTbl, CLASS_COUNT, (INT)cl);
+  return MapEnumToStr<EnumToStr_t, STClassToNameTbl,
+                      CLASS_COUNT>("STClassToNameTbl", (INT)cl);
 }
 
 ST_CLASS
 Name_To_Class (const char* nm) 
 {
   using namespace ir_a2b;
-  return (ST_CLASS)MapStringToInt<EnumToStr_t, STClassToNameTbl, CLASS_COUNT>(nm);
+  return (ST_CLASS)MapStrToEnum<EnumToStr_t, STClassToNameTbl, 
+                                CLASS_COUNT>("STClassToNameTbl", nm);
 }
 
 
@@ -1600,14 +1602,16 @@ const char *
 Sclass_Name (ST_SCLASS sc)
 {
   using namespace ir_a2b;
-  return MapIntToString<EnumToStr_t>(STSclassToNameTbl, SCLASS_COUNT, (INT)sc);
+  return MapEnumToStr<EnumToStr_t, STSclassToNameTbl, 
+                      SCLASS_COUNT>("STSclassToNameTbl", (INT)sc);
 }
 
 ST_SCLASS
 Name_To_Sclass (const char* nm)
 {
   using namespace ir_a2b;
-  return (ST_SCLASS)MapStringToInt<EnumToStr_t, STSclassToNameTbl, SCLASS_COUNT>(nm);
+  return (ST_SCLASS)MapStrToEnum<EnumToStr_t, STSclassToNameTbl, 
+                                 SCLASS_COUNT>("STSclassToNameTbl", nm);
 }
 
 
@@ -1615,14 +1619,16 @@ const char *
 Export_Name (ST_EXPORT ex)
 {
   using namespace ir_a2b;
-  return MapIntToString<EnumToStr_t>(STExportToNameTbl, EXPORT_COUNT, (INT)ex);
+  return MapEnumToStr<EnumToStr_t, STExportToNameTbl, 
+                      EXPORT_COUNT>("STExportToNameTbl", (INT)ex);
 }
 
 ST_EXPORT
 Name_To_Export (const char* nm)
 {
   using namespace ir_a2b;
-  return (ST_EXPORT)MapStringToInt<EnumToStr_t, STExportToNameTbl, EXPORT_COUNT>(nm);
+  return (ST_EXPORT)MapStrToEnum<EnumToStr_t, STExportToNameTbl, 
+                                 EXPORT_COUNT>("STExportToNameTbl", nm);
 }
 
 
@@ -1630,17 +1636,327 @@ const char *
 Kind_Name (TY_KIND k)
 {
   using namespace ir_a2b;
-  return MapIntToString<EnumToStr_t>(TYKindToNameTbl, KIND_LAST, (INT)k);
+  return MapEnumToStr<EnumToStr_t, TYKindToNameTbl, 
+                      KIND_LAST>("TYKindToNameTbl", (INT)k);
 }
 
 TY_KIND
 Name_To_Kind (const char* nm)
 {
   using namespace ir_a2b;
-  return (TY_KIND)MapStringToInt<EnumToStr_t, TYKindToNameTbl, KIND_LAST>(nm);
+  return (TY_KIND)MapStrToEnum<EnumToStr_t, TYKindToNameTbl, 
+                               KIND_LAST>("TYKindToNameTbl", nm);
 }
 
 
+/* ====================================================================
+ *
+ * xxxFlag_Name 
+ *   Given flag set, convert to a comma-separated flag string
+ *
+ * Name_To_xxxFlag
+ *   Given a comma-separated flag string, convert to a flags set
+ *
+ * ====================================================================
+ */
+
+// eraxxon (2005.01): Create these routines to support conversion in
+// both directions.
+
+// The type for flag value -> string tables
+struct FlagToStr_t : public ir_a2b::flag2str_tbl_entry_t {
+  FlagToStr_t(UINT64 val_ = 0, const char* str_ = 0) 
+    : val(val_), str(str_) { }
+
+  virtual ~FlagToStr_t() { }
+
+  virtual UINT64 getFlagVal() const  { return val; }
+  virtual const char* getStr() const { return str; }
+
+  UINT64      val;
+  const char* str;
+};
+
+
+// ST_FLAGS
+#define STFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t STFLAGS_ToStrTbl[] = {
+  STFLAGS_ToStrTblENTRY(ST_IS_WEAK_SYMBOL),
+  STFLAGS_ToStrTblENTRY(ST_IS_SPLIT_COMMON),
+  STFLAGS_ToStrTblENTRY(ST_IS_NOT_USED),
+  STFLAGS_ToStrTblENTRY(ST_IS_INITIALIZED),
+  STFLAGS_ToStrTblENTRY(ST_IS_RETURN_VAR),
+  STFLAGS_ToStrTblENTRY(ST_IS_VALUE_PARM),
+  STFLAGS_ToStrTblENTRY(ST_PROMOTE_PARM),
+  STFLAGS_ToStrTblENTRY(ST_KEEP_NAME_W2F),
+  STFLAGS_ToStrTblENTRY(ST_IS_DATAPOOL),
+  STFLAGS_ToStrTblENTRY(ST_IS_RESHAPED),
+  STFLAGS_ToStrTblENTRY(ST_EMIT_SYMBOL),
+  STFLAGS_ToStrTblENTRY(ST_HAS_NESTED_REF),
+  STFLAGS_ToStrTblENTRY(ST_INIT_VALUE_ZERO),
+  STFLAGS_ToStrTblENTRY(ST_GPREL),
+  STFLAGS_ToStrTblENTRY(ST_NOT_GPREL),
+  STFLAGS_ToStrTblENTRY(ST_IS_NAMELIST),
+  STFLAGS_ToStrTblENTRY(ST_IS_F90_TARGET),
+  STFLAGS_ToStrTblENTRY(ST_DECLARED_STATIC),
+  STFLAGS_ToStrTblENTRY(ST_IS_EQUIVALENCED),
+  STFLAGS_ToStrTblENTRY(ST_IS_FILL_ALIGN),
+  STFLAGS_ToStrTblENTRY(ST_IS_OPTIONAL_ARGUMENT),
+  STFLAGS_ToStrTblENTRY(ST_PT_TO_UNIQUE_MEM),
+  STFLAGS_ToStrTblENTRY(ST_IS_TEMP_VAR),
+  STFLAGS_ToStrTblENTRY(ST_IS_CONST_VAR),
+  STFLAGS_ToStrTblENTRY(ST_ADDR_SAVED),
+  STFLAGS_ToStrTblENTRY(ST_ADDR_PASSED),
+  STFLAGS_ToStrTblENTRY(ST_IS_THREAD_PRIVATE),
+  STFLAGS_ToStrTblENTRY(ST_PT_TO_COMPILER_GENERATED_MEM),
+  STFLAGS_ToStrTblENTRY(ST_IS_SHARED_AUTO),
+  STFLAGS_ToStrTblENTRY(ST_ASSIGNED_TO_DEDICATED_PREG),
+  STFLAGS_ToStrTblENTRY(ST_ASM_FUNCTION_ST),
+  STFLAGS_ToStrTblENTRY(ST_HAS_NAMED_SECTION)
+};
+
+const UINT STFLAGS_ToStrTblSZ = (sizeof(STFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
+// ST_EXT_FLAGS
+#define STEXTFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t STEXTFLAGS_ToStrTbl[] = {
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_POINTER),  
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_ALLOCATABLE),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_IN_MODULE),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_EXTERNAL),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_BLOCK_DATA), 
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_INTENT_IN_ARGUMENT),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_INTENT_OUT_ARGUMENT),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_ASSIGN_INTERFACE),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_OPERATOR_INTERFACE),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_U_OPERATOR_INTERFACE),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_PRIVATE),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_M_IMPORTED),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_IMPLEM_LEVEL_TEMP),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_PARAMETER),
+  STEXTFLAGS_ToStrTblENTRY(ST_ONE_PER_PU),
+  STEXTFLAGS_ToStrTblENTRY(ST_COPY_CONSTRUCTOR_ST),
+  STEXTFLAGS_ToStrTblENTRY(ST_INITV_IN_OTHER_ST),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_INITIALIZED_IN_F90)
+};
+
+const UINT STEXTFLAGS_ToStrTblSZ = 
+  (sizeof(STEXTFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
+// FLD_FLAGS
+// ARB_FLAGS
+// LABEL_FLAGS
+// ST_ATTR_KIND
+
+
+// TY_FLAGS
+#define TYFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t TYFLAGS_ToStrTbl[] = {
+  TYFLAGS_ToStrTblENTRY(TY_IS_CHARACTER),
+  TYFLAGS_ToStrTblENTRY(TY_IS_LOGICAL),
+  TYFLAGS_ToStrTblENTRY(TY_IS_UNION),
+  TYFLAGS_ToStrTblENTRY(TY_IS_PACKED),
+  TYFLAGS_ToStrTblENTRY(TY_PTR_AS_ARRAY),
+  TYFLAGS_ToStrTblENTRY(TY_ANONYMOUS),
+  TYFLAGS_ToStrTblENTRY(TY_SPLIT),
+  TYFLAGS_ToStrTblENTRY(TY_IS_F90_POINTER),
+  TYFLAGS_ToStrTblENTRY(TY_NOT_IN_UNION),
+  TYFLAGS_ToStrTblENTRY(TY_NO_ANSI_ALIAS),
+  TYFLAGS_ToStrTblENTRY(TY_IS_NON_POD),
+  TYFLAGS_ToStrTblENTRY(TY_IS_F90_ASSUMED_SHAPE),
+  TYFLAGS_ToStrTblENTRY(TY_IS_F90_ASSUMED_SIZE),
+  TYFLAGS_ToStrTblENTRY(TY_IS_F90_DEFERRED_SHAPE),
+  TYFLAGS_ToStrTblENTRY(TY_IS_EXTERNAL),
+  TYFLAGS_ToStrTblENTRY(TY_IS_SEQUENCE),
+  TYFLAGS_ToStrTblENTRY(TY_IS_SHARED),
+  TYFLAGS_ToStrTblENTRY(TY_IS_STRICT),
+  TYFLAGS_ToStrTblENTRY(TY_IS_RELAXED),
+  TYFLAGS_ToStrTblENTRY(TY_IS_CO_ARRAY),
+  TYFLAGS_ToStrTblENTRY(TY_IS_WRITTEN),
+  TYFLAGS_ToStrTblENTRY(TY_RETURN_IN_MEM)
+};
+
+const UINT TYFLAGS_ToStrTblSZ = 
+  (sizeof(TYFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
+// TY_PU_FLAGS
+
+// PU_FLAGS
+#define PUFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t PUFLAGS_ToStrTbl[] = {
+  PUFLAGS_ToStrTblENTRY(PU_IS_PURE),
+  PUFLAGS_ToStrTblENTRY(PU_NO_SIDE_EFFECTS),
+  PUFLAGS_ToStrTblENTRY(PU_IS_INLINE_FUNCTION),
+  PUFLAGS_ToStrTblENTRY(PU_NO_INLINE),
+  PUFLAGS_ToStrTblENTRY(PU_MUST_INLINE),
+  PUFLAGS_ToStrTblENTRY(PU_NO_DELETE),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_EXC_SCOPES),
+  PUFLAGS_ToStrTblENTRY(PU_IS_NESTED_FUNC),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_NON_MANGLED_CALL),
+  PUFLAGS_ToStrTblENTRY(PU_ARGS_ALIASED),
+  PUFLAGS_ToStrTblENTRY(PU_NEEDS_FILL_ALIGN_LOWERING),
+  PUFLAGS_ToStrTblENTRY(PU_NEEDS_T9),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_VERY_HIGH_WHIRL),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_ALTENTRY),
+  PUFLAGS_ToStrTblENTRY(PU_RECURSIVE),
+  PUFLAGS_ToStrTblENTRY(PU_IS_MAINPU),
+  PUFLAGS_ToStrTblENTRY(PU_UPLEVEL),
+  PUFLAGS_ToStrTblENTRY(PU_MP_NEEDS_LNO),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_ALLOCA),
+  PUFLAGS_ToStrTblENTRY(PU_IN_ELF_SECTION),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_MP),
+  PUFLAGS_ToStrTblENTRY(PU_MP),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_NAMELIST),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_RETURN_ADDRESS),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_REGION),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_INLINES),
+  PUFLAGS_ToStrTblENTRY(PU_CALLS_SETJMP),
+  PUFLAGS_ToStrTblENTRY(PU_CALLS_LONGJMP),
+  PUFLAGS_ToStrTblENTRY(PU_IPA_ADDR_ANALYSIS),
+  PUFLAGS_ToStrTblENTRY(PU_SMART_ADDR_ANALYSIS),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_SYSCALL_LINKAGE),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_GLOBAL_PRAGMAS),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_USER_ALLOCA),
+  PUFLAGS_ToStrTblENTRY(PU_HAS_UNKNOWN_CONTROL_FLOW),
+  PUFLAGS_ToStrTblENTRY(PU_IS_THUNK),
+  PUFLAGS_ToStrTblENTRY(PU_DECL_VIEW),
+  PUFLAGS_ToStrTblENTRY(PU_NEED_UNPARSED),
+  PUFLAGS_ToStrTblENTRY(PU_NEEDS_MANUAL_UNWINDING)
+#ifdef TARG_X8664
+  ,
+  PUFLAGS_ToStrTblENTRY(PU_FF2C_ABI
+#endif
+};
+
+const UINT PUFLAGS_ToStrTblSZ = 
+  (sizeof(PUFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
+
+// PU_SRC_LANG_FLAGS
+#define PUSRCLANGFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t PUSRCLANGFLAGS_ToStrTbl[] = {
+  PUSRCLANGFLAGS_ToStrTblENTRY(PU_UNKNOWN_LANG),
+  PUSRCLANGFLAGS_ToStrTblENTRY(PU_MIXED_LANG),
+  PUSRCLANGFLAGS_ToStrTblENTRY(PU_C_LANG),
+  PUSRCLANGFLAGS_ToStrTblENTRY(PU_CXX_LANG),
+  PUSRCLANGFLAGS_ToStrTblENTRY(PU_F77_LANG),
+  PUSRCLANGFLAGS_ToStrTblENTRY(PU_F90_LANG),
+  PUSRCLANGFLAGS_ToStrTblENTRY(PU_JAVA_LANG)
+};
+
+const UINT PUSRCLANGFLAGS_ToStrTblSZ = 
+  (sizeof(PUSRCLANGFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
+// FILE_INFO_FLAGS
+
+const char *
+ST_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, STFLAGS_ToStrTbl, 
+                       STFLAGS_ToStrTblSZ>("STFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_ST_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, STFLAGS_ToStrTbl, 
+                       STFLAGS_ToStrTblSZ>("STFLAGS_ToStrTbl", str);
+}
+
+
+const char *
+ST_EXT_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, STEXTFLAGS_ToStrTbl,
+		       STEXTFLAGS_ToStrTblSZ>("STEXTFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_ST_EXT_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, STEXTFLAGS_ToStrTbl, 
+                       STEXTFLAGS_ToStrTblSZ>("STEXTFLAGS_ToStrTbl", str);
+}
+
+
+const char *
+TY_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, TYFLAGS_ToStrTbl, 
+		       TYFLAGS_ToStrTblSZ>("TYFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_TY_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, TYFLAGS_ToStrTbl, 
+                       TYFLAGS_ToStrTblSZ>("TYFLAGS_ToStrTbl", str);
+}
+
+
+const char *
+PU_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, PUFLAGS_ToStrTbl, 
+		       PUFLAGS_ToStrTblSZ>("PUFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_PU_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, PUFLAGS_ToStrTbl, 
+                       PUFLAGS_ToStrTblSZ>("PUFLAGS_ToStrTbl", str);
+}
+
+
+const char *
+PU_SRC_LANG_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, PUSRCLANGFLAGS_ToStrTbl, 
+		       PUSRCLANGFLAGS_ToStrTblSZ>("PUSRCLANGFLAGS_ToStrTbl", 
+						  flags);
+}
+
+UINT64
+Str_To_PU_SRC_LANG_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, PUSRCLANGFLAGS_ToStrTbl, 
+                       PUSRCLANGFLAGS_ToStrTblSZ>("PUSRCLANGFLAGS_ToStrTbl", 
+						  str);
+}
+
+
+/* ====================================================================
+ *
+ * Print routines
+ *
+ * ====================================================================
+ */
 
 static void
 Print_type_attributes (FILE *f, TY_IDX ty)
@@ -1678,6 +1994,7 @@ TY_kind_name (const TY& ty)
 	return Kind_Name (TY_kind (ty));
 }
 
+
 void
 ST::Print (FILE *f, BOOL verbose) const
 {
@@ -1689,53 +2006,29 @@ ST::Print (FILE *f, BOOL verbose) const
     if (strlen (name_str) > 20)
 	fputs ("\n\t\t", f);
 
+    fprintf (f, "%s", Class_Name(sym_class));
+
     TY_IDX ty_idx = 0;
 
     switch (sym_class) {
-
-    case CLASS_UNK:
-	fputs ("Class unknown", f);
-	break;
-
     case CLASS_VAR:
-	fputs ("Variable", f);
 	ty_idx = u2.type;
 	break;
 
-    case CLASS_PARAMETER:
-        fputs ("Parameter", f);
-        break;
-
     case CLASS_FUNC:
-	fputs ("Subprogram", f);
 	ty_idx = PU_prototype (Pu_Table[u2.pu]);
 	break;
 
     case CLASS_CONST:
-	fputs ("Constant", f);
 	ty_idx = u2.type;
 	break;
 
     case CLASS_PREG:
-	fputs ("Pseudo-Register", f);
 	ty_idx = u2.type;
 	break;
 
     case CLASS_BLOCK:
-	fputs ("Block", f);
 	fprintf (f, " (#%d)", u2.blk);
-	break;
-
-    case CLASS_NAME:
-	fputs ("Name-only", f);
-	break;
-   
-    case CLASS_TYPE:
-        fputs ("Derived_Type Name",f);
-        break;
-	
-    default:
-	fprintf (f, "INVALID CLASS (%d)", sym_class);
 	break;
     }
 
@@ -1798,41 +2091,7 @@ ST::Print (FILE *f, BOOL verbose) const
 	    if (Pu_Table[u2.pu].src_lang & PU_F90_LANG)	fprintf (f, "F90  ");
 
 	    mUINT64 flags = Pu_Table[u2.pu].flags;
-	    fprintf (f, "flags:");
-	    if (flags & PU_IS_PURE)		fprintf (f, " pure");
-	    if (flags & PU_NO_SIDE_EFFECTS)	fprintf (f, " no_side_effects");
-	    if (flags & PU_IS_INLINE_FUNCTION)	fprintf (f, " inline");
-	    if (flags & PU_NO_INLINE)		fprintf (f, " no_inline");
-	    if (flags & PU_MUST_INLINE)		fprintf (f, " must_inline");
-	    if (flags & PU_NO_DELETE)		fprintf (f, " no_delete");
-	    if (flags & PU_HAS_EXC_SCOPES)	fprintf (f, " exc_scopes");
-	    if (flags & PU_IS_NESTED_FUNC)	fprintf (f, " nested_func");
-	    if (flags & PU_HAS_NON_MANGLED_CALL)fprintf (f, " non_mangled_call");
-	    if (flags & PU_ARGS_ALIASED)	fprintf (f, " args_aliased");
-	    if (flags & PU_NEEDS_FILL_ALIGN_LOWERING)fprintf (f, " fill_align");
-	    if (flags & PU_NEEDS_T9)		fprintf (f, " t9");
-	    if (flags & PU_HAS_VERY_HIGH_WHIRL)	fprintf (f, " very_high_whirl");
-	    if (flags & PU_HAS_ALTENTRY)	fprintf (f, " altentry");
-	    if (flags & PU_RECURSIVE)		fprintf (f, " recursive");
-	    if (flags & PU_IS_MAINPU)		fprintf (f, " main");
-	    if (flags & PU_UPLEVEL)		fprintf (f, " uplevel");
-	    if (flags & PU_MP_NEEDS_LNO)	fprintf (f, " mp_needs_lno");
-	    if (flags & PU_HAS_ALLOCA)		fprintf (f, " alloca");
-	    if (flags & PU_IN_ELF_SECTION)	fprintf (f, " in_elf_section");
-	    if (flags & PU_HAS_MP)		fprintf (f, " has_mp");
-	    if (flags & PU_MP)			fprintf (f, " mp");
-	    if (flags & PU_HAS_NAMELIST)	fprintf (f, " namelist");
-	    if (flags & PU_HAS_RETURN_ADDRESS)	fprintf (f, " return_address");
-	    if (flags & PU_HAS_REGION)		fprintf (f, " has_region");
-	    if (flags & PU_HAS_INLINES)		fprintf (f, " has_inlines");
-	    if (flags & PU_CALLS_SETJMP)	fprintf (f, " calls_setjmp");
-	    if (flags & PU_CALLS_LONGJMP)	fprintf (f, " calls_longjmp");
-	    if (flags & PU_IPA_ADDR_ANALYSIS)	fprintf (f, " ipa_addr");
-	    if (flags & PU_SMART_ADDR_ANALYSIS)	fprintf (f, " smart_addr");
-	    if (flags & PU_HAS_GLOBAL_PRAGMAS)	fprintf (f, " global_pragmas");
-	    if (flags & PU_HAS_USER_ALLOCA)	fprintf (f, " user_alloca");
-	    if (flags & PU_HAS_UNKNOWN_CONTROL_FLOW)	fprintf (f, " unknown_control_flow");
-	    if (flags & PU_IS_THUNK)		fprintf (f, " thunk");
+	    fprintf (f, "flags: %s", PU_FLAGS_To_Str(flags));
 	    if (TY_return_to_param(ty_idx))	fprintf (f, " return_to_param");
 	    if (TY_is_varargs(ty_idx))		fprintf (f, " varargs");
 	    if (TY_has_prototype(ty_idx))	fprintf (f, " prototype");
@@ -1861,90 +2120,17 @@ ST::Print (FILE *f, BOOL verbose) const
 	fprintf (f, "\n");
 
 	fprintf (f, "\t\tFlags:\t0x%08x", flags);
-	if (flags) {
-	    if (flags & ST_IS_WEAK_SYMBOL)	fprintf (f, " weak");
-	    if (flags & ST_IS_SPLIT_COMMON)	fprintf (f, " split_common");
-	    if (flags & ST_IS_NOT_USED)		fprintf (f, " not_used");
-	    if (flags & ST_IS_INITIALIZED)	fprintf (f, " initialized");
-	    if (flags & ST_IS_RETURN_VAR)	fprintf (f, " return_var");
-	    if (flags & ST_IS_VALUE_PARM)	fprintf (f, " value_parm");
-	    if (flags & ST_PROMOTE_PARM)	fprintf (f, " promote_parm");
-	    if (flags & ST_KEEP_NAME_W2F)	fprintf (f, " keep_name_w2f");
-	    if (flags & ST_IS_DATAPOOL)		fprintf (f, " datapool");
-	    if (flags & ST_IS_RESHAPED)		fprintf (f, " reshaped");
-	    if (flags & ST_EMIT_SYMBOL)		fprintf (f, " emit_symbol");
-	    if (flags & ST_HAS_NESTED_REF)	fprintf (f, " has_nested_ref");
-	    if (flags & ST_INIT_VALUE_ZERO)	fprintf (f, " init_value_zero");
-	    if (flags & ST_GPREL)		fprintf (f, " gprel");
-	    if (flags & ST_NOT_GPREL)		fprintf (f, " not_gprel");
-	    if (flags & ST_IS_NAMELIST)		fprintf (f, " namelist");
-	    if (flags & ST_IS_F90_TARGET)	fprintf (f, " f90_target");
-	    if (flags & ST_DECLARED_STATIC)	fprintf (f, " static");
-	    if (flags & ST_IS_EQUIVALENCED)	fprintf (f, " equivalenced");
-	    if (flags & ST_IS_FILL_ALIGN)	fprintf (f, " fill_align");
-	    if (flags & ST_IS_OPTIONAL_ARGUMENT)fprintf (f, " optional");
-	    if (flags & ST_PT_TO_UNIQUE_MEM)	fprintf (f, " pt_to_unique_mem");
-	    if (flags & ST_IS_TEMP_VAR)		fprintf (f, " temp");
-	    if (flags & ST_IS_CONST_VAR)	fprintf (f, " const");
-	    if (flags & ST_ADDR_SAVED)		fprintf (f, " addr_saved");
-	    if (flags & ST_ADDR_PASSED)		fprintf (f, " addr_passed");
-	    if (flags & ST_IS_THREAD_PRIVATE)	fprintf (f, " thread_private");
-	    if (flags & ST_ASSIGNED_TO_DEDICATED_PREG)
-		fprintf (f, " assigned_to_dedicated_preg");
+	fprintf (f, " %s", ST_FLAGS_To_Str(flags));
+
+	fprintf (f, ", %s", Export_Name(export_class));
+	
+	mUINT64 flags_ext = St_Table[st_idx].flags_ext;
+	if (flags_ext) {
+	   const char* flgstr = ST_EXT_FLAGS_To_Str(flags_ext);
+           fprintf (f, "\n\t\tFlags_ext:\t0x%016llx", flags_ext);
+	   fprintf (f, " %s", flags_ext);
 	}
-
-	switch (export_class) {
-
-	case EXPORT_LOCAL:
-	    fputs (", XLOCAL", f);
-	    break;
-
-	case EXPORT_LOCAL_INTERNAL:
-	    fputs (", XLOCAL(INTERNAL)", f);
-	    break;
-
-	case EXPORT_INTERNAL:
-	    fputs (", XINTERNAL", f);
-	    break;
-
-	case EXPORT_HIDDEN:
-	    fputs (", XHIDDEN", f);
-	    break;
-
-	case EXPORT_PROTECTED:
-	    fputs (", XPROTECTED", f);
-	    break;
-
-	case EXPORT_PREEMPTIBLE:
-	    fputs (", XPREEMPTIBLE", f);
-	    break;
-
-	case EXPORT_OPTIONAL:
-	    fputs (", XOPTIONAL", f);
-	    break;
-
-	default:
-	    fputs (", Export class unknown", f);
-	    break;
-	}
-
-
-       mUINT64 flags_ext = St_Table[st_idx].flags_ext;
-       if (flags_ext)
-          fprintf (f, "\n\t\tFlags_ext:\t0x%016llx", flags_ext);
-       if (flags_ext) {
-         if (flags_ext & ST_IS_POINTER)  	 fprintf (f, " pointer");
-         if (flags_ext & ST_IS_ALLOCATABLE)  	 fprintf (f, " allocatable ");
-         if (flags_ext & ST_IS_IN_MODULE)    	 fprintf (f, " in_module");
-         if (flags_ext & ST_IS_BLOCK_DATA)  	 fprintf (f, " block_Data");
-         if (flags_ext & ST_IS_INTENT_IN_ARGUMENT)	 fprintf (f, " intent_in_arg");
-         if (flags_ext & ST_IS_INTENT_OUT_ARGUMENT)  	 fprintf (f, " intent_out_arg ");
-         if (flags_ext & ST_IS_EXTERNAL)		 fprintf (f, " external");
-         if (flags_ext & ST_IS_PRIVATE)   		 fprintf (f, " private");
-         if (flags_ext & ST_IS_PARAMETER)		 fprintf (f, " parameter");
-       }
-
-
+	
 	fprintf (f, "\n\t\tSclass: %s\n", Sclass_Name (storage_class));
     }
 } // ST::Print
