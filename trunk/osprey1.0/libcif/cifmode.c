@@ -90,7 +90,7 @@ int mode;			/* memory management mode selector */
 
 		/* If memarea table not present, get it. */
 
-		if (_Cif_memasize == NULL) {
+		if (_Cif_memasize == 0) {
 			if ((me =_Cif_memtbl()) != 0)
 				return (me);
 		}

@@ -1097,7 +1097,7 @@ static int sortfile (
 	for (i = 0; i < CIF_MAXRECORD; i++) {
 	    patbl[i].aptr = NULL;
 	    patbl[i].psize = 0;
-	    patbl[i].next = NULL;
+	    patbl[i].next = (int)NULL;
 	}
 
 	if ((cifp1 = cif_copy_record(cifp)) == NULL)
@@ -1274,7 +1274,7 @@ static int sortfile (
 		patbl[i].aptr = (struct Cif_generic **) NULL;
 	    }
 	    patbl[i].psize = 0;
-	    patbl[i].next = NULL;
+	    patbl[i].next = (int)NULL;
 	}
 
 	return (0);

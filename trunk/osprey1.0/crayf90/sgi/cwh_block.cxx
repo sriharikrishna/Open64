@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_block
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:07 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-11-04 16:18:12 $
+ * $Author: eraxxon $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -239,7 +239,7 @@ cwh_block_add_to_enclosing_regions(WN_PRAGMA_ID id, ST * st)
 			    id,
 			    st,
 			    0,
-			    NULL,
+			    (int)NULL,
 			    FALSE);
 }
 

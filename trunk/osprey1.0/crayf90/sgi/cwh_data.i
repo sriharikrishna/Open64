@@ -185,7 +185,7 @@ struct data_info_s {
      if (excess_capacity > num_to_add) return;
 
      INT64 new_size = num_to_add + data_elements.size();
-     INT64 min_new_size = 1.05 * data_elements.capacity();
+     INT64 min_new_size = INT64(1.05 * data_elements.capacity());
      if (new_size < min_new_size) new_size = min_new_size;
      data_elements.reserve(new_size);
   }
