@@ -264,6 +264,11 @@ LCOPTS = $(STD_COMPILE_OPTS)
 HOSTDEFS += -D_NEW_SYMTAB -D_MERGE_SUMMARY_ST_IDX_=1 -DBACK_END
 
 LCINCS = $(addprefix -I, $(HEADER_DIRS))
+
+ifeq ($(BUILD_OS), LINUX)
+LCINCS += -I$(BUILD_AREA)/include
+endif
+
 LCDEFS += $(HOSTDEFS)
 LCDEFS += -DSTD_MONGOOSE_LOC='"$(STD_MONGOOSE_LOC)"' -D_SUPPORT_IPA -D_MULTIGOT
 ifeq ($(BUILD_COMPILER), EDG)
@@ -278,6 +283,14 @@ LC++INCS = $(LCINCS)
 
 ifeq ($(BUILD_OS), IRIX)
 LLDLIBS += -lgen -lm
+endif
+
+ifneq ($(STL_EXT_PATH),)
+LC++INCS += -I$(STL_EXT_PATH)
+endif
+
+ifeq ($(BUILD_OS), LINUX)
+LC++INCS += -D__STL_USE_NAMESPACES
 endif
 
 ifeq ($(BUILD_OPTIMIZE), DEBUG)
@@ -296,6 +309,9 @@ endif
 
 GLDOPTS = $(STD_LOAD_OPTS)
 
+ifeq ($(BUILD_OS), LINUX)
+  STD_DSO_LOADOPTS += -shared
+endif
 
 #DSOSTARTOPT = -update_registry $(TARG_BE_DIR)/so_locations -show -Wl,-no_unresolved
 DSOSTARTOPT = -check_registry $(TARG_BE_DIR)/so_locations -show -Wl,-no_unresolved
@@ -306,7 +322,7 @@ DSOSTARTOPT_N32 = $(DSOSTARTOPT)
 TARGETS = ipa.so
 TARGETS_PURE = ipa.so.pure
 
-default: first $(TARGETS) last
+default: first depends $(TARGETS) last
 pure: $(TARGETS_PURE)
 
 #----------------------------------------------------------------------
@@ -318,6 +334,8 @@ first:
 	cd $(TARG_BE_DIR) && $(MAKE)
 ## verify that ipl.so is up to date
 	cd $(TARG_IPL_DIR) && $(MAKE)
+
+include $(BUILD_TOT)/Makeinclude
 
 last : make_deps
 
@@ -367,4 +385,39 @@ include $(COMMONRULES)
 ifeq ($(BUILD_OS), IRIX)
 DSONAMEOPT = -soname ipa.so
 endif
+
+
+# FIXME: copied from Ji's ../be/Makefile.gbase, not sure if needed.
+ifeq ($(BUILD_OS), IRIX)
+CFLAGS += -D_SGI_SGI
+CXXFLAGS += -D_SGI_SGI -D_USE_STL_EXT
+ ifeq ($(BUILD_COMPILER), VENDOR)
+ CFLAGS += -woff 1174,1209,3201
+ CXXFLAGS += -woff 1174,1209,3201
+ else
+ CFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+ CXXFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+ endif
+endif
+
+ifeq ($(BUILD_OS), LINUX)
+CFLAGS  += -D_LINUX_LINUX
+CXXFLAGS += -D_LINUX_LINUX -D_USE_STL_EXT
+endif
+
+ifeq ($(BUILD_OS), SOLARIS) 
+CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END -DMONGOOSE_BE \        -D_LONGLONG -Dlonglong -D_SVR4_SOURCE -D_NEW_SYMTAB -DTARG_SOLARIS \
+        $(LCINCS) $(OPTIMIZER)
+ ifeq ($(BUILD_COMPILER), VENDOR)
+ CFLAGS += -KPIC
+ ifeq ($(BUILD_SB), YES)
+ CFLAGS += -xsb
+ endif
+ endif
+ ifeq ($(BUILD_COMPILER), GNU)
+ CFLAGS += -D_USE_STL_EXT -D__GNU_BUG_WORKAROUND -fPIC
+ endif
+CXXFLAGS = $(CFLAGS) -w
+endif
+
 

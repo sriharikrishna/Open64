@@ -39,29 +39,29 @@
 extern "C" {
 #endif
 
-extern string tmpdir;
+extern char *tmpdir;
 
-extern void dump_argv (string *);
+extern void dump_argv (char **);
 
-extern int do_compile (string *);
+extern int do_compile (char **);
 
 extern void ld_kill_compilation (int);
 
-extern void add_to_tmp_file_list (string);
+extern void add_to_tmp_file_list (char *);
 
 extern void cleanup_all_files (void);
 
-extern string make_temp_file (string, char);
+extern char *make_temp_file (char *, char);
 
 extern int create_tmpdir ( int tracing );
 
-extern string create_unique_file (string, char);
+extern char *create_unique_file (char *, char);
 
-extern string *get_command_line (an_object_file_ptr, string, string, int *);
+extern char **get_command_line (an_object_file_ptr, char *, char *, int *);
 
-extern int make_link (const string, const string);
+extern int make_link (const char *, const char *);
 
-extern string ld_compile (an_object_file_ptr);
+extern char *ld_compile (an_object_file_ptr);
 
 extern char * always_demangle(char *, char );
 

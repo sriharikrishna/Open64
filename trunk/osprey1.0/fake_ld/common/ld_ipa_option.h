@@ -112,7 +112,7 @@ typedef enum {
 	TOS_MAX
 }targos_enum;
 
-extern string tos_string[TOS_MAX];
+extern char *tos_string[TOS_MAX];
 
 #ifdef _SUPPORT_IPA
 #define verboseflag ld_ipa_opt[LD_IPA_VERBOSE].flag
@@ -120,11 +120,11 @@ extern string tos_string[TOS_MAX];
 #endif
 
 extern char *outfilename;
-extern string ipacom_flags;
-extern string WB_flags;
-extern string Y_flags;
+extern char *ipacom_flags;
+extern char *WB_flags;
+extern char *Y_flags;
 extern int ipa_argc;
-extern string *ipa_argv;
+extern char **ipa_argv;
 extern int ipa_use_intrinsic;
 
 extern void ld_to_ipa_option_update(void);

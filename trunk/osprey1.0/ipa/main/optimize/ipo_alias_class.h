@@ -522,10 +522,22 @@ static bool operator==(AC_ST_IDENTIFIER x, AC_ST_IDENTIFIER y)
 	  x.base_st_idx == y.base_st_idx);
 }
 
+static bool operator!=(AC_ST_IDENTIFIER x, AC_ST_IDENTIFIER y)
+{
+  return !(x.pu_st_idx   == y.pu_st_idx &&
+	   x.base_st_idx == y.base_st_idx);
+}
+
 static bool operator==(AC_PREG_IDENTIFIER x, AC_PREG_IDENTIFIER y)
 {
   return (x.pu_st_idx == y.pu_st_idx &&
 	  x.preg_num  == y.preg_num);
+}
+
+static bool operator!=(AC_PREG_IDENTIFIER x, AC_PREG_IDENTIFIER y)
+{
+  return !(x.pu_st_idx == y.pu_st_idx &&
+	   x.preg_num  == y.preg_num);
 }
 
 class IP_BASE_ID_MAP_ENTRY;	// defined in ipo_alias_class.cxx.

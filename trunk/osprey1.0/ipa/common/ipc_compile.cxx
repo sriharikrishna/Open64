@@ -1076,7 +1076,7 @@ static const char* get_extra_args(const char* ipaa_filename)
      * as delimiters for new arguments (undoubling the doubled ones):
      */
   if (WB_flags) {
-    string p = ipc_copy_of (WB_flags);
+    char *p = ipc_copy_of (WB_flags);
     while (*p) {
       args.push_back(p);
 #if 1
