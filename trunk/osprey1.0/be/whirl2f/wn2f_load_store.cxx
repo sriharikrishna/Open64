@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.13 $
- * $Date: 2002-09-20 22:00:09 $
+ * $Revision: 1.14 $
+ * $Date: 2002-10-11 17:31:00 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.14 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -740,6 +740,8 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* Get the lhs of the assignment (dereference address) */
    lhs_tokens = New_Token_Buffer();
+
+   set_WN2F_CONTEXT_has_no_arr_elmt(context);
    WN2F_Offset_Memref(lhs_tokens, 
 		      WN_kid1(wn),           /* base-symbol */
 		      base_ty,               /* base-type */
@@ -1069,6 +1071,7 @@ WN2F_iload(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     
    /* Get the object to be loaded (dereference address) */
 
+   set_WN2F_CONTEXT_has_no_arr_elmt(context);
    WN2F_Offset_Memref(tokens, 
 		      WN_kid0(wn),                     /* base-symbol */
 		      base_ty,                         /* base-type */
