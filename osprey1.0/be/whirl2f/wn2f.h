@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: wn2f.h
- * $Revision: 1.7 $
- * $Date: 2003-03-04 20:03:04 $
+ * $Revision: 1.8 $
+ * $Date: 2004-03-02 21:34:03 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.h,v $
  *
@@ -349,6 +349,15 @@ typedef struct WN2F_Context
    ((c).flags = (c).flags | WN2F_CONTEXT_ISSUE_IOC_UNIT_ASTERISK)
 #define reset_WN2F_CONTEXT_issue_ioc_asterisk(c)\
    ((c).flags = (c).flags & ~WN2F_CONTEXT_ISSUE_IOC_UNIT_ASTERISK)
+
+#define WN2F_CONTEXT_SUBEXP_NO_PARENTHESIS 0x00040000
+#define WN2F_CONTEXT_subexp_no_parenthesis(c)\
+   ((c).flags & WN2F_CONTEXT_SUBEXP_NO_PARENTHESIS)
+#define set_WN2F_CONTEXT_subexp_no_parenthesis(c)\
+   ((c).flags = (c).flags | WN2F_CONTEXT_SUBEXP_NO_PARENTHESIS)
+#define reset_WN2F_CONTEXT_subexp_no_parenthesis(c)\
+   ((c).flags = (c).flags & ~WN2F_CONTEXT_SUBEXP_NO_PARENTHESIS)
+
 
     /* ---- Utilities to aid in WN to Fortran translation ---- */
     /* ------------------------------------------------------- */

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.15 $
- * $Date: 2004-01-13 03:54:03 $
+ * $Revision: 1.16 $
+ * $Date: 2004-03-02 21:34:03 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.15 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.16 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -93,7 +93,6 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 
 #define WN2F_IS_FUNCALL_OP(opc) \
    (Opc_Fname[opc]!=NULL && WN2F_IS_ALPHABETIC(opc))
-
 
 /* Mapping from opcodes to Fortran names for arithmetic/logical 
  * operations.  An empty (NULL) name will occur for non-
@@ -518,6 +517,7 @@ WN2F_Convert(TOKEN_BUFFER tokens,
     * in the given token-buffer to the given mtype.
     */
    Prepend_Token_Special(tokens, '(');
+
    if (Conv_Op[from_mtype][to_mtype] == NULL)
    {
       ASSERT_WARN(Conv_Op[from_mtype][to_mtype] != NULL,
@@ -600,13 +600,18 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
    /* Infix Fortran operator.  Only string argument are passed by
     * reference; all other argument types are passed by value.
     */
-   const BOOL   parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+   const BOOL   parenthesize = !(WN2F_CONTEXT_no_parenthesis(context) ||
+                                WN2F_CONTEXT_subexp_no_parenthesis(context));
+
    const BOOL   binary_op = (wn0 != NULL);
 
    TY_IDX      wn0_ty;       /* Expected type of wn0 */
    TY_IDX      wn1_ty;       /* Expected type of wn1 */
    TY_IDX      kid0_ty;
    TY_IDX      kid1_ty;
+   INT  priori_p = 0;
+   INT  priori_k0 = 0;
+   INT  priori_k1 = 0;
 
    /* Ensure that subexpressions are parenthesized */
    reset_WN2F_CONTEXT_no_parenthesis(context);
@@ -621,6 +626,30 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
    if (parenthesize)
       Append_Token_Special(tokens, '(');
+  
+   if (OPCODE_operator(opcode) == OPR_ADD ||
+       OPCODE_operator(opcode) == OPR_SUB)
+         priori_p = 1;
+   else if (OPCODE_operator(opcode) == OPR_MPY)
+         priori_p = 2;
+
+   if (binary_op){
+      if (WN_operator(wn0) == OPR_ADD ||
+          WN_operator(wn0) == OPR_SUB)
+              priori_k0 = 1;
+      else if (WN_operator(wn0) == OPR_MPY)
+              priori_k0 = 2;
+   }
+
+   if (WN_operator(wn1) == OPR_ADD ||
+       WN_operator(wn1) == OPR_SUB)
+        priori_k1 = 1;
+   else if (WN_operator(wn1) == OPR_MPY)
+        priori_k1 = 2;
+
+   if (priori_p && priori_k0 &&
+       priori_p <= priori_k0)
+         set_WN2F_CONTEXT_subexp_no_parenthesis(context);
 
    /* First operand */
    if (binary_op)
@@ -629,6 +658,8 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 					TRUE/*call-by-value*/,
 					context);
       } 
+
+   reset_WN2F_CONTEXT_subexp_no_parenthesis(context);
 
    /* Operation */
 
@@ -696,10 +727,18 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
    /* Second operand, or only operand for unary operation */
 
+
+   if (priori_p && priori_k1 &&
+       priori_p <= priori_k1)
+      set_WN2F_CONTEXT_subexp_no_parenthesis(context);
+
    WN2F_Translate_Arithmetic_Operand(tokens, wn1, wn1_ty, 
 				     TRUE/*call-by-value*/,
 				     context);
+
    reset_WN2F_CONTEXT_has_logical_arg(context);
+   reset_WN2F_CONTEXT_subexp_no_parenthesis(context);
+
    if (parenthesize)
       Append_Token_Special(tokens, ')');
 
@@ -1398,7 +1437,9 @@ WN2F_paren(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_paren"));
 
    Append_Token_Special(tokens, '(');
+   set_WN2F_CONTEXT_subexp_no_parenthesis(context);
    status = WN2F_translate(tokens, WN_kid0(wn), context);
+   reset_WN2F_CONTEXT_subexp_no_parenthesis(context);
    Append_Token_Special(tokens, ')');
 
    return status;
@@ -1620,11 +1661,13 @@ WN2F_STATUS
 WN2F_recip(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
    TY_IDX const result_ty = Stab_Mtype_To_Ty(WN_opc_rtype(wn));
+   BOOL no_parenthesis =  (WN_operator(WN_kid0(wn)) == OPR_PAREN ||
+                           WN_operator(WN_kid0(wn)) == OPR_LDID  ||
+                           WN_operator(WN_kid0(wn)) == OPR_LDA);
    
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_RECIP, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_recip"));
 
-   Append_Token_Special(tokens, '(');
    if (TY_mtype(result_ty) == MTYPE_FQ || TY_mtype(result_ty) == MTYPE_CQ)
       Append_Token_String(tokens, "1Q00");
    else if (TY_mtype(result_ty) == MTYPE_F8 || TY_mtype(result_ty) == MTYPE_C8)
@@ -1633,10 +1676,13 @@ WN2F_recip(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       Append_Token_String(tokens, "1E00");
 
    Append_Token_Special(tokens, '/');
+   if (!no_parenthesis)
+         Append_Token_Special(tokens, '(');
    WN2F_Translate_Arithmetic_Operand(tokens, WN_kid(wn,0), result_ty,
 				     !TY_Is_Character_Reference(result_ty),
 				     context);
-   Append_Token_Special(tokens, ')');
+   if (!no_parenthesis)
+      Append_Token_Special(tokens, ')');
 
    return EMPTY_WN2F_STATUS;
 } /* WN2F_recip */
