@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:42 $
+ * $Revision: 1.4 $
+ * $Date: 2003-02-25 21:12:35 $
  * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -80,6 +80,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #if defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 2)))
 #include <ext/hash_set>
 using namespace __gnu_cxx;
+#elif defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
+#include <set>
 #else
 #include <hash_set>
 #endif
@@ -2051,6 +2053,19 @@ WN2C_Append_Symtab_Consts(TOKEN_BUFFER tokens,
    }
 } /* WN2C_Append_Symtab_Consts */
 
+
+#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
+struct ltstr
+{
+  bool operator()(const char* s1, const char* s2) const
+  {
+    return strcmp(s1, s2) < 0;
+  }
+};
+static std::set<const char*, ltstr> upcr_internal;
+
+#else
+
 struct eqstr
 {
   bool operator()(const char* s1, const char* s2) const
@@ -2058,8 +2073,9 @@ struct eqstr
     return strcmp(s1, s2) == 0;
   }
 };
-
 static hash_set<const char*, hash<const char*>, eqstr> upcr_internal;
+#endif
+
 static bool init = false;
 
 static bool lookup(const char* s) {

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: tcon2c.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:16 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-25 21:12:35 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/tcon2c.cxx,v $
  *
  * Revision history:
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/tcon2c.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/tcon2c.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -64,7 +64,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 /*---------------------- Hidden utilities ---------------------*/
 /*-------------------------------------------------------------*/
   
-static const char *
+static char *
 Remove_Trailing_Zero_Fraction(char *strbase)
 {
    /* Expect the input to be of the form: "d.dddde+dd", where a '-' may 
@@ -216,7 +216,7 @@ TCON2C_finalize(void)
 void 
 TCON2C_translate(TOKEN_BUFFER tokens, TCON tvalue)
 {
-   const char  *strbase;
+   char	       *strbase;
    char        *str;
    INT32        max_strlen, strlen, stridx;
    

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2c_driver.c
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:41 $
+ * $Revision: 1.4 $
+ * $Date: 2003-02-25 21:12:35 $
  * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $
  *
@@ -61,7 +61,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -1204,6 +1204,9 @@ W2C_Outfile_Init(BOOL emit_global_decls)
 
    char buf[MAX_LINE_LEN];
    FILE* in = fopen(W2C_File_Name[W2C_DATA_FILE], "r");
+   if (in == NULL) {
+      ErrMsg(EC_IR_Open, W2C_File_Name[W2C_DATA_FILE], errno);
+   }
 
    while (fgets(buf, MAX_LINE_LEN, in) != NULL) {
      Write_String(W2C_File[W2C_DOTC_FILE], W2C_File[W2C_LOC_FILE], buf);
