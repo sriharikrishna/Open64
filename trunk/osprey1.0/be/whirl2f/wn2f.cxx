@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.17 $
- * $Date: 2004-02-09 16:55:45 $
- * $Author: fzhao $
+ * $Revision: 1.18 $
+ * $Date: 2004-02-13 21:24:30 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
  *
@@ -67,11 +67,13 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.17 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.18 $";
 #endif
 
 #include <alloca.h>
 #include <set>
+
+#include "x_string.h"        // for strcasecmp()
 #include "whirl2f_common.h"
 #include "PUinfo.h"          /* From be/whirl2c directory */
 #include "wn2f.h"
@@ -1064,13 +1066,29 @@ WN2F_comment(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
    ASSERT_DBG_FATAL(WN_opcode(wn) == OPC_COMMENT,
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_comment"));
-   
-   /* Avoid comments with special interpretation
-    */
-   if (strcmp(Index_To_Str(WN_GetComment(wn)), "ENDLOOP") != 0)
-   {
-   }
 
+   /* Used to avoid comments with special interpretation.  Note that
+      this is basically a prefix test.
+    */
+   static char* avoid[] = {
+     "ENDLOOP",
+     /* original text of I/O stmt is saved in comment nodes */
+     /*   open, close, rewind, backspace, format? */
+     "read", "write", "print" 
+   };
+   static int avoidSZ = sizeof(avoid) / sizeof(char*);
+   
+   const char* com = Index_To_Str(WN_GetComment(wn));
+   
+   for (int i = 0; i < avoidSZ; ++i) {
+     const char* str = avoid[i];
+     if (ux_strncasecmp(com, str, strlen(str)) == 0) { 
+       return EMPTY_WN2F_STATUS; 
+     }
+   }
+   
+   WHIRL2F_Append_Comment(tokens, com, 0, 0);
+   
    return EMPTY_WN2F_STATUS;
 } /* WN2F_comment */
 
