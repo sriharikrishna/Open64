@@ -33,13 +33,14 @@
 #
 
 #
-#  This file does all the verification and preliminary processing of the
-#  BUILD_* parameters.  It is one of three files which act together to build
-#  all compiler components and libraries.  There is a Makefile in every build
-#  directory which defines the twelve BUILD_* parameters and includes this file.
-#  This file does its checking, computes some standard (STD_*) variables which
-#  are common to many builds then includes the final piece (Makefile.base)
-#  which does all the real build work.
+#  This file does all the verification and preliminary processing of
+#  the BUILD_* parameters.  It is one of three files which act together
+#  to build all compiler components and libraries.  There is a Makefile
+#  in every build directory which defines the twelve BUILD_* parameters
+#  and includes this file.  This file does its checking, computes some
+#  standard (STD_*) variables which are common to many builds then
+#  includes the final piece (Makefile.base) which does all the real
+#  build work.
 #
 #  The BUILD_* parameters are:
 #     BUILD_AREA     = specifies the top of this build area subtree
@@ -344,7 +345,7 @@ else
 endif
 
 #
-#  Verify that BUILD_OS is defined and is either IRIX or LINUX.
+#  Verify that BUILD_OS is defined and is either IRIX, LINUX, SOLARIS.
 #
 
 ifndef BUILD_OS
@@ -357,6 +358,7 @@ ifneq ($(BUILD_OS), LINUX)
 endif
 endif
 endif
+
 
 ifndef BUILD_HOST
   ifneq (,$(findstring MIPS,$(BUILD_ARCH)))
@@ -375,6 +377,23 @@ endif
 endif
 endif
 endif
+
+
+# eraxxon: For now, cygwin piggy-backs upon linux build files.  The
+# following variables are needed due to differences between cygwin and
+# conventional unices.
+REAL_BUILD_OS = $(findstring CYGWIN, $(shell uname -s))
+ifeq ($(REAL_BUILD_OS),CYGWIN)
+  BUILD_OS_CYGWIN = 1
+  # DSOs *must* have the dll extension in order to link correctly.
+  EXEext = .exe
+  DSOext = .dll
+else
+  EXEext =# (this value is the empty string)
+  DSOext = .so
+endif
+
+
 
 #
 #  Set COMMONDEFS as appropriate based on BUILD_OS.
