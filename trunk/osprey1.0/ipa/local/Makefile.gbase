@@ -198,6 +198,10 @@ LCOPTS = $(STD_COMPILE_OPTS)
 LCDEFS = $(HOSTDEFS) $(TARGDEFS)
 LCINCS = $(addprefix -I, $(HEADER_DIRS))
 
+ifeq ($(BUILD_OS), LINUX)
+LCINCS += -I$(BUILD_AREA)/include
+endif
+
 ifeq ($(BUILD_COMPILER), EDG)
 LC++OPTS = $(STD_COMPILE_OPTS) $(STD_C++_OPTS) -fullwarn -woff 1171,1172,1174,1201,1209,1375
 else
@@ -209,6 +213,14 @@ LC++INCS = $(LCINCS)
 LASOPTS = $(STD_COMPILE_OPTS)
 LASDEFS = $(HOSTDEFS) $(TARGDEFS)
 LASINCS = $(LCINCS)
+
+ifneq ($(STL_EXT_PATH),)
+LC++INCS += -I$(STL_EXT_PATH)
+endif
+
+ifeq ($(BUILD_OS), LINUX)
+LC++INCS += -D__STL_USE_NAMESPACES
+endif
 
 ifeq ($(BUILD_COMPILER), EDG)
 WOFF = -fullwarn
@@ -246,7 +258,7 @@ ifeq ($(BUILD_COMPILER), EDG)
 LLDLIBS = -none
 endif
 
-default: first $(TARGETS) last
+default: first depends $(TARGETS) last
 
 #----------------------------------------------------------------------
 #  The commands in this section are done BEFORE any other target is
@@ -258,6 +270,8 @@ ifeq ($(BUILD_OS), LINUX)
 endif
 ## verify that wopt.so is up to date
 	cd $(TARG_OPT_DIR) && $(MAKE)
+
+include $(BUILD_TOT)/Makeinclude
 
 #----------------------------------------------------------------------
 #  The commands in this section are done AFTER every other target is
@@ -291,6 +305,10 @@ else
 LINK_DSOS = $(TARG_BE_DIR)/be.so
 endif
 
+ifeq ($(BUILD_OS), LINUX)
+  STD_DSO_LOADOPTS += -shared
+endif
+
 ipl.so: $(IPA_OBJS) $(IPA_CXX_OBJS) $(LINK_DSOS) \
 		$(BE_BE_DIR)/so_locations $(IPA_LOCAL_DIR)/Exported
 	$(C++F) -o $@  $(STD_DSO_LOADOPTS) $(EXPORT_LIST)	\
@@ -304,4 +322,42 @@ ipl.so: $(IPA_OBJS) $(IPA_CXX_OBJS) $(LINK_DSOS) \
 #  Include the usual commonrules
 #----------------------------------------------------------------------
 include $(COMMONRULES)
+
+#----------------------------------------------------------------------
+#  Special case rules for files that want to be individualistic
+#----------------------------------------------------------------------
+
+# FIXME: copied from Ji's ../be/Makefile.gbase, not sure if needed.
+ifeq ($(BUILD_OS), IRIX)
+CFLAGS += -D_SGI_SGI
+CXXFLAGS += -D_SGI_SGI -D_USE_STL_EXT
+ ifeq ($(BUILD_COMPILER), VENDOR)
+ CFLAGS += -woff 1174,1209,3201
+ CXXFLAGS += -woff 1174,1209,3201
+ else
+ CFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+ CXXFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+ endif
+endif
+
+ifeq ($(BUILD_OS), LINUX)
+CFLAGS  += -D_LINUX_LINUX
+CXXFLAGS += -D_LINUX_LINUX -D_USE_STL_EXT
+endif
+
+ifeq ($(BUILD_OS), SOLARIS) 
+CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END -DMONGOOSE_BE \        -D_LONGLONG -Dlonglong -D_SVR4_SOURCE -D_NEW_SYMTAB -DTARG_SOLARIS \
+        $(LCINCS) $(OPTIMIZER)
+ ifeq ($(BUILD_COMPILER), VENDOR)
+ CFLAGS += -KPIC
+ ifeq ($(BUILD_SB), YES)
+ CFLAGS += -xsb
+ endif
+ endif
+ ifeq ($(BUILD_COMPILER), GNU)
+ CFLAGS += -D_USE_STL_EXT -D__GNU_BUG_WORKAROUND -fPIC
+ endif
+CXXFLAGS = $(CFLAGS) -w
+endif
+
 

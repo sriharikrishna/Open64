@@ -1024,7 +1024,7 @@ inline char * WN_asm_input_constraint(const WN *wn) { return ST_name(WN_st(wn));
 #define WN_switch_table(x)	WN_kid((x),1)
 #define WN_switch_default(x)	WN_kid((x),2)
 
-#if defined(_LP64) && !defined(_SGI_COMPILER_VERSION)
+#if (defined(_LP64) || defined(__GNUC__)) && !defined(_SGI_COMPILER_VERSION)
 /* workaround for g++ bug */
 #else
 #define max(a,b)  ((a > b) ? a : b)

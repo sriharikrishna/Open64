@@ -41,6 +41,7 @@
 #include <math.h>
 #include <sys/types.h>
 #include <limits.h>
+#include <float.h>
 #include "pu_info.h"
 #include "lnoutils.h"
 #include "lnopt_main.h"
