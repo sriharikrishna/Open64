@@ -34,7 +34,10 @@
 
 #include "intrn_info.h"
 
-const intrn_info_t intrn_info[INTRINSIC_LAST+1] = {
+// eraxxon: see comments about 'const' in intrn_info.h
+
+/*const*/
+intrn_info_t intrn_info[INTRINSIC_LAST+1] = {
   { /* NONE */
 	NOT_BYVAL, NOT_PURE, SIDEEFFECTS, DOES_RETURN, NOT_ACTUAL, NOT_CGINTRINSIC,
 	IRETURN_UNKNOWN, NULL, NULL, NULL},
