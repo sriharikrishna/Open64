@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.27 $
- * $Date: 2004-08-06 19:52:56 $
- * $Author: fzhao $
+ * $Revision: 1.28 $
+ * $Date: 2004-10-23 01:14:41 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -1795,13 +1795,25 @@ TY2F_Translate_Purple_Array(TOKEN_BUFFER tokens, ST *st, TY_IDX ty)
    }
 } /* TY2F_Translate_Purple_Array */
 
+
+
+static long
+GetLB(ARB_HANDLE arb)
+{
+  long lbnd = 1;
+  if (ARB_const_lbnd(arb)) {
+    lbnd = ARB_lbnd_val(arb);
+  }
+  return lbnd;
+}
+
+
 void 
 TY2F_Translate_ArrayElt(TOKEN_BUFFER tokens, 
 			TY_IDX       arr_ty_idx,
 			STAB_OFFSET  arr_ofst)
 {
   TOKEN_BUFFER idx_tokens = New_Token_Buffer();
-  STAB_OFFSET  idx;
   INT32        dim;
   ARB_HANDLE   arb;
   
@@ -1833,27 +1845,28 @@ TY2F_Translate_ArrayElt(TOKEN_BUFFER tokens,
       {
 	ARB_HANDLE arb = arb_base[dim];
 
-	if (arr_ofst == 0)
-	  {
-	    Prepend_Token_String(idx_tokens, Number_as_String(1LL, "%lld"));
-	  }
-	else if (ARB_const_stride(arb)) /* Constant stride */
-	  {
-	    idx = arr_ofst/ARB_stride_val(arb) + 1;
-	    Prepend_Token_String(idx_tokens, Number_as_String(idx, "%lld"));
-	    arr_ofst -= (arr_ofst/ARB_stride_val(arb))*ARB_stride_val(arb);
-	  }
-	else
-	  {
-	    Append_Token_String(idx_tokens, "*");
-	  }
+	if (arr_ofst == 0) {
+	  long lbnd = GetLB(arb);
+	  Prepend_Token_String(idx_tokens, Number_as_String(lbnd, "%ld"));
+	}
+	else if (ARB_const_stride(arb)) { /* Constant stride */
+	  long lbnd = GetLB(arb);
+	  long idx = arr_ofst/ARB_stride_val(arb) + lbnd;
+	  Prepend_Token_String(idx_tokens, Number_as_String(idx, "%ld"));
+	  arr_ofst -= (arr_ofst/ARB_stride_val(arb))*ARB_stride_val(arb);
+	}
+	else {
+	  Append_Token_String(idx_tokens, "*");
+	}
 	if (dim-- > 0)
 	  Prepend_Token_Special(idx_tokens, ',');
       }
-  Append_And_Reclaim_Token_List(tokens, &idx_tokens);
-}
-Append_Token_Special(tokens, ')');
+      Append_And_Reclaim_Token_List(tokens, &idx_tokens);
+    }
+  Append_Token_Special(tokens, ')');
 } /* TY2F_Translate_ArrayElt */
+
+
 
 void
 TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
