@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.18 $
- * $Date: 2003-02-19 20:15:35 $
+ * $Revision: 1.19 $
+ * $Date: 2003-03-13 21:16:58 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.18 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.19 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -69,6 +69,9 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "ty2f.h"
 #include "tcon2f.h"
 #include "wn2f_load_store.h"
+
+#define DEB_Whirl2f_IR_TY_WN2F_Arrsection_Slots 0
+#define DEB_Whirl2f_IR_TY_WN2F_Arrsection_Slots_st1 0
 
 extern BOOL W2F_Only_Mark_Loads; /* Defined in w2f_driver.c */
 static void WN2F_Block(TOKEN_BUFFER tokens, ST * st, STAB_OFFSET off,WN2F_CONTEXT context) ;
@@ -83,9 +86,9 @@ static WN *WN2F_OneInt_Ptr = NULL;
    (WN2F_OneInt_Ptr == NULL? WN2F_OneInt_Ptr = WN2F_Initiate_OneInt() \
                             : WN2F_OneInt_Ptr)
 
-void WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,
+void WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,TY_IDX array_ty,WN2F_CONTEXT context,
                             BOOL parens);
-void WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens);
+void WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,TY_IDX array_ty,WN2F_CONTEXT context,BOOL parens);
 
 /*------------------------- Utility Functions ------------------------*/
 /*--------------------------------------------------------------------*/
@@ -1755,7 +1758,8 @@ WN2F_arrsection(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 */
 
      WN2F_translate(tokens, kid, context);
-     WN2F_Arrsection_Slots(tokens,wn,context,TRUE);
+     WN2F_Arrsection_Slots(tokens,wn,ptr_ty,context,TRUE);
+/* need example to test how to set this TY_IDX argument---fzhao*/
    }
    else
    {
@@ -1877,7 +1881,8 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
        /* a preg or sym has been used as an address, usually after optimization      */
        /* don't know base type, or anything else so use OPR_ARRAY to generate bounds */
      WN2F_translate(tokens, kid, context);
-     WN2F_Array_Slots(tokens,wn,context,TRUE);     
+     WN2F_Array_Slots(tokens,wn, ptr_ty, context,TRUE);     
+/* need to take example to see if it's OK to use ptr_ty here*/
    } 
    else 
    {
@@ -1940,14 +1945,13 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
 
 void
-WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
+WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,TY_IDX array_ty,WN2F_CONTEXT context,BOOL parens)
 {
   INT32 dim;
   WN * kidz;
   INT32 co_dim;
   INT32 array_dim;
   TY_IDX ttyy;
-  ST * st;
   ARB_HANDLE arb_base;
    WN* kid;
 
@@ -1961,9 +1965,8 @@ WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL pare
    * memory locations.
    */
 
-  kidz = WN_kid0(wn);
-  st  =  WN_st(kidz);
-  ttyy = ST_type(st);
+  ttyy = array_ty;
+
   if (TY_Is_Pointer(ttyy))  //Sept temp use
      ttyy=TY_pointed(ttyy);
   if (TY_is_f90_pointer(ttyy))
@@ -1973,8 +1976,7 @@ WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL pare
 
   dim =  ARB_dimension(arb_base);
   co_dim = ARB_co_dimension(arb_base);
-  if (co_dim <= 0)
-      co_dim = 0;
+
 
   if (dim >  WN_num_dim(wn) ) {
 
@@ -2054,13 +2056,12 @@ if (co_dim > 0) {
 }
 
 void
-WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
+WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,TY_IDX array_ty,WN2F_CONTEXT context,BOOL parens)
 {
   INT32 dim;
   WN * kid;
   INT32 co_dim;
   INT32 array_dim;
-  ST * st;
   ARB_HANDLE arb_base;
   TY_IDX ttyy;
 
@@ -2076,8 +2077,7 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
 
 if (WN_operator(kid)==OPR_LDA)
  {
-  st  =  WN_st(kid);
-  ttyy = ST_type(st);
+  ttyy = array_ty;
 
   if (TY_Is_Pointer(ttyy))
      ttyy =TY_pointed(ttyy);
@@ -2093,15 +2093,17 @@ if (WN_operator(kid)==OPR_LDA)
    dim = WN_num_dim(wn);
  }
 
-  if (co_dim <= 0)
-      co_dim = 0;
 
- if (dim == WN_num_dim(wn))
+  if (dim >  WN_num_dim(wn) ) {
      array_dim = dim-co_dim;
- else { // this means the co_rnks were omitted
-        array_dim = WN_num_dim(wn);
-        co_dim = 0;
-      }
+     co_dim = 0;
+   }
+   else {
+         dim =  WN_num_dim(wn);
+         array_dim = dim;
+       }
+
+
 
   /* Gets bounds from the slots of an OPC_ARRAY node  */
 
@@ -2175,7 +2177,7 @@ WN2F_arrsection_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT
                       (DIAG_UNIMPLEMENTED,
                        "access/declaration mismatch in array element size"));
 
-      WN2F_Arrsection_Slots(tokens,wn,context,TRUE);
+      WN2F_Arrsection_Slots(tokens,wn,array_ty,context,TRUE);
 
       /* We handle the case when an array is declared to have more
        * dimensions than that given by this array addressing expression.
@@ -2234,7 +2236,7 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
 		      (DIAG_UNIMPLEMENTED, 
 		       "access/declaration mismatch in array element size"));
 
-      WN2F_Array_Slots(tokens,wn,context,FALSE);
+      WN2F_Array_Slots(tokens,wn,array_ty,context,FALSE);
 
       /* We handle the case when an array is declared to have more 
        * dimensions than that given by this array addressing expression.
