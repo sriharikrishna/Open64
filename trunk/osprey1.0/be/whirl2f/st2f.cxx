@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.27 $
- * $Date: 2003-12-09 19:25:10 $
- * $Author: eraxxon $
+ * $Revision: 1.28 $
+ * $Date: 2004-01-06 19:07:07 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.27 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.28 $";
 #endif
 
 #include <ctype.h>
@@ -779,7 +779,9 @@ void ReorderParms(ST **parms,INT32 num_params)
   for (i=0; i<num_params; i++)
    if (TY_kind(ST_type(parms[i])) == KIND_POINTER ){
         ty_index = TY_pointed(ST_type(parms[i]));
+
         if ((TY_kind(ty_index) == KIND_ARRAY) &&
+             !TY_is_character(ty_index) &&
               !TY_is_f90_deferred_shape(ty_index)){
 
           TY& ty = Ty_Table[ty_index];
@@ -868,7 +870,6 @@ void ReorderParms(ST **parms,INT32 num_params)
    }
   }
 
-  reorder_parms[keep] = NULL;
   for(INT32 k=0; k<num_params; k++)
       parms[k] = reorder_parms[k];
 
@@ -1095,7 +1096,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
     }  /*while*/
 
    if (num_params)
-       ReorderParms(params,num_params);
+       ReorderParms(params,num_params-implicit_parms);
    param_tokens = New_Token_Buffer();
 
    if (!is_altentry)
