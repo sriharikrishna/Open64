@@ -43,7 +43,7 @@ PWD := $(shell pwd)
 
 BUILD_AREA     = ..
 BUILD_TOT      = $(PWD)/../..
-BUILD_BASE     = $(BUILD_TOT)/gnu_common/libiberty
+BUILD_BASE     = $(BUILD_TOT)/kgnu_common/libiberty
 
 include $(BUILD_AREA)/Makefile.platform
 

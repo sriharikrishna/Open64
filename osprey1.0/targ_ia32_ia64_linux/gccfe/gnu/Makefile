@@ -43,7 +43,7 @@ PWD := $(shell pwd)
 
 BUILD_AREA     = ../..
 BUILD_TOT      = $(PWD)/../../..
-BUILD_BASE     = $(BUILD_TOT)/gccfe/gnu
+BUILD_BASE     = $(BUILD_TOT)/kgccfe/gnu
 
 include $(BUILD_AREA)/Makefile.platform
 

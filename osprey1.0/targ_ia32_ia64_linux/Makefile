@@ -101,7 +101,7 @@ TOOL_SUBDIRS = \
         crayf90/fe90 \
         crayf90/sgi \
         driver \
-        gccfe \
+        kgccfe \
         ir_tools \
         whirl2f \
         whirl2c \
