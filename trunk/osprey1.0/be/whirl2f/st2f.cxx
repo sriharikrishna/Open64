@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.14 $
- * $Date: 2003-06-19 19:22:35 $
- * $Author: broom $
+ * $Revision: 1.15 $
+ * $Date: 2003-06-23 20:46:46 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.14 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.15 $";
 #endif
 
 #include <ctype.h>
@@ -826,6 +826,13 @@ ST2F_func_header(TOKEN_BUFFER tokens,
     int k;
     const char *st_name;
     const char *st_name1;
+
+/* add a use stmt corresponding to an added module in *.w2f.f
+ * to solve the real kind problem
+ *--------fzhao
+ */
+     Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
+     Append_Token_String(header_tokens, "use w2f__types");
 
     while (stmt !=NULL) {
    if (WN_operator(stmt)==OPR_USE){
