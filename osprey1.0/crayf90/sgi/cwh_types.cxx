@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.14 $
- * $Date: 2003-06-03 20:15:22 $
+ * $Revision: 1.15 $
+ * $Date: 2003-06-24 22:11:54 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.14 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.15 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -159,6 +159,8 @@ fei_descriptor (INT32        flag_matrix,
      if (test_flag(flag_matrix,FEI_ASSUMED_SIZE_ARRAY))
 	    Set_TY_is_f90_assumed_size(ty_idx);
 
+     if (co_top_decl_bounds != ANULL)
+            Set_TY_is_co_array(ty_idx);
 
    /*
     * move unique from "cwh_types_mk_array_TY" to here,
