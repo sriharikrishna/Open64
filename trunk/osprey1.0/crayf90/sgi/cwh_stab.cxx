@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.17 $
- * $Date: 2003-05-22 19:08:17 $
+ * $Revision: 1.18 $
+ * $Date: 2003-06-09 22:06:39 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.17 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.18 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -359,12 +359,16 @@ fei_proc_def(char         *name_string,
   /* which should be replaced with the correct return type/args */
 
   
+
   PU_IDX pu_idx = ST_pu(st);
   PU& pu = Pu_Table[pu_idx];
+  pu.lexical_level =CURRENT_SYMTAB;   /*"interface" declared in nested PU  gave a wrong
+                                       * PU level;must reset the PU level for "later" defintion
+                                       * ----fzhao
+                                       */
 
   Set_PU_prototype (pu, ty);
   Set_PU_f90_lang (pu);
-  
 
   if (is_inline_func)
      Set_PU_is_inline_function(pu);
@@ -498,6 +502,7 @@ fei_proc_interface(char         *name_string,
 
   sym_class = (FUNCTION_SYM) Sym_class_arg;
   Class = (PROC_CLASS) Class_arg;
+  eclass = EXPORT_PREEMPTIBLE;
 
   /* fn result type - void for results by formal */
 
