@@ -39,11 +39,11 @@ static char USMID[] = "\n@(#)5.0_pl/sources/cond_comp.c	5.8	09/21/99 00:21:13\n"
 /*
  * Linux workaround - not necessary for all linux machine
  */
-#ifdef _LINUX_LINUX
+/* #ifdef _LINUX_LINUX*/
 # include <time.h>
-#else
+/* #else*/
 # include <sys/time.h>
-#endif
+/* #endif*/
 
 # include "defines.h"           /* Machine dependent ifdefs */
 
