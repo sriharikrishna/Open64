@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.9 $
- * $Date: 2003-09-04 18:24:37 $
- * $Author: broom $
+ * $Revision: 1.10 $
+ * $Date: 2003-09-09 16:27:42 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.10 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -5767,8 +5767,16 @@ WN2C_lda(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
 	       TY_pointed(WN_ty(wn)),        /* preferred type */
 	       TY_mtype(wn_st_type),         /* required mtype */
 	       lda_offset);                  /* offset from base */
+
+        /*if the object type is "struct"(union) need to output the corresponding
+          selector------fzhao
+         */
+         if (TY_Is_Structured(object_ty) && WN_field_id(wn) != 0 )
+            object_ty = Get_Field_Type(object_ty,WN_field_id(wn));
+
       }
       else
+
       {
          object_ty = ST_sym_class(WN_st(wn)) == CLASS_FUNC ?
                                     ST_pu_type(WN_st(wn)) : ST_type(WN_st(wn));
