@@ -38,8 +38,8 @@
 // ====================================================================
 //
 // Module: fb_cfg.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:31 $
+// $Revision: 1.2 $
+// $Date: 2003-12-09 19:20:43 $
 //
 // Description:
 //
@@ -59,6 +59,9 @@
 
 #include <cmplrs/fb.h>
 #include <stdlib.h>
+#include <utility>        // STL pair.
+using namespace std;
+
 #include "wn_util.h"
 #include "wn_map.h"
 #include "errors.h"		// for ErrMsg
@@ -69,14 +72,6 @@
 #include "com_whirlview.h"
 
 #include "cxx_graph.h"
-
-// Solaris CC workaround
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-#include <utility>
-using namespace std;
-#else
-#include <pair.h>         // STL pair.
-#endif
 
 #include "DaVinci.h"      // for DaVinci viewer (for FB CFG).
 #include "wb_util.h"      // more: move this to another file (gwe).

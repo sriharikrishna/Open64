@@ -38,8 +38,8 @@
 // ====================================================================
 //
 // Module: fb_whirl.cxx
-// $Revision: 1.2 $
-// $Date: 2003-02-17 23:49:51 $
+// $Revision: 1.3 $
+// $Date: 2003-12-09 19:20:44 $
 //
 // Description:
 //
@@ -67,6 +67,9 @@
 
 #include <cmplrs/fb.h>
 #include <stdlib.h>
+#include <utility>        // STL pair.
+using namespace std;
+
 #include "wn_util.h"
 #include "wn_map.h"
 #include "errors.h"		// for ErrMsg
@@ -80,14 +83,6 @@
 #include "com_whirlview.h"
 
 #include "cxx_graph.h"
-
-// Solaris CC workaround
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-#include <utility>
-using namespace std;
-#else
-#include <pair.h>         // STL pair.
-#endif
 
 #include "DaVinci.h"      // for DaVinci viewer (for FB CFG).
 #include "wb_util.h"      // more: move this to another file (gwe).
@@ -976,20 +971,8 @@ FEEDBACK::Annot_switch( WN *wn, const FB_Info_Switch& fb_info )
 }
 
 
-// Solaris CC workaround
-// FEEDBACK::Annot() is declared as Annot(WN, const FB_EDGE_TYPE, FB_FREQ)
-// in fb_whirl.h but here is defined without "const".
-// this caused the usual name mangling error, because Solaris CC comipler
-// decorate different names for them. As a result, other source files 
-// including the header will get a different name than fb_whirl.o
-//
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
 void
 FEEDBACK::Annot( WN *wn, const FB_EDGE_TYPE type, FB_FREQ freq )
-#else
-void
-FEEDBACK::Annot( WN *wn, FB_EDGE_TYPE type, FB_FREQ freq )
-#endif
 {
   INT32 fb_index;
 
