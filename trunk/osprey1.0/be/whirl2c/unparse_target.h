@@ -28,8 +28,8 @@
 /* ====================================================================
  *
  * Module: unparse_target.h
- * $Revision: 1.1 $
- * $Date: 2003-06-12 15:27:49 $
+ * $Revision: 1.2 $
+ * $Date: 2003-06-13 23:05:29 $
  * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/unparse_target.h,v $
  *
@@ -71,11 +71,18 @@ public:
 	virtual const char *Make_Valid_Name(const char *name, BOOL allow_dot) = 0;
 
 	virtual const char *Get_St_Name(const ST *st, const char *original_name) = 0;
+	virtual const char *Intrinsic_Name(INTRINSIC intr_opc) = 0;
 
         /* Some globals eg: COMMONs, functions,  should get the same name */
         /* if they appear in the global symbol table more than once. They */
         /* may have been created by different PUs.                        */
 	virtual BOOL Avoid_Common_Suffix(void) = 0;
+
+        virtual BOOL Reduce_Const_Ptr_Exprs(void) = 0;
+
+	virtual BOOL Enter_Symtab_Pointee_Names(void) = 0;
+
+	virtual BOOL Is_Binary_Or_Tertiary_Op (char c) = 0;
 };
 
 extern Unparse_Target *W2X_Unparse_Target;

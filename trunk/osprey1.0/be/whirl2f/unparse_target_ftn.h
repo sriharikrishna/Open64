@@ -28,9 +28,9 @@
 /* ====================================================================
  *
  * Module: unparse_target.h
- * $Revision: 1.2 $
- * $Date: 2003-06-13 19:14:12 $
- * $Author: jle $
+ * $Revision: 1.3 $
+ * $Date: 2003-06-13 23:05:30 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/unparse_target_ftn.h,v $
  *
  * Revision history:
@@ -44,6 +44,9 @@
 #include "unparse_target.h"
 #include "whirl2f_common.h"
 #include "symtab.h"
+#include "intrn_info.h"
+#include "wutil.h"
+#include "token_names.h"
 
 static const char *
 W2CF_Get_Ftn_St_Name(const ST *st, const char *original_name)
@@ -106,12 +109,59 @@ public:
 	const char *Get_St_Name(const ST *st, const char *original_name)
 	{ return W2CF_Get_Ftn_St_Name (st, original_name); }
 
+	const char *Intrinsic_Name(INTRINSIC intr_opc)
+	{
+   const char *name;
+   
+   Is_True(INTRINSIC_FIRST<=intr_opc && intr_opc<=INTRINSIC_LAST,
+	   ("Intrinsic Opcode (%d) out of range", intr_opc)); 
+   if (INTRN_specific_name(intr_opc) != NULL)
+      name = INTRN_specific_name(intr_opc);
+   else
+   {
+/*      ASSERT_WARN(FALSE, 
+		  (DIAG_A_STRING,
+		   Concat2_Strings("Missing intrinsic name ", 
+				   get_intrinsic_name(intr_opc))));
+*/
+      name = get_intrinsic_name(intr_opc);
+   }
+
+   return name;
+
+	}
+
 	BOOL Avoid_Common_Suffix(void)
 	{
 	  BOOL avoid = TRUE;
 	  return avoid;
 	}
 
+        BOOL Reduce_Const_Ptr_Exprs(void)
+	{
+	  return FALSE;
+	}
+
+	BOOL Enter_Symtab_Pointee_Names(void)
+	{
+	  return TRUE;
+	}
+
+	BOOL Is_Binary_Or_Tertiary_Op (char c)
+	{
+          return (c==PLUS          || \
+                  c==MINUS         || \
+                  c==MULTIPLY      || \
+                  c==DIVIDE        || \
+                  c==BITAND        || \
+                  c==BITOR         || \
+                  c==EQUAL         || \
+                  c==NOT           || \
+                  c==QUESTION_MARK || \
+                  c==COLON         || \
+                  c==LESS_THAN     || \
+                  c==LARGER_THAN);
+	}
 };
 
 #endif /* unparse_target_ftn_INCLUDED */
