@@ -2132,7 +2132,7 @@ typedef enum {
 /* operators, types, and attributes of the operators */
 /* eraxxon (2005.01): Re-implement table and routines to support b2a
    and a2b conversions. */
-struct OPERATOR_info_struct : public ir_a2b::i2s_tbl_entry_t {
+struct OPERATOR_info_struct : public ir_a2b::enum2str_tbl_entry_t {
 
   OPERATOR_info_struct(OPERATOR opr_ = OPERATOR_UNKNOWN, 
 		       const char* name_ = NULL,
@@ -2143,8 +2143,8 @@ struct OPERATOR_info_struct : public ir_a2b::i2s_tbl_entry_t {
     { }
   virtual ~OPERATOR_info_struct() { }
 
-  virtual INT getEnumVal()     { return opr; }
-  virtual const char* getStr() { return _name; }
+  virtual INT getEnumVal() const     { return opr; }
+  virtual const char* getStr() const { return _name; }
 
   OPERATOR        opr;
   const char*     _name;
