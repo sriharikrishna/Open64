@@ -1005,6 +1005,9 @@ ARB_are_equivalent(ARB_HANDLE arb_id1, ARB_HANDLE arb_id2, UINT32 flags)
     if (ARB_dimension(arb1) != ARB_dimension(arb2))
       return FALSE;
 
+    if (ARB_co_dimension(arb1) != ARB_co_dimension(arb2))
+      return FALSE;
+
     if (ARB_flags(arb1) != ARB_flags( arb2))
       return FALSE;
 
