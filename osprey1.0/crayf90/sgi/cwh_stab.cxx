@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.16 $
- * $Date: 2003-03-06 16:28:48 $
+ * $Revision: 1.15 $
+ * $Date: 2003-02-20 01:51:32 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.15 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1188,7 +1188,6 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
 
       /* does ABI require fn result in regs - see cwh_defines.h */
 
-# if 0 /* don't understand why we need this piece of code---fzhao */
       if (STRUCT_BY_VALUE(ty)) {
 
       Set_ST_sclass(st, SCLASS_AUTO);
@@ -1201,8 +1200,6 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
 	p->form   = is_UNDEF ;
 
       } else 
-# endif
-
 	Set_ST_auxst_is_rslt_tmp(st, TRUE);
 
 
@@ -1692,7 +1689,7 @@ fei_name (char *name_string,
 
     if (st_idx != 0){
 
-     if (entry_point_count >= 1 ) {  
+      if (entry_point_count > 1 ) { 
 
 	p = cast_to_STB(st_idx);
 
@@ -1704,12 +1701,11 @@ fei_name (char *name_string,
 	      cwh_auxst_add_dummy(st,FALSE);
 	  } 
 	}
-      } 
+      }
     } else {
        /* Just return a pointer to a duplicate of the name string */
        cwh_mkdepend_add_name(idx, name_string);
     }
-    break;
 
    case Sym_Null:
       cwh_mkdepend_add_name(idx, name_string);
