@@ -32,12 +32,6 @@
 
 */
 
-// Solaris workaround
-// patch for solaris's sys/mman.h
-#ifdef _SOLARIS_SOLARIS
-extern char*   sys_errlist[];
-#endif
-
 
 #ifdef USE_PCH
 #include "common_com_pch.h"
@@ -45,6 +39,7 @@ extern char*   sys_errlist[];
 #pragma hdrstop
 #include <unistd.h>		    /* for unlink() */
 #include <sys/mman.h>		    /* for mmap() */
+#include <string.h>                 /* for strerror() */
 #include <errno.h>		    /* for errno */
 #include <elf.h>		    /* for all Elf stuff */
 #include <sys/elf_whirl.h>	    /* for WHIRL sections' sh_info */
@@ -205,26 +200,25 @@ ir_b_grow_map (Elf64_Word min_size, Output_File *fl)
 	    fl->mapped_size += MAPPED_SIZE;
     }
 
-// Solaris workaround
-// solaris does not have 'MAP_AUTOGROW' option for mmap()
-
-#ifdef _SOLARIS_SOLARIS
-    fl->map_addr = (char *) mmap (0, fl->mapped_size, PROT_READ|PROT_WRITE,
-				  MAP_SHARED, fl->output_fd, 0); 
-#elif !defined(linux)
+#if defined(__sgi)
+    // Only SGI supports 'MAP_AUTOGROW' for mmap()
     fl->map_addr = (char *) mmap (0, fl->mapped_size, PROT_READ|PROT_WRITE,
 				  MAP_SHARED|MAP_AUTOGROW, fl->output_fd, 0); 
 #else
     fl->map_addr = (char *) mmap (0, fl->mapped_size, PROT_READ|PROT_WRITE,
 				  MAP_SHARED, fl->output_fd, 0); 
+#endif    
 
+    // Hack: Because mmaps typically cannot automatically increase the file
+    // size, we allocate some space (4MB) in the output file (.B) now.
+    // cf. ir_b_create_map(); also cf. use of ftruncate() in ir_bwrite.cxx
+#if (defined(__linux__) || defined(__CYGWIN__))
     if (ftruncate(fl->output_fd, fl->mapped_size))
-	ErrMsg (EC_IR_Write, fl->file_name, sys_errlist[errno]);
+	ErrMsg (EC_IR_Write, fl->file_name, strerror(errno));
 #endif
-
-
+    
     if (fl->map_addr == (char *) (-1))
-	ErrMsg (EC_IR_Write, fl->file_name, sys_errlist[errno]);
+	ErrMsg (EC_IR_Write, fl->file_name, strerror(errno));
 
     return fl->map_addr;
 } /* ir_b_grow_map */
@@ -235,29 +229,22 @@ ir_b_create_map (Output_File *fl)
     int fd = fl->output_fd;
     fl->mapped_size = INIT_TMP_MAPPED_SIZE;
 
-// Solaris workaround
-// must allocate some enough space 4MB to the output file (.B)
-// before calling mmap(). mmap() on Sun cannot automatically grow
-// the file. Note this change is also needed in ir_b_grow_map().
-//
-// NOTE: this is NOT an elegant solution. See ir_bwrite.cxx and
-// search for "ftruncate" for a similar solution for Linux
-
+    // Hack: Because mmaps typically cannot automatically increase the file
+    // size, we allocate some space (4MB) in the output file (.B) now.
+    // cf. ir_b_grow_map(); also cf. use of ftruncate() in ir_bwrite.cxx
 #ifdef _SOLARIS_SOLARIS
-       ftruncate(fd, 1024 * 4096);
+    ftruncate(fd, 1024 * 4096);
 #endif
 
-// Solaris workaround
-// solaris does not have 'MAP_AUTOGROW' option for mmap()
-        
-#if defined(_SOLARIS_SOLARIS) || defined(linux)
-    fl->map_addr = (char *) mmap (0, fl->mapped_size, PROT_READ|PROT_WRITE,
-                                  MAP_SHARED, fl->output_fd, 0);
-#else
+#if defined(__sgi)
+    // Only SGI supports 'MAP_AUTOGROW' for mmap()
     fl->map_addr = (char *) mmap (0, fl->mapped_size, PROT_READ|PROT_WRITE,
                                   MAP_SHARED|MAP_AUTOGROW, fl->output_fd, 0);
+#else
+    fl->map_addr = (char *) mmap (0, fl->mapped_size, PROT_READ|PROT_WRITE,
+                                  MAP_SHARED, fl->output_fd, 0);
 #endif
-
+    
     return fl->map_addr;
 } /* ir_b_create_map */
 
