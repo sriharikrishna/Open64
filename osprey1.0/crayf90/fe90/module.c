@@ -1748,8 +1748,11 @@ static	void  set_mod_link_tbl_for_bd(int	bd_idx)
             KEEP_ATTR(BD_UB_IDX(bd_idx, dim));
          }
 
-         if (BD_XT_FLD(bd_idx, dim) == CN_Tbl_Idx) {
-            KEEP_CN(BD_XT_IDX(bd_idx, dim));
+         if (BD_XT_FLD(bd_idx, dim) == CN_Tbl_Idx ) {
+            if (BD_XT_IDX(bd_idx, dim))
+               KEEP_CN(BD_XT_IDX(bd_idx, dim));
+            else
+	       ;
          }
          else if (BD_XT_FLD(bd_idx, dim) == AT_Tbl_Idx) {
             KEEP_ATTR(BD_XT_IDX(bd_idx, dim));
