@@ -735,6 +735,7 @@ ifeq ($(BUILD_OS), LINUX)
 	if ! test -f $(TARGET_SO); then ln -sf $(TARG_TARG_INFO_DIR)/$(TARGET_SO) .; fi
 endif
 	cd $(TARG_TARG_INFO_DIR) && $(MAKE)
+	cd $(TARG_COMUTIL_DIR) && $(MAKE) #FMZ add for making libcomutil.a
 ifeq ($(BUILD_PCH), USE_PCH)
 ## build the files in common/com and be/com that can use precompiled headers.
 	($(MAKE) PCH_OPTS="-LANG:create_pch=common_com_pch.pch"  \
