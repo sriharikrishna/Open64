@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.14 $
- * $Date: 2003-07-24 18:36:27 $
+ * $Revision: 1.15 $
+ * $Date: 2004-01-13 03:54:03 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.14 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.15 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -644,11 +644,15 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
        }
        else 
        {
-              kid0_ty=WN_ty(wn0);
-	      kid1_ty=WN_ty(wn1);
+              kid0_ty= (WN_operator(wn0) == OPR_CALL)? 
+                      TY_ret_type(ST_pu_type(WN_st(wn0))):WN_ty(wn0);
+	      kid1_ty= (WN_operator(wn1) == OPR_CALL)?
+                      TY_ret_type(ST_pu_type(WN_st(wn1))):WN_ty(wn1);
 	}
-      if ( (wn0!=NULL) && (kid0_ty && TY_is_logical(kid0_ty)||TY_is_logical(wn0_ty))  ||
-           ( (wn1!=NULL) && (kid1_ty&&TY_is_logical(kid1_ty)||TY_is_logical(wn1_ty))) )
+
+
+      if ( wn0 && (kid0_ty && TY_is_logical(kid0_ty)||TY_is_logical(wn0_ty))  ||
+           ( wn1 && (kid1_ty && TY_is_logical(kid1_ty)||TY_is_logical(wn1_ty))) )
      {
          set_WN2F_CONTEXT_has_logical_arg(context);
             Append_Token_String(tokens,".eqv.");
@@ -667,12 +671,14 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
        }
        else
        {
-              kid0_ty=WN_ty(wn0);
-              kid1_ty=WN_ty(wn1);
+              kid0_ty= (WN_operator(wn0) == OPR_CALL)? 
+                      TY_ret_type(ST_pu_type(WN_st(wn0))):WN_ty(wn0);
+	      kid1_ty= (WN_operator(wn1) == OPR_CALL)?
+                      TY_ret_type(ST_pu_type(WN_st(wn1))):WN_ty(wn1);
         }
 
-      if ( (wn0!=NULL && kid0_ty && TY_is_logical(kid0_ty)) ||
-           ( (wn1!=NULL) && kid1_ty&&TY_is_logical(kid1_ty)))
+      if ( wn0 && (kid0_ty && TY_is_logical(kid0_ty)||TY_is_logical(wn0_ty))  ||
+           ( wn1 && (kid1_ty && TY_is_logical(kid1_ty)||TY_is_logical(wn1_ty))) )
          {
 	    set_WN2F_CONTEXT_has_logical_arg(context); 
             Append_Token_String(tokens,".neqv.");
