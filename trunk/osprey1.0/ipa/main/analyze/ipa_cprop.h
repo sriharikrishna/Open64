@@ -101,7 +101,13 @@ struct OFFSET_SIZE
   UINT32 size;
 };
 
+#if defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 2)))
+#include <ext/hash_map>
+using namespace __gnu_cxx;
+namespace __gnu_cxx {
+#else
 namespace std {
+#endif
 template<> struct hash<OFFSET_SIZE> 
 {
   size_t operator()(OFFSET_SIZE x) const { return x.offset + x.size; }
