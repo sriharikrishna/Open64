@@ -556,9 +556,13 @@ typedef enum {
 	Context_Omp_Shared,
 	Context_Omp_Firstprivate,
 	Context_Omp_Lastprivate,
+	Context_Omp_Copyprivate,
 	Context_Omp_Copyin,
 	Context_Omp_Affinity,
-        Context_Omp_Nest } CONTEXT_TYPE;
+        Context_Omp_Nest,
+/* there is no FLUSH clause in OpenMP (radu@par.univie.ac.at) */
+/* we fake this clause in order to treat FLUSH directive the same as the others */
+	Context_Omp_Flush } CONTEXT_TYPE;
 
 typedef enum {
         Unknown_Table,
@@ -1174,8 +1178,10 @@ extern void  fei_paralleldo_open_mp       ( INT32 task_if_idx,
                                             INT32 threadcount,
                                             INT32 datacount,
                                             INT32 ontocount );
+extern void  fei_parallelworkshare_open_mp( INT32 task_if_idx, INT32 defaultt );
 extern void  fei_single_open_mp           ( void );
 extern void  fei_sections_open_mp         ( void );
+extern void  fei_workshare_open_mp        ( void );
 extern void  fei_do_open_mp               ( INT32 ordered,
                                   	    INT32 scheduletype,
                                   	    INT32 schedulechunck,
@@ -1191,12 +1197,14 @@ extern void  fei_ordered_open_mp          ( void );
 extern void  fei_endsingle_open_mp        ( INT32 nowait );
 extern void  fei_enddo_open_mp            ( INT32 nowait );
 extern void  fei_endsections_open_mp      ( INT32 nowait );
-extern void  fei_flush_open_mp            ( INT32 list_count );
+extern void  fei_endworkshare_open_mp     ( INT32 nowait );
+extern void  fei_flush_open_mp            ( void );
 extern void  fei_endordered_open_mp       ( void );
 extern void  fei_endparalleldo_open_mp    ( void );
 extern void  fei_endparallel_open_mp      ( void );
 extern void  fei_atomic_open_mp           ( void );
 extern void  fei_endparallelsections_open_mp( void );
+extern void  fei_endparallelworkshare_open_mp( void );
 extern void  fei_fetch_and_add            ( TYPE type );
 extern void  fei_fetch_and_sub            ( TYPE type );
 extern void  fei_fetch_and_xor            ( TYPE type );

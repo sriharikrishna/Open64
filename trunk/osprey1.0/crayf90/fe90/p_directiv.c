@@ -105,7 +105,7 @@ static void	parse_open_mp_directives(void);
 static void	parse_open_mp_clauses(open_mp_directive_type);
 static int	update_fld_type(fld_type, int,int);
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -216,7 +216,9 @@ void	init_directive(int	pass)
 
    cdir_switches.firstprivate_list_idx  = NULL_IDX;
    cdir_switches.copyin_list_idx	= NULL_IDX;
+   cdir_switches.copyprivate_list_idx	= NULL_IDX;
    cdir_switches.lastprivate_list_idx	= NULL_IDX;
+   cdir_switches.flush_list_idx		= NULL_IDX;
    cdir_switches.default_scope_list_idx = NULL_IDX;
    cdir_switches.do_omp_sh_idx		= NULL_IDX;
    cdir_switches.paralleldo_omp_sh_idx	= NULL_IDX;
@@ -310,7 +312,7 @@ void	init_directive(int	pass)
    return;
 
 }  /* init_directive */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -518,7 +520,7 @@ EXIT:
    return;
 
 }  /* parse_directive_stmt */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -572,7 +574,7 @@ int	gen_directive_ir(operator_type	operator)
 
 }  /* gen_directive_ir */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -684,7 +686,7 @@ NEXT:
    return;
 
 }  /* parse_copy_assumed_shape_dir */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -763,7 +765,7 @@ static void parse_ignore_tkr(void)
    return;
 
 }  /* parse_ignore_tkr */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -858,7 +860,7 @@ static void parse_auxiliary_dir(void)
    return;
 
 }  /* parse_auxiliary_dir */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -940,7 +942,7 @@ static void parse_cache_bypass_dir(opnd_type	*opnd)
    return;
 
 }  /* parse_cache_bypass_dir */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1030,7 +1032,7 @@ static void parse_nosideeffects_dir(void)
    return;
 
 }  /* parse_nosideeffects_dir */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1135,7 +1137,7 @@ static void parse_vfunction_dir(void)
    return;
 
 }  /* parse_vfunction_dir */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1249,7 +1251,7 @@ static void parse_common_dirs(sb_type_type	blk_type)
    return;
 
 }  /* parse_common_dirs */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1381,7 +1383,7 @@ static void parse_slash_common_dirs(void)
    return;
 
 }  /* parse_slash_common_dirs */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1459,7 +1461,7 @@ static void parse_dir_var_list(void)
    return;
 
 }  /* parse_dir_var_list */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1956,7 +1958,7 @@ EXIT:
    return;
 
 }  /* parse_doall_cmic */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2035,7 +2037,7 @@ static boolean parse_var_name_list(opnd_type   *list_opnd)
 
 /* No one uses this routine */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2099,7 +2101,7 @@ static void parse_expr_list(opnd_type *list_opnd)
 
 }  /* parse_expr_list */
 # endif
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2351,7 +2353,7 @@ EXIT:
    return;
 
 }  /* parse_doparallel_cmic */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2648,7 +2650,7 @@ EXIT:
    return;
 
 }  /* parse_parallel_cmic */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2704,7 +2706,7 @@ void do_cmic_blk_checks(void)
    return;
 
 }  /* do_cmic_blk_checks */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2813,7 +2815,7 @@ static void parse_cache_align_name_list(opnd_type *list_opnd)
    return;
 
 }  /* parse_cache_align_name_list */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2980,7 +2982,7 @@ static void parse_name_dir(void)
    return;
 
 }  /* parse_name_dir */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3101,7 +3103,7 @@ static void parse_permutation_mic(void)
    return;
 
 }  /* parse_permutation_mic */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3290,7 +3292,7 @@ NEXT:
    return;
 
 }  /* parse_inline_always_never */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3435,7 +3437,7 @@ static int	update_fld_type(fld_type	fld,
    return(new_idx);
 
 }  /* update_fld_type */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3512,7 +3514,7 @@ static void parse_symmetric_dir(void)
    return;
 
 }  /* parse_symmetric_dir */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4742,7 +4744,7 @@ EXIT:
    return;
 
 }  /* parse_dir_directives */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -5490,7 +5492,7 @@ CONTINUE:
    return;
 
 }  /* parse_mic_directives */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -5868,7 +5870,7 @@ EXIT:
    return;
 
 }  /* parse_par_directives */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6147,7 +6149,7 @@ EXIT:
 
 }  /* parse_dollar_directives */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -6792,7 +6794,7 @@ EXIT:
    return;
 
 }  /* parse_star_directives */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -7060,7 +7062,7 @@ EXIT:
    return;
 
 }  /* parse_prefetch_ref */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -8056,7 +8058,7 @@ EXIT:
    return;
 
 }  /* parse_mp_directive */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -8121,7 +8123,7 @@ static void parse_int_or_star_list(opnd_type *list_opnd)
    return;
 
 }  /* parse_int_or_star_list */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -8182,7 +8184,7 @@ static void parse_reference_list(opnd_type *list_opnd)
    return;
 
 }  /* parse_reference_list */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -8431,7 +8433,7 @@ NEXT:
    return;
 
 }  /* parse_var_common_list */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -8589,7 +8591,7 @@ EXIT:
    return;
 
 }  /* parse_fill_align_symbol */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -8928,7 +8930,7 @@ EXIT:
    return;
 
 }  /* parse_sgi_dir_inline */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -9161,7 +9163,7 @@ EXIT:
    return;
 
 }  /* parse_distribution_dir */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -9454,7 +9456,7 @@ EXIT:
    return;
 
 }  /* parse_redistribute_dir */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -9824,7 +9826,7 @@ EXIT:
    return(ok);
 
 }  /* parse_assert_directive */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -9904,7 +9906,7 @@ static boolean directive_region_error(directive_stmt_type	dir,
    return(error);
 
 }  /* directive_region_error */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -10078,7 +10080,7 @@ static void parse_id_directive(void)
    return;
 
 }  /* parse_id_directive */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -10382,6 +10384,22 @@ static void parse_open_mp_directives(void)
          end_open_mp_parallel_sections_blk(FALSE);
          break;
 
+      case Tok_Open_Mp_Dir_Endparallelworkshare:
+         ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
+         ir_idx = gen_directive_ir(Endparallelworkshare_Open_Mp_Opr);
+
+         if (directive_region_error(Endparallelworkshare_Open_Mp_Dir,
+                                    IR_LINE_NUM(ir_idx),
+                                    IR_COL_NUM(ir_idx))) {
+            break;
+         }
+
+         CLEAR_DIRECTIVE_STATE(Open_Mp_Parallel_Workshare_Region);
+         SH_STMT_TYPE(curr_stmt_sh_idx) = Open_MP_End_Parallel_Workshare_Stmt;
+         stmt_type = Open_MP_End_Parallel_Workshare_Stmt;
+         end_open_mp_parallel_workshare_blk(FALSE);
+         break;
+
       case Tok_Open_Mp_Dir_Endmaster:
          ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
          ir_idx = gen_directive_ir(Endmaster_Open_Mp_Opr);
@@ -10452,6 +10470,40 @@ static void parse_open_mp_directives(void)
       case Tok_Open_Mp_Dir_Endsingle:
          ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
          ir_idx = gen_directive_ir(Endsingle_Open_Mp_Opr);
+	 
+         if (LA_CH_VALUE != EOS) {
+            if (MATCHED_TOKEN_CLASS(Tok_Class_Open_Mp_Dir_Kwd)) {
+               if (TOKEN_VALUE(token) == Tok_Open_Mp_Dir_Nowait) {
+                  IR_FLD_L(ir_idx) = CN_Tbl_Idx;
+                  IR_IDX_L(ir_idx) = CN_INTEGER_ONE_IDX;
+                  IR_LINE_NUM_L(ir_idx) = TOKEN_LINE(token);
+                  IR_COL_NUM_L(ir_idx) = TOKEN_COLUMN(token);
+               }
+               else {
+		  /* rescan the token and check for COPYPRIVATE clause (radu@par.univie.ac.at) */
+                  /* nowait and copyprivate are exclusive */
+		  reset_lex(TOKEN_BUF_IDX(token), TOKEN_STMT_NUM(token));
+		  parse_open_mp_clauses(End_Single_Omp);
+		  /* parse_err_flush(Find_EOS, "NOWAIT"); */
+               }
+            }
+         }
+
+         if (directive_region_error(Endsingle_Open_Mp_Dir,
+                                    IR_LINE_NUM(ir_idx),
+                                    IR_COL_NUM(ir_idx))) {
+            break;
+         }
+
+         CLEAR_DIRECTIVE_STATE(Open_Mp_Single_Region);
+         SH_STMT_TYPE(curr_stmt_sh_idx) = Open_MP_End_Single_Stmt;
+         stmt_type = Open_MP_End_Single_Stmt;
+         end_open_mp_single_blk(FALSE);
+         break;
+
+      case Tok_Open_Mp_Dir_Endworkshare:
+         ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
+         ir_idx = gen_directive_ir(Endworkshare_Open_Mp_Opr);
 
          if (LA_CH_VALUE != EOS) {
             if (MATCHED_TOKEN_CLASS(Tok_Class_Open_Mp_Dir_Kwd)) {
@@ -10467,16 +10519,16 @@ static void parse_open_mp_directives(void)
             }
          }
 
-         if (directive_region_error(Endsingle_Open_Mp_Dir,
+         if (directive_region_error(Endworkshare_Open_Mp_Dir,
                                     IR_LINE_NUM(ir_idx),
                                     IR_COL_NUM(ir_idx))) {
             break;
          }
 
-         CLEAR_DIRECTIVE_STATE(Open_Mp_Single_Region);
-         SH_STMT_TYPE(curr_stmt_sh_idx) = Open_MP_End_Single_Stmt;
-         stmt_type = Open_MP_End_Single_Stmt;
-         end_open_mp_single_blk(FALSE);
+         CLEAR_DIRECTIVE_STATE(Open_Mp_Workshare_Region);
+         SH_STMT_TYPE(curr_stmt_sh_idx) = Open_MP_End_Workshare_Stmt;
+         stmt_type = Open_MP_End_Workshare_Stmt;
+         end_open_mp_workshare_blk(FALSE);
          break;
 
       case Tok_Open_Mp_Dir_Master:
@@ -10539,7 +10591,7 @@ static void parse_open_mp_directives(void)
          ir_idx = gen_directive_ir(Paralleldo_Open_Mp_Opr);
 
          parse_open_mp_clauses(Parallel_Do_Omp);
-
+ 
          if (directive_region_error(Paralleldo_Open_Mp_Dir,
                                     IR_LINE_NUM(ir_idx),
                                     IR_COL_NUM(ir_idx))) {
@@ -10578,6 +10630,25 @@ static void parse_open_mp_directives(void)
          LINK_TO_PARENT_BLK;
          break;
 
+
+      case Tok_Open_Mp_Dir_Parallelworkshare:
+         ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
+         ir_idx = gen_directive_ir(Parallelworkshare_Open_Mp_Opr);
+
+         parse_open_mp_clauses(Parallel_Workshare_Omp);
+
+         if (directive_region_error(Parallelworkshare_Open_Mp_Dir,
+                                    IR_LINE_NUM(ir_idx),
+                                    IR_COL_NUM(ir_idx))) {
+            break;
+         }
+
+         SET_DIRECTIVE_STATE(Open_Mp_Parallel_Workshare_Region);
+         PUSH_BLK_STK (Open_Mp_Parallel_Workshare_Blk);
+         BLK_IS_PARALLEL_REGION(blk_stk_idx)	= TRUE;
+         CURR_BLK_FIRST_SH_IDX     = curr_stmt_sh_idx;
+         LINK_TO_PARENT_BLK;
+         break;
 
       case Tok_Open_Mp_Dir_Section:
          ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
@@ -10656,6 +10727,23 @@ static void parse_open_mp_directives(void)
          LINK_TO_PARENT_BLK;
          break;
 
+      case Tok_Open_Mp_Dir_Workshare:
+         ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
+         ir_idx = gen_directive_ir(Workshare_Open_Mp_Opr);
+
+         if (directive_region_error(Workshare_Open_Mp_Dir,
+                                    IR_LINE_NUM(ir_idx),
+                                    IR_COL_NUM(ir_idx))) {
+            break;
+         }
+
+         SET_DIRECTIVE_STATE(Open_Mp_Workshare_Region);
+         PUSH_BLK_STK (Open_Mp_Workshare_Blk);
+         BLK_IS_PARALLEL_REGION(blk_stk_idx)	= TRUE;
+         CURR_BLK_FIRST_SH_IDX     = curr_stmt_sh_idx;
+         LINK_TO_PARENT_BLK;
+         break;
+
       case Tok_Open_Mp_Dir_Atomic:
          ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
          ir_idx = gen_directive_ir(Atomic_Open_Mp_Opr);
@@ -10684,27 +10772,18 @@ static void parse_open_mp_directives(void)
          ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
          ir_idx = gen_directive_ir(Flush_Open_Mp_Opr);
 
-         if (LA_CH_VALUE == LPAREN) {
-            NEXT_LA_CH;
-
-            parse_var_name_list(&opnd);
-            COPY_OPND(IR_OPND_L(ir_idx), opnd);
-
-            if (LA_CH_VALUE == RPAREN) {
-               NEXT_LA_CH;
-            }
-            else {
-               parse_err_flush(Find_EOS, ")");
-               goto EXIT;
-            }
-         }
+	 /* if a list of variables follows as agument, rescan FLUSH as clause (radu@par.univie.ac.at) */
+         /* we introduce a fake clause FLUSH, to handle the directive similar to the others */
+	 if (LA_CH_VALUE != EOS) {
+	   reset_lex(TOKEN_BUF_IDX(token), TOKEN_STMT_NUM(token));
+	   parse_open_mp_clauses(Flush_Omp);
+	 }
 
          if (directive_region_error(Flush_Open_Mp_Dir,
                                     IR_LINE_NUM(ir_idx),
                                     IR_COL_NUM(ir_idx))) {
             break;
          }
-
          break;
 
       case Tok_Open_Mp_Dir_Threadprivate:
@@ -10897,7 +10976,7 @@ EXIT:
    return;
 
 }  /* parse_open_mp_directives */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -10918,11 +10997,13 @@ EXIT:
 |*                      |- ORDERED constant (ORDERED == 1, else NO_Tbl_Idx)   *|
 |*                      |- SCHEDULE type (CN_Tbl_Idx)                         *|
 |*                      |- SCHEDULE chunk (CN_Tbl_Idx)                        *|
+|*                      |- COPYPRIVATE var list                               *|
 |*                      |- AFFINITY index_var list                            *|
 |*                      |- IS THREAD constant (THREAD == 1, DATA == 0)        *|
 |*                      |- THREAD/DATA list                                   *|
 |*                      |- ONTO list                                          *|
 |*                      |- NEST list                                          *|
+|*                      |- FLUSH var list	                              *|
 |*                                                                            *|
 |* Input parameters:                                                          *|
 |*      NONE                                                                  *|
@@ -11614,6 +11695,56 @@ static void parse_open_mp_clauses(open_mp_directive_type directive)
                }
                break;
 
+            case Tok_Open_Mp_Dir_Copyprivate:
+
+               if (! open_mp_clause_allowed[directive]
+                                           [Copyprivate_Omp_Clause]) {
+                  PRINTMSG(TOKEN_LINE(token), 1370, Error, TOKEN_COLUMN(token),
+                           "COPYPRIVATE", open_mp_dir_str[directive]);
+                  parse_err_flush(Find_EOS, NULL);
+                  goto EXIT;
+               }
+
+               if (LA_CH_VALUE == LPAREN) {
+                  NEXT_LA_CH;
+                  parse_var_common_list(&opnd, FALSE);
+
+                  if (IL_IDX(list_array[OPEN_MP_COPYPRIVATE_IDX]) == 
+                                                                  NULL_IDX) {
+
+                     COPY_OPND(IL_OPND(list_array[OPEN_MP_COPYPRIVATE_IDX]),
+                               opnd);
+                  }
+                  else {
+                     /* find the end of list */
+
+                     list_idx = IL_IDX(list_array[OPEN_MP_COPYPRIVATE_IDX]);
+                     while (IL_NEXT_LIST_IDX(list_idx)) {
+                        list_idx = IL_NEXT_LIST_IDX(list_idx);
+                     }
+
+                     /* append the new list */
+                     IL_NEXT_LIST_IDX(list_idx) = OPND_IDX(opnd);
+                     IL_PREV_LIST_IDX(OPND_IDX(opnd)) = list_idx;
+                     IL_LIST_CNT(list_array[OPEN_MP_COPYPRIVATE_IDX]) +=
+                                                       OPND_LIST_CNT(opnd);
+                  }
+
+                  if (LA_CH_VALUE == RPAREN) {
+                     NEXT_LA_CH;
+                  }
+                  else {
+                     parse_err_flush(Find_EOS, ")");
+                     goto EXIT;
+                  }
+               }
+               else {
+                  parse_err_flush(Find_EOS, "(");
+                  goto EXIT;
+               }
+
+               break;
+
 # if defined(GENERATE_WHIRL)
             case Tok_Open_Mp_Dir_Affinity:
 
@@ -11853,6 +11984,55 @@ static void parse_open_mp_clauses(open_mp_directive_type directive)
                break;
 # endif
 
+/* there is no FLUSH clause in OpenMP (radu@par.univie.ac.at) */
+/* we fake this clause in order to treat FLUSH directive the same as the others */
+            case Tok_Open_Mp_Dir_Flush:
+
+               if (! open_mp_clause_allowed[directive][Flush_Omp_Clause]){
+                  PRINTMSG(TOKEN_LINE(token), 1370, Error, TOKEN_COLUMN(token),
+                           "FLUSH", open_mp_dir_str[directive]);
+                  parse_err_flush(Find_EOS, NULL);
+                  goto EXIT;
+               }
+
+               if (LA_CH_VALUE == LPAREN) {
+                  NEXT_LA_CH;
+                  parse_var_common_list(&opnd, FALSE);
+
+                  if (IL_IDX(list_array[OPEN_MP_FLUSH_IDX]) == NULL_IDX) {
+                     COPY_OPND(IL_OPND(list_array[OPEN_MP_FLUSH_IDX]),
+                               opnd);
+                  }
+                  else {
+                     /* find the end of list */
+
+                     list_idx = IL_IDX(list_array[OPEN_MP_FLUSH_IDX]);
+                     while (IL_NEXT_LIST_IDX(list_idx)) {
+                        list_idx = IL_NEXT_LIST_IDX(list_idx);
+                     }
+
+                     /* append the new list */
+                     IL_NEXT_LIST_IDX(list_idx) = OPND_IDX(opnd);
+                     IL_PREV_LIST_IDX(OPND_IDX(opnd)) = list_idx;
+                     IL_LIST_CNT(list_array[OPEN_MP_FLUSH_IDX]) +=
+                                                       OPND_LIST_CNT(opnd);
+                  }
+
+                  if (LA_CH_VALUE == RPAREN) {
+                     NEXT_LA_CH;
+                  }
+                  else {
+                     parse_err_flush(Find_EOS, ")");
+                     goto EXIT;
+                  }
+               }
+               else {
+                  parse_err_flush(Find_EOS, "(");
+                  goto EXIT;
+               }
+
+               break;
+
             default:
                PRINTMSG(TOKEN_LINE(token), 1517, Error, TOKEN_COLUMN(token),
                         "OpenMP");
@@ -11884,7 +12064,7 @@ EXIT:
    return;
 
 }  /* parse_open_mp_clauses */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -11957,7 +12137,7 @@ static void check_do_open_mp_nesting(void)
    return;
 
 }  /* check_do_open_mp_nesting */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -12024,7 +12204,7 @@ static void check_ordered_open_mp_nesting(void)
    return;
 
 }  /* check_ordered_open_mp_nesting */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -12076,7 +12256,7 @@ FOUND:
    return(ok);
 
 }  /* check_section_open_mp_context */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -12150,7 +12330,7 @@ static void parse_cache_noalloc(void)
 
 }  /* parse_cache_noalloc */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|

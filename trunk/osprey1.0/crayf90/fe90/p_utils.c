@@ -65,7 +65,7 @@ static void block_err_string(operator_type, char *, int *);
 
 extern boolean star_expected;
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -122,7 +122,7 @@ boolean matched_specific_token (token_values_type	specific_token,
 
 }  /* matched_specific_token */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -319,7 +319,7 @@ boolean parse_err_flush (search_type	 rule,
 
 }  /* parse_err_flush */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -465,7 +465,7 @@ static boolean  create_kwd_text(opnd_type *result_opnd,
 
 } /* create_kwd_text */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -649,7 +649,7 @@ boolean parse_actual_arg_spec (opnd_type *result_opnd,
 
 } /* parse_actual_arg_spec */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2071,7 +2071,7 @@ EXIT:
    return(parsed_ok);
 
 } /* parse_deref */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2402,7 +2402,7 @@ EXIT:
 
 } /* parse_imp_do */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2536,7 +2536,7 @@ int  check_label_ref(void)
 
 }  /* check_label_ref */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -2839,7 +2839,7 @@ EXIT:
 
 }  /* label_ref_semantics */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -3003,7 +3003,7 @@ void  build_fwd_ref_entry(int           lbl_attr_idx,
 
 }  /* build_fwd_ref_entry */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -3154,7 +3154,7 @@ void  resolve_fwd_lbl_refs (void)
    return;
 
 }  /* resolve_fwd_lbl_refs */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3215,7 +3215,7 @@ static void check_cmic_blk_branches(int		ref_blk_sh_idx,
    return;
 
 }  /* check_cmic_blk_branches */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3303,6 +3303,16 @@ static void block_err_string(operator_type    opr,
          *msg_num = 1503;
          break;
 
+      case Parallelworkshare_Open_Mp_Opr:
+         strcpy(str, "!$OMP PARALLEL WORKSHARE");
+         *msg_num = 1503;
+         break;
+
+      case Workshare_Open_Mp_Opr:
+         strcpy(str, "!$OMP WORKSHARE");
+         *msg_num = 1503;
+         break;
+
       case Doacross_Dollar_Opr:
          strcpy(str, "!$ DOACROSS");
          *msg_num = 1504;
@@ -3357,7 +3367,7 @@ static void block_err_string(operator_type    opr,
    return;
 
 }  /* block_err_string */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3406,7 +3416,7 @@ void	mark_attr_defined(opnd_type *opnd)
    return;
 
 }  /* mark_attr_defined */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3548,7 +3558,7 @@ EXIT:
    return(is_constant);
 
 }  /* "paren_grp_is_cplx_const" */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3604,7 +3614,7 @@ void check_for_vestigial_task_blks(void)
    return;
 
 }  /* check_for_vestigial_task_blks */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|

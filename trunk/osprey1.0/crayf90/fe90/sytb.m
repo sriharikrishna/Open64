@@ -1203,12 +1203,32 @@
 # endif
 
 # ifdef _DEBUG
+# define ATD_TASK_COPYPRIVATE(IDX)                                             \
+        ((AT_OBJ_CLASS(IDX) == Data_Obj) ?                                     \
+		attr_aux_tbl:attr_aux_var_error("ATD_TASK_COPYPRIVATE", IDX))  \
+                [IDX].fld.flag15
+# else
+# define ATD_TASK_COPYPRIVATE(IDX)        attr_aux_tbl[IDX].fld.flag15
+# endif
+
+# ifdef _DEBUG
 # define ATD_TASK_FIRSTPRIVATE(IDX)                                            \
         ((AT_OBJ_CLASS(IDX) == Data_Obj) ?                                     \
 		attr_aux_tbl:attr_aux_var_error("ATD_TASK_FIRSTPRIVATE", IDX)) \
                 [IDX].fld.flag17
 # else
 # define ATD_TASK_FIRSTPRIVATE(IDX)       attr_aux_tbl[IDX].fld.flag17
+# endif
+
+/* there is no FLUSH clause in OpenMP (radu@par.univie.ac.at) */
+/* we fake this clause in order to treat FLUSH directive the same as the others */
+# ifdef _DEBUG
+# define ATD_TASK_FLUSH(IDX)                                             \
+        ((AT_OBJ_CLASS(IDX) == Data_Obj) ?                                     \
+		attr_aux_tbl:attr_aux_var_error("ATD_TASK_COPYPRIVATE", IDX))  \
+                [IDX].fld.flag16
+# else
+# define ATD_TASK_FLUSH(IDX)             attr_aux_tbl[IDX].fld.flag16
 # endif
 
 # ifdef _DEBUG

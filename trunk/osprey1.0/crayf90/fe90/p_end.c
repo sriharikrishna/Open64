@@ -72,7 +72,7 @@ static void	 loop_end_processing(void);
 static void      check_loop_bottom_nesting(void);
 # endif
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -273,7 +273,7 @@ static void finish_cdir_id(void)
    TRACE (Func_Exit, "finish_cdir_id", NULL);
 
 } /* finish_cdir_id */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -839,7 +839,7 @@ EXIT:
 
 }  /* parse_end_stmt */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -979,7 +979,7 @@ static void end_program_unit(boolean	err_call)
 
 }  /* end_program_unit */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1113,7 +1113,7 @@ static void end_function(boolean	err_call)
 
 }  /* end_function */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1255,7 +1255,7 @@ static void end_subroutine(boolean	err_call)
 
 }  /* end_subroutine */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1342,7 +1342,7 @@ static void end_module(boolean	err_call)
 
 }  /* end_module */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1429,7 +1429,7 @@ int       act_file_line;
 
 }  /* end_blockdata */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1562,7 +1562,7 @@ static void end_internal_proc(boolean	err_call)
 
 }  /* end_internal_proc */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1710,7 +1710,7 @@ static void end_module_proc(boolean	err_call)
 
 }  /* end_module_proc */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1892,7 +1892,7 @@ static void end_interface_body(boolean	err_call)
 
 }  /* end_interface_body */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -1948,7 +1948,7 @@ static void end_forall_blk(boolean	err_call)
 
 }  /* end_forall_blk */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2010,7 +2010,7 @@ static void end_where_blk(boolean	err_call)
 
 }  /* end_where_blk */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2183,7 +2183,7 @@ EXIT:
 
 }  /* end_select_blk */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2530,7 +2530,7 @@ EXIT:
    return;
 
 }  /* end_labeled_do */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2635,7 +2635,7 @@ static boolean end_task_do_blk(void)
 
 }  /* end_task_do_blk */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -2901,7 +2901,7 @@ EXIT:
 
 }  /* end_do_blk */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3093,7 +3093,7 @@ static void end_if_blk(boolean	err_call)
 
 }  /* end_if_blk */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3185,7 +3185,7 @@ static void end_interface_blk(boolean	err_call)
 
 }  /* end_interface_blk */
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -3231,7 +3231,7 @@ static void end_contains(boolean	err_call)
 
 }  /* end_contains */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3456,7 +3456,7 @@ static void end_type_blk(boolean	err_call)
 
 }  /* end_type_blk */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3762,7 +3762,7 @@ static void loop_end_processing()
 
 }  /* loop_end_processing */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3795,7 +3795,7 @@ static void end_internal_err(boolean	err_call)
 
 }  /* end_internal_err */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -3981,6 +3981,14 @@ static char *blk_desc_str(int	 blk_idx)
          blk_stmt_str = "!$OMP ORDERED";
          break;
 
+      case Open_Mp_Parallel_Workshare_Blk:
+         blk_stmt_str = "!$OMP PARALLEL WORKSHARE";
+         break;
+
+      case Open_Mp_Workshare_Blk:
+         blk_stmt_str = "!$OMP WORKSHARE";
+         break;
+
       case Contains_Blk:
          for (idx = blk_idx;
               idx > NULL_IDX && (BLK_TYPE(idx) > Blockdata_Blk);
@@ -4006,7 +4014,7 @@ static char *blk_desc_str(int	 blk_idx)
 
 }  /* blk_desc_str */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4268,7 +4276,7 @@ int	blk_match_err(blk_cntxt_type	blk_type,
 
 }  /* blk_match_err */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4491,7 +4499,7 @@ boolean	pop_and_err_blk_stk(int		match_idx,
 
 }  /* pop_and_err_blk_stk */
 
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4546,7 +4554,7 @@ int move_blk_to_end(int	blk_idx)
    return(blk_stk_idx);
 
 }  /* move_blk_to_end */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4607,7 +4615,7 @@ void end_parallel_blk(boolean  err_call)
    return;
 
 }  /* end_parallel_blk */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4637,7 +4645,7 @@ void end_doall_blk(boolean  err_call)
    return;
 
 }  /* end_doall_blk */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4670,7 +4678,7 @@ void end_wait_blk(boolean  err_call)
    return;
 
 }  /* end_wait_blk */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4736,7 +4744,7 @@ void end_do_parallel_blk(boolean  err_call)
    return;
 
 }  /* end_do_parallel_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -4806,7 +4814,7 @@ void end_pdo_blk(boolean  err_call)
    return;
 
 }  /* end_pdo_blk */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4859,7 +4867,7 @@ void end_guard_blk(boolean  err_call)
    return;
 
 }  /* end_guard_blk */
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -4912,7 +4920,7 @@ void end_parallel_case_blk(boolean  err_call)
    return;
 
 }  /* end_parallel_case_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5002,7 +5010,7 @@ void end_SGI_parallel_blk(boolean  err_call)
    return;
 
 }  /* end_SGI_parallel_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5032,7 +5040,7 @@ void end_doacross_blk(boolean  err_call)
    return;
 
 }  /* end_doacross_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5085,7 +5093,7 @@ void end_critical_section_blk(boolean  err_call)
    return;
 
 }  /* end_critical_section_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5146,7 +5154,7 @@ void end_psection_blk(boolean  err_call)
    return;
 
 }  /* end_psection_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5203,7 +5211,7 @@ void end_single_process_blk(boolean  err_call)
    return;
 
 }  /* end_single_process_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5256,7 +5264,7 @@ void end_region_blk(boolean  err_call)
    return;
 
 }  /* end_region_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5314,7 +5322,7 @@ void end_open_mp_parallel_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_parallel_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5375,7 +5383,7 @@ void end_open_mp_do_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_do_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5420,7 +5428,52 @@ void end_open_mp_parallel_sections_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_parallel_sections_blk */
-
+
+/******************************************************************************\
+|*                                                                            *|
+|* Description:                                                               *|
+|*      <description>                                                         *|
+|*                                                                            *|
+|* Input parameters:                                                          *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Output parameters:                                                         *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Returns:                                                                   *|
+|*      NOTHING                                                               *|
+|*                                                                            *|
+\******************************************************************************/
+
+void end_open_mp_parallel_workshare_blk(boolean  err_call)
+
+{
+   TRACE (Func_Entry, "end_open_mp_parallel_workshare_blk", NULL);
+
+   if (! err_call) {
+
+      if (STMT_CANT_BE_IN_BLK(Open_MP_End_Parallel_Workshare_Stmt, CURR_BLK)) {
+         blk_match_err(Open_Mp_Parallel_Workshare_Blk, FALSE, FALSE);
+      }
+
+      if (CURR_BLK == Open_Mp_Parallel_Workshare_Blk) {
+         /* point to the PARALLEL WORKSHARE directive */
+         IR_FLD_R(SH_IR_IDX(curr_stmt_sh_idx)) = SH_Tbl_Idx;
+         IR_IDX_R(SH_IR_IDX(curr_stmt_sh_idx)) = CURR_BLK_FIRST_SH_IDX;
+
+         POP_BLK_STK;
+      }
+   }
+   else {
+      POP_BLK_STK;
+   }
+
+   TRACE (Func_Exit, "end_open_mp_parallel_workshare_blk", NULL);
+
+   return;
+
+}  /* end_open_mp_parallel_workshare_blk */
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5465,7 +5518,7 @@ void end_open_mp_sections_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_sections_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5506,7 +5559,7 @@ void end_open_mp_section_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_section_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5551,7 +5604,7 @@ void end_open_mp_single_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_single_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5611,7 +5664,7 @@ void end_open_mp_parallel_do_blk(boolean  err_call)
 
    return;
 }
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5652,7 +5705,7 @@ void end_open_mp_master_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_master_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5693,7 +5746,7 @@ void end_open_mp_critical_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_critical_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5734,7 +5787,52 @@ void end_open_mp_ordered_blk(boolean  err_call)
    return;
 
 }  /* end_open_mp_ordered_blk */
-
+
+/******************************************************************************\
+|*                                                                            *|
+|* Description:                                                               *|
+|*      <description>                                                         *|
+|*                                                                            *|
+|* Input parameters:                                                          *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Output parameters:                                                         *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Returns:                                                                   *|
+|*      NOTHING                                                               *|
+|*                                                                            *|
+\******************************************************************************/
+
+void end_open_mp_workshare_blk(boolean  err_call)
+
+{
+   TRACE (Func_Entry, "end_open_mp_workshare_blk", NULL);
+
+   if (! err_call) {
+
+      if (STMT_CANT_BE_IN_BLK(Open_MP_End_Workshare_Stmt, CURR_BLK)) {
+         blk_match_err(Open_Mp_Workshare_Blk, FALSE, FALSE);
+      }
+
+      if (CURR_BLK == Open_Mp_Workshare_Blk) {
+         /* point to the WORKSHARE directive */
+         IR_FLD_R(SH_IR_IDX(curr_stmt_sh_idx)) = SH_Tbl_Idx;
+         IR_IDX_R(SH_IR_IDX(curr_stmt_sh_idx)) = CURR_BLK_FIRST_SH_IDX;
+
+         POP_BLK_STK;
+      }
+   }
+   else {
+      POP_BLK_STK;
+   }
+
+   TRACE (Func_Exit, "end_open_mp_workshare_blk", NULL);
+
+   return;
+
+}  /* end_open_mp_workshare_blk */
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5801,7 +5899,7 @@ boolean remove_do_parallel_blk(boolean  cannot_nest,
    return(err);
 
 }  /* remove_do_parallel_blk */
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -5873,7 +5971,7 @@ boolean remove_pdo_blk(boolean  cannot_nest,
 
 # if defined(GENERATE_WHIRL)
 
-
+
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
@@ -6061,7 +6159,7 @@ static void check_loop_bottom_nesting(void)
 # endif
 
 # if defined(_EXPRESSION_EVAL)
-
+
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|

@@ -58,10 +58,10 @@ for ($i = 0; $i <= $#ARGV; $i++) {
   exit(1);
 
 }	
-$f90dir = "/home/derivs/share/Open64/osprey1.0/targ_ia32_ia64_linux" if ($f90dir eq "");
+$f90dir = "/home/radu/Open64/osprey1.0/targ_sparc_solaris" if ($f90dir eq "");
 $mfef90 = "$f90dir/crayf90/sgi/mfef90" if ($mfef90 eq "");
 $whirl2f = "$f90dir/whirl2f/whirl2f" if ($whirl2f eq "");
-$f90 = "f90" if ($f90 eq "");
+$f90 = "f90 -ansi" if ($f90 eq "");
 $logdir = "logs" if ($logdir eq ""); system("mkdir -p $logdir") if ( ! -e $logdir );
 if ($#sourcedirs == -1) { $sourcedirs[0] = `pwd` ; chomp $sourcedirs[0];}
 $tests = "mfef90,whirl2f,compile,run" if ($tests eq "");

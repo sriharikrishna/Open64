@@ -4,8 +4,8 @@ BUILD_ABI      = 32BIT
 BUILD_ARCH     = SPARC
 BUILD_TARGET   = SPARC
 BUILD_OS       = SOLARIS
-#BUILD_COMPILER = GNU
-BUILD_COMPILER = VENDOR
+BUILD_COMPILER = GNU
+#BUILD_COMPILER = VENDOR
 BUILD_TYPE     = SHARED
 BUILD_OPTIMIZE = DEBUG
 BUILD_INSTALL  = DEFAULT
@@ -18,4 +18,4 @@ BUILD_SB       = NO
 #-----------------------------------------------------------------------
 STL_EXT_PATH =
 	
-MAKE = gnumake
+MAKE = gmake

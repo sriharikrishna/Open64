@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.9 $
- * $Date: 2002-08-30 21:21:21 $
+ * $Revision: 1.10 $
+ * $Date: 2002-09-12 13:06:10 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.10 $";
 #endif
 
 #include <alloca.h>
@@ -1083,7 +1083,8 @@ WN2F_Is_Parallel_Region(WN *region, WN2F_CONTEXT context)
 	  WN_pragma(pragma) == WN_PRAGMA_MASTER_BEGIN || 
 	  WN_pragma(pragma) == WN_PRAGMA_SINGLE_PROCESS_BEGIN ||
 	  WN_pragma(pragma) == WN_PRAGMA_PSECTION_BEGIN ||
-	  WN_pragma(pragma) == WN_PRAGMA_PARALLEL_SECTIONS) &&
+	  WN_pragma(pragma) == WN_PRAGMA_PARALLEL_SECTIONS ||
+	  WN_pragma(pragma) == WN_PRAGMA_PARALLEL_WORKSHARE) &&
 	    !Ignore_Synchronized_Construct(pragma, context);
  }
    return predicate;

@@ -4,7 +4,7 @@
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of version 2 of the GNU General Public License as
-  published by the Free Software Foundation.
+  published by the Free Software Foundation.a
 
   This program is distributed in the hope that it would be useful, but
   WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_directive
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:08 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-09-12 13:06:12 $
+ * $Author: open64 $
  *
  * Description: contains routines to support directives, converting
  *              from Cray IR to WHIRL. Entry points from
@@ -288,6 +288,20 @@ fei_task_var( INT32	sym_idx,
         cwh_stk_push(wn, WN_item);
         task_var_count++;
         break;
+    case Context_Omp_Copyprivate:
+	wn = WN_CreatePragma(WN_PRAGMA_COPYPRIVATE, (ST *)p->item, 0, /*offset=*/0);
+        if ((CONTEXT_TYPE) context == Context_Omp_Copyprivate) 
+          WN_set_pragma_omp(wn);
+        cwh_stk_push(wn, WN_item);
+        task_var_count++;
+	break;
+    case Context_Omp_Flush:
+        wn = WN_CreatePragma(WN_PRAGMA_FLUSH, (ST *)p->item, 0, /*offset=*/0);
+        if ((CONTEXT_TYPE) context == Context_Omp_Flush) 
+          WN_set_pragma_omp(wn);
+        cwh_stk_push(wn, WN_item);
+        task_var_count++;
+        break;
     default:
 	DevAssert((0), ("Unimplemented fei_task_var type"));
 	break;
@@ -504,7 +518,10 @@ cwh_mp_region(       WN_PRAGMA_ID wn_pragma_id,
     wn = cwh_stk_pop_WN();
 
     if ((WN_operator(wn) == OPR_PRAGMA) && 
-	(WN_pragma(wn) == WN_PRAGMA_LOCAL)) 
+	(WN_pragma(wn) == WN_PRAGMA_LOCAL &&
+         /* no idea why the clause is added to all enclosing regions, but it makes private disapear */
+	 /* therefore we do not do this for OpenMP (radu@par.univie.ac.at) */
+         ! WN_pragma_omp(wn))) 
       cwh_block_add_to_enclosing_regions(WN_PRAGMA_LOCAL,WN_st(wn));
     else
       cwh_block_append(wn);
@@ -1843,7 +1860,7 @@ fei_endguard (INT32 task_x, INT32 guard_num, INT32 lineno )
  *
  *
  * fei_parallelsections_open_mp
- *
+ *  
  *
  *===============================================
 */
@@ -1935,6 +1952,60 @@ fei_paralleldo_open_mp (int task_if_idx,
   /* set the MP and uplevel bits on the symtab */
 
   cwh_directive_set_PU_flags(nested_do_descriptor.depth > 1);
+}
+
+/*===============================================
+ *
+ *
+ * fei_parallelworkshare_open_mp
+ *
+ *
+ *===============================================
+*/
+void
+fei_parallelworkshare_open_mp(int task_if_idx,
+			      int defaultt)
+{
+  WN *body;
+
+  task_nest_count = 0;
+  body = cwh_mp_region(WN_PRAGMA_PARALLEL_WORKSHARE,0,0,0,0,0,1);
+
+  /* now attach all applicable pragmas */
+
+  cwh_directive_load_value_pragma(task_if_idx,WN_PRAGMA_IF,TRUE);
+
+  if (defaultt) {     /* there is a DEFAULT clause */
+
+    DevAssert((defaultt > 0 && defaultt < MAX_PRAGMA_DEFAULT),("Odd defaultt"));
+    cwh_stmt_add_pragma(WN_PRAGMA_DEFAULT,TRUE,(ST_IDX) NULL,defaultt);
+  }
+
+  /* append statements to region body */
+
+  cwh_block_set_current(body);
+
+  cwh_directive_set_PU_flags(FALSE);
+}
+
+/*===============================================
+ *
+ * fei_workshare_open_mp 
+ * 
+ * create a new region & make body current block
+ *
+ *===============================================
+*/ 
+void 
+fei_workshare_open_mp (void) 
+{
+  WN *body;
+
+  body = cwh_mp_region(WN_PRAGMA_WORKSHARE,0,0,0,0,0,1);
+
+  cwh_block_set_current(body);
+
+  cwh_directive_set_PU_flags(FALSE);
 }
 
 /*===============================================
@@ -2206,7 +2277,7 @@ fei_ordered_open_mp         ( void )
 extern void 
 fei_endsingle_open_mp       ( int nowait )
 {
-  cwh_directive_pop_and_nowait(nowait,TRUE);
+  cwh_directive_pop_and_nowait_or_copyprivate(nowait);
 }
 
 /*===============================================
@@ -2302,19 +2373,65 @@ fei_endparallelsections_open_mp( void )
 
 /*===============================================
  *
+ * fei_endparallelworkshare_open_mp 
+ * 
+ * 
+ *===============================================
+*/ 
+extern void 
+fei_endparallelworkshare_open_mp( void )
+{
+  cwh_directive_pop_and_nowait(FALSE,TRUE);
+} 
+
+/*===============================================
+ *
+ * fei_endworkshare_open_mp 
+ * 
+ * similar to ending any other parallel construct
+ * 
+ *===============================================
+*/ 
+extern void 
+fei_endworkshare_open_mp       ( int nowait )
+{
+  cwh_directive_pop_and_nowait(nowait,TRUE);
+}
+
+/*===============================================
+ *
  * fei_flush_open_mp 
  * 
  * 
  *===============================================
 */ 
 extern void 
-fei_flush_open_mp(int list_count)
+fei_flush_open_mp(/*int list_count*/void)
 {
-WN *sync;
+  WN *block, *pragma;
 
-  sync = WN_Create_Intrinsic(OPC_VINTRINSIC_CALL,INTRN_SYNCHRONIZE,0,NULL);
-  cwh_directive_barrier_insert(sync,list_count) ;
+  block = WN_CreateBlock ();
+  pragma = WN_CreatePragma(WN_PRAGMA_FLUSH, (ST_IDX) NULL, 0, 0);
+  WN_set_pragma_omp(pragma);
+  cwh_block_append_given_block(pragma, block);
+
+  while (task_var_count) {
+    cwh_block_append_given_block(cwh_stk_pop_WN(), block);
+    task_var_count--;
+  }
+
+  cwh_block_append(block);
+
+// intrinsic calls produce errors
+// we do not translate FLUSH in an intrinsic call (within barriers) any more
+// instead we create a new WN region (radu@par.univie.ac.at)
+// WN *sync;
+  
+//  sync = WN_Create_Intrinsic(OPC_VINTRINSIC_CALL,INTRN_SYNCHRONIZE,0,NULL);
+//  cwh_directive_barrier_insert(sync,list_count) ;
 }
+
+
 /*===============================================
  *
  * fei_atomic_open_mp 
@@ -2503,6 +2620,39 @@ cwh_directive_pop_and_nowait( BOOL nowait, BOOL is_omp)
 
   cwh_directive_pragma_to_region(wn,region);
 }
+
+
+/*================================================================
+ *
+ * cwh_directive_pop_and_nowait_or_copyprivate (radu@par.univie.ac.at)
+ * 
+ * Pop the current region and issue a COPYPRIVATE or NOWAIT to the region
+ * pragmas if required. If both COPYPRIVATE and NOWAIT are absent, issue an ENDMARKER,
+ * to mark the line number at the end of the region.
+ *
+ *================================================================
+*/
+static void
+cwh_directive_pop_and_nowait_or_copyprivate( BOOL nowait)
+{
+  WN *region;
+  WN_PRAGMA_ID  p ;
+  BOOL copyprivate = FALSE;
+
+  region = cwh_block_pop_region();
+
+  while (task_var_count) {
+    cwh_directive_pragma_to_region(cwh_stk_pop_WN(), region);
+    task_var_count--;
+    copyprivate = TRUE;
+  }
+
+  if (nowait) 
+    cwh_directive_pragma_to_region(WN_CreatePragma (WN_PRAGMA_NOWAIT, (ST_IDX) NULL, 0, 0),region);
+  else if(! copyprivate)
+    cwh_directive_pragma_to_region(WN_CreatePragma (WN_PRAGMA_END_MARKER, (ST_IDX) NULL, 0, 0),region);
+}
+
 
 /*================================================================
  *

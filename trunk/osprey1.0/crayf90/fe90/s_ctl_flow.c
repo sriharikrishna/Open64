@@ -5890,6 +5890,8 @@ static void chk_for_unlabeled_stmt (void)
             case Open_MP_End_Master_Stmt:
             case Open_MP_End_Critical_Stmt:
             case Open_MP_End_Ordered_Stmt:
+            case Open_MP_End_Parallel_Workshare_Stmt:
+            case Open_MP_End_Workshare_Stmt:
 
                break;
 

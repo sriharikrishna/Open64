@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.6 $
- * $Date: 2002-09-05 21:42:18 $
+ * $Revision: 1.7 $
+ * $Date: 2002-09-12 13:06:13 $
  * $Author: open64 $
  *
  * Revision history:
@@ -3352,16 +3352,27 @@ fei_doloop(INT32	line)
       doloop_ty = lcv_t;
    }
 
-   if (WNOPR(stride) != OPR_INTCONST) {
+   if (WNOPR(stride) != OPR_INTCONST && ! is_top_pdo) {
+       /* do not canonicalize the PDO loops, to avoid emitting unvalid code (radu@par.univie.ac.at) */
+       /* (e.g. PDO region which does not start with a DO loop) */
+       /* if they are to be canonicalized, the code introduced must be moved outside the region */
       canonicalize = TRUE;
    }
-   if (WNOPR(stride) != OPR_INTCONST && WNOPR(stride) != OPR_CONST) {
+   if (WNOPR(stride) != OPR_INTCONST && WNOPR(stride) != OPR_CONST &&
+       /* do not canonicalize the PDO loops, to avoid emitting unvalid code (radu@par.univie.ac.at) */
+       /* (e.g. PDO region which does not start with a DO loop) */
+       /* if they are to be canonicalized, the code introduced must be moved outside the region */
+       ! is_top_pdo) {
       stride_in_loop = cwh_preg_temp_save("doloop_stride",stride);
    } else {
       stride_in_loop = WN_COPY_Tree(stride);
    }
       
-   if (WNOPR(ub) != OPR_INTCONST && WNOPR(ub) != OPR_CONST) {
+   if (WNOPR(ub) != OPR_INTCONST && WNOPR(ub) != OPR_CONST &&
+       /* do not canonicalize the PDO loops, to avoid emitting unvalid code (radu@par.univie.ac.at) */
+       /* (e.g. PDO region which does not start with a DO loop) */
+       /* if they are to be canonicalized, the code introduced must be moved outside the region */
+       ! is_top_pdo) {
       ubcomp = cwh_preg_temp_save("doloop_ub",ub);
    } else {
       ubcomp = WN_COPY_Tree(ub);
@@ -3373,7 +3384,11 @@ fei_doloop(INT32	line)
    if (parallel_do_count) {
 
      if (! ((WNOPR(lb) == OPR_INTCONST) ||
-	    (WNOPR(lb) == OPR_LDID && ST_class(WN_st(lb)) == CLASS_PREG))) {
+	    (WNOPR(lb) == OPR_LDID && ST_class(WN_st(lb)) == CLASS_PREG)) &&
+       ! is_top_pdo) {
+       /* do not canonicalize the PDO loops, to avoid emitting unvalid code (radu@par.univie.ac.at) */
+       /* (e.g. PDO region which does not start with a DO loop) */
+       /* if they are to be canonicalized, the code introduced must be moved outside the region */
        lb = cwh_preg_temp_save("doloop_lb",lb);
      }
    }

@@ -35,9 +35,9 @@
 
 /* ====================================================================
  * Module: omp_lower.cxx
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:20 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-09-12 13:06:10 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/omp_lower.cxx,v $
  *
  * Revision history:
@@ -299,7 +299,7 @@ WN *OMP_Prelower(PU_Info *current_pu, WN *pu)
   WN_LIST nested_set(&omp_pool);  // initially-empty nested constructs
 
   Privatize_Index_Vars_And_Check_Final_Scopes(
-      pu, &pragma_block_list, NULL, &processed_set, &nested_set, TRUE);
+    pu, &pragma_block_list, NULL, &processed_set, &nested_set, TRUE);
 
   Is_True(pragma_block_list.Lastidx() < 0,
           ("unmatched scope push in "
@@ -971,13 +971,17 @@ static BOOL Immed_Inside_Par_Begin(WN* wn_barrier)
   return FALSE;
 }
 
+// this routine is buggy (radu@par.univie.ac.at)
+// we disable the code transformations associated with SECTIONS, ORDERED and ATOMIC directives
+// we also prefer to emit code closer to the original
 static WN *Translate_OMP_to_MP(WN *wn)
 {
   OPCODE opcode = WN_opcode(wn);
-  WN *section = Is_Section_Begin(wn);
-  if (section) {
-    Convert_Section_To_Pdo(wn,section);
-  }
+  // do not convert sections (radu@par.univie.ac.at)
+  //WN *section = Is_Section_Begin(wn);
+  //if (section) {
+  //  Convert_Section_To_Pdo(wn,section);
+  //}
 
   wn = Lower_Master(wn);
   
@@ -997,22 +1001,24 @@ static WN *Translate_OMP_to_MP(WN *wn)
     Convert_Just_Chunksize_To_Dynamic (wn);
   }
 
+  // do not lower ATOMIC (radu@par.univie.ac.at)
   // Lower atomic when processing the next instruction
   // since the processing will delete the atomic pragma
   // and the following one
-  if (OPCODE_is_store(opcode)) {
-    WN *prev = WN_prev(wn);
-    if (prev && WN_operator(prev) == OPR_PRAGMA) {
-      if (WN_pragma(prev) == WN_PRAGMA_ATOMIC) {
-        Lower_Atomic(prev);
-        return NULL;
-      }
-    }
-  }
+  //   if (OPCODE_is_store(opcode)) {
+  //     WN *prev = WN_prev(wn);
+  //     if (prev && WN_operator(prev) == OPR_PRAGMA) {
+  //       if (WN_pragma(prev) == WN_PRAGMA_ATOMIC) {
+  //       Lower_Atomic(prev);
+  //         return NULL;
+  //       }
+  //     }
+  //   }
 
-  if (Is_Ordered_Do(wn)) {
-    Add_Ordered_XPragmas (wn);
-  }
+  // do not process ORDERED (radu@par.univie.ac.at)
+  //if (Is_Ordered_Do(wn)) {
+  //  Add_Ordered_XPragmas (wn);
+  //}
 
   if (opcode == OPC_PRAGMA &&
       WN_pragma_omp(wn) &&
@@ -2723,7 +2729,11 @@ Apply_Par_Region_Default_Scopes(WN *wn, ST_TO_BOOL_HASH *processed,
               WN_set_pragma_compiler_generated(scope_prag);
   
               Set_Parent(scope_prag, pragma_block);
-              WN_INSERT_BlockLast(pragma_block, scope_prag);
+              // insert the PRIVATE pragmas before the END_MARKER, if this exists (radu@par.univie.ac.at)
+              if (WN_pragma(WN_last(pragma_block)) == WN_PRAGMA_END_MARKER)
+                WN_INSERT_BlockBefore(pragma_block, WN_last(pragma_block), scope_prag);
+              else 
+                WN_INSERT_BlockLast(pragma_block, scope_prag);
               if (Get_Trace(TP_LNOPT2, TT_LNO_OMP_TRANSFORMS))
                 printf("OMP_Prelower: inserting PRIVATE(%s) clause for region "
                        "starting at line %d due to use at line %d\n",
