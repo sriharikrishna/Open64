@@ -35,7 +35,7 @@
 
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/util.c,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/util.c,v $ $Revision: 1.2 $";
 #include <unistd.h>
 #include <errno.h>
 #include "defs.h"
@@ -43,7 +43,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "tracing.h"
 #include "util.h"
 
-extern pid_t wait(INT *statptr);	/* Currently not defined with
+#include <sys/wait.h>
+/*extern pid_t wait(INT *statptr); */	/* Currently not defined with
 					 *  prototype in sys/wait.h
                                          */
 
