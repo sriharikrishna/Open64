@@ -91,7 +91,19 @@ endif
 LCXXOPTS = $(LCOPTS)
 LCXXDEFS = $(LCDEFS)
 
-TARGETS = ir_b2a ir_size
+
+#----------------------------------------------------------------------
+#  Define target
+#----------------------------------------------------------------------
+
+IR_B2A_EXE = $(addsuffix $(EXEext), ir_b2a)
+IR_SIZE_EXE = $(addsuffix $(EXEext), ir_size)
+
+IR_A2B_EXE = $(addsuffix $(EXEext), ir_a2b)
+IR_SEL_EXE = $(addsuffix $(EXEext), ir_sel)
+
+
+TARGETS = $(IR_B2A_EXE) $(IR_SIZE_EXE)
 
 COMMON_DIR = $(BUILD_TOT)/common
 COMMON_UTIL_DIR= $(BUILD_TOT)/common/util
@@ -101,7 +113,7 @@ LIBCOMUTIL_DIR= $(BUILD_TOT)/libcomutil
 
 TARG_COMUTIL_DIR	= $(TARGDIR)/libcomutil
 
-LDIRT = ir_a2b ir_sel
+LDIRT = $(IR_A2B_EXE) $(IR_SEL_EXE)
 
 
 #----------------------------------------------------------------------
@@ -228,10 +240,10 @@ DIRTS =
 #  Installation
 #----------------------------------------------------------------------
 install: default 
-	$(STD_INSTALL) -F /usr/sbin ir_b2a
-	$(STD_INSTALL) -lns ir_b2a -F /usr/sbin ir_a2b
-	$(STD_INSTALL) -lns ir_b2a -F /usr/sbin ir_sel
-	$(STD_INSTALL) -F /usr/sbin ir_size
+	$(STD_INSTALL) -F /usr/sbin $(IR_B2A_EXE)
+	$(STD_INSTALL) -lns $(IR_B2A_EXE) -F /usr/sbin $(IR_A2B_EXE)
+	$(STD_INSTALL) -lns $(IR_B2A_EXE) -F /usr/sbin $(IR_SEL_EXE)
+	$(STD_INSTALL) -F /usr/sbin $(IR_SIZE_EXE)
 
 #----------------------------------------------------------------------
 #  Include the usual commonrules
@@ -248,17 +260,18 @@ VPATH = $(BUILD_BASE) $(COMMON_COM_DIR) $(COMMON_COM_TARG_DIR)
 #----------------------------------------------------------------------
 #  Build executables
 #----------------------------------------------------------------------
-ir_b2a: $(OBJECTS) ir_a2b.o
-	$(C++F) -o ir_b2a ir_a2b.o $(OBJECTS) $(LDFLAGS)
+$(IR_B2A_EXE): $(OBJECTS) ir_a2b.o
+	$(C++F) -o $(IR_B2A_EXE) ir_a2b.o $(OBJECTS) $(LDFLAGS)
 
-ir_a2b: ir_b2a
-	ln -sf ir_b2a ir_a2b
+$(IR_A2B_EXE): $(IR_B2A_EXE)
+	ln -sf $(IR_B2A_EXE) $(IR_A2B_EXE)
 
-ir_sel: ir_b2a
-	ln -sf ir_b2a ir_sel
+$(IR_SEL_EXE): $(IR_B2A_EXE)
+	ln -sf $(IR_B2A_EXE) $(IR_SEL_EXE)
 
-ir_size: $(OBJECTS) ir_size.o ir_b2a
-	$(C++F) -o ir_size ir_size.o $(OBJECTS) $(LDFLAGS)
+$(IR_SIZE_EXE): $(OBJECTS) ir_size.o $(IR_B2A_EXE)
+	$(C++F) -o $(IR_SIZE_EXE) ir_size.o $(OBJECTS) $(LDFLAGS)
 
 ir_walker: $(OBJECTS) ir_walker.o
 	$(C++F) -o ir_walker ir_walker.o $(OBJECTS) $(LDFLAGS)
+
