@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.24 $
- * $Date: 2003-12-08 15:45:41 $
+ * $Revision: 1.25 $
+ * $Date: 2003-12-08 22:00:56 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.24 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.25 $";
 #endif
 
 #include <ctype.h>
@@ -720,7 +720,7 @@ ST2F_decl_translate(TOKEN_BUFFER tokens, const ST *st)
 
 void ReorderParms(ST **parms,INT32 num_params)
 {
-  INT32 i = 0;
+  INT32 i;
   ST **reorder_parms;
   ST_IDX bdindex;
   TY_IDX ty_index;
@@ -732,13 +732,8 @@ void ReorderParms(ST **parms,INT32 num_params)
 
   workset.clear();
   reorder_parms = (ST **)alloca((num_params + 1) * sizeof(ST *));
-  for (i=0; i<num_params; i++){
-      if (dependset[i].empty())
+  for (i=0; i<num_params; i++)
       st_idx_to_parms[(ST_IDX)(parms[i]->st_idx)] = i;
-  }
-
-  TY_IDX ty_i = ST_type(parms[0]);
-  if (TY_kind(ST_type(parms[0])) == KIND_POINTER )
 
   for (i=0; i<num_params; i++)
    if (TY_kind(ST_type(parms[i])) == KIND_POINTER ){
@@ -761,7 +756,8 @@ void ReorderParms(ST **parms,INT32 num_params)
                  if (ST_is_temp_var(St_Table[bdindex])){
                      ST * tempst =GetTmpVarTransInfo(NULL,bdindex,PU_Body);
 		     real_index = tempst->st_idx;
-                     dependset[i].insert(st_idx_to_parms[real_index]);
+                     if (st_idx_to_parms[real_index]!=i)
+                         dependset[i].insert(st_idx_to_parms[real_index]);
                   }
                  }
               if (!ARB_const_ubnd(arb)){
@@ -769,7 +765,8 @@ void ReorderParms(ST **parms,INT32 num_params)
                  if (ST_is_temp_var(St_Table[bdindex])){
                      ST * tempst=GetTmpVarTransInfo(NULL,bdindex,PU_Body);
 		     real_index = tempst->st_idx;
-                     dependset[i].insert(st_idx_to_parms[real_index]);
+                     if (st_idx_to_parms[real_index]!=i)
+                        dependset[i].insert(st_idx_to_parms[real_index]);
                   }
                  }
                }
@@ -784,15 +781,16 @@ void ReorderParms(ST **parms,INT32 num_params)
      workset.erase(i);
      reorder_parms[keep] = parms[i];
      keep++;
-     for (INT32 j=0; j<num_params; j++)
+     for (INT32 j=0; j<num_params; j++){
            dependset[j].erase(i);
+     } 
     }
   }
 
   std::set<int>::iterator runner;
   std::set<int>::iterator cleaner;
  
-  INT32 size = workset.size();
+  INT32 size = workset.size()+1;
   while (!workset.empty() && size )
    {
     runner = workset.begin();
@@ -811,6 +809,7 @@ void ReorderParms(ST **parms,INT32 num_params)
    }
   size--;
  }
+
   reorder_parms[keep] = NULL;
   for(INT32 k=0; k<num_params; k++)
       parms[k] = reorder_parms[k];
