@@ -71,9 +71,9 @@
 ***
 **/
 
-/** $Revision: 1.3 $
-*** $Date: 2003-02-21 21:13:43 $
-*** $Author: jle $
+/** $Revision: 1.4 $
+*** $Date: 2003-05-14 13:30:26 $
+*** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wintrinsic.h,v $
 **/
 
@@ -1233,7 +1233,7 @@ typedef enum {
   
   /* this one somehow gets missing */
   INTRN_SUB_PI = 881,
-  INTRINSIC_LAST  = 882,
+  INTRINSIC_LAST = 882
 
 } INTRINSIC;
 
