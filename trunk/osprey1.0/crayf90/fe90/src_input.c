@@ -654,6 +654,10 @@ void fixed_get_char (void)
          case 4 :
 	    LA_CH_CLASS  = Ch_Class_Dir4;		/* directive class    */
             break;
+         case 7 :
+	    /* eraxxon: OpenAD directive */
+	    LA_CH_CLASS  = Ch_Class_Dir7;		/* directive class    */
+            break;
          }
 
 	 TRACE (Func_Exit, "fixed_get_char", 
@@ -948,6 +952,10 @@ void free_get_char (void)
             break;
          case 4 :
             LA_CH_CLASS  = Ch_Class_Dir4;               /* directive class    */
+            break;
+         case 7 :
+	    /* eraxxon: OpenAD directive */
+            LA_CH_CLASS  = Ch_Class_Dir7;               /* directive class    */
             break;
          }
 
@@ -2180,6 +2188,52 @@ START:
                 ! on_off_flags.preprocess_only) {
                PP_LINE_TYPE = Comment_Line;
             }
+         }
+      }
+      else if (((ch = nxt_line[NXT_COL(2)]) == dollar) &&
+               ((ch = nxt_line[NXT_COL(3)]) == uc_o   || ch == lc_o) &&
+               ((ch = nxt_line[NXT_COL(4)]) == uc_p   || ch == lc_p) &&
+               ((ch = nxt_line[NXT_COL(5)]) == uc_e   || ch == lc_e) &&
+	       ((ch = nxt_line[NXT_COL(6)]) == uc_n   || ch == lc_n) &&
+	       ((ch = nxt_line[NXT_COL(7)]) == uc_a   || ch == lc_a) &&
+	       ((ch = nxt_line[NXT_COL(8)]) == uc_d   || ch == lc_d)) {
+	
+	 /* eraxxon: OpenAD directive */
+         /* C$OpenAD */
+
+         PP_PREFIX_LEN = 7;
+
+         first_line = FALSE;
+
+         /* mark the sign bit of the dollar or at_sign */
+         MARK_CHAR_CONST(nxt_line[NXT_COL(2)]);
+
+         if (nxt_line[NXT_COL(9)] == zero) {
+            nxt_line[NXT_COL(9)] = blank;
+         }
+
+         if ((ch = nxt_line[NXT_COL(9)]) != blank && ch != tab) {
+
+            if (IS_DIR_CONTINUATION(Copenad_Dir)) {
+
+               PP_LINE_TYPE = Dir_Continuation_Line;
+               PP_ACTUAL_DIR_PREFIX = Copenad_Dir;
+               in_format = FALSE;
+               PP_IDX  = NXT_COL(9);
+            }
+            else {
+               PP_LINE_TYPE = Comment_Line;
+            }
+         }
+         else {
+
+            PP_IDX = NXT_COL(2);                   /* skip 'C' char      */
+            in_format = FALSE;
+            PP_LINE_TYPE = Dir_Line;
+            PP_DIR_PREFIX = Copenad_Dir;
+            PP_ACTUAL_DIR_PREFIX = Copenad_Dir;
+
+            idx = NXT_COL(9);
          }
       }
 # endif
@@ -3914,6 +3968,97 @@ START:
                 ! on_off_flags.preprocess_only) {
                PP_LINE_TYPE = Comment_Line;
             }
+         }
+      }
+      else if (((ch = nxt_line[PP_IDX+1]) == dollar) &&
+               ((ch = nxt_line[PP_IDX+2]) == uc_o   || ch == lc_o) &&
+               ((ch = nxt_line[PP_IDX+3]) == uc_p   || ch == lc_p) &&
+               ((ch = nxt_line[PP_IDX+4]) == uc_e   || ch == lc_e) &&
+               ((ch = nxt_line[PP_IDX+5]) == uc_n   || ch == lc_n) &&
+               ((ch = nxt_line[PP_IDX+6]) == uc_a   || ch == lc_a) &&
+               ((ch = nxt_line[PP_IDX+7]) == uc_d   || ch == lc_d)) {
+
+	 /* eraxxon: OpenAD directive */
+         /* !$OpenAD */
+
+         PP_PREFIX_LEN = 7;
+
+         /* mark the sign bit of the dollar and at_sign */
+         MARK_CHAR_CONST(nxt_line[PP_IDX+1]);
+
+         if (issue_classify_msg &&
+             dump_flags.open_mp &&
+             expected_line == Continuation_Line) {
+
+            ntr_next_msg_queue(PP_LINE_NUM, 1656, Error, nxt_line_col[PP_IDX],
+                               (char *)NULL,
+                               0,
+                               NO_ARG);
+            expected_line = Regular_Line;
+            PP_EXPECTED_LINE = expected_line;
+         }
+
+         if (expected_line == Dir_Continuation_Line) {
+
+            PP_EXPECTED_LINE = Regular_Line;
+
+            if (IS_DIR_CONTINUATION(Copenad_Dir)) {
+
+               PP_LINE_TYPE = Dir_Continuation_Line;
+               PP_ACTUAL_DIR_PREFIX = Copenad_Dir;
+               in_format = FALSE;
+               PP_IDX  = PP_IDX+8;
+
+               src_idx = PP_IDX;
+
+               do {
+                  ch = nxt_line[++src_idx];           /* get next src char  */
+               }
+               while (ch == blank  ||  ch == tab);
+
+               if (ch == AMP) {
+
+                  PP_IDX = src_idx;
+
+                  do {
+                     ch = nxt_line[++src_idx];
+                  }
+                  while (ch == blank  ||  ch == tab);
+
+                  if (ch == newline  ||  ch == bang) {
+                     PP_EOL = src_idx;
+
+                     /* Cont lines must contain text following */
+                     /* the & in free src form. */
+
+                     if (issue_classify_msg) {
+                        ntr_next_msg_queue(PP_LINE_NUM, 71, Ansi,
+                                      nxt_line_col[src_idx],
+                                      (char *)NULL,
+                                      0,
+                                      NO_ARG);
+                     }
+
+                     PP_LINE_TYPE = Comment_Line;
+                  }
+
+                  had_amp = TRUE;
+               }
+            }
+            else {
+               PP_LINE_TYPE = Comment_Line;
+            }
+         }
+         else if ((ch = nxt_line[PP_IDX+8]) != blank && ch != tab) {
+            PP_LINE_TYPE = Comment_Line;
+         }
+         else {
+            idx = PP_IDX+8;
+            PP_IDX++;                             /* skip '!' char      */
+            PP_LINE_TYPE = Dir_Line;
+            PP_DIR_PREFIX = Copenad_Dir;
+            PP_ACTUAL_DIR_PREFIX = Copenad_Dir;
+            in_format = FALSE;
          }
       }
 # endif
@@ -8043,6 +8188,12 @@ static void print_nxt_line(void)
                   remaining_room -= 7;
                   break;
 
+	       /* eraxxon: OpenAD directive */
+               case Copenad_Dir:
+                  fprintf(dot_i_fptr, "!$OPENAD& ");
+                  remaining_room -= 10;
+                  break;
+
                }
             }
             else if (PP_MP_LINE) {
@@ -8113,6 +8264,14 @@ static void print_nxt_line(void)
                   OUTPUT_POUND_LINE_NUM(PP_LINE_NUM);
                   fprintf(dot_i_fptr, "!$SGI& ");
                   remaining_room -= 7;
+                  break;
+
+	       /* eraxxon: OpenAD directive */
+               case Copenad_Dir:
+                  fprintf(dot_i_fptr, "&\n");
+                  OUTPUT_POUND_LINE_NUM(PP_LINE_NUM);
+                  fprintf(dot_i_fptr, "!$OPENAD& ");
+                  remaining_room -= 10;
                   break;
 
                }

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:10 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-14 17:34:47 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stmt.h,v $
  *
  * Revision history:
@@ -55,7 +55,7 @@
 #define CWH_STMT_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stmt.h,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stmt.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -85,8 +85,15 @@ enum site {
   block_pu                  /* pu pragmas in OPC_FUNCENTRY */
 }; 
 
+enum pu_pragma_placement_t {
+  pu_pragma_placement_first,       /* add to beginning of block */
+  pu_pragma_placement_last         /* add to end of block */
+}; 
 
-extern BOOL cwh_stmt_add_to_preamble(WN *wn,enum site block);
+
+extern BOOL cwh_stmt_add_to_preamble(WN *wn, 
+				     enum site block, 
+				     enum pu_pragma_placement_t placement = pu_pragma_placement_first);
 
 extern USRCPOS current_srcpos ; /* line of current statement  */
 

@@ -321,9 +321,15 @@ static	char		*p_tasking_context[] = {
         		"Context_Omp_Copyprivate",
         		"Context_Omp_Copyin",
 			"Context_Omp_Affinity",
-			"Context_Omp_Nest"
+			"Context_Omp_Nest",
         		"Context_Omp_Flush",
-						 };
+
+			/* eraxxon: OpenAD directive */
+			"Context_OpenAD_XXX",
+			"Context_OpenAD_Dependent",
+			"Context_OpenAD_Independent",
+			"Context_OpenAD_Simple"
+                        };
 
 int     pdg_align[8] = {0,                      /* Signifies no alignment */
                         Bit_Align,
@@ -10575,6 +10581,68 @@ CONTINUE:
         fei_endcritical_open_mp(criticalname);
 # endif
         break;
+
+
+
+      /* eraxxon: OpenAD directive */
+      case XXX_OpenAD_Opr: {
+         char* str;
+	 if (IR_FLD_L(ir_idx) == CN_Tbl_Idx) {
+            str = (char *) &CN_CONST(IR_IDX_L(ir_idx));
+	 }
+
+	 PDG_DBG_PRINT_START
+	 PDG_DBG_PRINT_C("fei_xxx_openad");
+         PDG_DBG_PRINT_S("(1) string", str);
+         PDG_DBG_PRINT_END
+
+# ifdef _ENABLE_FEI
+         fei_xxx_openad(str);
+# endif
+	 break;
+      }
+
+      case Dependent_OpenAD_Opr:
+      case Independent_OpenAD_Opr: {
+	 operator_type op  = Dependent_OpenAD_Opr;
+	 CONTEXT_TYPE ctxt = Context_OpenAD_Dependent;
+	 if (IR_OPR(ir_idx) == Independent_OpenAD_Opr) {
+	    op   = Independent_OpenAD_Opr;
+	    ctxt = Context_OpenAD_Independent;
+	 }
+
+	 /* The list should be of length 1 */
+	 list_idx1 = IR_IDX_L(ir_idx);
+	 list_idx2 = IL_IDX(list_idx1);
+
+	 send_attr_ntry(list_idx2);
+	 
+	 PDG_DBG_PRINT_START
+	 PDG_DBG_PRINT_C("fei_task_var");
+	 PDG_DBG_PRINT_LD("(1) PDG_AT_IDX", PDG_AT_IDX(list_idx2));
+	 PDG_DBG_PRINT_S("(2) context", p_tasking_context[ctxt]);
+	 PDG_DBG_PRINT_END
+   
+# ifdef _ENABLE_FEI
+	 last_task_idx = fei_task_var(PDG_AT_IDX(list_idx2), ctxt);
+# endif
+
+         PDG_DBG_PRINT_START
+         PDG_DBG_PRINT_C("fei_dependent_independent_openad");
+         PDG_DBG_PRINT_END
+
+# ifdef _ENABLE_FEI
+	 fei_dependent_independent_openad();
+# endif
+         break;
+      }
+
+
+      case Simple_OpenAD_Opr:
+      case EndSimple_OpenAD_Opr:
+	 /* FIXME */
+	 break;
+	    
     
       case Nullify_Opr:
          cvrt_exp_to_pdg(IR_IDX_L(ir_idx),

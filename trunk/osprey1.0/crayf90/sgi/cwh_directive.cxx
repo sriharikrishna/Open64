@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_directive
- * $Revision: 1.3 $
- * $Date: 2002-09-12 13:06:12 $
- * $Author: open64 $
+ * $Revision: 1.4 $
+ * $Date: 2004-12-14 17:34:46 $
+ * $Author: eraxxon $
  *
  * Description: contains routines to support directives, converting
  *              from Cray IR to WHIRL. Entry points from
@@ -302,6 +302,22 @@ fei_task_var( INT32	sym_idx,
         cwh_stk_push(wn, WN_item);
         task_var_count++;
         break;
+
+    /* eraxxon: OpenAD directive */
+    case Context_OpenAD_Dependent:
+        wn = WN_CreatePragma(WN_PRAGMA_OPENAD_DEPENDENT, 
+			     (ST *)p->item, 0, /*offset=*/0);
+        cwh_stk_push(wn, WN_item);
+        task_var_count++;
+        break;
+
+    case Context_OpenAD_Independent:
+        wn = WN_CreatePragma(WN_PRAGMA_OPENAD_INDEPENDENT, 
+			     (ST *)p->item, 0, /*offset=*/0);
+        cwh_stk_push(wn, WN_item);
+        task_var_count++;
+        break;
+
     default:
 	DevAssert((0), ("Unimplemented fei_task_var type"));
 	break;
@@ -2445,6 +2461,47 @@ fei_atomic_open_mp(void)
   cwh_stmt_add_pragma(WN_PRAGMA_ATOMIC,TRUE);
   cwh_directive_set_PU_flags(FALSE);
 }
+
+
+/*===============================================
+ *
+ * fei_xxx_openad 
+ * 
+ *===============================================
+*/ 
+extern void 
+fei_xxx_openad( char *str )
+{
+  /* This pragma has WN scope */
+  ST *st = NULL;
+
+  if (str != NULL) {
+    st = cwh_create_str_st(str);
+  }
+  
+  cwh_stmt_add_pragma(WN_PRAGMA_OPENAD_XXX, FALSE, st);
+}
+
+
+/*===============================================
+ *
+ * fei_dependent_independent_openad
+ * 
+ * eraxxon: OpenAD directive
+ * 
+ *===============================================
+*/ 
+extern void 
+fei_dependent_independent_openad(void)
+{
+  /* These pragmas have PU scope */
+  while (task_var_count) {
+    WN* pragma = cwh_stk_pop_WN();
+    cwh_stmt_add_to_preamble(pragma, block_pu, pu_pragma_placement_last);
+    task_var_count--;
+  }
+}
+
 
 /*
  *================================================================

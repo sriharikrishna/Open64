@@ -774,6 +774,39 @@ static  kwd_type        kwd_open_mp_dir[] = {
 
 static  int                     kwd_open_mp_dir_idx[27];
 
+/**************************************************************************\
+|*                 GENERAL RULE FOR THESE STRING TABLES                   *|
+|*                                                                        *|
+|*   All strings are grouped by the beginning letter. In this group,      *|
+|* they are ordered longest to shortest. That means CONTINUE comes before *|
+|* CASE.                                                                  *|
+|*                                                                        *|
+|*   The idx table is indexed by a zero based alphabet. That is, the      *|
+|* index = character - 'A'. If a letter has no corresponding keyword,     *|
+|* it has the index of the next letter that has keywords.                 *|
+|*                                                                        *|
+\**************************************************************************/
+
+/* eraxxon: OpenAD directive */
+
+static  int             *kwd_openad_dir_len;
+
+static  kwd_type        kwd_openad_dir[] = {
+        "DEPENDENT",			Tok_OpenAD_Dir_Dependent,
+
+	"ENDSIMPLE",			Tok_OpenAD_Dir_EndSimple,
+
+	"INDEPENDENT",			Tok_OpenAD_Dir_Independent,
+
+	"SIMPLE",			Tok_OpenAD_Dir_Simple,
+
+	"XXX",				Tok_OpenAD_Dir_XXX,
+
+	"",				Tok_LAST };
+
+static  int                     kwd_openad_dir_idx[27];
+
+/**************************************************************************/
 
 # ifdef _DEBUG
 static 	int			*kwd_dbg_len;

@@ -262,6 +262,8 @@ extern	int	lc_l;
 extern	int	uc_l;
 extern	int	lc_m;
 extern	int	uc_m;
+extern	int	lc_n;
+extern	int	uc_n;
 extern	int	lc_o;
 extern	int	uc_o;
 extern	int	lc_r;

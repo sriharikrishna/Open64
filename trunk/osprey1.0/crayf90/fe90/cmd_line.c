@@ -898,6 +898,8 @@ static void init_cmd_line (void)
    cmd_line_flags.disregard_all_mips		= FALSE;        /* -x SGI     */
    cmd_line_flags.disregard_all_omps		= FALSE;        /* -x omp     */
    cmd_line_flags.disregard_conditional_omp	= FALSE;        /* -x cond_.. */
+   /* eraxxon: OpenAD directive */
+   cmd_line_flags.disregard_all_openads		= FALSE;        /* -x openad  */
    cmd_line_flags.msg_lvl_suppressed	= (msg_lvl_type) cft90_dash_m_option;
    cmd_line_flags.truncate_bits		= 0;			/* -t  0      */
    cmd_line_flags.implicit_use_idx	= NULL_IDX;
@@ -1026,6 +1028,11 @@ static void init_cmd_line (void)
 
    for (idx = 0; idx < (Tok_Open_Mp_Dir_End-Tok_Open_Mp_Dir_Start); idx++) {
       disregard_open_mp[idx]	= FALSE;
+   }
+   
+   for (idx = 0; idx < (Tok_OpenAD_Dir_End-Tok_OpenAD_Dir_Start); idx++) {
+      /* eraxxon: OpenAD directive */		
+      disregard_openad[idx]	= FALSE;
    }
 
    /* set defaults for -u option flags */
@@ -4118,6 +4125,8 @@ static void process_x_option (char *optargs)
                cmd_line_flags.disregard_all_mips	= TRUE;
                cmd_line_flags.disregard_all_omps	= TRUE;
                cmd_line_flags.disregard_conditional_omp = TRUE;
+	       /* eraxxon: OpenAD directive */
+               cmd_line_flags.disregard_all_openads	= TRUE;
             }
             else {
                ntr_msg_queue(0, 78, Log_Error, 0, cp, 'x', ARG_STR_ARG);
@@ -4169,6 +4178,10 @@ static void process_x_option (char *optargs)
                cmd_line_flags.disregard_all_omps        = TRUE;
                cmd_line_flags.disregard_conditional_omp = TRUE;
             }
+            else if (EQUAL_STRS(cp, "openad")) {
+	       /* eraxxon: OpenAD directive */		
+               cmd_line_flags.disregard_all_openads     = TRUE;
+            }
             else {
                PRINTMSG (0, 78, Log_Error, 0, 'x', cp);
             }
@@ -4198,6 +4211,8 @@ static void process_x_option (char *optargs)
              tok_type < Tok_Open_Mp_Dir_End) {
             disregard_open_mp[tok_type - Tok_Open_Mp_Dir_Start]	= TRUE;
          }
+
+	 /* eraxxon: OpenAD directive: do not support selective disabling */
 
          /* We need to handle the legal directives, vs the tokens that */
          /* are actually parameters to the directives.   We also need  */
@@ -4534,6 +4549,17 @@ static void process_x_option (char *optargs)
          case Tok_Open_Mp_Dir_Sections :
          case Tok_Open_Mp_Dir_Threadprivate :
             break;
+
+
+	 /* eraxxon: OpenAD directive: do not support selective disabling */
+
+	 case Tok_OpenAD_Dir_XXX:
+	 case Tok_OpenAD_Dir_Dependent:
+	 case Tok_OpenAD_Dir_Independent:
+	 case Tok_OpenAD_Dir_Simple:
+	 case Tok_OpenAD_Dir_EndSimple:
+	   break;
+
 
          /* Mips directives */
 

@@ -48,6 +48,8 @@ enum	ch_class_values		{Ch_Class_Letter,
 				 Ch_Class_Dir2,		/* CDIR$ or CMIC$     */
 				 Ch_Class_Dir3,		/* CDIR$ or CMIC$     */
 				 Ch_Class_Dir4,		/* CDIR$ or CMIC$     */
+							/* eraxxon: OpenAD    */
+				 Ch_Class_Dir7,		/* C$OPENAD           */
 				 Ch_Class_EOS,		/* End-Of-Stmt	      */
 				 Ch_Class_EOF };	/* End-Of-File	      */
 
@@ -61,6 +63,7 @@ enum	ch_class_values		{Ch_Class_Letter,
 /*	Tok_Class_Mic_Kwd	==> Tok_Mic_*				      */
 /*	Tok_Class_SGI_Dir_Kwd	==> Tok_SGI_Dir_* !$par !$ and !*$* dirs      */
 /*	Tok_Class_Open_Mp_Dir_Kwd==> Tok_Open_Mp_* !$omp                      */
+/*	Tok_Class_OpenAD_Dir_Kwd==> Tok_OpenAD_* !$OpenAD                     */
 /*	Tok_Class_Mic_Kwd	==> Tok_Dbg_*		   DEBUG ONLY	      */
 /*	Tok_Class_Punct		==> Tok_Punc_* | Tok_Eos		      */
 /*	Tok_Class_Int_Spec	==> Tok_Const_Int			      */
@@ -78,6 +81,7 @@ enum	token_class_values	{Tok_Class_Label,
 				 Tok_Class_Mic_Kwd,
 				 Tok_Class_SGI_Dir_Kwd,
 				 Tok_Class_Open_Mp_Dir_Kwd,
+				 Tok_Class_OpenAD_Dir_Kwd, /* eraxxon: OpenAD */
 				 Tok_Class_Dbg_Kwd,
 				 Tok_Class_Punct,
 				 Tok_Class_Int_Spec,
@@ -538,6 +542,15 @@ enum	token_values {
                 Tok_Open_Mp_Dir_Threadprivate,  /* THREADPRIVATE              */
                 Tok_Open_Mp_Dir_Workshare,      /* WORKSHARE                  */
                 Tok_Open_Mp_Dir_End,            /* End of Open Mp directives  */
+
+		/* eraxxon: OpenAD directive */		
+		Tok_OpenAD_Dir_Start,		/* Start of OpenAD directives */
+        	Tok_OpenAD_Dir_XXX,             /* XXX                        */
+        	Tok_OpenAD_Dir_Dependent,       /* DEPENDENT                  */
+		Tok_OpenAD_Dir_Independent,     /* INDEPENDENT                */
+		Tok_OpenAD_Dir_Simple,          /* SIMPLE                     */
+		Tok_OpenAD_Dir_EndSimple,       /* END SIMPLE                 */
+		Tok_OpenAD_Dir_End,             /* End of OpenAD directives   */
 
 		Tok_Dbg_Sytb,			/* Symbol table               */
 		Tok_Dbg_Stmt,			/* Statement                  */

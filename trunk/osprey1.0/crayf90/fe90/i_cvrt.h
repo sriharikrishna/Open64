@@ -571,7 +571,13 @@ typedef enum {
         Context_Omp_Nest,
 /* there is no FLUSH clause in OpenMP (radu@par.univie.ac.at) */
 /* we fake this clause in order to treat FLUSH directive the same as the others */
-	Context_Omp_Flush } CONTEXT_TYPE;
+	Context_Omp_Flush,
+	
+	/* eraxxon: OpenAD directive */
+	Context_OpenAD_XXX,
+	Context_OpenAD_Dependent,
+	Context_OpenAD_Independent,
+	Context_OpenAD_Simple } CONTEXT_TYPE;
 
 typedef enum {
         Unknown_Table,
@@ -1216,6 +1222,8 @@ extern void  fei_endparallel_open_mp      ( void );
 extern void  fei_atomic_open_mp           ( void );
 extern void  fei_endparallelsections_open_mp( void );
 extern void  fei_endparallelworkshare_open_mp( void );
+extern void  fei_xxx_openad               ( char *str ); /* eraxxon: OpenAD */
+extern void  fei_dependent_independent_openad( void );   /* eraxxon: OpenAD */
 extern void  fei_fetch_and_add            ( TYPE type );
 extern void  fei_fetch_and_sub            ( TYPE type );
 extern void  fei_fetch_and_xor            ( TYPE type );

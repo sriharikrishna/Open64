@@ -71,8 +71,9 @@ static boolean	get_directive (void);
 static boolean	get_format_str (void);
 static boolean	get_label (void);
 static boolean	get_micro_directive (void);
-static boolean get_open_mp_directive (void);
+static boolean  get_open_mp_directive (void);
 static boolean	get_sgi_directive (void);
+static boolean  get_openad_directive (void);
 static boolean	get_operand_digit (void);
 static boolean	get_operand_dot (void);
 static boolean	get_operand_letter (void);
@@ -403,6 +404,27 @@ boolean get_token (token_class_type class)
             }
             result = TRUE;
          }
+         else if (LA_CH_CLASS == Ch_Class_Dir7) {
+
+	    /* eraxxon: OpenAD directive */
+            /* Only set to Ch_Class_Dir7 by src_input if the next letters */
+            /* are known to be the start of a C$OPENAD                    */
+
+            sig_blank           = FALSE;
+            token               = initial_token;
+            TOKEN_LINE(token)   = LA_CH_LINE;
+            TOKEN_COLUMN(token) = LA_CH_COLUMN;
+            TOKEN_BUF_IDX(token) = LA_CH_BUF_IDX;
+            TOKEN_STMT_NUM(token) = LA_CH_STMT_NUM;
+            TOKEN_VALUE(token)  = Tok_Kwd_Dir;
+            TOKEN_LEN(token)    = 7;
+
+            for (tok_len = 0; tok_len < TOKEN_LEN(token); tok_len++) {
+               TOKEN_STR(token)[tok_len] = LA_CH_VALUE;
+               NEXT_LA_CH;
+            }
+            result = TRUE;
+         }
          else if (LA_CH_VALUE == USCORE &&
                   on_off_flags.allow_leading_uscore) {
          
@@ -699,6 +721,19 @@ boolean get_token (token_class_type class)
             TOKEN_BUF_IDX(token) = LA_CH_BUF_IDX;
             TOKEN_STMT_NUM(token) = LA_CH_STMT_NUM;
             result              = get_sgi_directive ();
+         }
+         break;
+
+      case Tok_Class_OpenAD_Dir_Kwd :
+	 /* eraxxon: OpenAD directive */
+         if (LA_CH_CLASS == Ch_Class_Letter) {
+            sig_blank           = FALSE;
+            token               = initial_token;
+            TOKEN_LINE(token)   = LA_CH_LINE;
+            TOKEN_COLUMN(token) = LA_CH_COLUMN;
+            TOKEN_BUF_IDX(token) = LA_CH_BUF_IDX;
+            TOKEN_STMT_NUM(token) = LA_CH_STMT_NUM;
+            result              = get_openad_directive ();
          }
          break;
 
@@ -1825,6 +1860,142 @@ static boolean get_sgi_directive (void)
    return (TRUE);
 
 }  /* get_sgi_directive */
+
+/******************************************************************************\
+|*                                                                            *|
+|* Description:                                                               *|
+|*      get_openad_directive is called by the get_token routine to attempt    *|
+|*      recognition of a !$OPENAD$ keyword by matching the look ahead char    *|
+|*      and following characters of class Ch_Class_Letter with entries in the *|
+|*      kwd_mic table.  If a keyword is not found, an id token is created.    *|
+|*                                                                            *|
+|* Input parameters:                                                          *|
+|*      la_ch                   first character of !$  kwd token              *|
+|*                                                                            *|
+|* Output parameters:                                                         *|
+|*      la_ch                   next character of input source statement      *|
+|*      token                   token created by get_open_mp_directive        *|
+|*                                                                            *|
+|* Returns:                                                                   *|
+|*      TRUE indicates a keyword or id token was produced.                    *|
+|*      FALSE indicates that an error was encountered.                        *|
+|*                                                                            *|
+|* eraxxon: OpenAD directive                                                  *|
+|*                                                                            *|
+\******************************************************************************/
+
+static boolean get_openad_directive (void)
+
+{
+   int          beg_idx;
+   la_type      la_queue[MAX_KWD_LEN + 1];
+   int          letter_idx;
+   int          lim_idx;
+   int          tok_len         = 0;
+
+
+   TRACE (Func_Entry, "get_openad_directive", NULL);
+
+# ifdef _DEBUG
+   if (LA_CH_CLASS != Ch_Class_Letter) {
+      PRINTMSG(TOKEN_LINE(token), 295, Internal, TOKEN_COLUMN(token),
+               "get_openad_directive", "letter");
+   }
+# endif
+
+   TOKEN_VALUE(token) = Tok_Id;
+
+   /* check for any keywords starting with look ahead char */
+   letter_idx = LA_CH_VALUE - 'A';
+
+   beg_idx = kwd_openad_dir_idx[letter_idx];
+   lim_idx = kwd_openad_dir_idx[letter_idx+1];
+
+   if (beg_idx != lim_idx) {
+
+#ifdef _DEBUG
+      if (kwd_openad_dir_len[beg_idx] > MAX_ID_LEN) {
+         PRINTMSG(TOKEN_LINE(token), 384, Internal, TOKEN_COLUMN(token),
+                  beg_idx, kwd_openad_dir_len[beg_idx]);
+      }
+# endif
+
+      while ((LA_CH_CLASS == Ch_Class_Letter ||
+              LA_CH_CLASS == Ch_Class_Digit  ||
+              LA_CH_VALUE == USCORE) &&
+             tok_len < kwd_openad_dir_len[beg_idx]) {
+         la_queue[tok_len]              = la_ch;
+         TOKEN_STR(token)[tok_len]      = LA_CH_VALUE;
+         tok_len++;
+         NEXT_LA_CH;
+      }
+
+      TOKEN_LEN(token) = tok_len;
+
+      if (tok_len >= kwd_openad_dir_len[lim_idx-1]) {
+
+         /* compare token string to keyword entries */
+
+         while (beg_idx < lim_idx) {
+
+            if (kwd_openad_dir_len[beg_idx] <= tok_len) {
+
+               if (strncmp(TOKEN_STR(token),
+                           kwd_openad_dir[beg_idx].name,
+                           kwd_openad_dir_len[beg_idx]) == IDENTICAL) {
+
+                  /* the following chars and preceding letter can't be */
+                  /* part of a keyword on full length match of string. */
+
+                  if (tok_len == kwd_openad_dir_len[beg_idx]  &&
+                      (LA_CH_VALUE == USCORE  ||
+                       LA_CH_VALUE == DOLLAR  ||
+                       LA_CH_VALUE == AT_SIGN)) {
+                  }
+                  else {
+                     TOKEN_VALUE(token) = kwd_openad_dir[beg_idx].value;
+
+                     /* adjust la_ch to be char following keyword */
+
+                     if (tok_len > kwd_openad_dir_len[beg_idx]) {
+                        tok_len = kwd_openad_dir_len[beg_idx];
+                        la_ch   = la_queue[tok_len];
+                        TOKEN_LEN(token) = tok_len;
+
+                        /* reset src input buffer and col index to la_ch pos */
+                        reset_src_input (LA_CH_BUF_IDX, LA_CH_STMT_NUM);
+                     }
+                     break;
+                  }
+               }
+            }  /* if */
+
+            beg_idx++;
+
+         }  /* while */
+      }  /* if */
+   }  /* if */
+
+   if (TOKEN_VALUE(token) == Tok_Id) {                  /* keyword not found  */
+
+      while (VALID_LA_CH) {
+         ADD_TO_TOKEN_STR (LA_CH_VALUE, tok_len);
+         NEXT_LA_CH;
+      }
+
+      if (tok_len > MAX_ID_LEN) { /* Id len exceeds maximum of 31 characters. */
+         PRINTMSG (TOKEN_LINE(token), 67, Error, TOKEN_COLUMN(token));
+         tok_len = MAX_ID_LEN;
+      }
+      TOKEN_LEN(token) = tok_len;
+   }
+
+   TRACE (Func_Exit, "get_openad_directive", NULL);
+
+   return (TRUE);
+
+}  /* get_openad_directive */
+
 
 /******************************************************************************\
 |*                                                                            *|
@@ -4453,7 +4624,8 @@ token_values_type get_dir_token_from_str(char *str)
         (strncmp("MIC", upper_str, 3) == IDENTICAL) ||
         (strncmp("MIPSPRO", upper_str, 7) == IDENTICAL) ||
         (strncmp("OMP", upper_str, 3) == IDENTICAL) ||
-        (strncmp("CONDITIONAL_OMP", upper_str, 15) == IDENTICAL) ||
+	(strncmp("CONDITIONAL_OMP", upper_str, 15) == IDENTICAL) ||
+        (strncmp("OPENAD", upper_str, 6) == IDENTICAL) || /* eraxxon: OpenAD */
         (strncmp("MPP", upper_str, 3) == IDENTICAL))) {
 
       /* Tok_Id is a signal to cmd_line that "all" or "mpp" was specified */
@@ -4543,6 +4715,8 @@ token_values_type get_dir_token_from_str(char *str)
          }
       }
    }
+   
+   /* eraxxon: OpenAD directive: do not support selective disabling */
 
 EXIT:
 
@@ -5286,6 +5460,27 @@ void set_up_token_tables(void)
    }
 
    set_up_letter_idx_table(kwd_open_mp_dir_idx, kwd_open_mp_dir, len);
+
+   /*************************\
+   |* kwd_openad_dir table  *|
+   \*************************/
+   /* eraxxon: OpenAD directive */
+
+   len = 0;
+
+   while (kwd_openad_dir[len].value != Tok_LAST) {
+      len++;
+   }
+
+   len++;
+
+   kwd_openad_dir_len = malloc(sizeof(int) * len);
+
+   for (i = 0; i < len; i++) {
+      kwd_openad_dir_len[i] = strlen(kwd_openad_dir[i].name);
+   }
+
+   set_up_letter_idx_table(kwd_openad_dir_idx, kwd_openad_dir, len);
 
 # ifdef _DEBUG
    /*****************\

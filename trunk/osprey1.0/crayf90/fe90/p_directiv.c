@@ -99,10 +99,13 @@ static void	parse_star_directives(void);
 static void	parse_star_dir_directives(void);
 static void	parse_symmetric_dir(void);
 static void	parse_var_common_list(opnd_type *, boolean);
-static boolean	parse_var_name_list(opnd_type *);
+static boolean	parse_var_name_list(opnd_type *, int maxlen);
 static void	parse_vfunction_dir(void);
 static void	parse_open_mp_directives(void);
 static void	parse_open_mp_clauses(open_mp_directive_type);
+static void     parse_openad_directives(void);           /* eraxxon: OpenAD */
+static char*    get_openad_dir_xxx_string(void);         /* eraxxon: OpenAD */
+static void     parse_openad_varlist(token_values_type); /* eraxxon: OpenAD */
 static int	update_fld_type(fld_type, int,int);
 
 
@@ -437,6 +440,34 @@ void parse_directive_stmt (void)
          NEXT_LA_CH;
          goto EXIT;
       }
+   }
+   else if (TOKEN_STR(token)[0] == '$' &&
+            TOKEN_STR(token)[1] == 'O' &&
+            TOKEN_STR(token)[2] == 'P' &&
+            TOKEN_STR(token)[3] == 'E' &&
+            TOKEN_STR(token)[4] == 'N' &&
+            TOKEN_STR(token)[5] == 'A' &&
+            TOKEN_STR(token)[6] == 'D') {
+     /* eraxxon: OpenAD directive */
+      if (MATCHED_TOKEN_CLASS(Tok_Class_OpenAD_Dir_Kwd)) {
+	 if (cmd_line_flags.disregard_all_openads) {
+	    /* Do not attempt to recognize any OpenAD directives. */
+            parse_err_flush(Find_EOS, NULL);
+            NEXT_LA_CH;
+            goto EXIT;
+         }
+	 
+         parse_openad_directives();
+      }
+      else {
+         /* no error, just treat as comment */
+         parse_err_flush(Find_EOS, NULL);
+         NEXT_LA_CH;
+         goto EXIT;
+      }
+
+
+     /* can we assume we won't go past the end of the token? */
    }
 # endif
    else if (TOKEN_STR(token)[0] == '$') {
@@ -1557,7 +1588,7 @@ static void parse_doall_cmic(void)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[1]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[1]), opnd);
@@ -1595,7 +1626,7 @@ static void parse_doall_cmic(void)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[2]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[2]), opnd);
@@ -1633,7 +1664,7 @@ static void parse_doall_cmic(void)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[3]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[3]), opnd);
@@ -1684,7 +1715,7 @@ static void parse_doall_cmic(void)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[5]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[5]), opnd);
@@ -1967,6 +1998,7 @@ EXIT:
 |*									      *|
 |* Input parameters:							      *|
 |*	NONE								      *|
+|*	'maxlen' is the maximum length of the list or -1 for infinite	      *|
 |*									      *|
 |* Output parameters:							      *|
 |*	list_opnd - points to list of attrs.                                  *|
@@ -1976,7 +2008,7 @@ EXIT:
 |*									      *|
 \******************************************************************************/
 
-static boolean parse_var_name_list(opnd_type   *list_opnd)
+static boolean parse_var_name_list(opnd_type   *list_opnd, int maxlen)
 
 {
    int		column;
@@ -1984,13 +2016,19 @@ static boolean parse_var_name_list(opnd_type   *list_opnd)
    int		list_idx = NULL_IDX;
    opnd_type	opnd;
    boolean      result   = TRUE;
+   int          curlen = 0;  /* current length of the list so far */
 
 
    TRACE (Func_Entry, "parse_var_name_list", NULL);
 
-   while (TRUE) {
+   if (maxlen == 0) {
+      return(result);
+   }
 
+   while (TRUE) {
+      
       if (MATCHED_TOKEN_CLASS(Tok_Class_Id)) {
+	 curlen++;
          parse_deref(&opnd, NULL_IDX);
 
          if (OPND_FLD(opnd) != AT_Tbl_Idx) {
@@ -2021,6 +2059,10 @@ static boolean parse_var_name_list(opnd_type   *list_opnd)
          result = FALSE;
       }
 
+      /* if we have processed the whole list, stop */
+      if (maxlen > 0 && curlen == maxlen) {
+	 break;
+      }
       if (LA_CH_VALUE != COMMA) {
          break;
       }
@@ -2445,7 +2487,7 @@ static void parse_parallel_cmic(void)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[1]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[1]), opnd);
@@ -2483,7 +2525,7 @@ static void parse_parallel_cmic(void)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[2]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[2]), opnd);
@@ -2521,7 +2563,7 @@ static void parse_parallel_cmic(void)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[3]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[3]), opnd);
@@ -2573,7 +2615,7 @@ static void parse_parallel_cmic(void)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[5]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[5]), opnd);
@@ -3673,7 +3715,7 @@ static void parse_dir_directives(void)
          ir_idx		 	= gen_directive_ir(Bounds_Cdir_Opr);
             
          if (LA_CH_VALUE != EOS) {
-            parse_var_name_list(&opnd);
+            parse_var_name_list(&opnd, -1);
             COPY_OPND(IR_OPND_L(ir_idx), opnd);
 
             if (LA_CH_VALUE != EOS) {
@@ -4025,7 +4067,7 @@ static void parse_dir_directives(void)
          ir_idx			= gen_directive_ir(Nobounds_Cdir_Opr);
 
          if (LA_CH_VALUE != EOS) {
-            parse_var_name_list(&opnd);
+            parse_var_name_list(&opnd, -1);
             COPY_OPND(IR_OPND_L(ir_idx), opnd);
 
             if (LA_CH_VALUE != EOS) {
@@ -5935,7 +5977,7 @@ static void parse_dollar_directives(void)
 
    case Tok_SGI_Dir_Dynamic:
       if (dump_flags.dsm) {
-         if (parse_var_name_list(&opnd)) {
+         if (parse_var_name_list(&opnd, -1)) {
             ir_idx = gen_directive_ir(Dynamic_Dollar_Opr);
             COPY_OPND(IR_OPND_L(ir_idx), opnd);
          }
@@ -6277,7 +6319,7 @@ static void parse_star_directives(void)
       if (LA_CH_VALUE == LPAREN) {
          NEXT_LA_CH;
 
-         parse_var_name_list(&opnd);
+         parse_var_name_list(&opnd, -1);
          COPY_OPND(IR_OPND_L(ir_idx), opnd);
 
          if (LA_CH_VALUE == RPAREN) {
@@ -7225,7 +7267,7 @@ static void parse_mp_directive(mp_directive_type directive)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[MP_DIR_SHARE_IDX]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[MP_DIR_SHARE_IDX]), opnd);
@@ -7271,7 +7313,7 @@ static void parse_mp_directive(mp_directive_type directive)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[MP_DIR_LASTLOCAL_IDX]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[MP_DIR_LASTLOCAL_IDX]), 
@@ -7513,7 +7555,7 @@ static void parse_mp_directive(mp_directive_type directive)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   COPY_OPND(IL_OPND(list_array[MP_DIR_AFFINITY_IDX]), opnd);
 
@@ -7614,7 +7656,7 @@ static void parse_mp_directive(mp_directive_type directive)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[MP_DIR_LOCAL_IDX]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[MP_DIR_LOCAL_IDX]), opnd);
@@ -7737,7 +7779,7 @@ static void parse_mp_directive(mp_directive_type directive)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   COPY_OPND(IL_OPND(list_array[MP_DIR_NEST_IDX]), opnd);
 
@@ -9526,7 +9568,7 @@ static boolean parse_assert_directive(void)
             if (LA_CH_VALUE == LPAREN) {
                NEXT_LA_CH;
 
-               parse_var_name_list(&opnd);
+               parse_var_name_list(&opnd, -1);
                COPY_OPND(IR_OPND_R(ir_idx), opnd);
 
                if (LA_CH_VALUE == RPAREN) {
@@ -10849,7 +10891,7 @@ static void parse_open_mp_directives(void)
          }
 
          if (dump_flags.dsm) {
-            if (parse_var_name_list(&opnd)) {
+            if (parse_var_name_list(&opnd, -1)) {
                ir_idx = gen_directive_ir(Dynamic_Dollar_Opr);
                COPY_OPND(IR_OPND_L(ir_idx), opnd);
             }
@@ -11152,7 +11194,7 @@ static void parse_open_mp_clauses(open_mp_directive_type directive)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[OPEN_MP_SHARED_IDX]) == NULL_IDX) {
                      COPY_OPND(IL_OPND(list_array[OPEN_MP_SHARED_IDX]), opnd);
@@ -11496,7 +11538,7 @@ static void parse_open_mp_clauses(open_mp_directive_type directive)
                   }
 
                   /* parse var list */
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   if (IL_IDX(list_array[OPEN_MP_REDUCTION_LIST_IDX]) == 
                                                                     NULL_IDX) {
@@ -11771,7 +11813,7 @@ static void parse_open_mp_clauses(open_mp_directive_type directive)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   COPY_OPND(IL_OPND(list_array[OPEN_MP_AFFINITY_IDX]), opnd);
 
@@ -11964,7 +12006,7 @@ static void parse_open_mp_clauses(open_mp_directive_type directive)
 
                if (LA_CH_VALUE == LPAREN) {
                   NEXT_LA_CH;
-                  parse_var_name_list(&opnd);
+                  parse_var_name_list(&opnd, -1);
 
                   COPY_OPND(IL_OPND(list_array[OPEN_MP_NEST_IDX]), opnd);
 
@@ -12260,6 +12302,244 @@ FOUND:
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
+|*	<description>							      *|
+|*									      *|
+|* Input parameters:							      *|
+|*	NONE								      *|
+|*									      *|
+|* Output parameters:							      *|
+|*	NONE								      *|
+|*									      *|
+|* Returns:								      *|
+|*	NOTHING								      *|
+|*									      *|
+|* eraxxon: OpenAD directive						      *|
+|*									      *|
+\******************************************************************************/
+
+static void parse_openad_directives(void)
+
+{
+   int			ir_idx;
+   int			list_idx;
+   opnd_type		opnd;
+   int			sh_idx;
+   int			type_idx;
+   token_values_type	tokval = TOKEN_VALUE(token);
+
+   TRACE (Func_Entry, "parse_openad_directives", NULL);
+
+   if (tokval > Tok_OpenAD_Dir_Start && tokval < Tok_OpenAD_Dir_End &&
+       disregard_openad[tokval - Tok_OpenAD_Dir_Start]) {
+      parse_err_flush(Find_EOS, NULL);
+      goto EXIT;
+   }
+
+   switch (tokval) {
+      case Tok_OpenAD_Dir_XXX: {
+	 char* str = NULL;
+
+         ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
+         ir_idx = gen_directive_ir(XXX_OpenAD_Opr);
+
+	 if ( (str = get_openad_dir_xxx_string()) ) {
+	   
+	    CLEAR_TBL_NTRY(type_tbl, TYP_WORK_IDX);
+	    TYP_TYPE(TYP_WORK_IDX)    = Character;
+	    TYP_LINEAR(TYP_WORK_IDX)  = CHARACTER_DEFAULT_TYPE;
+	    TYP_DESC(TYP_WORK_IDX)    = Default_Typed;
+	    TYP_CHAR_CLASS(TYP_WORK_IDX)= Const_Len_Char;
+	    TYP_FLD(TYP_WORK_IDX)     = CN_Tbl_Idx;
+	    TYP_IDX(TYP_WORK_IDX) = C_INT_TO_CN(CG_INTEGER_DEFAULT_TYPE,
+						(strlen(str)+1));
+	    type_idx                  = ntr_type_tbl();
+	    
+	    IR_LINE_NUM_L(ir_idx) = TOKEN_LINE(token);
+	    IR_COL_NUM_L(ir_idx) = TOKEN_COLUMN(token);
+	    IR_FLD_L(ir_idx) = CN_Tbl_Idx;
+	    IR_IDX_L(ir_idx) = ntr_const_tbl(type_idx, TRUE, NULL);
+	    
+	    strcpy((char *)&CN_CONST(IR_IDX_L(ir_idx)), str);
+	    
+	    free(str);
+	    str = NULL;
+	 }
+	 else {
+	    parse_err_flush(Find_EOS, "XXX STRING");
+	 }
+
+	 if (directive_region_error(XXX_OpenAD_Dir,
+                                    IR_LINE_NUM(ir_idx),
+                                    IR_COL_NUM(ir_idx))) {
+	    break;
+         }
+	 break;
+      }
+
+      case Tok_OpenAD_Dir_Dependent: 
+      case Tok_OpenAD_Dir_Independent: {
+	 directive_stmt_type dty = Dependent_OpenAD_Dir;
+	 operator_type       op  = Dependent_OpenAD_Opr;
+	 if (tokval == Tok_OpenAD_Dir_Independent) {
+	    dty = Independent_OpenAD_Dir;
+	    op  = Independent_OpenAD_Opr;
+	 } 
+
+         ATP_HAS_TASK_DIRS(SCP_ATTR_IDX(curr_scp_idx)) = TRUE;
+         ir_idx = gen_directive_ir(op);
+	 
+	 parse_openad_varlist(tokval);
+	 
+         if (directive_region_error(dty, 
+				    IR_LINE_NUM(ir_idx), 
+				    IR_COL_NUM(ir_idx))) {
+            break;
+         }
+	 break;
+      }
+
+      /* case Tok_OpenAD_Dir_Simple:    OPENAD_FIXME */
+      /* case Tok_OpenAD_Dir_EndSimple: OPENAD_FIXME */
+	 /* cf. Tok_Open_Mp_Dir_Do */
+
+      default:
+         PRINTMSG(TOKEN_LINE(token), 790, Warning, TOKEN_COLUMN(token));
+         parse_err_flush(Find_EOS, NULL);
+         break;
+   }
+
+   if (LA_CH_VALUE != EOS) {
+      parse_err_flush(Find_EOS, EOS_STR);
+   }
+
+EXIT:
+
+   NEXT_LA_CH;
+
+   TRACE (Func_Exit, "parse_openad_directives", NULL);
+
+   return;
+
+}  /* parse_openad_directives */
+
+/******************************************************************************\
+|*                                                                            *|
+|* Description:                                                               *|
+|*      This routine parses the string attached to an OpenAD XXX directive    *|
+|*      and returns a malloc'd copy or NULL on error.  It does not change     *|
+|*      'token'.                                                              *|
+|*                                                                            *|
+|* Input parameters:                                                          *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Output parameters:                                                         *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Returns:                                                                   *|
+|*      NOTHING                                                               *|
+|*                                                                            *|
+|* eraxxon: OpenAD directive						      *|
+|*                                                                            *|
+\******************************************************************************/
+
+static char* get_openad_dir_xxx_string(void)
+
+{
+  char* str = NULL;
+  int   strLen = 132; /* length of string, not including terminator */
+  int   i = -1;       /* last index in string (before terminator) */
+  
+  int	paren_lvl = 0;
+
+  str = (char*)malloc( (strLen + 1) * sizeof(char*) );
+  
+  /* The look-ahead points to a non-black character.  Grab everything
+     between it and and EOS as a literal */
+  while (LA_CH_VALUE != EOS) {
+     i++;
+     if (i > strLen) {
+        strLen *= 2;
+	str = (char*)realloc(str, (strLen + 1) * sizeof(char*) );
+     }
+     str[i] = LA_CH_VALUE;
+     NEXT_LA_CH_LITERAL;
+  }
+  str[i+1] = '\0';
+  
+  /* throw away any trailing blanks on the end of the string */
+  while (i >= 0 && str[i] == BLANK) {
+     i--;
+  }
+  str[i+1] = '\0';
+  
+  return str;
+}
+
+/******************************************************************************\
+|*                                                                            *|
+|* Description:                                                               *|
+|*      This routine parses the openad var-list and attaches it to the        *|
+|*      left child of the current statement handle.                           *|
+|*                                                                            *|
+|* Input parameters:                                                          *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Output parameters:                                                         *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Returns:                                                                   *|
+|*      NOTHING                                                               *|
+|*                                                                            *|
+|* eraxxon: OpenAD directive						      *|
+|*                                                                            *|
+\******************************************************************************/
+
+static void parse_openad_varlist(token_values_type tok)
+
+{
+   int          i;
+   int          ir_idx;
+   opnd_type    opnd;
+   
+   TRACE (Func_Entry, "parse_openad_varlist", NULL);
+   
+   ir_idx = SH_IR_IDX(curr_stmt_sh_idx); /* directive stmt handle */
+
+   if (LA_CH_VALUE == LPAREN) {
+      NEXT_LA_CH;
+      parse_var_name_list(&opnd, 1);
+      
+      COPY_OPND(IR_OPND_L(ir_idx), opnd); /* set left hand child */
+
+      if (LA_CH_VALUE == RPAREN) {
+	 NEXT_LA_CH;
+      }
+      else {
+	 parse_err_flush(Find_EOS, ")");
+	 goto EXIT;
+      }
+   }
+   else {
+      parse_err_flush(Find_EOS, "(");
+      goto EXIT;
+   }
+      
+   if (LA_CH_VALUE != EOS) {
+      parse_err_flush(Find_EOS, "(");
+      goto EXIT;
+   }
+
+      
+EXIT:
+   TRACE (Func_Exit, "parse_openad_varlist", NULL);
+
+   return;
+
+}  /* parse_open_mp_clauses */
+
+/******************************************************************************\
+|*									      *|
+|* Description:								      *|
 |*	This routine parses the !DIR$ CACHE_NOALLOCATE                        *|
 |*									      *|
 |* Input parameters:							      *|
@@ -12415,7 +12695,7 @@ static void parse_star_dir_directives(void)
 
          NEXT_LA_CH;
 
-         if (parse_var_name_list(&opnd)) {
+         if (parse_var_name_list(&opnd, -1)) {
 
             if (LA_CH_VALUE == RPAREN) {
 
@@ -12500,7 +12780,7 @@ static void parse_star_dir_directives(void)
 
          NEXT_LA_CH;
 
-         if (parse_var_name_list(&opnd)) {
+         if (parse_var_name_list(&opnd, -1)) {
 
             if (LA_CH_VALUE == RPAREN) {
 
