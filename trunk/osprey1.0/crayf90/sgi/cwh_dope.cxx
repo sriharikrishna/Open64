@@ -12,7 +12,7 @@
 
   Further, this software is distributed without any warranty that it is
   free of the rightful claim of any third person regarding infringement 
-  or the like.  Any license provided herein, whether implied or 
+  or the like.  Any license provided h/erein, whether implied or 
   otherwise, applies only to this software file.  Patent licenses, if 
   any, provided herein do not apply to combinations of this program with 
   other software, or any other product whatsoever.  
@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_dope
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:08 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-30 21:27:13 $
+ * $Author: open64 $
  * $Source: 
  *
  * Revision history:
@@ -58,7 +58,7 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dope.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dope.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */

@@ -3007,7 +3007,6 @@ void    num_images_intrinsic(opnd_type     *result_opnd,
 
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-/* # if 0  fzhao cannot get ride of this code ???*/
 
    if (ATP_INTRIN_ENUM(*spec_idx) == Rem_Images_Intrinsic) {
       ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
@@ -3208,7 +3207,6 @@ EXIT:
    /* must reset foldable and will_fold_later because there is no */
    /* folder for this intrinsic in constructors.                  */
 
-/* # endif  */
 
    res_exp_desc->foldable = FALSE;
    res_exp_desc->will_fold_later = FALSE;
@@ -18538,7 +18536,6 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
       }
       else if (arg_info_list[info_idx2].ed.foldable) {
          /* check that each element is >= 0 */
-
          attr_idx = find_base_attr(&IL_OPND(list_idx2), &line, &col);
 
 # ifdef _DEBUG
@@ -18553,7 +18550,6 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
                      "array constant", "reshape_intrinsic");
          }
 # endif
-
          NTR_IR_TBL(sub_idx);
          IR_OPR(sub_idx) = Subscript_Opr;
          IR_TYPE_IDX(sub_idx) = ATD_TYPE_IDX(attr_idx);
@@ -18580,11 +18576,9 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
 
          for (i = 0; i < res_exp_desc->rank; i++) {
             IL_IDX(list_idx) = C_INT_TO_CN(CG_INTEGER_DEFAULT_TYPE, i+1);
-
             OPND_FLD(opnd) = IR_Tbl_Idx;
             OPND_IDX(opnd) = sub_idx;
-
-            ok = fold_aggragate_expression(&opnd,
+           ok = fold_aggragate_expression(&opnd,
                                            &exp_desc,
                                            TRUE);  
 
@@ -18601,9 +18595,8 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
          FREE_IR_NODE(sub_idx);
          FREE_IR_LIST_NODE(list_idx);
       }
-   }
 
-# if 0 
+   }
 
    switch (res_exp_desc->rank) { 
          case 0: ATD_ARRAY_IDX(ATP_RSLT_IDX(*spec_idx)) = NULL_IDX;
@@ -18623,8 +18616,6 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
          case 7: ATD_ARRAY_IDX(ATP_RSLT_IDX(*spec_idx)) = BD_DEFERRED_7_IDX;
                  break;
    }
-
-#endif
 
    if (list_idx3 != NULL_IDX && IL_IDX(list_idx3) != NULL_IDX) {
       info_idx3 = IL_ARG_DESC_IDX(list_idx3);

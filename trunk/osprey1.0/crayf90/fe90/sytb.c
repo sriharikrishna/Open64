@@ -1329,7 +1329,7 @@ int ntr_array_in_bd_tbl(int	bd_idx)
    /*        If there is nothing that changes these declarations, the same  */
    /*        bounds table entry will be used for A, B and C.                */
 
-   if (BD_ARRAY_CLASS(bd_idx) == Deferred_Shape && FALSE ) {
+   if (BD_ARRAY_CLASS(bd_idx) == Deferred_Shape ) {
 
       if (!BD_DCL_ERR(bd_idx)) {
          BD_LINE_NUM(BD_RANK(bd_idx))	= BD_LINE_NUM(bd_idx);
