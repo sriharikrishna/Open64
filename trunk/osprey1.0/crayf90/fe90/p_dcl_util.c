@@ -681,6 +681,7 @@ static	void	parse_kind_selector(void)
       }
 # endif
 
+#if 0 /*works well for source-level translation ----fzhao*/
 # if defined(_TARGET_OS_LINUX)
       if ((TYP_TYPE(ATD_TYPE_IDX(AT_WORK_IDX)) == Complex ||
            TYP_TYPE(ATD_TYPE_IDX(AT_WORK_IDX)) == Real) &&
@@ -688,7 +689,7 @@ static	void	parse_kind_selector(void)
          PRINTMSG(OPND_LINE_NUM(opnd), 541, Error, OPND_COL_NUM(opnd));
       }
 # endif
-
+#endif
       if (field_type == AT_Tbl_Idx) {
 
          /* Mark tmp not referenced and remove it from the tmp list.  This */
@@ -1307,7 +1308,7 @@ boolean parse_type_spec(boolean		chk_kind)
 
             ATD_TYPE_IDX(AT_WORK_IDX)	= ntr_type_tbl();
  
-            ATT_TY_IDX(attr_idx) = ATD_TYPE_IDX(AT_WORK_IDX); /*fzhao-working*/
+            ATT_TY_IDX(attr_idx) = ATD_TYPE_IDX(AT_WORK_IDX); 
 
             NEXT_LA_CH;			/* Skip Rparen */
          }
@@ -1393,9 +1394,11 @@ boolean parse_type_spec(boolean		chk_kind)
 
 # ifdef _TARGET_OS_MAX /* Msg was issued when DOUBLE PRECISION was parsed.*/
                      linear_type = Real_8;
+/* works well for source-level translation--fzhao
 # elif defined(_TARGET_OS_LINUX)
                      PRINTMSG(TOKEN_LINE(token), 541, Error, 
                               TOKEN_COLUMN(token));
+*/
 # else
                      linear_type = Real_16;
 
@@ -1428,9 +1431,12 @@ boolean parse_type_spec(boolean		chk_kind)
                               TOKEN_COLUMN(token),
                               type_str, num, type_str, 8);
                      linear_type = Real_8;
+
+/* works well for source level translation---fzhao
 # elif defined(_TARGET_OS_LINUX)
                      PRINTMSG(TOKEN_LINE(token), 541, Error, 
                               TOKEN_COLUMN(token));
+*/
 # else
                      linear_type = Real_16;
 
@@ -1468,9 +1474,12 @@ boolean parse_type_spec(boolean		chk_kind)
                            TOKEN_COLUMN(token),
                            type_str, num, type_str, 16);
                   linear_type = Complex_8;
-# elif defined(_TARGET_OS_LINUX)
-                     PRINTMSG(TOKEN_LINE(token), 541, Error, 
-                              TOKEN_COLUMN(token));
+
+/* works well for source-level translation---fzhao
+ *# elif defined(_TARGET_OS_LINUX)
+ *                     PRINTMSG(TOKEN_LINE(token), 541, Error, 
+ *                              TOKEN_COLUMN(token));
+*/
 # else
                   linear_type = Complex_16;
 
@@ -3006,11 +3015,11 @@ static boolean	parse_int_spec_expr(long		*len_idx,
                *field_type	= CN_Tbl_Idx;
             }
             else {
-# if 0 /*  fzhao May */
+# if 0 
                *field_type      		= AT_Tbl_Idx;
                *len_idx				= ntr_bnds_tmp_list(&len_opnd);
                ATD_TMP_HAS_CVRT_OPR(*len_idx)	= TRUE;
-# endif/*  May */
+# endif
             }
          }
          else {

@@ -5642,8 +5642,12 @@ boolean	validate_kind(basic_type_type	 type,
 # if defined(_TARGET_OS_MAX)
             PRINTMSG(line, 543, Warning, column, 16, 8);
             *linear_type = Real_8;
+
+/* in source-level translation we don't need concern TARGET_OS----fzhao
 # elif defined(_TARGET_OS_LINUX)
             PRINTMSG(line, 541, Error, column);
+*/
+
 # endif
             break;
 

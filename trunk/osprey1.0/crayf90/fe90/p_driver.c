@@ -173,6 +173,7 @@ void complete_intrinsic_definition(int		generic_attr)
       /* static intrinsic table now to reflect the  */
       /* correct result type of this intrinsic.     */
 
+/* we don't care about this in source-level translation---fzhao
 # if defined(_TARGET_OS_LINUX)
          if (intrin_tbl[intrin_tbl_idx].n_specifics == 1) {
             if (intrin_tbl[intrin_tbl_idx].id_str.string[0] == 'Q' ||
@@ -182,7 +183,7 @@ void complete_intrinsic_definition(int		generic_attr)
             }
          }
 # endif
-
+*/
       if (intrin_tbl[intrin_tbl_idx].n_specifics == 1 &&
 # if defined(_QUAD_PRECISION)
           (intrin_tbl[intrin_tbl_idx].id_str.string[0] == 'D' ||
