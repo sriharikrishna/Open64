@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.24 $
- * $Date: 2004-04-30 15:33:37 $
+ * $Revision: 1.25 $
+ * $Date: 2004-07-13 13:36:36 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -1305,72 +1305,73 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
              break;
       }
    }
-   else switch(mt)
-   {
-      /* Strictly speaking unsigned integers not supported in Fortran,
-       * but we are lenient and treat them as the signed equivalent.
-       */
-   case MTYPE_U1:
-   case MTYPE_I1:
-      base_name = "INTEGER";
-      kind_spec = "(w2f__i1)"; 
-      break;
-     
-   case MTYPE_U2:
-   case MTYPE_I2:
-      base_name = "INTEGER";
-      kind_spec = "(w2f__i2)"; 
-      break;
-   case MTYPE_U4:
-   case MTYPE_I4:
-      base_name = "INTEGER";
-      kind_spec = "(w2f__i4)"; 
-      break;
-   case MTYPE_U8:
-   case MTYPE_I8:
-      base_name = "INTEGER";
-      kind_spec = "(w2f__i8)"; 
-      break;
-      break;
-      
-  case MTYPE_F4:
-     kind_spec = "(w2f__4)"; 
-     base_name = "REAL";
-     break;
-
-   case MTYPE_F8:
-     kind_spec = "(w2f__8)";
-     base_name = "REAL";
-     break;
-
-   case MTYPE_FQ:
-      kind_spec = "(w2f__16)";
-      base_name = "REAL";
-      break;
-      
-   case MTYPE_C4:
-      base_name = "COMPLEX";
-     kind_spec = "(w2f__4)"; 
-      break;
-   case MTYPE_C8:
-      base_name = "COMPLEX";
-     kind_spec = "(w2f__8)";
-      break;
-   case MTYPE_CQ:
-      base_name = "COMPLEX";
-      kind_spec = "(w2f__16)";
-      break;
-      
-   case MTYPE_M:
-      base_name = "memory block";
-      break;
-
-   default:
-      ASSERT_DBG_FATAL(FALSE,
-		       (DIAG_W2F_UNEXPECTED_BTYPE, 
-			MTYPE_name(mt), 
-			"TY2F_scalar"));
-   } /* switch(TY_btype(ty) */
+   else {
+     switch(mt) 
+     {
+       /* Strictly speaking unsigned integers not supported in Fortran,
+	* but we are lenient and treat them as the signed equivalent.
+	*/
+     case MTYPE_U1:
+     case MTYPE_I1:
+       base_name = "INTEGER";
+       kind_spec = "(w2f__i1)"; 
+       break;
+       
+     case MTYPE_U2:
+     case MTYPE_I2:
+       base_name = "INTEGER";
+       kind_spec = "(w2f__i2)"; 
+       break;
+     case MTYPE_U4:
+     case MTYPE_I4:
+       base_name = "INTEGER";
+       kind_spec = "(w2f__i4)"; 
+       break;
+     case MTYPE_U8:
+     case MTYPE_I8:
+       base_name = "INTEGER";
+       kind_spec = "(w2f__i8)"; 
+       break;
+       
+     case MTYPE_F4:
+       kind_spec = "(w2f__4)"; 
+       base_name = "REAL";
+       break;
+       
+     case MTYPE_F8:
+       kind_spec = "(w2f__8)";
+       base_name = "REAL";
+       break;
+       
+     case MTYPE_FQ:
+       kind_spec = "(w2f__16)";
+       base_name = "REAL";
+       break;
+       
+     case MTYPE_C4:
+       base_name = "COMPLEX";
+       kind_spec = "(w2f__4)"; 
+       break;
+     case MTYPE_C8:
+       base_name = "COMPLEX";
+       kind_spec = "(w2f__8)";
+       break;
+     case MTYPE_CQ:
+       base_name = "COMPLEX";
+       kind_spec = "(w2f__16)";
+       break;
+       
+     case MTYPE_M:
+       base_name = "memory block";
+       break;
+       
+     default:
+       ASSERT_DBG_FATAL(FALSE,
+			(DIAG_W2F_UNEXPECTED_BTYPE, 
+			 MTYPE_name(mt), 
+			 "TY2F_scalar"));
+     } /* switch(TY_btype(ty) */
+   }
 
    if (TY_size(ty) > 0)
    {
@@ -1381,36 +1382,40 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 	    kind_type = TY_size(ty);
 	 }
 
-         if (!strcmp(kind_spec,"NULL"))
-             kind_spec = Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
-	 Prepend_Token_String(decl_tokens,Concat2_Strings(base_name,kind_spec));
+         if (strcmp(kind_spec,"NULL") == 0) {
+	    kind_spec = 
+	      Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
+	 }
+	 Prepend_Token_String(decl_tokens,
+			      Concat2_Strings(base_name, kind_spec));
       } else {
-        if (TY_is_character(ty))
-            Prepend_Token_String(
-                              decl_tokens,
-                              Concat3_Strings(Concat2_Strings(base_name, "("),
-                                              Number_as_String(TY_size(ty), "%lld"),
-                                              ")"));
-        else
-	 Prepend_Token_String(
-			      decl_tokens, 
-			      Concat3_Strings(base_name,
-					      "*", 
-					      Number_as_String(TY_size(ty), "%lld")));
+         if (TY_is_character(ty)) {
+	    Prepend_Token_String(
+		    decl_tokens,
+		    Concat3_Strings(Concat2_Strings(base_name, "("),
+				    Number_as_String(TY_size(ty), "%lld"),
+				    ")"));
+	}
+        else {
+	   Prepend_Token_String(
+		   decl_tokens, 
+		   Concat3_Strings(base_name, "*", 
+				   Number_as_String(TY_size(ty), "%lld")));
+	}
       }
    }
    else
    {
-     if (mt == MTYPE_M)
-      Prepend_Token_String(decl_tokens, ".mblock.");
-     else
-    {
-       
-      ASSERT_DBG_FATAL(TY_is_character(ty),
-		       (DIAG_W2F_UNEXPECTED_TYPE_SIZE,
-			TY_size(ty),"TY2F_scalar"));
-      Prepend_Token_String(decl_tokens, "CHARACTER*(*)");
-    }
+      if (mt == MTYPE_M) {
+	 Prepend_Token_String(decl_tokens, ".mblock.");
+      }
+      else
+      {
+	 ASSERT_DBG_FATAL(TY_is_character(ty),
+			  (DIAG_W2F_UNEXPECTED_TYPE_SIZE,
+			   TY_size(ty),"TY2F_scalar"));
+	 Prepend_Token_String(decl_tokens, "CHARACTER*(*)");
+      }
    }
 } /* TY2F_scalar */
 
