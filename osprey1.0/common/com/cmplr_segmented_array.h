@@ -227,6 +227,8 @@ protected:
     }
 
 public:
+  growing_table() : size(0) { }
+  virtual ~growing_table() { }
 
   // Here we have a member function to register a new kid with this
   // growing_table.
