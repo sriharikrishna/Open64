@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_loop.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:50 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2003-02-19 22:44:16 $
+// $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_loop.cxx,v $
 //
 // Revision history:
@@ -73,12 +73,12 @@
 
 #ifdef _KEEP_RCS_ID
 #define opt_loop_CXX	"opt_loop.cxx"
-static char *rcs_id = 	opt_loop_CXX"$Revision: 1.1.1.1 $";
+static char *rcs_id = 	opt_loop_CXX"$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #define USE_STANDARD_TYPES
-#include <set.h>
-#include <algo.h>
+#include <set>
+#include <algorithm>
 
 #include "defs.h"
 #include "config.h"
