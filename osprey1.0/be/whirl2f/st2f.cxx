@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.5 $
- * $Date: 2002-08-30 21:21:20 $
+ * $Revision: 1.6 $
+ * $Date: 2002-09-18 17:51:41 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.6 $";
 #endif
 
 #include <ctype.h>
@@ -239,7 +239,9 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
 				    ST_type(st), 
 				    FALSE /* regular equivalence */);
    }
-   else if (TY_Is_Pointer(ty_rt) && ST_sclass(st) != SCLASS_FORMAL)
+   else if (TY_Is_Pointer(ty_rt) && 
+            !TY_is_f90_pointer(ty_rt) &&
+            ST_sclass(st) != SCLASS_FORMAL)
    {
       /* Declare pointee with the name specified in the symbol table */
       pointee_name = W2CF_Symtab_Nameof_St_Pointee(st);
@@ -347,7 +349,6 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
        Append_F77_Indented_Newline(tokens, 0, NULL);
        Append_And_Reclaim_Token_List(tokens,&decl_tokens); }
 
-
    if (ST_is_my_pointer(st)) {
        TOKEN_BUFFER decl_tokens=New_Token_Buffer();
        Append_Token_String(decl_tokens,"POINTER");
@@ -355,7 +356,6 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
        Append_Token_Special(tokens, '\n');
        Append_F77_Indented_Newline(tokens, 0, NULL);
        Append_And_Reclaim_Token_List(tokens,&decl_tokens); }
-
 
    if (ST_is_f90_target(st)) {
        TOKEN_BUFFER decl_tokens=New_Token_Buffer();

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.6 $
- * $Date: 2002-09-12 21:15:51 $
+ * $Revision: 1.7 $
+ * $Date: 2002-09-18 17:51:41 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -64,6 +64,7 @@ extern WN* PU_Body;
 extern BOOL Array_Bnd_Temp_Var;
 
 #define NUMBER_OF_OPERATORS (OPERATOR_LAST + 1)
+#define  DBGPATH 1
 typedef WN2F_STATUS (*WN2F_HANDLER_FUNC)(TOKEN_BUFFER, WN*, WN2F_CONTEXT);
 extern WN2F_HANDLER_FUNC  WN2F_Handler[NUMBER_OF_OPERATORS];
 BOOL Use_Purple_Array_Bnds_Placeholder = FALSE;
@@ -675,6 +676,10 @@ Construct_Fld_Path(FLD_HANDLE   fld,
    TY_IDX            fld_ty = FLD_type(fld);
    BOOL              is_array_elt = FALSE;
    STAB_OFFSET       ofst_in_fld = 0;
+   
+    if (TY_is_f90_pointer(fld_ty))
+          fld_ty = TY_pointed(fld_ty);
+
 
    /* This field cannot be on the path to a field with the given
     * attributes, unless the desired_offset is somewhere within
@@ -688,7 +693,6 @@ Construct_Fld_Path(FLD_HANDLE   fld,
 	   desired_offset);
 #endif
 
- 
 
    if (desired_offset < fld_offset ||
        desired_offset >= (fld_offset + TY_size(fld_ty)))
@@ -728,6 +732,12 @@ Construct_Fld_Path(FLD_HANDLE   fld,
    else
    {
       /* See if the field we are looking for may be an array element */
+
+      if(TY_kind(desired_ty)==KIND_POINTER)   //Sept
+          desired_ty = TY_pointed(desired_ty);
+      if (TY_kind(desired_ty)==KIND_ARRAY)
+          desired_ty = TY_AR_etype(desired_ty);
+
       is_array_elt = (TY_Is_Array(fld_ty) &&
 		      (TY_Is_Structured(TY_AR_etype(fld_ty))||
 		       TY2F_is_character(fld_ty) ||
@@ -784,7 +794,8 @@ Construct_Fld_Path(FLD_HANDLE   fld,
 	 /* We only match a field with the expected size, offset
 	  * and alignment.
 	  */
-         
+       
+ 
 	 if (desired_offset != fld_offset+ofst_in_fld || /* unexpected ofst */
 	     fld_size < (TY_size(fld_ty)+ofst_in_fld) || /* unexpected size */
 	     TY_align(struct_ty) < TY_align(fld_ty))     /* unexpected align */
@@ -1861,7 +1872,8 @@ TY2F_Point_At_Path(FLD_PATH_INFO * path, STAB_OFFSET off)
   /* given a fld path, return a pointer to */
   /* the slot at the given offset          */
 
-  while (path != NULL)
+
+  while (path != NULL )
   {
     if (FLD_ofst(path->fld) >= off)
       break ;

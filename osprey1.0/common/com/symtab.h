@@ -148,7 +148,15 @@ inline ST_CLASS				// for compatibility
 ST_class (const ST_IDX s)		{ return ST_class (St_Table[s]); }
 
 inline TY_IDX
-ST_type (const ST_IDX s)		{ return ST_type(St_Table[s]); }
+// ST_type (const ST_IDX s)		{ return ST_type(St_Table[s]); }
+ST_type (const ST_IDX s)
+ 
+{
+  if (! TY_is_f90_pointer(ST_type(St_Table[s])))
+     return ST_type(St_Table[s]);
+  else
+     return TY_pointed(ST_type(St_Table[s]));
+}
 
 inline TYPE_ID
 ST_mtype (const ST* s) {
