@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.c
- * $Revision: 1.7 $
- * $Date: 2004-07-26 19:06:31 $
+ * $Revision: 1.8 $
+ * $Date: 2004-08-13 18:41:15 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
@@ -76,7 +76,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.8 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
@@ -918,10 +918,8 @@ W2CF_Symtab_Nameof_Ty(TY_IDX ty)
    }
    
    /* Return the resultant disambiguated name */
-if (Run_w2f)
     return valid_name; 
-else
-    return W2CF_SYMBOL_name_string(symtab, symbol);
+//    return W2CF_SYMBOL_name_string(symtab, symbol);
    
 } /* W2CF_Symtab_Nameof_Ty */
 
