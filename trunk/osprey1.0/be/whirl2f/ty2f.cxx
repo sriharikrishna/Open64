@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.23 $
- * $Date: 2004-04-30 15:27:23 $
+ * $Revision: 1.24 $
+ * $Date: 2004-04-30 15:33:37 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -149,14 +149,14 @@ WN2F_tempvar_rhs(TOKEN_BUFFER tokens,
 }
 
 // GetTmpVarTransInfo: mfef90 may define array bound extents using
-// temporaries that cannot be directly translated into fortran. E.g:
+// temporaries that cannot be directly translated into Fortran. E.g:
 // 't__1' below
 //    REAL(w2f__8) XXX(1 : t__1)
 // should be the formal parameter 'N'
 //    REAL(w2f__8) XXX(1 : N)
 // This routine finds the definition of 't__1'
 //    t__1 = N
-// so that it can be replaced witih 'N'.
+// so that 't__1' can be used instead of 'N'.
 static BOOL
 GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
                    ST_IDX         arbnd,
@@ -170,7 +170,7 @@ GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
   
    WN* foundStmt = NULL;
    for (WN* stmt = WN_first(wn); (stmt); stmt = WN_next(stmt)) {
-      // mfef90 typically generates statements like this
+      // mfef90 typically generates temporary-define statements like this
       bool isDefinedInSTID = 
 	((WN_operator(stmt) == OPR_STID) && 
 	 (strcmp(ST_name(WN_st(stmt)), bndSymNm) == 0));
