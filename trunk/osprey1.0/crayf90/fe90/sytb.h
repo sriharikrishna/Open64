@@ -954,7 +954,15 @@ struct ir_list_link_entry	{Uint                   prev_idx        : 24;
 				 Uint			for_ref		:  3;
 
 /*                                 Uint                   unused          :  4;*/
+/* We need bring detail arguments' description to cvrt_to_PDG
+ * and further to whirl representation,so we need these 4 bits
+ * to record the information about dummy-actual arguments matching
+ * the flag will be use in s_call.c "final_arg_work" function
+ * and cvrt_to_PDG i_cvrt.c
+ * -----fzhao
+ */
                                  Uint                   multi_flags     :  4;
+
                                  Uint                   flag_8          :  1;
 				 boolean		flag_6          :  1;
 				 boolean		flag_7          :  1;

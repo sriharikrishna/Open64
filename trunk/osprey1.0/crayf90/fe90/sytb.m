@@ -3786,6 +3786,7 @@ March # ifdef _DEBUG
 # define IL_LIST_CNT(IDX)               ir_list_tbl[IDX].il.op.line_num
 # define IL_FLD(IDX)                    ir_list_tbl[IDX].il.op.fld
 # define IL_ARG_DESC_VARIANT(IDX)	ir_list_tbl[IDX].il.link.arg_desc
+# define IL_ARG_MULTI_FLAGS(IDX)	ir_list_tbl[IDX].il.link.multi_flags
 
 # ifdef _DEBUG
 # define IL_PREV_LIST_IDX(IDX)                                                \

@@ -116,9 +116,9 @@
 ***
 **/
 
-/** $Revision: 1.2 $
-*** $Date: 2003-04-18 21:46:28 $
-*** $Author: dotsenko $
+/** $Revision: 1.3 $
+*** $Date: 2003-04-28 16:47:06 $
+*** $Author: fzhao $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/cxx_memory.h,v $
 **/
 
@@ -129,6 +129,7 @@
 #include "mempool.h"
 #endif
 
+#define CXX_USE_STANDARD_NEW_AND_DELETE
 #ifdef CXX_USE_STANDARD_NEW_AND_DELETE
 
 #define CXX_NEW(constructor, mempool)			\

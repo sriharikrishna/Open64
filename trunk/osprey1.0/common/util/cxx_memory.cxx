@@ -135,7 +135,7 @@ const char *_alloc_callsite_file = NULL;
  */
 
 void* operator new (size_t sz)
-#ifdef __GNUC__
+#if defined(__GNUC__) && (__GNUC__ < 3)
                                throw(std::bad_alloc) 
 #endif /* __GNUC__ */
 {

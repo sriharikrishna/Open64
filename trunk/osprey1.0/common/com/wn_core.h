@@ -1374,6 +1374,23 @@ inline BOOL WN_Is_Volatile_Mem(const WN *wn)
 #define WN_PARM_IS_KILLED   0x80        /* the parameter is killed, for
 					   pass by reference */
 
+/* following for record detail information about dummy-actual arguments
+ * association
+ *  fzhao@rice.edu
+ */
+# define WN_PARM_PASS_ADDRESS                  0x0100 
+# define WN_PARM_PASS_ADDRESS_FROM_DV          0x0200
+# define WN_PARM_PASS_DV                       0x0400 
+# define WN_PARM_PASS_DV_COPY                  0x0800 
+# define WN_PARM_COPY_IN                       0x2000
+# define WN_PARM_COPY_IN_COPY_OUT              0x4000
+# define WN_PARM_MAKE_DV                       0x8000 
+# define WN_PARM_COPY_IN_MAKE_DV               0x010000 
+# define WN_PARM_MAKE_NEW_DV                   0x020000 
+# define WN_PARM_PASS_SECTION_ADDRESS          0x040000 
+# define WN_PARM_CHECK_CONTIG_FLAG             0x080000 
+
+
 #define WN_Parm_By_Reference(x)		(WN_parm_flag(x) & WN_PARM_BY_REFERENCE)
 #define WN_Set_Parm_By_Reference(x)	(WN_parm_flag(x) |= WN_PARM_BY_REFERENCE)
 #define WN_Clear_Parm_By_Reference(x)   (WN_parm_flag(x) &= ~WN_PARM_BY_REFERENCE)
@@ -1394,6 +1411,30 @@ inline BOOL WN_Is_Volatile_Mem(const WN *wn)
 #define WN_Parm_Not_Exposed_Use(x)      (WN_parm_flag(x) & WN_PARM_NOT_EXPOSED_USE)
 #define WN_Set_Parm_Is_Killed(x)        (WN_parm_flag(x) |= WN_PARM_IS_KILLED)
 #define WN_Parm_Is_Killed(x)            (WN_parm_flag(x) & WN_PARM_IS_KILLED)
+
+#define WN_Parm_Pass_Address(x)         (WN_parm_flag(x) & WN_PARM_PASS_ADDRESS)
+#define WN_Set_Parm_Pass_Address(x)     (WN_parm_flag(x) |= WN_PARM_PASS_ADDRESS)
+#define WN_Parm_Pass_Address_From_Dv(x)         (WN_parm_flag(x) & WN_PARM_PASS_ADDRESS_FROM_DV)
+#define WN_Set_Parm_Pass_Address_From_Dv(x)     (WN_parm_flag(x) |= WN_PARM_PASS_ADDRESS_FROM_DV)
+#define WN_Parm_Pass_Dv(x)         (WN_parm_flag(x) & WN_PARM_PASS_DV)
+#define WN_Set_Parm_Pass_Dv(x)     (WN_parm_flag(x) |= WN_PARM_PASS_DV)
+#define WN_Parm_Pass_Dv_Copy(x)         (WN_parm_flag(x) & WN_PARM_PASS_DV_COPY)
+#define WN_Set_Parm_Pass_Dv_Copy(x)     (WN_parm_flag(x) |= WN_PARM_PASS_DV_COPY)
+#define WN_Parm_Copy_In(x)         (WN_parm_flag(x) & WN_PARM_COPY_IN)
+#define WN_Set_Parm_Copy_In(x)     (WN_parm_flag(x) |= WN_PARM_COPY_IN)
+#define WN_Parm_Copy_In_Copy_out(x)         (WN_parm_flag(x) & WN_PARM_BY_REFERENCE)
+#define WN_Set_Parm_Copy_In_Copy_out(x)     (WN_parm_flag(x) |= WN_PARM_COPY_IN_COPY_OUT)
+#define WN_Parm_Make_Dv(x)         (WN_parm_flag(x) & WN_PARM_MAKE_DV)
+#define WN_Set_Parm_Make_Dv(x)     (WN_parm_flag(x) |= WN_PARM_MAKE_DV)
+#define WN_Parm_Copy_In_Make_Dv(x)         (WN_parm_flag(x) & WN_PARM_COPY_IN_MAKE_DV)
+#define WN_Set_Parm_Copy_In_Make_Dv(x)     (WN_parm_flag(x) |= WN_PARM_COPY_IN_MAKE_DV)
+#define WN_Parm_Make_New_Dv(x)         (WN_parm_flag(x) & WN_PARM_MAKE_NEW_DV)
+#define WN_Set_Parm_Make_New_Dv(x)     (WN_parm_flag(x) |= WN_PARM_MAKE_NEW_DV)
+#define WN_Parm_Pass_Section_Address(x)         (WN_parm_flag(x) & WN_PARM_PASS_SECTION_ADDRESS)
+#define WN_Set_Parm_Pass_Section_Address(x)     (WN_parm_flag(x) |= WN_PARM_PASS_SECTION_ADDRESS)
+#define WN_Parm_Check_Contig_Flag(x)         (WN_parm_flag(x) & WN_PARM_CHECK_CONTIG_FLAG)
+#define WN_Set_Parm_Check_Contig_Flag(x)     (WN_parm_flag(x) |= WN_PARM_CHECK_CONTIG_FLAG)
+
 
 #define WN_CALL_NEVER_RETURN	0x01 /* call will never return */
 #define WN_CALL_NON_DATA_MOD	0x02 /* modifies data not present in program */

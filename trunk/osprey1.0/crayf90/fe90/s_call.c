@@ -3181,7 +3181,6 @@ boolean final_arg_work(opnd_type	*list_opnd,
 # endif
 
       arg_info_list[info_idx].association = association;
-
       switch (association) {
          case ERROR_ASSOC          :
             break;
@@ -3442,6 +3441,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
          case PASS_DV_COPY         :
 
+# if 0
             if (AT_OPTIONAL(dummy) &&
                 arg_info_list[info_idx].ed.optional_darg) {
 
@@ -3551,6 +3551,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
                IR_LINE_NUM_L(ir_idx) = line;
                IR_COL_NUM_L(ir_idx)  = col;
             }
+# endif 
             break;
 
          case COPY_IN              :
@@ -4481,6 +4482,7 @@ EXIT:
       COPY_OPND(opnd, IL_OPND(list_idx));
       stmt_expansion_control_end(&opnd);
       COPY_OPND(IL_OPND(list_idx), opnd);
+      IL_ARG_MULTI_FLAGS(list_idx) = association; 
 
       list_idx = IL_NEXT_LIST_IDX(list_idx);
    }
@@ -5751,7 +5753,7 @@ static int	create_tmp_DV_asg(int	list_idx,
    }
 
    /* had better be a deref_opr */
-
+# if 0 /*fzhao April*/
    if (IL_FLD(list_idx)         != IR_Tbl_Idx ||
        IR_OPR(IL_IDX(list_idx)) != Dv_Deref_Opr) {
 
@@ -5761,6 +5763,7 @@ static int	create_tmp_DV_asg(int	list_idx,
       PRINTMSG(line, 861, Internal, column,
                "create_tmp_DV_asg");
    }
+# endif 
 
    COPY_OPND(IR_OPND_R(asg_idx), IR_OPND_L(IL_IDX(list_idx)));
 

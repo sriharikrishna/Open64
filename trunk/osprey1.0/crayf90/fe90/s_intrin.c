@@ -4957,7 +4957,7 @@ void    cmplx_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 
+/* # if 0  */
 
    if (arg_info_list[info_idx1].ed.type == Integer) { 
       COPY_OPND(opnd, IL_OPND(list_idx1));
@@ -5009,7 +5009,7 @@ void    cmplx_intrinsic(opnd_type     *result_opnd,
       IL_NEXT_LIST_IDX(list_idx) = NULL_IDX;
    }
 
-# endif
+/* # endif */
 
    /* must reset foldable and will_fold_later because there is no */
    /* folder for this intrinsic in constructors.                  */

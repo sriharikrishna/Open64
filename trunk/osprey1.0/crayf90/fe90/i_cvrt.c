@@ -1647,10 +1647,14 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
 
 
    case IL_Tbl_Idx :
-
+   
       while (ir_idx != NULL_IDX){   
          cvrt_exp_to_pdg(IL_IDX(ir_idx), 
                          IL_FLD(ir_idx));
+
+         if (processing_call)
+            fei_arg_associate(IL_ARG_MULTI_FLAGS(ir_idx));
+
          ir_idx = IL_NEXT_LIST_IDX(ir_idx);
       }
 

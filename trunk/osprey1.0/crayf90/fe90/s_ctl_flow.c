@@ -189,7 +189,7 @@ void allocate_stmt_semantics (void)
 /* still need go through semantics for allocate stmts        */
 /* at least need keep "expr_semantics"                       */
 /* will think about keep other semantics later  --fzhao      */
-   while (list_idx != NULL_IDX ) { 
+   while (list_idx != NULL_IDX && FALSE) { 
 
       COPY_OPND(opnd, IL_OPND(list_idx));
       exp_desc.rank = 0;
