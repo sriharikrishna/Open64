@@ -213,7 +213,26 @@ Make_Const ( TCON c )
   Check_TCON(&c);
 #endif /* Is_True_On */
 
+  // eraxxon: The CONST opcode supports more rtypes than are listed
+  // here: it would seem that this function could be converted to
+  // creating the opcode with OPCODE_make_op(...).  For the moment, I
+  // add integer support taking the conservative route.
   switch(TCON_ty(c)) {
+
+    case MTYPE_I4:
+      opc = OPC_I4CONST;
+      break;
+    case MTYPE_I8:
+      opc = OPC_I8CONST;
+      break;
+    
+    case MTYPE_U4:
+      opc = OPC_U4CONST;
+      break;
+    case MTYPE_U8:
+      opc = OPC_U8CONST;
+      break;
+
     case MTYPE_F4:
       opc = OPC_F4CONST;
       break;
@@ -239,7 +258,7 @@ Make_Const ( TCON c )
   }
    
    csym = New_Const_Sym (Enter_tcon (c), Be_Type_Tbl(TCON_ty(c)));
-   n = WN_CreateConst(opc, csym );
+   n = WN_CreateConst(opc, csym);
    return (n);
    
 }
