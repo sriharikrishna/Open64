@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: init2f.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:55 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:33 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $
  *
  * Revision history:
@@ -75,7 +75,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.2 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -694,6 +694,7 @@ INIT2F_Get_Array_Segment(INITV_IDX   *initv_array, /* in */
    ARRAY_SEGMENT aseg;
    INITV_IDX     initv;
 
+
    /* Get the immediately available information */
    aseg.initv_array = initv_array;
    aseg.num_initvs = 0;            /* To be calculated */
@@ -702,6 +703,7 @@ INIT2F_Get_Array_Segment(INITV_IDX   *initv_array, /* in */
    aseg.start_ofst = *object_ofst;
    aseg.atype = object_type;
    aseg.etype = TY_AR_etype(object_type);
+   
    
    /* Walk though the initializers until we reach the last initv
     * belonging to this array segment.  I.e. the in/out parameters
@@ -827,6 +829,9 @@ INIT2F_Implied_DoLoop(TOKEN_BUFFER  tokens,        /* Append to this buffer */
    const char  *ivar_name;
    TY_IDX       atype;
 
+   ARB_HANDLE arb_base = TY_arb(aseg->atype);
+ARB_HANDLE arb = arb_base[0];
+
    /* Declare the induction variable */
    ivar_idx = Stab_Lock_Tmpvar(Stab_Mtype_To_Ty(MTYPE_I8),  
 			       &ST2F_Declare_Tempvar);
@@ -865,13 +870,41 @@ INIT2F_Implied_DoLoop(TOKEN_BUFFER  tokens,        /* Append to this buffer */
    Append_Token_Special(tokens, ',');
    Append_Token_String(tokens, ivar_name);
    Append_Token_Special(tokens, '=');
+
+# if 0//June
+
    Append_Token_String(tokens, 
 	    Number_as_String(aseg->start_ofst/TY_size(aseg->etype) + 1,
 			     "%llu"));
+# endif
+
+/***************************************************************************/
+/* Maybe think about chang more for DATA fzhao----June                      */
+/*here only suppose array in DATA is always one-dimension,and initialization*/
+/* is for whole array                                                       */
+/****************************************************************************/
+     TCON2F_translate(tokens,
+                              Host_To_Targ(MTYPE_I4,
+                                             ARB_lbnd_val(arb)),
+                            FALSE /*is_logical*/);
+
    Append_Token_Special(tokens, ',');
+
+// June#if 0
    Append_Token_String(tokens, 
-		       Number_as_String(aseg->end_ofst/TY_size(aseg->etype),
+		       Number_as_String(aseg->end_ofst/TY_size(aseg->etype)+ 
+                                                           ARB_lbnd_val(arb)-1,
 					"%llu"));
+//#endif
+# if 0
+
+     TCON2F_translate(tokens,
+                              Host_To_Targ(MTYPE_I4,
+                                             ARB_ubnd_val(arb)),
+                            FALSE /*is_logical*/);
+
+#endif
+
    Append_Token_Special(tokens, ',');
    Append_Token_String(tokens, Number_as_String(1, "%llu"));
    Append_Token_Special(tokens, ')');

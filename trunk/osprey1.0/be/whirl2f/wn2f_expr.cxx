@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:56 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:34 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.2 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -160,18 +160,18 @@ static const FNAME_PARTIALMAP Fname_Map[] =
   {OPC_U8F4TRUNC, "KINT"},
   {OPC_U8FQTRUNC, "KIQINT"},
   {OPC_U8F8TRUNC, "KIDINT"},
-  {OPC_I4F4CEIL, "OPC_I4F4CEIL"},
-  {OPC_I4FQCEIL, "OPC_I4FQCEIL"},
-  {OPC_I4F8CEIL, "OPC_I4F8CEIL"},
-  {OPC_I8F4CEIL, "OPC_I8F4CEIL"},
-  {OPC_I8FQCEIL, "OPC_I8FQCEIL"},
-  {OPC_I8F8CEIL, "OPC_I8F8CEIL"},
-  {OPC_I4F4FLOOR, "OPC_I4F4FLOOR"},
-  {OPC_I4FQFLOOR, "OPC_I4FQFLOOR"},
-  {OPC_I4F8FLOOR, "OPC_I4F8FLOOR"},
-  {OPC_I8F4FLOOR, "OPC_I8F4FLOOR"},
-  {OPC_I8FQFLOOR, "OPC_I8FQFLOOR"},
-  {OPC_I8F8FLOOR, "OPC_I8F8FLOOR"},
+  {OPC_I4F4CEIL, "CEIL"},
+  {OPC_I4FQCEIL, "CEIL"},
+  {OPC_I4F8CEIL, "CEIL"},
+  {OPC_I8F4CEIL, "CEIL"},
+  {OPC_I8FQCEIL, "CEIL"},
+  {OPC_I8F8CEIL, "CEIL"},
+  {OPC_I4F4FLOOR, "FLOOR"},
+  {OPC_I4FQFLOOR, "FLOOR"},
+  {OPC_I4F8FLOOR, "FLOOR"},
+  {OPC_I8F4FLOOR, "FLOOR"},
+  {OPC_I8FQFLOOR, "FLOOR"},
+  {OPC_I8F8FLOOR, "FLOOR"},
   {OPC_I4BNOT, "NOT"},
   {OPC_U8BNOT, "NOT"},
   {OPC_I8BNOT, "NOT"},
@@ -1121,7 +1121,12 @@ WN2F_cvt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_cvt"));
 
    WN2F_translate(expr_tokens, WN_kid0(wn), context);
-   WN2F_Convert(expr_tokens, WN_opc_dtype(wn), WN_opc_rtype(wn));
+
+/*  Maybe we shouldn't or needn't  explicitly output these kinds of 
+    convert in .w2f.f file----fzhao
+*/
+
+//   WN2F_Convert(expr_tokens, WN_opc_dtype(wn), WN_opc_rtype(wn));
    Append_And_Reclaim_Token_List(tokens, &expr_tokens);
 
    return EMPTY_WN2F_STATUS;
@@ -1141,7 +1146,9 @@ WN2F_cvtl(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    rtype = WN_Tree_Type(wn);
    
    /* Only convert if it is necessary */
-   if (Conv_Op[TY_mtype(dtype)][TY_mtype(rtype)] != NULL)
+
+   if (Conv_Op[TY_mtype(dtype)][TY_mtype(rtype)] != NULL )
+
    {
       expr_tokens = New_Token_Buffer();
       WN2F_translate(expr_tokens, WN_kid0(wn), context);

@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: wn2f_pragma.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:56 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:35 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.h,v $
  *
  * Revision history:

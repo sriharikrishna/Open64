@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:56 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:34 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
  *
  * Revision history:
@@ -66,7 +66,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.2 $";
 #endif
 
 #include <alloca.h>
@@ -260,7 +260,9 @@ static const WN2F_OPR_HANDLER WN2F_Opr_Handler_List[] =
    {OPR_DEALLOCA, &WN2F_dealloca},
    {OPR_USE, &WN2F_use_stmt},
    {OPR_IMPLICIT_BND, &WN2F_implicit_bnd},  
-   {OPR_NAMELIST, &WN2F_namelist_stmt}
+   {OPR_NAMELIST, &WN2F_namelist_stmt},
+   {OPR_SWITCH,&WN2F_switch},
+   {OPR_CASEGOTO,&WN2F_casegoto}
    
 }; /* WN2F_Opr_Handler_List */
 
@@ -1294,11 +1296,15 @@ WN2F_End_Routine_Strings(TOKEN_BUFFER tokens, INT32 func_id)
       else {
 	TY_IDX rt = PUINFO_RETURN_TY;
 
-	if (TY_kind(rt) == KIND_VOID)
+	if (TY_kind(rt) == KIND_VOID) {
           if (ST_is_in_module(PUINFO_FUNC_ST))  
             p = "END MODULE";
           else
+          if (ST_is_block_data(PUINFO_FUNC_ST))
+            p = "END BLOCK DATA";
+          else
 	  p = "END SUBROUTINE";
+        }
 	else
       	  p = "END FUNCTION";
       }

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:56 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:35 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.2 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1235,23 +1235,67 @@ public:
      int testb2 = !ST_is_in_module(st);
      ST *sts = Scope_tab[Current_scope].st;
      ST *stbase = ST_base(st);
+     ST * stcombase;
+     char *stcombasename;
+
+     INITO_IDX inito;
      char *scope_name = ST_name(sts);
      int  lens = strlen(scope_name);
      char *stbasename = ST_name(stbase);
      BOOL nomodulevar;
-     char *stname = ST_name(st);
 
-     nomodulevar = strstr(stbasename,scope_name)==NULL;
+     BOOL ntinthispu;
+
+     char *stname = ST_name(st);
+     BOOL variabledefinemodule = !strcmp(stbasename,scope_name);
+
+     nomodulevar = (strstr(stbasename,scope_name)==NULL &&
+                    strstr(scope_name,stbasename)==NULL );
 
 
      if (!BE_ST_w2fc_referenced(st) && !ST_has_nested_ref(st)
             && !ST_is_in_module(st)   
-            &&(nomodulevar
+            && ST_sclass(st)!= SCLASS_DGLOBAL
+            && ST_sclass(st)!= SCLASS_PSTATIC
+            &&(nomodulevar 
                 || !strcmp(ST_name(st),stbasename)))  
 	  return ;
+
+     if (ST_is_in_module(st) && nomodulevar && !Stab_Is_Common_Block(stbase))
+          return;
+
+     if (ST_is_in_module(st)
+                  && !variabledefinemodule)
+          return;
+     
+      if (ST_sclass(st)==SCLASS_TEXT && variabledefinemodule) 
+ /* don't redeclare recuresive function's type in this PU(recursive function PU */
+          return;  
+
+#if 0
+     if (ST_sclass(stbase) == SCLASS_COMMON )
+          return;
+#endif
+
+#if 0
+     if(Stab_Is_Common_Block(stbase)) 
+       {
+         stcombase = ST_base(stbase);
+         stbasename = ST_name(stcombase);
+         if (strcmp(stbasename,scope_name))
+              return;
+        }
+# endif
+         
+
       if (ST_is_external(st))
          return;
 	  
+    
+      if (ST_sym_class(st) ==CLASS_FUNC)
+          if ( ST_export(st) == EXPORT_LOCAL_INTERNAL) 
+          return;
+
       BOOL dop ;
 
       dop = ST_sclass(st) != SCLASS_FORMAL && 	
@@ -1259,8 +1303,19 @@ public:
 
       dop &= ((ST_sym_class(st) == CLASS_VAR  && !ST_is_namelist(st)) ||
 	      (ST_sym_class(st) == CLASS_FUNC)) ;
+    
 
-
+     if ((ST_sclass(stbase) == SCLASS_DGLOBAL) && 
+          ST_is_initialized(st)               &&
+          !Stab_No_Linkage(st)                &&
+           (!TY_Is_Structured(ST_type(st))      ||
+           Stab_Is_Equivalence_Block(st)))
+       {
+           inito = Find_INITO_For_Symbol(st);
+      if (inito != (INITO_IDX) 0)
+         INITO2F_translate(Data_Stmt_Tokens, inito);
+       }
+      else
       if (dop)
 	{
 	  if (tokens != NULL)
@@ -2889,3 +2944,58 @@ WN2F_implicit_bnd(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
      Append_Token_Special(tokens, ' ');
   return EMPTY_WN2F_STATUS;
  }
+
+// OPC_SWITCH only appears in very high level whirl
+
+WN2F_STATUS
+WN2F_switch(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
+ {
+  WN *stmt;
+  WN *kid1wn;
+
+//Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
+//  Append_Token_String(tokens,"SELECT CASE (");
+//(void)WN2F_translate(tokens, WN_condbr_cond(wn), context);
+// Append_Token_Special(tokens, ')');
+
+   kid1wn = WN_kid1(wn);
+
+   for (stmt = WN_first(kid1wn); stmt != NULL; stmt = WN_next(stmt))
+   {
+      if (!WN2F_Skip_Stmt(stmt))
+      {
+         if (WN_operator(stmt) == OPR_CASEGOTO)
+           WN_st_idx(stmt) = WN_st_idx(WN_kid0(wn));
+      }
+   }
+
+(void)WN2F_translate(tokens, WN_kid1(wn), context);
+if (WN_kid_count(wn) == 3)
+(void)WN2F_translate(tokens, WN_kid2(wn), context);
+//  Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
+//  Append_Token_String(tokens,"END SELECT ");
+
+   return EMPTY_WN2F_STATUS;
+ }
+
+
+WN2F_STATUS
+WN2F_casegoto(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
+ {
+  ST *st;
+  st = WN_st(wn);
+
+  Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
+//  Append_Token_String(tokens,"CASE");
+  Append_Token_String(tokens,"IF (");
+  ST2F_use_translate(tokens,st);
+  Append_Token_String(tokens," .EQ. ");
+  TCON2F_translate(tokens,Host_To_Targ(MTYPE_I4,WN_const_val(wn)),FALSE);
+  Append_Token_Special(tokens,')');
+  Append_Token_String(tokens," GO TO ");
+  Append_Token_String(tokens, WHIRL2F_number_as_name(WN_label_number(wn)));
+   return EMPTY_WN2F_STATUS;
+ }
+
+
+
