@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.31.2.2 $
- * $Date: 2004-11-24 20:53:24 $
+ * $Revision: 1.31.2.3 $
+ * $Date: 2004-11-29 16:00:26 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.31.2.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.31.2.3 $";
 #endif
 
 #include <ctype.h>
@@ -386,9 +386,7 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
    if (!Stab_Is_Equivalence_Block(st) &&
        !ST_is_parameter(st) &&
        (ST_sclass(st) == SCLASS_FSTATIC || 
-	ST_sclass(st) == SCLASS_PSTATIC ||
-	/* eraxxon: TEMPORARY HACK */
-	ST_sclass(st) == SCLASS_MODULE))
+	ST_sclass(st) == SCLASS_PSTATIC))
    {
       Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
       Append_Token_String(tokens, "SAVE");
