@@ -229,15 +229,10 @@ public:
   }
 
   ~SEGMENTED_ARRAY() {
+    typedef typename vector<pair<T *, BOOL>, mempool_allocator<pair<T *, BOOL> > >::iterator TempIteratorType;
     // Free memory from blocks. Map memory gets freed when the map
     // vector is destructed.
-
-    // Yuri: 1/24/03
-    // for (std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> >::iterator
-    for (std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *, BOOL> > >::iterator
-	   entry = map.begin();
-	 entry != map.end();
-	 ++entry) {
+    for ( TempIteratorType entry = map.begin(); entry != map.end(); ++entry ) {
       // entry->second <==> this map entry owns the block's memory.
       if (entry->second) {
 	MEM_POOL_FREE(pool, entry->first);

@@ -891,11 +891,15 @@ WN_set_opcode (WN *wn, OPCODE opc) {
   wn->common.desc        = OPCODE_desc(opc);
 }
 
-class STMT_WN {
-public:
+class STMT_WN_BASE {
+ public:
   WN      *prev;
   WN      *next;
   mUINT64 linenum;
+};
+
+class STMT_WN : public STMT_WN_BASE {
+public:
   WN       wn;
 
 #ifndef WN_NO_ACCESSOR_FUNCTIONS
@@ -912,9 +916,10 @@ public:
 #endif /* WN_NO_ACCESSOR_FUNCTIONS */
 };
 
-#define WN_OFFSET_IN_STMT_WN (offsetof(STMT_WN,wn))
+//#define WN_OFFSET_IN_STMT_WN (offsetof(STMT_WN,wn))
+//#define WN_CAST_WN_TO_STMT_WN(x) ((STMT_WN *)((UINTPS)x - WN_OFFSET_IN_STMT_WN))
 
-#define WN_CAST_WN_TO_STMT_WN(x) ((STMT_WN *)((UINTPS)x - WN_OFFSET_IN_STMT_WN))
+#define WN_CAST_WN_TO_STMT_WN(x) ((STMT_WN *)( (STMT_WN_BASE *)x - 1))
 
 #ifndef WN_NO_ACCESSOR_FUNCTIONS
 inline WN* WN_prev (const WN* wn) { return (WN_CAST_WN_TO_STMT_WN(wn)->prev); }
