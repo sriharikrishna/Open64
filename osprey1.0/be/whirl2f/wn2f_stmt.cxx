@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:35 $
+ * $Revision: 1.3 $
+ * $Date: 2002-07-19 14:16:01 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.3 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -914,7 +914,13 @@ WN2F_Translate_DoLoop_Bound(TOKEN_BUFFER   tokens,
    if (bound->const0 != 0)
    {
       Append_Token_Special(bound_expr, '+');
-      Append_Token_String(bound_expr, Number_as_String(bound->const0, "%lld"));
+      if (bound->const0<0) {
+        Append_Token_Special(bound_expr,'(');
+        Append_Token_String(bound_expr, Number_as_String(bound->const0, "%lld"));
+        Append_Token_Special(bound_expr,')');
+        }
+      else
+        Append_Token_String(bound_expr, Number_as_String(bound->const0, "%lld"));
    }
    for (op_idx = 0; op_idx < bound->num_ops; op_idx++)
    {
