@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:34 $
+ * $Revision: 1.3 $
+ * $Date: 2003-03-14 21:46:49 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.3 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -81,6 +81,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "st2f.h"
 #include "wn2f.h"
 #include "wn2f_stmt.h"
+
+#define DEB_Whirl2f_IR_TY_W2F_Outfile_Translate_Pu 0
 
 /* Avoid errors due to uses of "int" in stdio.h macros.
  */
@@ -1205,8 +1207,10 @@ W2F_Outfile_Translate_Pu(WN *pu)
    if (W2F_Emit_Nested_PUs)
       lower_actions = LOWER_MP;
 
+# if 0
    if (lower_actions != LOWER_NULL)
-// 	  pu = WN_Lower(pu, lower_actions, NULL, "W2F Lowering"); 
+       pu = WN_Lower(pu, lower_actions, NULL, "W2F Lowering"); 
+# endif
 
    Start_Timer(T_W2F_CU);
    if (W2F_Progname != NULL)
@@ -1234,6 +1238,18 @@ W2F_Outfile_Translate_Pu(WN *pu)
       Increment_Indentation();
    } else
       WN2F_Emit_End_Stmt(tokens,FALSE);
+
+  xDEBUG(DEB_Whirl2f_IR_TY_W2F_Outfile_Translate_Pu,
+	 TY_TAB::iterator it;
+	 int i;
+  
+	 for(i=0, it=Ty_tab.begin(); it != Ty_tab.end(); it++, i++) {
+	   if (i==0) continue;
+	   TY &ty = *it;
+	   printf("[%d]: ", i);
+	   ty.Print(stdout);
+	 }
+  );
 
    
 
