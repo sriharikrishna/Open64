@@ -6204,13 +6204,11 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
            break;
         }
 
-# if 0 /* fzhao March*/
        if (IR_OPR(ir_idx) == Whole_Subscript_Opr) {
              is_subscript = FALSE; 
              nested_array = FALSE;
              break;  /* fzhao */
         }
-# endif
      
         attr_idx = find_base_attr(&IR_OPND_L(ir_idx), &line, &col);
         bound_idx = ATD_ARRAY_IDX(attr_idx);
