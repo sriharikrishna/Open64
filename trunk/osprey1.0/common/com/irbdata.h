@@ -40,9 +40,9 @@
 
 /* ====================================================================
  * Module: irbdata.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:32 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2005-02-01 00:38:42 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/irbdata.h,v $
  *
  * Revision history:
@@ -379,6 +379,13 @@ Get_INITO_Size (INITO_IDX ino);
 
 extern INITO_IDX
 Find_INITO_For_Symbol (const ST *st);
+
+const char *
+InitvKind_Name (INITVKIND knd);
+
+INITVKIND
+Name_To_InitvKind (const char* nm);
+
 
 extern void
 Print_INITV (const INITV& initv);

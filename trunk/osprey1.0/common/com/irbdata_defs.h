@@ -67,7 +67,8 @@ enum INITVKIND {
     INITVKIND_PAD	= 6,
     INITVKIND_SYMDIFF	= 7,
     INITVKIND_SYMDIFF16 = 8,
-    INITVKIND_LABEL	= 9 
+    INITVKIND_LABEL	= 9,
+    INITVKIND_COUNT     = 10	// total number of kinds
 };
 
 struct INITV
