@@ -41,8 +41,8 @@
 //
 /////////////////////////////////////
 //
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:07 $
+//  $Revision: 1.2 $
+//  $Date: 2003-12-11 22:13:19 $
 
 
 #include <stddef.h>
@@ -174,8 +174,8 @@ void ISA_Properties_End(void)
     }
   }
 
-  char *int_type;
-  char *int_suffix;
+  const char *int_type;
+  const char *int_suffix;
   int int_size;
   if (isa_property_count <= 8) {
     int_type = "mUINT8";

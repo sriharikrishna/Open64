@@ -40,8 +40,8 @@
 //
 /////////////////////////////////////
 //
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:07 $
+//  $Revision: 1.2 $
+//  $Date: 2003-12-11 22:13:19 $
 
 
 #include <stddef.h>
@@ -230,7 +230,8 @@ void ISA_Subset_End(void)
   fprintf(cfile,"  return isa_subset_names[(INT)subset];\n");
   fprintf(cfile,"}\n");
 
-  fprintf(cfile,"static const char isa_subset_opcode_table[%d][%d] = {\n",
+  fprintf(cfile,
+	  "static const unsigned char isa_subset_opcode_table[%d][%d] = {\n",
           isa_subset_count+1,bit_vector_sizeof);
 
   for ( isi = subsets.begin(); isi != subsets.end(); ++isi ) {
@@ -263,7 +264,7 @@ void ISA_Subset_End(void)
 	  "{\n"
 	  "  INT byte_index = ((UINT) opcode) / 8;\n"
 	  "  INT bit_index = ((UINT) opcode) %% 8;\n"
-	  "  INT byte = isa_subset_opcode_table[(int) subset][byte_index];\n"
+	  "  INT byte = (INT)isa_subset_opcode_table[(int) subset][byte_index];\n"
 	  "  return (byte >> bit_index) & 1;\n"
 	  "}\n");
 

@@ -40,8 +40,8 @@
 //  within a bundle.
 //
 /////////////////////////////////////
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:06 $
+//  $Revision: 1.2 $
+//  $Date: 2003-12-11 22:13:20 $
 
 #include <alloca.h>
 #include <stddef.h>
@@ -347,7 +347,7 @@ static void Emit_Bundle_Scheduling(FILE *hfile, FILE *cfile, FILE *efile)
 								  ++iei) {
   }
 
-  char *int_suffix;
+  const char *int_suffix;
   // select the ISA_EXEC_unit_prop based on the number of exec info types.
   if (index <= 8) {
     info_index_type = "mUINT8";

@@ -40,8 +40,8 @@
 //
 /////////////////////////////////////
 //
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:06 $
+//  $Revision: 1.2 $
+//  $Date: 2003-12-11 22:13:19 $
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -160,7 +160,7 @@ static const char * const interface[] = {
 const char* Print_Name(int print_index)
 /////////////////////////////////////
 {
-  static char *comp_name[MAX_LISTING_OPERANDS];
+  static const char *comp_name[MAX_LISTING_OPERANDS];
   static bool initialized;
 
   if (!initialized) {
