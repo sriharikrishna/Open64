@@ -36,37 +36,47 @@
 // the following definitions are in IRIX elf.h but not in Solaris elf.h
 
 #ifdef _SOLARIS_SOLARIS
-#include <limits.h>
-#ifdef __GNUC__
-#define INT64_MAX       0x7fffffffffffffffll    /* Max 64-bit int */
+# include <limits.h>
+# ifdef __GNUC__
+#  define INT64_MAX       0x7fffffffffffffffll    /* Max 64-bit int */
+# endif
+# define ELF_BSS         ".bss"
+# define ELF_TEXT        ".text"
+# define ELF_DATA        ".data"
+# define ELF_GOT         ".got"
+# define ELF_RODATA      ".rodata"
+# define MIPS_SDATA              ".sdata"
+# define MIPS_SRDATA             ".srdata"
+# define MIPS_LIT4               ".lit4"
+# define MIPS_LIT8               ".lit8"
+# define MIPS_LIT16              ".lit16"
+# define MIPS_SBSS               ".sbss"
+# define SHF_MIPS_GPREL          0x10000000
+# define SHF_MIPS_MERGE          SHF_IRIX_MERGE
+# define SHF_IRIX_MERGE          0x20000000
+# define SHF_MIPS_NAMES          SHF_IRIX_NAMES
+# define SHF_IRIX_NAMES          0x02000000
+# define SHF_MIPS_LOCAL          SHF_IRIX_LOCAL
+# define SHF_IRIX_LOCAL          0x04000000
 #endif
-#define ELF_BSS         ".bss"
-#define ELF_TEXT        ".text"
-#define ELF_DATA        ".data"
-#define ELF_GOT         ".got"
-#define ELF_RODATA      ".rodata"
-#define MIPS_SDATA              ".sdata"
-#define MIPS_SRDATA             ".srdata"
-#define MIPS_LIT4               ".lit4"
-#define MIPS_LIT8               ".lit8"
-#define MIPS_LIT16              ".lit16"
-#define MIPS_SBSS               ".sbss"
-#define SHF_MIPS_GPREL          0x10000000
-#define SHF_MIPS_MERGE          SHF_IRIX_MERGE
-#define SHF_IRIX_MERGE          0x20000000
-#define SHF_MIPS_NAMES          SHF_IRIX_NAMES
-#define SHF_IRIX_NAMES          0x02000000
-#define SHF_MIPS_LOCAL          SHF_IRIX_LOCAL
-#define SHF_IRIX_LOCAL          0x04000000
-#endif
-
-
 
 #include <elf.h>
 #include "sections.h"
 
 #define SHF_IA_64_SHORT	SHF_MIPS_GPREL
 #define INST_BYTES 16
+
+#include <iostream>
+
+
+#if defined(__CYGWIN__)
+  // The $%&# g++ compiler under cygwin says a INT64 is 8 bytes but
+  // *will not* allow one to assign INT64_MAX to such a variable.
+  // FIXME
+# undef INT64_MAX
+# define INT64_MAX INT32_MAX
+#endif
+
 
 SECTION Sections[_SEC_INDEX_MAX] = {
   {_SEC_UNKNOWN,NULL,
@@ -118,14 +128,14 @@ SECTION Sections[_SEC_INDEX_MAX] = {
 	SHT_NOBITS, 0, 
      INT32_MAX, MIPS_SBSS, 0},
 
-// Solaris workaround
-#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
+#if defined(__mips)
   {_SEC_LBSS,	NULL,
      0|SHF_WRITE|SHF_ALLOC|SHF_MIPS_LOCAL,
 	SHT_NOBITS, 0, 
      INT64_MAX, MIPS_LBSS, 0},
 #else
-  // There is no MIPS_LBSS section on Linux, but we need a space holder
+  // There is no MIPS_LBSS section on non-IRIX systems, but we need a
+  // space holder
   {_SEC_LBSS,   NULL,
      0,
         0, 0,
@@ -141,8 +151,7 @@ SECTION Sections[_SEC_INDEX_MAX] = {
 	SHT_PROGBITS, 0, 
      INT64_MAX, "__cplinit", 0},
 
-// Solaris workaround
-#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
+#if defined(__mips)
   {_SEC_EH_REGION,	NULL,
      0|SHF_WRITE|SHF_ALLOC|SHF_MIPS_NAMES,
 	SHT_PROGBITS, 0, 
@@ -152,7 +161,8 @@ SECTION Sections[_SEC_INDEX_MAX] = {
 	SHT_PROGBITS, 0, 
      INT64_MAX, MIPS_EH_REGION_SUPP, 0},
 #else
-  // It's not yet clear what to do about the EH_REGION sections on Linux
+  // It's not yet clear what to do about the EH_REGION sections on
+  // non-IRIX systems.
   {_SEC_EH_REGION,      NULL,
      0,
         0, 0,
