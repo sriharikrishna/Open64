@@ -3297,24 +3297,25 @@ extern char *mktemp __((char *));
 extern int Cif_Open_V1 __((char *, char *, int *, int));
 #endif
 
-
 /* Special open for version 2 applications, allows us to check if they are
    trying to open a cif less than the library thay they were compiled
    with; ie app = v1, trying to open a v2 cif */
 
-#if CIF_VERSION == 2
+/* eraxxon: must be visible becuase will be used w/o a macro check! */
+/* #if CIF_VERSION == 2 */
 extern int Cif_Open_V2 __((char *, char *, int *, int));
 extern int Cif_Open_V2_1 __((char *, char *, int *, int, int));
 extern int Cif_Lines_V2_1 __((char *, char *, int *, int, int, int));
 extern int Cif_Cifconv_V2_1 __((char *, char *, int *, int, int, int));
-#endif
+/* #endif */
 
-#if CIF_VERSION == 3
+/* eraxxon: must be visible becuase will be used w/o a macro check! */
+/* #if CIF_VERSION == 3 */
 extern int Cif_Open_V3 __((char *, char *, int *, int));
 extern int Cif_Open_V3_1 __((char *, char *, int *, int, int));
 extern int Cif_Lines_V3_1 __((char *, char *, int *, int, int, int));
 extern int Cif_Cifconv_V3_1 __((char *, char *, int *, int, int, int));
-#endif
+/* #endif */
 
 extern int Cif_Recgroup __((int, struct Cif_unitdir *, int, struct Cif_generic **));
 extern int Cif_Release __((int, int));
