@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.16 $
- * $Date: 2003-11-25 21:16:02 $
+ * $Revision: 1.17 $
+ * $Date: 2003-12-04 16:28:07 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -335,9 +335,15 @@ TY2F_Append_ARB(TOKEN_BUFFER decl_tokens, ARB_HANDLE arb, BOOL purple_assumed_si
 static void
 TY2F_Append_ARB (TOKEN_BUFFER decl_tokens,ARB_HANDLE arb,BOOL purple_assumed_size)
   {
+     BOOL lb_one = FALSE;
+
      WN2F_CONTEXT context = INIT_WN2F_CONTEXT;
+
        if (ARB_const_lbnd(arb))
-           TCON2F_translate(decl_tokens,
+           if (ARB_lbnd_val(arb) == 1)
+                 lb_one = TRUE;
+           else
+              TCON2F_translate(decl_tokens,
                               Host_To_Targ(MTYPE_I4,
                                              ARB_lbnd_val(arb)),
                             FALSE /*is_logical*/);
@@ -346,8 +352,11 @@ TY2F_Append_ARB (TOKEN_BUFFER decl_tokens,ARB_HANDLE arb,BOOL purple_assumed_siz
                                   ARB_lbnd_var(arb),
                                   purple_assumed_size);
             }
-      
-      Append_Token_Special(decl_tokens, ':');
+      if (!lb_one) {
+          Append_Token_Special(decl_tokens, ':');
+          lb_one = FALSE;
+        }
+
       if (purple_assumed_size )
            Append_Token_Special(decl_tokens,'*');
       else     
