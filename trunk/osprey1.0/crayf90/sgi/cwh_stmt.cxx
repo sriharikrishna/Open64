@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:10 $
+ * $Revision: 1.3 $
+ * $Date: 2002-07-16 20:17:02 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -2954,16 +2954,33 @@ fei_concat(INT32 numops)
 
   for (i = sc ; i >= 2 ;  i--) {
     k = i + numops ;
-    cwh_stk_pop_STR();
-    wn[k] = cwh_stk_pop_WN();
-    wn[i] = F90_Wrap_ARREXP(cwh_expr_address(f_T_PASSED));
-    if (WNOPR(wn[i]) == OPR_ARRAYEXP)
-      ae = wn[i] ;
-    sz[k] = NULL;
-    sz[i] = WN_COPY_Tree(wn[k]) ;
-    va[k] = TRUE;
-    va[i] = FALSE;
-    rsz   = cwh_expr_bincalc(OPR_ADD,rsz,WN_COPY_Tree(wn[k]));
+    switch (cwh_stk_get_class()) {
+      case STR_item:
+         cwh_stk_pop_STR();
+         wn[k] = cwh_stk_pop_WN();
+         wn[i] = F90_Wrap_ARREXP(cwh_expr_address(f_T_PASSED));
+         if (WNOPR(wn[i]) == OPR_ARRAYEXP)
+               ae = wn[i] ;
+         sz[k] = NULL;
+         sz[i] = WN_COPY_Tree(wn[k]) ;
+         va[k] = TRUE;
+         va[i] = FALSE;
+         rsz   = cwh_expr_bincalc(OPR_ADD,rsz,WN_COPY_Tree(wn[k]));
+         break;
+
+      case WN_item:
+         wn[i] = cwh_stk_pop_WN();
+         wn[k] = rsz;
+         sz[k] = rsz;
+         sz[i] = WN_COPY_Tree(wn[i]);
+         va[k] = TRUE;
+         va[i] = TRUE;
+         rsz   = cwh_expr_bincalc(OPR_ADD,rsz,rsz);
+         break;
+
+      default:
+        DevAssert((0),("Odd string")); 
+    }
   }
 
   /* if an ARRAYEXP (ae) appeared it was an elemental */
