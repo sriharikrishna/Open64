@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.19 $
- * $Date: 2004-06-30 20:28:17 $
+ * $Revision: 1.20 $
+ * $Date: 2004-07-02 14:45:35 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.20 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -2199,7 +2199,7 @@ WN2C_Append_Symtab_Types(TOKEN_BUFFER tokens, UINT lines_between_decls)
     * to the W2C_File[W2C_DOTH_FILE] (at file-level); otherwise, append them
     * them to the given token-list.
     */
-   TY_IDX       ty;
+   TY_IDX       ty,ty_idx;
    TOKEN_BUFFER tmp_tokens;
 
    //WEI: This code is obviously broken, but should we fix it?
@@ -2208,20 +2208,21 @@ WN2C_Append_Symtab_Types(TOKEN_BUFFER tokens, UINT lines_between_decls)
    /* Declare structure types. --*/
    for (ty = 1; ty < TY_Table_Size(); ty++)
    {
-     if (TY_Is_Structured(ty)       &&
-	 !TY_split(Ty_Table[ty])    &&
-	 !TY_is_translated_to_c(ty)  &&
-	  !Stab_Reserved_Ty(ty))
+     ty_idx = ty<<8;
+     if (TY_Is_Structured(ty_idx)       &&
+	 !TY_split(Ty_Table[ty_idx])    &&
+	 !TY_is_translated_to_c(ty_idx)  &&
+	  !Stab_Reserved_Ty(ty_idx))
       {
 	 tmp_tokens = New_Token_Buffer();
 
-         Set_TY_is_written(ty<<8); 
+         Set_TY_is_written(ty_idx); 
          //this should  be done in frontend,will fix later--FMZ
 
 //	 TY2C_translate_unqualified(tmp_tokens, ty);
          //misuse this ty as TY_IDX--FMZ
 
-	 TY2C_translate_unqualified(tmp_tokens, ty<<8);
+	 TY2C_translate_unqualified(tmp_tokens, ty_idx);
 
 #if 0 //not correct code---FMZ
 	 Append_Token_Special(tmp_tokens, ';');
