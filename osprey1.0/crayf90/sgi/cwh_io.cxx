@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_io.c
- * $Revision: 1.8 $
- * $Date: 2003-06-03 20:15:22 $
+ * $Revision: 1.9 $
+ * $Date: 2004-09-24 21:45:40 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_io.cxx,v $
  *
@@ -57,7 +57,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-  static char *rcs_id = " $Id: cwh_io.cxx,v 1.8 2003-06-03 20:15:22 fzhao Exp $ ";
+  static char *rcs_id = " $Id: cwh_io.cxx,v 1.9 2004-09-24 21:45:40 fzhao Exp $ ";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -720,12 +720,14 @@ fei_formatted_read(void)
     marked_set = NULL;
     status = cwh_io_analyse_io_statement(wn, READ_STMT);
     cwh_io_unmark();
-  
+
+#if 0   
     if (status) {
        cwh_io_split_io_statement(wn);
     } else {
+#endif
        cwh_block_append(wn);
-    }
+//    }
   }
 }
 
@@ -753,12 +755,14 @@ fei_unformatted_write(void)
     marked_set = NULL;
     status = cwh_io_analyse_io_statement(wn, WRITE_STMT);
     cwh_io_unmark();
-  
+ 
+#if 0  
     if (status) {
        cwh_io_split_io_statement(wn);
     } else {
+#endif 
        cwh_block_append(wn);
-    }
+//    }
   }
 }
 
