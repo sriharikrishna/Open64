@@ -261,7 +261,7 @@ static	void print_attr_f (int		 attr_idx,
 
             fprintf(outfile, "%s", AT_OBJ_NAME_PTR(SN_ATTR_IDX(sn_idx)));
             len   += AT_NAME_LEN(SN_ATTR_IDX(sn_idx));
-            sn_idx	= sn_idx++;
+            sn_idx++;
             comma	= ",";
          }
 
@@ -282,7 +282,7 @@ static	void print_attr_f (int		 attr_idx,
 
             for (i = ATP_NUM_DARGS(attr_idx); i > 0; i--) {
                print_attr_f(SN_ATTR_IDX(sn_idx), outfile);
-               sn_idx	= sn_idx++;
+               sn_idx++;
             }
          }
 
