@@ -664,7 +664,7 @@ void cvrt_to_pdg (char	*compiler_gen_date)
 # endif
 
    TBL_FREE(pdg_link_tbl);
-   TBL_FREE(pdg_type_tbl);
+   TBL_FREE(pdg_type_tbl); 
 
    TRACE (Func_Exit, "cvrt_to_pdg", NULL);
 
@@ -1502,6 +1502,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
       assumes that the constant was already created and we can just stack
       the saved index for that particular constant.
       */
+
       if (PDG_CN_IDX(ir_idx) == 0 || ir_idx >= pdg_link_tbl_size) { 
          basic = get_basic_type(CN_TYPE_IDX(ir_idx), 0, NULL_IDX);
 
@@ -2026,7 +2027,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
 
            PDG_DBG_PRINT_START
            PDG_DBG_PRINT_C("fei_label_addr");
-           PDG_DBG_PRINT_D("(1) PDG_AT_IDX", PDG_AT_IDX(IR_IDX_L(ir_idx)));
+           PDG_DBG_PRINT_LD("(1) PDG_AT_IDX", PDG_AT_IDX(IR_IDX_L(ir_idx)));
            PDG_DBG_PRINT_END
 
 # ifdef _ENABLE_FEI
@@ -11794,7 +11795,7 @@ if (i == BD_RANK(pe_bd_idx)) {
       PDG_DBG_PRINT_C("fei_descriptor");
       PDG_DBG_PRINT_O("(1) flags", type_flag);
       PDG_DBG_PRINT_S("(2) table type", p_table_type[Array]);
-      PDG_DBG_PRINT_D("(3) pdg_array_idx", pdg_array_idx);
+      PDG_DBG_PRINT_LD("(3) pdg_array_idx", pdg_array_idx);
       PDG_DBG_PRINT_S("(4) basic type", p_basic_type[basic_type]);
       PDG_DBG_PRINT_D("(5) aux info", kind_type);
       PDG_DBG_PRINT_D("(6) alignment", pdg_align[ATD_ALIGNMENT(attr_idx)]);
@@ -12304,7 +12305,7 @@ static void  send_procedure(int			attr_idx,
    ((long64) (call_type == In_Interface)         << FEI_PROC_IN_INTERFACE) |
    ((long64) (call_type == Imported)          	<< FEI_PROC_IMPORTED)|
    ((long64) AT_MODULE_OBJECT(attr_idx)          << FEI_PROC_MODULE)|
-   ((long64) (AT_MODULE_IDX(attr_idx)!= NULL)        << FEI_PROC_M_IMPORTED)|
+   ((long64) (AT_MODULE_IDX(attr_idx))        << FEI_PROC_M_IMPORTED)|
    ((long64) (call_type == Parent)          	<< FEI_PROC_PARENT)|
    ((long64) (ATP_NOSIDE_EFFECTS(attr_idx) | ATP_PURE(attr_idx))
 						<< FEI_PROC_NOSIDE_EFFECTS)|
@@ -12744,7 +12745,6 @@ static TYPE	send_derived_type(int	type_idx)
    PDG_DBG_PRINT_START
    PDG_DBG_PRINT_T("(r) type", pdg_type_idx);
    PDG_DBG_PRINT_END
-
    pdg_type_tbl[type_idx] = pdg_type_idx;
    PDG_AT_IDX(dt_attr_idx) = dt_idx;
    PDG_AT_TYP_IDX(dt_attr_idx) = type_idx;
@@ -13252,7 +13252,7 @@ static void send_interface_list(int ng_attr_idx)
        kids_count = ATI_NUM_SPECIFICS(ng_attr_idx);
        sn_idx = ATI_FIRST_SPECIFIC_IDX(ng_attr_idx);
             for (i = 0; i < ATI_NUM_SPECIFICS(ng_attr_idx); i++) {
-                 if (AT_MODULE_IDX(SN_ATTR_IDX(sn_idx))==NULL &&
+                 if (AT_MODULE_IDX(SN_ATTR_IDX(sn_idx))==0 &&
                       ATP_PROC(SN_ATTR_IDX(sn_idx)) != Intrin_Proc ){
                         send_procedure(SN_ATTR_IDX(sn_idx),
                                     NULL_IDX,
@@ -13276,7 +13276,7 @@ static void send_interface_list(int ng_attr_idx)
            } 
  
 /*      is_imported = AT_MODULE_IDX(ng_attr_idx); */
-       if (AT_MODULE_IDX(ng_attr_idx) !=NULL)
+       if (AT_MODULE_IDX(ng_attr_idx) )
           is_imported = 1;
        else
           is_imported =0;
@@ -13340,6 +13340,7 @@ static void allocate_pdg_link_tbls(void)
    new_size++;          /* Do not use entry 0, so increase size by 1 */
 
    CHECK_TBL_ALLOC_SIZE(pdg_link_tbl, new_size);
+
    pdg_link_tbl_idx = pdg_link_tbl_size - 1;
    pdg_tbl_base	= (long *) pdg_link_tbl;
 
@@ -14178,6 +14179,7 @@ static void send_attr_ntry(int		attr_idx)
             TYP_IDX(TYP_WORK_IDX)       = attr_idx;
             ATT_TY_IDX(attr_idx)        = ntr_derived_type_tbl();
 
+            TBL_REALLOC_CK(pdg_type_tbl, 1);/*need to enlarge pdg_type_tbl */
             send_derived_type(ATT_TY_IDX(attr_idx)); 
         }
       goto EXIT; 

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.21 $
- * $Date: 2004-01-06 20:33:14 $
+ * $Revision: 1.22 $
+ * $Date: 2004-02-09 16:55:44 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -65,7 +65,9 @@ extern WN* PU_Body;
 extern BOOL Array_Bnd_Temp_Var;
 
 #define NUMBER_OF_OPERATORS (OPERATOR_LAST + 1)
-// #define DBGPATH 1
+
+//#define DBGPATH 1
+
 typedef WN2F_STATUS (*WN2F_HANDLER_FUNC)(TOKEN_BUFFER, WN*, WN2F_CONTEXT);
 extern WN2F_HANDLER_FUNC  WN2F_Handler[NUMBER_OF_OPERATORS];
 BOOL Use_Purple_Array_Bnds_Placeholder = FALSE;
@@ -864,7 +866,7 @@ Construct_Fld_Path(FLD_HANDLE   fld,
 } /* Construct_Fld_Path */
 
 
-static const char * 
+const char * 
 TY2F_Fld_Name(FLD_HANDLE fld, 
 	      BOOL       common_or_equivalence,
 	      BOOL       alt_return_name)
@@ -2033,11 +2035,13 @@ TY2F_Translate_Fld_Path(TOKEN_BUFFER   tokens,
       /* Separate fields with the dot-notation. */
 
       fld_path = fld_path->next;
+
       if (fld_path != NULL)
       {
 	 TY2F_Fld_Separator(tokens) ;
 	 alt_ret_name = FALSE; /* Only applies to first field on the path */
       }
+
     } /* while */
 
 } /* TY2F_Translate_Fld_Path */

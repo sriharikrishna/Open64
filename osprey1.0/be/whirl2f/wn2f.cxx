@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.16 $
- * $Date: 2003-12-08 15:45:41 $
+ * $Revision: 1.17 $
+ * $Date: 2004-02-09 16:55:45 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.17 $";
 #endif
 
 #include <alloca.h>
@@ -463,7 +463,9 @@ WN2F_Sum_Offsets(WN *addr)
     break;
 
     case OPR_ADD:
+#if 0 
     sum += WN2F_Sum_Offsets(WN_kid0(addr));
+#endif
     sum += WN2F_Sum_Offsets(WN_kid1(addr));
     break;
 
@@ -665,7 +667,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
 	     * operator ('.').
 	     */
 	    (void)translate_var_ref(tokens, st);
-	    Append_Token_Special(tokens, WN2F_F90_pu ? '%' : '.');
+	    TY2F_Fld_Separator(tokens);
 	 }
 # if 0
 	 if (Stab_Is_Equivalence_Block(st) &&
@@ -727,6 +729,7 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 
    /* Prepare to dereference the base-address expression */
    set_WN2F_CONTEXT_deref_addr(context);
+   fld_type_z = 0;
 
    if (WN2F_Is_Address_Preg(addr,addr_ty))
    {
@@ -734,7 +737,7 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
      /* and high level type is more or less useless */
      /* just go with WN tree ADDs etc.              */
 
-     (void)WN2F_translate(tokens, addr, context);
+    (void)WN2F_translate(tokens, addr, context);
 
      if (offset != 0)
      {
@@ -830,13 +833,23 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	  * is already set up correctly to handle the combined offsets.
 	  */
 
+         WN_OFFSET offset = WN2F_Sum_Offsets(addr);
          WN_OFFSET tmp = WN2F_Sum_Offsets(addr);
+
          if (tmp < TY_size(TY_pointed(addr_ty)))
              offset += tmp;
          else 
              offset = tmp;
+       
+         WN_OFFSET offset_add = (WN_operator(addr)==OPR_ADD)?   \
+                                 WN_const_val(WN_kid1(addr)):0;
 
-	 fld_path = TY2F_Get_Fld_Path(base_ty, object_ty, offset);
+          if (fld_type_z && WN_operator(addr)==OPR_ADD) {
+ 	       offset_add = WN_const_val(WN_kid1(WN_kid1(addr)));
+          
+          } else
+              fld_path = TY2F_Get_Fld_Path(base_ty, object_ty, offset);
+
 	 ASSERT_DBG_WARN(fld_path != NULL,
 			 (DIAG_W2F_NONEXISTENT_FLD_PATH, 
 			  "WN2F_Offset_Memref"));
@@ -846,36 +859,54 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	 /* The deepest ARRAY (with the address) is handled     */
 	 /* by the WN2F_array processing, but the others        */
 	 /* are field references with array components.         */
-	 
+
+      if (!fld_type_z){
 	 LOC_INFO det(fld_path);
 	 det.WN2F_Find_And_Mark_Nested_Address(addr);
 	 addr = det._nested_addr;
-
+       }
 	 /* Get the base expression to precede the path */
 
 	 (void)WN2F_translate(tokens, addr, context);
-	 TY2F_Fld_Separator(tokens);
 
 	 /* Append the path-name, perhaps w/o array subscripts. */
+  
+          if (fld_type_z &&  offset_add) {
+                 fld_path = TY2F_Get_Fld_Path(fld_type_z, fld_type_z, offset_add);
+              } 
 
-	 if (fld_path != NULL)
-         {
-	   TY2F_Translate_Fld_Path(tokens, 
+         if (fld_path != NULL )
+             {
+             if (fld_type_z && offset_add){
+	         TY2F_Fld_Separator(tokens);
+                 Append_Token_String(tokens,
+                           TY2F_Fld_Name(fld_path->fld,FALSE,FALSE));
+             }else {
+               if (!offset_add && fld_type_z 
+                               && TY_kind(fld_type_z) == KIND_STRUCT){
+	          TY2F_Fld_Separator(tokens);
+	          TY2F_Translate_Fld_Path(tokens, 
 				   fld_path, 
 				   deref_fld, 
 				   FALSE/*common*/,
 				   FALSE/*as_is*/,
 				   context);
-					 
-	   TY2F_Free_Fld_Path(fld_path);
-	 }
-	 else
-         {
-	   Append_Token_String(tokens, 
+	         }				 
+              }
+             fld_type_z = FLD_type(fld_path->fld);
+	     TY2F_Free_Fld_Path(fld_path);
+	   }
+  #if 0
+	   else
+           {
+	     Append_Token_String(tokens, 
 			       Number_as_String(offset, 
 						"<field-at-offset=%lld>"));
-	 }
+	  }
+  #endif        
+
        } /* if (neither common-block nor equivalence field-access */
+
      } /* if (object_ty is incompatible with base_ty) */
    } /* else */
 

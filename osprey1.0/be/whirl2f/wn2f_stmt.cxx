@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.30 $
- * $Date: 2003-12-11 22:20:24 $
- * $Author: eraxxon $
+ * $Revision: 1.31 $
+ * $Date: 2004-02-09 16:55:45 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.30 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.31 $";
 #endif
 
 #include <alloca.h>
@@ -256,7 +256,8 @@ WN2F_Function_Call_Lhs(TOKEN_BUFFER rhs_tokens,  /* The function call */
       ASSERT_WARN(WN2F_Can_Assign_Types(TY_pointed(WN_ty(result_store)),
 					return_ty),
 		  (DIAG_W2F_INCOMPATIBLE_TYS, "WN2F_Function_Call_Lhs"));
-
+   
+      fld_type_z = 0; 
       WN2F_Offset_Memref(lhs_tokens,
 			 WN_kid1(result_store),          /* lhs of ISTORE */
 			 WN_Tree_Type(WN_kid1(result_store)), /* base addr */
@@ -1449,7 +1450,7 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
       WHIRL2F_Append_Comment(tokens,
                            "**** Parameters and Result ****", 1, 1);
 
-     Append_And_Reclaim_Token_List(tokens, &param_tokens); //fzhao
+     Append_And_Reclaim_Token_List(tokens, &param_tokens); 
    }
 
   decl_tokens = New_Token_Buffer();
@@ -2254,7 +2255,7 @@ WN2F_return(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     * from the current PU (PUinfo_current_func).
     */
 
-   if (WN2F_Next_ReturnSite ==NULL) //when will this  happen??  fzhao
+   if (WN2F_Next_ReturnSite ==NULL) 
         return EMPTY_WN2F_STATUS;
 
    ST               *result_var =
@@ -2370,7 +2371,7 @@ WN2F_return(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	  * the register-values to the components of this equivalent
 	  * return value.  For now, do nothing but warn about this case!
 	  */
-# if 0 //Maybe it's all right---fzhao
+# if 0 
 	 ASSERT_WARN(FALSE,
 		     (DIAG_UNIMPLEMENTED, "WN2F_return from two registers"));
 #endif
@@ -2489,6 +2490,7 @@ WN2F_intrinsic_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       /* Only emit the string argument if it is of length > 0 */
       if (WN_const_val(arg_expr) > 0LL)
       {
+         fld_type_z = 0;
 	 WN2F_Offset_Memref(tokens, 
 			    WN_kid0(wn),        /* address expression */
 			    arg_ty,             /* address type */
@@ -2874,6 +2876,7 @@ else
                   has_stat = FALSE;
 
            first_nonemptyarg = TRUE;
+            fld_type_z = 0;
 	    WN2F_Offset_Memref(call_tokens, 
 			    WN_kid(wn, arg_idx), /* address expression */
 			    arg_ty,              /* address type */
@@ -2980,6 +2983,7 @@ else
 	    /* Return through a parameter:  Assign the call-value to
 	     * the dereferenced implicit argument expression (first_arg).
 	     */
+            fld_type_z = 0;
 	    (void)WN2F_Offset_Memref(tokens, 
 				     WN_kid0(wn),  /* return addr expression */
 				     WN_Tree_Type(WN_kid0(wn)), /* addr type */
