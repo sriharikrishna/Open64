@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.7 $
- * $Date: 2003-07-01 16:49:55 $
+ * $Revision: 1.8 $
+ * $Date: 2003-07-16 21:25:37 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.8 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -127,7 +127,6 @@ using namespace __gnu_cxx;
     WN2C_arithmetic_compatible_types(TY_AR_etype(TY_pointed(ptr_to_array)), \
 				     TY_pointed(ptr)))
 
-
 static BOOL
 WN2C_is_pointer_diff(OPCODE op, const WN *kid0, const WN *kid1)
 {
@@ -169,6 +168,39 @@ static BOOL       WN2C_Used_Return_Value = FALSE;
  */
 static const RETURNSITE *WN2C_Next_ReturnSite = NULL;
 static const CALLSITE   *WN2C_Prev_CallSite = NULL;
+
+typedef struct SCALAR_C_NAME
+{
+   const char *real_name;
+   const char *pseudo_name;
+} SCALAR_C_NAME;
+
+
+/* This name is used to wrap a union around a block containing
+ * equivalence fields.  Should only occur when translating
+ * Fortran to C.
+ */
+const char TY2C_Aligned_Block_Name[] = "__block";
+
+#define MTYPE_PREDEF MTYPE_F16
+
+static char Name_Unknown_Type[] = "__UNKNOWN_TYPE";
+static const SCALAR_C_NAME Scalar_C_Names[MTYPE_PREDEF+1] =
+   {{"void",               Name_Unknown_Type},  /* MTYPE_UNKNOWN 0 */
+    {"char",               "_BOOLEAN"},         /* MTYPE_B = 1 */
+    {"signed char",        "_INT8"},            /* MTYPE_I1 = 2 */
+    {"signed short",       "_INT16"},           /* MTYPE_I2 = 3 */
+    {"signed int",         "_INT32"},           /* MTYPE_I4 = 4 */
+    {"signed long long",   "_INT64"},           /* MTYPE_I8 = 5 */
+    {"unsigned char",      "_UINT8"},           /* MTYPE_U1 = 6 */
+    {"unsigned short",     "_UINT16"},          /* MTYPE_U2 = 7 */
+    {"unsigned int",       "_UINT32"},          /* MTYPE_U4 = 8 */
+    {"unsigned long long", "_UINT64"},          /* MTYPE_U8 = 9 */
+    {"float",              "_IEEE32"},          /* MTYPE_F4 = 10 */
+    {"double",             "_IEEE64"},          /* MTYPE_F8 = 11 */
+    {Name_Unknown_Type,    "_IEEE80"},          /* MTYPE_F10 = 12 */
+    {Name_Unknown_Type,    "_IEEE128"}  /* MTYPE_F16 = 13 = MTYPE_PREDEF */
+   }; /* Scalar_C_Names */
 
 
 static BOOL 
@@ -5485,6 +5517,7 @@ WN2C_ldid(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
    TOKEN_BUFFER expr_tokens;
    STAB_OFFSET  addr_offset;
 
+
    Is_True(WN_operator(wn) == OPR_LDID || 
 	   (WN_operator(wn) == OPR_LDA && 
 	    ST_sclass(WN_st(wn)) == SCLASS_FORMAL_REF),
@@ -5576,7 +5609,7 @@ WN2C_ldid(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
 			 prefered_ty,          /* preferred type */
 			 WN_opc_dtype(wn),   /* required mtype */
 			 addr_offset);       /* offset from base */
-     //cout << "IN LDID: OBJECT TYPE: " << object_ty << endl;
+     //cout << "IN LDID: OBJECT TYPE: " << object_ty << endl; 
 
       /* Get the lvalue or address of the data to be loaded */
       load_status = WN2C_lvalue_st(expr_tokens,
@@ -5589,7 +5622,16 @@ WN2C_ldid(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
       /* Dereference the address from which we are loading, if necessary */
       if (!STATUS_is_lvalue(load_status))
 	 Prepend_Token_Special(expr_tokens, '*');
-   }
+
+   //need output (*type) for void pointer----fzhao
+   if (TY_kind(ST_type(WN_st(wn))) == KIND_POINTER &&
+          TY_kind(TY_pointed(ST_type(WN_st(wn))))==KIND_VOID) {
+        Prepend_Token_String(expr_tokens,"*)");
+        Prepend_Token_String(expr_tokens,
+                           Scalar_C_Names[TY_mtype(TY_pointed(WN_ty(wn)))].pseudo_name);
+        Prepend_Token_Special(expr_tokens, '(');
+     }
+  }
    
    /* Cast the resultant value to the expected result type if different 
     * from the type of value loaded.
