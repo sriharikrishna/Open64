@@ -1542,7 +1542,7 @@ static void set_compile_info_for_target (void)
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
-|*	init_release_level gets the compilers release string from a system   *|
+|*	init_release_level gets the compilers release string from a system    *|
 |*	file.  It sets the global variable release_string.      	      *|
 |*									      *|
 |* Input parameters:							      *|
@@ -1555,10 +1555,12 @@ static void set_compile_info_for_target (void)
 |*	NOTHING								      *|
 |*									      *|
 \******************************************************************************/
+/*
  // a side effect of this function was the insertion of a string into 
  // str_pool; I removed this side effect, because the element 
  // inserted was always overwritten immediately after init_release_level 
  // returned (clovis@par.univie.ac.at)
+*/
 
 static void init_release_level (void)
 
