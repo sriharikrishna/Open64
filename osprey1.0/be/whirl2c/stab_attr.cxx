@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: stab_attr.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:16 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-30 21:29:24 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $
  *
  * Revision history:
@@ -55,7 +55,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -724,14 +724,14 @@ Stab_Array_Of(TY_IDX etype, mINT64 num_elts)
 
   ARB_HANDLE arb = New_ARB ();
 
-  ARB_Init (arb, 0, num_elts - 1, TY_size(etype));
+//  ARB_Init (arb, 0, num_elts - 1, TY_size(etype));
 
 /* here,since we keep all arrays lower bound and upper bound     */
 /* same with the source files,we have to change this function     */
 /* set lower bound is 1 and upper bound is num_elts to consistent */
 /*with our source level definition----fzhao                       */
 
-//  ARB_Init (arb, 1, num_elts , TY_size(etype));
+  ARB_Init (arb, 1, num_elts , TY_size(etype));
 
   Set_ARB_dimension (arb,1);
   Set_ARB_last_dimen (arb);
