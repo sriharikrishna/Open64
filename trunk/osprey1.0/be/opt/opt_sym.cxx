@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_sym.cxx
-// $Revision: 1.2 $
-// $Date: 2002-09-06 22:34:54 $
-// $Author: open64 $
+// $Revision: 1.3 $
+// $Date: 2003-02-19 22:07:13 $
+// $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_sym.cxx,v $
 //
 // ====================================================================
@@ -3402,7 +3402,7 @@ Overlap(INT64 offset1, INT64 size1,
 
 #undef max // defined in wn_core.h
 
-#include <algo.h>
+#include <algorithm>
 
 // Find_symtab_of should probably be in opt_util.cxx, but it's here
 // because right now this is the only client.
