@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.8 $
- * $Date: 2003-07-16 21:25:37 $
- * $Author: fzhao $
+ * $Revision: 1.9 $
+ * $Date: 2003-09-04 18:24:37 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.9 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -5625,7 +5625,8 @@ WN2C_ldid(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
 
    //need output (*type) for void pointer----fzhao
    if (TY_kind(ST_type(WN_st(wn))) == KIND_POINTER &&
-          TY_kind(TY_pointed(ST_type(WN_st(wn))))==KIND_VOID) {
+          TY_kind(TY_pointed(ST_type(WN_st(wn))))==KIND_VOID &&
+	  TY_kind(TY_pointed(WN_ty(wn))) != KIND_VOID) {
         Prepend_Token_String(expr_tokens,"*)");
         Prepend_Token_String(expr_tokens,
                            Scalar_C_Names[TY_mtype(TY_pointed(WN_ty(wn)))].pseudo_name);
