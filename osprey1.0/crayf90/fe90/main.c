@@ -1555,15 +1555,19 @@ static void set_compile_info_for_target (void)
 |*	NOTHING								      *|
 |*									      *|
 \******************************************************************************/
+ // a side effect of this function was the insertion of a string into 
+ // str_pool; I removed this side effect, because the element 
+ // inserted was always overwritten immediately after init_release_level 
+ // returned (clovis@par.univie.ac.at)
 
 static void init_release_level (void)
 
 {
    char		*char_ptr;
-   int		 length;
+   //int		 length;
    char		*location;
    char		 new_release[RELEASE_LEVEL_LEN];
-   int		 str_idx;
+   //int		 str_idx;
    FILE		*release_file_ptr;
    char		*version_string_location	= "COMPILER";
 
@@ -1573,21 +1577,23 @@ static void init_release_level (void)
    location = getenv(version_string_location);
 
    if (location != NULL) {
-      length	= WORD_LEN(strlen(location) + 14);
-      str_idx	= str_pool_idx;
+      //length	= WORD_LEN(strlen(location) + 14);
+      //str_idx	= str_pool_idx;
 
-      TBL_REALLOC_CK(str_pool, length);
+      //TBL_REALLOC_CK(str_pool, length);
 
-      strcpy(&str_pool[str_idx].name_char, location);
+      //strcpy(&str_pool[str_idx].name_char, location);
 
-      char_ptr	= strrchr(&str_pool[str_idx].name_char, SLASH);
+      //char_ptr	= strrchr(&str_pool[str_idx].name_char, SLASH);
+      char_ptr	= strrchr(location, SLASH);
 
       if (char_ptr == NULL) {
          release_file_ptr = fopen("version.string", "r");
       }
       else {
          strcpy(++char_ptr, "version.string");
-         release_file_ptr = fopen(&str_pool[str_idx].name_char, "r");
+         //release_file_ptr = fopen(&str_pool[str_idx].name_char, "r");
+         release_file_ptr = fopen(location, "r");
       }
 
       /* If not found - default to initial value in release_level #.x.x.x */
@@ -1602,7 +1608,7 @@ static void init_release_level (void)
          }
       }
 
-      str_pool_idx	= str_idx;
+      //str_pool_idx	= str_idx;
    }
 
    TRACE (Func_Exit, "init_release_level", NULL);
