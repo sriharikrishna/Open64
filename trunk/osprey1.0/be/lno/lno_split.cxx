@@ -46,9 +46,9 @@
  * ====================================================================
  *
  * Module: lno_split.cxx
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:40 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-02-17 23:49:52 $
+ * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/lno/lno_split.cxx,v $
  *
  * Revision history:
@@ -65,7 +65,7 @@
 #pragma hdrstop
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/lno/lno_split.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/lno/lno_split.cxx,v $ $Revision: 1.2 $";
 
 #include <sys/types.h>
 #include "lnopt_main.h"
@@ -73,7 +73,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "model.h"
 #include "lnoutils.h"
 #include "lwn_util.h"
-#include "config_TARG.h"
+#include "config_targ2.h"
 #include "config_targ.h"
 #include "config_opt.h"
 #include "opt_du.h"

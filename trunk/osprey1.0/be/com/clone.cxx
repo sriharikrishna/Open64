@@ -522,6 +522,7 @@ IPO_CLONE::New_Clone (ST *clone_st)
 // Fix up ST entries
 // ======================================================================
 
+template <>
 inline void 
 IPO_SYMTAB::fix_table_entry<ST>::operator () (UINT idx, ST* st) const
 {
@@ -547,6 +548,7 @@ IPO_SYMTAB::fix_table_entry<ST>::operator () (UINT idx, ST* st) const
 // ======================================================================
 // Fix up INITO entries
 // ======================================================================
+template <>
 inline void 
 IPO_SYMTAB::fix_table_entry<INITO>::operator () (UINT idx, INITO* inito) const
 {
@@ -556,6 +558,7 @@ IPO_SYMTAB::fix_table_entry<INITO>::operator () (UINT idx, INITO* inito) const
 // ======================================================================
 // Fix up ST_ATTR entries
 // ======================================================================
+template <>
 inline void 
 IPO_SYMTAB::fix_table_entry<ST_ATTR>::operator () (UINT idx, ST_ATTR* st_attr) const
 {
@@ -700,6 +703,7 @@ IPO_SYMTAB::Update_Symtab (BOOL label_only)
 // their correcponding INITO to the Global Symtab
 // ======================================================================
 
+template <>
 inline void
 IPO_SYMTAB::promote_entry<ST>::operator () (UINT idx, ST* old_st) const
 {
@@ -722,6 +726,7 @@ IPO_SYMTAB::promote_entry<ST>::operator () (UINT idx, ST* old_st) const
 // a different base, need to fix it
 // ======================================================================
 
+template <>
 inline void
 IPO_SYMTAB::fix_base<ST>::operator () (UINT idx, ST* old_st) const
 {
@@ -744,6 +749,7 @@ IPO_SYMTAB::fix_base<ST>::operator () (UINT idx, ST* old_st) const
     }
 }
 
+template <>
 inline void
 IPO_SYMTAB::promote_entry<INITO>::operator () (UINT idx, INITO* old_inito) const
 {

@@ -44,7 +44,7 @@
 
 // Needed to make MAT package work
 
-MEM_POOL* MAT<mINT32>::_default_pool = NULL; 
+template <> MEM_POOL* MAT<mINT32>::_default_pool = NULL; 
 
 
 //----------------------------------------------------------------------------------

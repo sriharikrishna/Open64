@@ -46,7 +46,7 @@
 #undef long
 #endif // defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
 
-# include <algorithm>
+#include <algorithm>
 
 using std::find;
 using std::transform;
@@ -84,13 +84,8 @@ using std::vector;
 #endif // defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
 
 
-#ifdef _USE_STL_EXT
-# include <slist>  
-  using std::slist;
-#else
-# include <list> 
-  using std::list;
-#endif
+#include <list> 
+using std::list;
 
 #endif // __SGI_STL_LIST_H
 
@@ -178,11 +173,7 @@ protected:
 
 private:
 
-#ifdef _USE_STL_EXT
-  typedef std::slist<growing_table *> kids_type;
-#else
   typedef std::list<growing_table *> kids_type;
-#endif
 
   kids_type kids;	
   
@@ -269,17 +260,7 @@ template <class T, UINT block_size = 128>
 class RELATED_SEGMENTED_ARRAY : public growing_table {
 private:
 
-
-// Solaric CC workaround
-//
-// Solaris vendor CC causes a "cast" error with mempool_allocator, so 
-// change mempool_allocator<T*> to mempool_allocator<std::pair<T *,BOOL> > 
-// also see segmented_array.h 
-#ifndef _USE_STL_EXT
     std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *,BOOL> > > map;
-#else
-    std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> > map;
-#endif
 
     MEM_POOL *pool;
     UINT max_size;			// total # of elements allocated
@@ -381,7 +362,10 @@ public:
   ~RELATED_SEGMENTED_ARRAY() {
     // Free memory from blocks. Map memory gets freed when the map
     // vector is destructed.
-    for (std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> >::iterator
+
+    // Yuri: 1/24/03
+    // for (std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> >::iterator
+    for (std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *, BOOL> > >::iterator
 	   entry = map.begin();
 	 entry != map.end();
 	 ++entry) {

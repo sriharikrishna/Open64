@@ -60,11 +60,9 @@
 #include "wn.h"
 #include "config_targ.h"
 
-#ifndef _USE_STL_EXT
-#include <map>
-#else
-#include <hash_map>
-#endif
+#undef max
+#include "HashTable.h"
+using namespace stlCompatibility;
 
 #include <math.h>
 
@@ -72,103 +70,99 @@ namespace {
     // unnamed namespace for function objects used for removing duplicated
     // constant STs
 
-#ifndef _USE_STL_EXT
-    struct tcon_compare {
-        bool operator() (const TCON_IDX idx1, const TCON_IDX idx2) const{
-              if(idx1 < idx2) return true;
-              return false;
-             }
-    };
+bool eqTCON (const TCON_IDX t1_idx, const TCON_IDX t2_idx) {
+  if (t1_idx == t2_idx)
+    return TRUE;
+  const TCON& t1 = Tcon_Table[t1_idx];
+  const TCON& t2 = Tcon_Table[t2_idx];
 
-#else
-    struct eq_tcon {
-	bool operator () (TCON_IDX t1_idx, TCON_IDX t2_idx) const {
-	    if (t1_idx == t2_idx)
-		return TRUE;
-	    const TCON& t1 = Tcon_Table[t1_idx];
-	    const TCON& t2 = Tcon_Table[t2_idx];
+  if (TCON_ty (t1) != TCON_ty (t2))
+    return FALSE;
+  if (t1.flags != t2.flags)
+    return FALSE;
 
-	    if (TCON_ty (t1) != TCON_ty (t2))
-		return FALSE;
-	    if (t1.flags != t2.flags)
-		return FALSE;
+  switch (TCON_ty (t1)) {
 
-	    switch (TCON_ty (t1)) {
+  case MTYPE_I1:
+  case MTYPE_I2:
+  case MTYPE_I4:
+  case MTYPE_I8:
+  case MTYPE_U1:
+  case MTYPE_U2:
+  case MTYPE_U4:
+  case MTYPE_U8:
+    return TCON_i0 (t1) == TCON_i0 (t2);
 
-	    case MTYPE_I1:
-	    case MTYPE_I2:
-	    case MTYPE_I4:
-	    case MTYPE_I8:
-	    case MTYPE_U1:
-	    case MTYPE_U2:
-	    case MTYPE_U4:
-	    case MTYPE_U8:
-		return TCON_i0 (t1) == TCON_i0 (t2);
+  case MTYPE_F4:
+    // Need to use integer inequality because need to match exact bit pattern
+    return TCON_ival (t1) == TCON_ival (t2);
 
-	    case MTYPE_F4:
-		// Need to use integer inequality because need to match exact bit pattern
-		return TCON_ival (t1) == TCON_ival (t2);
-
-	    case MTYPE_F8:
-		// Need to use integer inequality because need to match exact bit pattern
-		return TCON_k0 (t1) == TCON_k0 (t2);
+  case MTYPE_F8:
+    // Need to use integer inequality because need to match exact bit pattern
+    return TCON_k0 (t1) == TCON_k0 (t2);
 	    
-	    case MTYPE_STR:
-		return (TCON_str_idx (t1) == TCON_str_idx (t2) &&
-			TCON_str_len (t1) == TCON_str_len (t2));
+  case MTYPE_STR:
+    return (TCON_str_idx (t1) == TCON_str_idx (t2) &&
+	    TCON_str_len (t1) == TCON_str_len (t2));
 
-	    default:
-		return memcmp (&t1, &t2, sizeof(TCON)) == 0;
-	    }
-	}
-    };
+  default:
+    return memcmp (&t1, &t2, sizeof(TCON)) == 0;
+  }
+} // eqTCON
 
-    struct tcon_hash {
-	size_t operator() (TCON_IDX tcon_idx) const {
-	    const TCON& tcon = Tcon_Table[tcon_idx];
-	    size_t val = TCON_ty (tcon);
-	    val ^= TCON_ival (tcon);
-	    return val;
-	}
-    };
 
-#endif // !_USE_STL_EXT
+size_t hashTCON(const TCON_IDX tcon_idx) {
+  const TCON& tcon = Tcon_Table[tcon_idx];
+  size_t val = TCON_ty (tcon);
+  val ^= TCON_ival (tcon);
+  return val;
+}
+
+struct EqTCON {
+  bool operator() (const TCON_IDX t1Idx, const TCON_IDX t2Idx) const{
+    return eqTCON(t1Idx, t2Idx);
+  } // operator
+};
+
+struct HashTCON {
+  size_t operator() (const TCON_IDX idx) const {
+    return hashTCON(idx);
+  }
+};
 
 } // unnamed namespace
 		
 
-#ifndef _USE_STL_EXT
-     typedef std::map<TCON_IDX, ST *, tcon_compare> TCON_MERGE;
-#else 
-     typedef std::hash_map<TCON_IDX, ST *, tcon_hash, eq_tcon> TCON_MERGE;
-#endif
+typedef HashTable<TCON_IDX, ST *, HashTCON, EqTCON> TCON_MERGE;
 
+
+extern void dump_st (ST *st);
 ST *
 New_Const_Sym (TCON_IDX tcon, TY_IDX ty)
 {
     static TCON_MERGE merge;
 
-    TCON_MERGE::iterator iter = merge.find (tcon);
+    TCON_MERGE::ValueBoolPair fv = merge.find(tcon);
+    const TCON& t1 = Tcon_Table[ tcon ];
+    ST * st;
 
-    ST* st;
-    if (iter == merge.end ()) {
-	// create new constant
-
-	st = New_ST (GLOBAL_SYMTAB);
-
-	ST_Init (st, 0, CLASS_CONST, SCLASS_FSTATIC, EXPORT_LOCAL, ty);
-	Set_ST_tcon (st, tcon);
-	Set_ST_is_initialized (st);
-	merge[tcon] = st;
+    if (fv.second == true) {
+      st = (ST *)fv.first;
+      Is_True (ST_class (st) == CLASS_CONST &&
+	       ST_sclass (st) == SCLASS_FSTATIC &&
+	       ST_export (st) == EXPORT_LOCAL &&
+	       ST_is_initialized (st), ("Mismatched const ST"));
     } else {
-	st = (*iter).second;
-	Is_True (ST_class (st) == CLASS_CONST &&
-		 ST_sclass (st) == SCLASS_FSTATIC &&
-		 ST_export (st) == EXPORT_LOCAL &&
-		 ST_is_initialized (st), ("Mismatched const ST"));
+      // create new constant
+      st = New_ST (GLOBAL_SYMTAB);
+      ST_Init (st, 0, CLASS_CONST, SCLASS_FSTATIC, EXPORT_LOCAL, ty);
+      Set_ST_tcon (st, tcon);
+      Set_ST_is_initialized (st);
+      TCON_MERGE::ValueBoolPair tmp1 = 
+	merge.insert(TCON_MERGE::KeyValuePair(tcon, st));
+      assert(tmp1.second == true);
     }
     return st;
-	
 } // New_Const_Sym
 
 

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: config.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:27 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-17 23:49:53 $
+ * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifdef FRONT_END	/* For setting fullwarn, woff in front end */
@@ -96,7 +96,7 @@ static INT32 Ignore_Int;
 /* The following contains the phase-specific option groups and their
  * associated variable definitions:
  */
-#include "config_TARG.cxx"
+#include "config_targ2.cxx"
 #include "config_debug.cxx"
 #include "config_ipa.cxx"
 #include "config_list.cxx"

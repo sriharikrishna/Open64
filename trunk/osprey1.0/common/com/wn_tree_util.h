@@ -429,8 +429,8 @@ public:
 
   // tree related "iterators"
   
-  self &      operator++()    { WN_TREE_next(); return *this;} // pre
-  self        operator++(INT) { self tmp = *this; WN_TREE_next(); return tmp;}
+  WN_TREE_ITER_base<WHIRL> &      operator++()    { WN_TREE_next(); return *this;} // pre
+  WN_TREE_ITER_base<WHIRL> operator++(INT) { self tmp = *this; WN_TREE_next(); return tmp;}
 
 }; // WN_TREE_ITER<PRE_ORDER, WHIRL>
 
@@ -518,8 +518,8 @@ public:
 
   // tree related "iterators"
   
-  self &      operator++()    { WN_TREE_next(); return *this;} // pre
-  self        operator++(INT) { self tmp = *this; WN_TREE_next(); return tmp;}
+  WN_TREE_ITER_base<WHIRL> &      operator++()    { WN_TREE_next(); return *this;} // pre
+  WN_TREE_ITER_base<WHIRL>        operator++(INT) { self tmp = *this; WN_TREE_next(); return tmp;}
 
   // constructors
   

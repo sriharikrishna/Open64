@@ -37,9 +37,9 @@
 // =======================================================================
 //
 //  Module: cg_thr.cxx
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:06:23 $
-//  $Author: dsystem $
+//  $Revision: 1.2 $
+//  $Date: 2003-02-17 23:49:49 $
+//  $Author: dotsenko $
 //  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/cg/cg_thr.cxx,v $
 //
 //  Description:
@@ -54,7 +54,7 @@
 #include <math.h>
 #include "defs.h"
 #include "config.h"
-#include "config_TARG.h"
+#include "config_targ2.h"
 #include "mempool.h"
 #include "bb.h"
 #include "bb_set.h"

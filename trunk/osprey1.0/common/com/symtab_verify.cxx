@@ -1060,6 +1060,7 @@ verify_op<T>::operator () (UINT, T *entry) const {
 
 // specialization for verifying TCONs
 
+template <>
 inline void
 verify_op <TCON>::operator () (UINT, TCON *tc) const 
 {

@@ -640,7 +640,7 @@ endif
 
 ifeq ($(BUILD_OS), IRIX)
 CFLAGS += -D_SGI_SGI
-CXXFLAGS += -D_SGI_SGI -D_USE_STL_EXT
+CXXFLAGS += -D_SGI_SGI 
  ifeq ($(BUILD_COMPILER), VENDOR)
  CFLAGS += -woff 1174,1209,3201
  CXXFLAGS += -woff 1174,1209,3201
@@ -652,7 +652,7 @@ endif
 
 ifeq ($(BUILD_OS), LINUX)
 CFLAGS  += -D_LINUX_LINUX
-CXXFLAGS += -D_LINUX_LINUX -D_USE_STL_EXT
+CXXFLAGS += -D_LINUX_LINUX 
 endif
 
 ifeq ($(BUILD_OS), SOLARIS) 
@@ -666,7 +666,7 @@ CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END -DMONGOOSE_BE \
  endif
  endif
  ifeq ($(BUILD_COMPILER), GNU)
- CFLAGS += -D_USE_STL_EXT -D__GNU_BUG_WORKAROUND -fPIC
+ CFLAGS += -D__GNU_BUG_WORKAROUND -fPIC 
  endif
 CXXFLAGS = $(CFLAGS) -w
 endif
@@ -888,6 +888,7 @@ ifeq ($(BUILD_OS), IRIX)
 	$(C++F) $(BE_C_OBJS) $(BE_CXX_OBJS) $(BE_AS_OBJS) \
 	$(TARG_INFO_LIB_DIR)/libtarginfo.a $(LINK_TARGET_SO) -shared -o $@ -lm -lgen
 else # linux
+#	$(C++F)  $(BE_C_OBJS) $(BE_CXX_OBJS) $(BE_AS_OBJS)  \
 # The addition of itanium.o below is a temporary measure to avoid the
 # (dynamically) unresolved SI_* symbols. This way, the are pre-linked
 # into the be.so. 
