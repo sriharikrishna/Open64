@@ -1,0 +1,11 @@
+# dependences for compilation
+../include/bstring.h
+../include/stddef.h
+../include/stdio.h
+../targ_info/targ_proc.h
+../targ_info/targ_proc_properties.h
+../targ_info/topcode.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../common/com/defs.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../common/targ_info/access/ti_res.c
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../common/targ_info/access/ti_res.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../common/targ_info/access/ti_si.h

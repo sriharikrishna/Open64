@@ -1,0 +1,4 @@
+# dependences for compilation
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/cif.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/cif.m
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/cifcmnrecs.c

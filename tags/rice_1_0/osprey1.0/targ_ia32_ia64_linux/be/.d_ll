@@ -1,0 +1,3 @@
+# dependences for compilation
+../include/stdio.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../common/com/ll.cxx

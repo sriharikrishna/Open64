@@ -1,0 +1,19 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/config.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/config_host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/defs.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/err_host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/ia64/config_targ.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/language.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/mtypes.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/opcode.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/opcode_core.cxx
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/opcode_core.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/opcode_gen.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/opcode_gen_core.cxx
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/opcode_gen_core.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/srcpos.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/util/errdesc.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/util/errors.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/util/flags.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/util/mempool.h

@@ -1,0 +1,5 @@
+# dependences for compilation
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/libcif/../../libcif/cif.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/libcif/../../libcif/cif_int.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/libcif/../../libcif/cif_lines.c
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/libcif/../../libcif/unitrecord.h

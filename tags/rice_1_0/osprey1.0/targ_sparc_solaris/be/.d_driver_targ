@@ -1,0 +1,20 @@
+# dependences for compilation
+../targ_info/targ_abi_properties.h
+../targ_info/targ_isa_registers.h
+../targ_info/targ_isa_subset.h
+../targ_info/targ_proc.h
+../targ_info/topcode.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../be/be/ia64/driver_targ.cxx
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/config.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/config_host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/defs.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/err_host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/ia64/config_targ.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/language.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/mtypes.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/srcpos.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/targ_info/access/ti_init.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/errdesc.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/errors.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/flags.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/mempool.h
