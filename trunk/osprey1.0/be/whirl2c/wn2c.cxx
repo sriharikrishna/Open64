@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.11 $
- * $Date: 2003-09-10 18:30:57 $
+ * $Revision: 1.12 $
+ * $Date: 2003-09-12 20:30:10 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.12 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -6145,14 +6145,17 @@ WN2C_translate_file_scope_defs(CONTEXT context)
    WN2C_new_symtab();
 
    //WEI: don't see why this needs to be called
-#if 0
+//#if 0 WEI(who is this?) set "#if 0/#endif" cause some static constant
+// missed output to the corresponding w2c.h file.This cause bug #19 (see bug
+// track website),get back the function call----fzhao
+
    Write_String(W2C_File[W2C_DOTH_FILE], NULL/* No srcpos map */,
 		"/* File-level symbolic constants */\n");
    WN2C_Append_Symtab_Consts(NULL, /* token_buffer */ 
 			     TRUE, /* use const_tab */
 			     2,    /* lines between decls */
 			     context);
-#endif
+//#endif
 
    Write_String(W2C_File[W2C_DOTH_FILE], NULL/* No srcpos map */,
 		"/* File-level vars and routines */\n");
