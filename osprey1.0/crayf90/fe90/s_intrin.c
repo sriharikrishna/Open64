@@ -5366,7 +5366,6 @@ void    index_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-/* fzhao Jan  # if 0  */
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -5419,6 +5418,7 @@ void    index_intrinsic(opnd_type     *result_opnd,
       COPY_OPND(IL_OPND(list_idx3), opnd);
    }
 
+# if 0 /*fzhao*/
    if (IL_FLD(list_idx1) == CN_Tbl_Idx &&
        IL_FLD(list_idx2) == CN_Tbl_Idx &&
        IL_FLD(list_idx3) == CN_Tbl_Idx &&
@@ -5433,7 +5433,7 @@ void    index_intrinsic(opnd_type     *result_opnd,
                      3,
                      opr,
                      (char *)&CN_CONST(IL_IDX(list_idx3)),
-                     (long)arg_info_list[info_idx3].ed.type_idx)) {
+                     (long)arg_info_list[info_idx3].ed.type_idx)) { 
       OPND_FLD((*result_opnd)) = CN_Tbl_Idx;
       OPND_IDX((*result_opnd)) = ntr_const_tbl(type_idx,
                                                FALSE,
@@ -5445,16 +5445,16 @@ void    index_intrinsic(opnd_type     *result_opnd,
       res_exp_desc->foldable = TRUE;
    }
    else {
+#endif
+
       if (!ATP_EXTERNAL_INTRIN(*spec_idx)) {
          IR_OPR(ir_idx) = opr;
          COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
          IR_OPND_R(ir_idx) = null_opnd;
       }
-   }
 
-/* fzhao Jan # endif */
-         res_exp_desc->foldable = FALSE;
-         res_exp_desc->will_fold_later = FALSE;
+/*   } */
+
 
    TRACE (Func_Exit, "index_intrinsic", NULL);
 
