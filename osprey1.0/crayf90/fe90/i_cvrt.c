@@ -2011,7 +2011,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
         }
 
         PDG_DBG_PRINT_START
-        PDG_DBG_PRINT_C("fei_store");
+        PDG_DBG_PRINT_C("fei_pstore");
         PDG_DBG_PRINT_END
 
 # ifdef _ENABLE_FEI
@@ -13916,8 +13916,7 @@ static void send_attr_ntry(int		attr_idx)
  * Whirl,here we have to generate a bounch of OPR_FUNC_ENTRY and
  * send all dummy arguments for "OPR_INTERFACE"
  ****************************************************************/
-/*     if (!AT_IS_INTRIN(attr_idx)) */
-     if (ATI_USER_SPECIFIED(attr_idx))
+     if (!AT_IS_INTRIN(attr_idx)||ATI_USER_SPECIFIED(attr_idx)) 
           send_interface_list(attr_idx);
 
       break;
