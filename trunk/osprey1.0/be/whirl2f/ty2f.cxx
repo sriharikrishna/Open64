@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.15 $
- * $Date: 2003-06-26 19:52:33 $
+ * $Revision: 1.16 $
+ * $Date: 2003-11-25 21:16:02 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -144,7 +144,7 @@ WN2F_tempvar_rhs(TOKEN_BUFFER tokens,
 }
 
 
-static void
+static bool 
 GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
                    ST_IDX         arbnd,
                    WN*            wn)
@@ -156,8 +156,11 @@ GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
                              &&strcmp(ST_name(WN_st(stmt)),ST_name(ST_ptr(arbnd)))))
 
        stmt = WN_next(stmt);
-   if ( stmt !=NULL)
+   if ( stmt !=NULL) {
         WN2F_tempvar_rhs(decl_tokens,stmt);
+        return TRUE;
+   }
+   else return FALSE;
 
 }
 
@@ -185,7 +188,8 @@ TY2F_Append_Array_Bnd_Ph(TOKEN_BUFFER decl_tokens,
    Array_Bnd_Temp_Var=TRUE;
 
    wn= PU_Body;
-   GetTmpVarTransInfo(decl_tokens,arbnd,wn);
+   if (!GetTmpVarTransInfo(decl_tokens,arbnd,wn))
+          Append_Token_String(decl_tokens, ST_name(arbnd));
 
 } /* TY2F_Append_Array_Bnd_Ph */
 
