@@ -1,0 +1,4 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../clibinc/liberrno.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../crayf90/fe90/cdefs.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../libu/errmsg/lerror.c

@@ -1,0 +1,22 @@
+# dependences for compilation
+../../include/bstring.h
+../../include/stddef.h
+../../include/stdio.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/config.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/config_host.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/controls.cxx
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/controls.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/defs.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/erglob.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/err_host.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/glob.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/ia64/config_targ.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/ia64/targ_ctrl.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/language.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/mtypes.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/com/srcpos.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/util/errdesc.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/util/errors.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/util/flags.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/util/mempool.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/sgi/../../../common/util/tracing.h

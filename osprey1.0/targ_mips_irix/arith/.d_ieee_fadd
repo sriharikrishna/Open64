@@ -1,0 +1,4 @@
+# dependences for compilation
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/arith/../../arith/arith.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/arith/../../arith/arith.internal.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/arith/../../arith/ieee_fadd.c
