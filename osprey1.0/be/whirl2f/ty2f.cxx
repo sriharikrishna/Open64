@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.9 $
- * $Date: 2002-09-20 20:49:26 $
+ * $Revision: 1.10 $
+ * $Date: 2002-09-24 17:58:49 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -79,6 +79,7 @@ typedef void (*TY2F_HANDLER_FUNC)(TOKEN_BUFFER, TY_IDX);
 static void TY2F_invalid(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty);
+static void TY2F_array_for_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_2_struct(TOKEN_BUFFER decl_tokens,TY_IDX ty);
 static void TY2F_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty);
@@ -1018,10 +1019,15 @@ TY2F_Translate_Structure(TY_IDX ty)
 					       FALSE/*common*/, 
 					       FALSE/*alt_ret_name*/));
 
-             if (FLD_is_pointer(fld))
+             if (FLD_is_pointer(fld)) {
                 Prepend_Token_String(fld_tokens,",POINTER::");
-
-  	     TY2F_translate(fld_tokens, FLD_type(fld));
+                if (TY_kind( FLD_type(fld))==KIND_ARRAY)
+                     TY2F_array_for_pointer(fld_tokens,FLD_type(fld));
+                else
+                  TY2F_translate(fld_tokens, FLD_type(fld));
+              }
+             else
+               TY2F_translate(fld_tokens, FLD_type(fld));
 
 	     Append_And_Reclaim_Token_List(struct_tokens, &fld_tokens);
 
@@ -1341,7 +1347,7 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
       {
 	ARB_HANDLE arb = arb_base[dim-1];
 
-    if (TY_is_f90_deferred_shape(ty_idx) || TY_is_f90_pointer(ty_idx))
+    if (TY_is_f90_deferred_shape(ty_idx)) 
          Append_Token_Special(decl_tokens, ':');
     else
     if (TY_is_f90_assumed_size(ty_idx) &&
@@ -1402,6 +1408,105 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 
    }
 } /* TY2F_array */
+
+
+static void
+TY2F_array_for_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
+{
+  TY& ty = Ty_Table[ty_idx] ;
+
+   ASSERT_DBG_FATAL(TY_kind(ty) == KIND_ARRAY,
+                    (DIAG_W2F_UNEXPECTED_TYPE_KIND,
+                     TY_kind(ty), "TY2F_array"));
+
+   if (TY_is_character(ty))
+   {
+      /* A character string...
+       */
+      if (TY_size(ty) > 0) /* ... of known size */
+         Prepend_Token_String(
+            decl_tokens,
+            Concat2_Strings("CHARACTER*",
+                            Number_as_String(TY_size(ty), "%lld")));
+      else /* ... of unknown size */
+         Prepend_Token_String(decl_tokens, "CHARACTER*(*)");
+   }
+   else
+   {
+      /* A regular array, so prepend the element type and append
+       * the index bounds.
+       */
+     ARB_HANDLE arb_base = TY_arb(ty);
+     INT32       dim = ARB_dimension(arb_base) ;
+     INT32       co_dim = ARB_co_dimension(arb_base);
+     INT32       array_dim = dim-co_dim;
+     INT32       revdim = 0;
+
+      /* Do not permit pointers as elements of arrays, so just use
+       * the corresponding integral type instead.  We do not expect
+       * such pointers to be dereferenced anywhere.
+       */
+      if (TY_Is_Pointer(TY_AR_etype(ty)))
+         TY2F_translate(decl_tokens,
+                        Stab_Mtype_To_Ty(TY_mtype(TY_AR_etype(ty))));
+      else
+         TY2F_translate(decl_tokens, TY_AR_etype(ty));
+
+ if (ARB_co_dimension(arb_base)<=0){
+     co_dim=0;
+     array_dim = dim;
+  }
+
+    if (array_dim>0) {
+      Append_Token_Special(decl_tokens, '(');
+
+      while (array_dim > 0)
+      {
+        ARB_HANDLE arb = arb_base[dim-1];
+
+         Append_Token_Special(decl_tokens, ':');
+
+    if (array_dim--> 1)
+      Append_Token_Special(decl_tokens, ',');
+
+      --dim;
+      ++revdim;
+
+      }
+
+      Append_Token_Special(decl_tokens, ')');
+ }
+
+   dim = ARB_dimension(arb_base);
+   array_dim = dim - co_dim;
+   --dim;
+
+   if (co_dim >0)
+    {
+      Append_Token_Special(decl_tokens, '[');
+     while (co_dim >0 )
+           {
+        ARB_HANDLE arb = arb_base[dim-array_dim];
+
+
+       Append_Token_Special(decl_tokens,':');
+
+      dim--;
+
+    if (co_dim-- > 1)
+      Append_Token_Special(decl_tokens, ',');
+
+      ++revdim;
+
+      }
+
+      Append_Token_Special(decl_tokens, ']');
+  }
+
+   }
+} /* TY2F_array_for_pointer */
+
+
 
 
 static void
