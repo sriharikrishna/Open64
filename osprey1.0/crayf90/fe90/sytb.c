@@ -5353,6 +5353,64 @@ EXIT:
 /******************************************************************************\
 |*                                                                            *|
 |* Description:                                                               *|
+|*      This routine adds new types to the type table.  It attempts to share  *|
+|*      them all.  							      *|
+|*      It's called in cvrt-to-PDG to generate a type table entry for a       *|
+|*      derived type which no variable in the current PU.Added it for module  *|
+|* Input parameters:                                                          *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Output parameters:                                                         *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+|* Returns:                                                                   *|
+|*      NONE                                                                  *|
+|*                                                                            *|
+\******************************************************************************/
+int     ntr_derived_type_tbl(void)
+{
+   boolean       found;
+   int           i;
+   int           new_type_idx;
+   long         *null_base;
+   long         *type_tbl_base;
+
+
+   TRACE (Func_Entry, "ntr_type_tbl", NULL);
+    null_base = (long *) type_tbl;
+
+   for (new_type_idx = 1; new_type_idx  <= type_tbl_idx; new_type_idx++) {
+      found             = TRUE;
+      type_tbl_base     = (long *) &(type_tbl[new_type_idx]);
+
+      for (i = 0; i < NUM_TYP_WDS; i++) {
+
+         if (null_base[i] != type_tbl_base[i]) {
+             found = FALSE;
+          }
+      }
+
+      if (found) {
+         goto EXIT;
+      }
+   }
+
+   TBL_REALLOC_CK(type_tbl, 1);
+   new_type_idx                 = type_tbl_idx;
+   type_tbl[new_type_idx]       = type_tbl[TYP_WORK_IDX];
+
+EXIT:
+
+   TRACE (Func_Exit, "ntr_derived_type_tbl", NULL);
+
+   return(new_type_idx);
+
+}   /* ntr_type_tbl */
+
+
+/******************************************************************************\
+|*                                                                            *|
+|* Description:                                                               *|
 |*      srch_linked_sn searches linked lists in the secondary name table.     *|
 |*                                                                            *|
 |* Input parameters:                                                          *|

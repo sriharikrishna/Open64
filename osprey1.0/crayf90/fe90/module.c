@@ -3982,7 +3982,6 @@ void	use_stmt_semantics(void)
 
          goto EXIT;
       }
-
       start_ln_idx	= loc_name_tbl_idx - MD_NUM_ENTRIES(Loc_Name_Tbl) + 1;
       attr_idx		= attr_tbl_idx - MD_NUM_ENTRIES(Attr_Tbl) + 1;
 
@@ -4224,7 +4223,6 @@ EXIT:
          RO_NAME_ATTR(ro_idx)= ML_AT_IDX(RO_NAME_ATTR(ro_idx));
          ro_idx =  RO_NEXT_IDX(ro_idx);
             }  
-    
       TBL_FREE(mod_link_tbl);
    }
 

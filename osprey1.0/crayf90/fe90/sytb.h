@@ -1461,6 +1461,7 @@ extern	int		ntr_sh_tbl(void);
 extern	int		ntr_stor_blk_tbl(char *, int, int, int, int);
 extern	int		ntr_sym_tbl(token_type *, int);
 extern	int		ntr_type_tbl(void);
+extern	int		ntr_derived_type_tbl(void);
 extern	int		ntr_unshared_const_tbl(int, boolean, long_type *);
 extern	void		remove_hidden_name_ntry(int);
 extern	void		remove_hidden_name_tbl(int);
