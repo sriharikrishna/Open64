@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.11 $
- * $Date: 2003-03-27 19:29:10 $
+ * $Revision: 1.12 $
+ * $Date: 2003-03-28 21:33:47 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.12 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -614,7 +614,7 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
     * or not we have a descriptor type.
     */
    if (OPCODE_desc(opcode) == MTYPE_V)
-      wn0_ty = wn1_ty = result_ty;
+      wn0_ty = wn1_ty = OPCODE_rtype(opcode);
    else
       wn0_ty = wn1_ty = Stab_Mtype_To_Ty(OPCODE_desc(opcode));
 
@@ -634,24 +634,48 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
   switch (OPCODE_operator(opcode)) {
     case  OPR_EQ:
-       kid0_ty =(WN_opc_operator(wn0)==OPR_CONST)?0:WN_ty(wn0);
-       kid1_ty =(WN_opc_operator(wn1)==OPR_CONST)?0:WN_ty(wn1);
-      if ( (wn0!=NULL && kid0_ty && TY_is_logical(kid0_ty)) ||
-           ( (wn1!=NULL) && kid1_ty&&TY_is_logical(kid1_ty)))
 
+      if (WN_rtype(wn0)!=MTYPE_I4 ||
+              WN_rtype(wn1)!=MTYPE_I4)
+       {
+	     kid0_ty=0;
+             kid1_ty=0;
+       }
+       else 
+       {
+              kid0_ty=WN_ty(wn0);
+	      kid1_ty=WN_ty(wn1);
+	}
+      if ( (wn0!=NULL) && (kid0_ty && TY_is_logical(kid0_ty)||TY_is_logical(wn0_ty))  ||
+           ( (wn1!=NULL) && (kid1_ty&&TY_is_logical(kid1_ty)||TY_is_logical(wn1_ty))) )
+     {
+         set_WN2F_CONTEXT_has_logical_arg(context);
             Append_Token_String(tokens,".eqv.");
+      }
       else
             Append_Token_String(tokens,".eq.");
 
      break;
     case  OPR_NE:
-       kid0_ty =(WN_opc_operator(wn0)==OPR_CONST)?0:WN_ty(wn0);
-       kid1_ty =(WN_opc_operator(wn1)==OPR_CONST)?0:WN_ty(wn1);
+
+      if (WN_rtype(wn0)!=MTYPE_I4 ||
+              WN_rtype(wn1)!=MTYPE_I4)
+       {
+             kid0_ty=0;
+             kid1_ty=0;
+       }
+       else
+       {
+              kid0_ty=WN_ty(wn0);
+              kid1_ty=WN_ty(wn1);
+        }
 
       if ( (wn0!=NULL && kid0_ty && TY_is_logical(kid0_ty)) ||
            ( (wn1!=NULL) && kid1_ty&&TY_is_logical(kid1_ty)))
-
+         {
+	    set_WN2F_CONTEXT_has_logical_arg(context); 
             Append_Token_String(tokens,".neqv.");
+         }
       else
             Append_Token_String(tokens,".ne.");
 
@@ -668,7 +692,7 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
    WN2F_Translate_Arithmetic_Operand(tokens, wn1, wn1_ty, 
 				     TRUE/*call-by-value*/,
 				     context);
-
+   reset_WN2F_CONTEXT_has_logical_arg(context);
    if (parenthesize)
       Append_Token_Special(tokens, ')');
 
@@ -1819,7 +1843,6 @@ WN2F_intconst(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    if (parenthesize && !WN2F_CONTEXT_is_logical_arg(context))
       {
-
         switch (TCON_ty(Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn))))
           {
             case MTYPE_I1:
