@@ -1,0 +1,3 @@
+# dependences for compilation
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../include/cmplrs/host.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../libF77/pow_ri.c

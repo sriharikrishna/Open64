@@ -1,0 +1,9 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/defs.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/wintrinsic.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/wintrinsic90.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/wio.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/wutil.cxx
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/wutil.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../common/com/wutil90.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/ir_tools/../../include/cmplrs/rcodes.h

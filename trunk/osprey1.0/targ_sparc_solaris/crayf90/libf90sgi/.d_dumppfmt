@@ -1,0 +1,5 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../clibinc/cray/format.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../clibinc/cray/portdefs.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../clibinc/cray/solaris.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../libf/fio/dumppfmt.c

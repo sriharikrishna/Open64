@@ -1,0 +1,8 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../clibinc/cray/format.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../clibinc/cray/nassert.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../clibinc/cray/portdefs.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../clibinc/cray/solaris.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../libf/fio/fmtparse.c
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../libf/fio/parsfmt.c
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../libf/include/lio.h

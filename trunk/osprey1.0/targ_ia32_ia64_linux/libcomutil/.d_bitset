@@ -1,0 +1,13 @@
+# dependences for compilation
+../include/bstring.h
+../include/stddef.h
+../include/stdio.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/com/config_host.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/com/defs.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/com/err_host.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/com/srcpos.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/util/bitset.c
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/util/bitset.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/util/errdesc.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/util/errors.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/util/mempool.h
