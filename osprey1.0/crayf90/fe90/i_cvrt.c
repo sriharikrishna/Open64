@@ -11139,58 +11139,57 @@ static TYPE get_type_desc(int	input_idx)
    type_idx = null_type;
 
    switch (AT_OBJ_CLASS(input_idx)) {
-
    case Data_Obj:
-      attr_idx = input_idx;
-      global_attr_idx = attr_idx;
-      type_idx = get_basic_type(ATD_TYPE_IDX(attr_idx),
-                                ATD_ALIGNMENT(attr_idx),
-                                attr_idx);
-   
-      global_attr_idx = NULL_IDX;
-      break;
-
+     attr_idx = input_idx;
+     global_attr_idx = attr_idx;
+     type_idx = get_basic_type(ATD_TYPE_IDX(attr_idx),
+			       ATD_ALIGNMENT(attr_idx),
+			       attr_idx);
+     
+     global_attr_idx = NULL_IDX;
+     break;
+     
    case Pgm_Unit:
-      if (ATP_PGM_UNIT(input_idx) == Function) {
-         attr_idx = ATP_RSLT_IDX(input_idx);
+     if (ATP_PGM_UNIT(input_idx) == Function) {
+       attr_idx = ATP_RSLT_IDX(input_idx);
 
-         /* If this is an array or character, the tmps are just templates.   */
-         /* They are never defined or referenced in the IR.  We need to send */
-         /* over the referenced tmps to PDGCS.  Put them in the current      */
-         /* stack block so that they do not end up causing host association. */
-         /* Or in the case of functions defined in interface blocks, they    */
-         /* do not have valid storage.  Have to restore storage, in case     */
-         /* this is an internal or module procedure.  The storage must be    */
-         /* correct when that routine is sent across.                        */
+       /* If this is an array or character, the tmps are just templates.   */
+       /* They are never defined or referenced in the IR.  We need to send */
+       /* over the referenced tmps to PDGCS.  Put them in the current      */
+       /* stack block so that they do not end up causing host association. */
+       /* Or in the case of functions defined in interface blocks, they    */
+       /* do not have valid storage.  Have to restore storage, in case     */
+       /* this is an internal or module procedure.  The storage must be    */
+       /* correct when that routine is sent across.                        */
 
-         if (ATP_EXPL_ITRFC(input_idx) && !ATP_SCP_ALIVE(input_idx)) {
-            template_tmp = TRUE;
+       if (ATP_EXPL_ITRFC(input_idx) && !ATP_SCP_ALIVE(input_idx)) {
+	 template_tmp = TRUE;
 
-            if (TYP_TYPE(ATD_TYPE_IDX(attr_idx)) == Character &&
-                TYP_CHAR_CLASS(ATD_TYPE_IDX(attr_idx)) != Const_Len_Char &&
-                PDG_AT_IDX(TYP_IDX(ATD_TYPE_IDX(attr_idx))) == NULL_IDX) {
-               tmp_idx = TYP_IDX(ATD_TYPE_IDX(attr_idx));
-               COPY_ATTR_NTRY(AT_WORK_IDX, tmp_idx);
-               AT_REFERENCED(tmp_idx) = Referenced;
-               ATD_OFFSET_ASSIGNED(tmp_idx) = FALSE;
-               ATD_STOR_BLK_IDX(tmp_idx) = SCP_SB_STACK_IDX(curr_scp_idx);
-               send_attr_ntry(tmp_idx);
-               COPY_ATTR_NTRY(tmp_idx, AT_WORK_IDX);
-            }
-         }
+	 if (TYP_TYPE(ATD_TYPE_IDX(attr_idx)) == Character &&
+	     TYP_CHAR_CLASS(ATD_TYPE_IDX(attr_idx)) != Const_Len_Char &&
+	     PDG_AT_IDX(TYP_IDX(ATD_TYPE_IDX(attr_idx))) == NULL_IDX) {
+	   tmp_idx = TYP_IDX(ATD_TYPE_IDX(attr_idx));
+	   COPY_ATTR_NTRY(AT_WORK_IDX, tmp_idx);
+	   AT_REFERENCED(tmp_idx) = Referenced;
+	   ATD_OFFSET_ASSIGNED(tmp_idx) = FALSE;
+	   ATD_STOR_BLK_IDX(tmp_idx) = SCP_SB_STACK_IDX(curr_scp_idx);
+	   send_attr_ntry(tmp_idx);
+	   COPY_ATTR_NTRY(tmp_idx, AT_WORK_IDX);
+	 }
+       }
 
-         type_idx = get_basic_type(ATD_TYPE_IDX(attr_idx),
-                                   ATD_ALIGNMENT(attr_idx),
-                                   attr_idx);
-      }
-      else {
-         type_idx = pdg_type_void;
-         goto EXIT;
-      }
-      break;
-   }
+       type_idx = get_basic_type(ATD_TYPE_IDX(attr_idx),
+				 ATD_ALIGNMENT(attr_idx),
+				 attr_idx);
+     }
+     else {
+       type_idx = pdg_type_void;
+       goto EXIT;
+     }
+     break;
+   } /* switch */
 
-
+   fei_init_global_vars();
    if (ATD_IM_A_DOPE(attr_idx)) { 
       rank = (ATD_ARRAY_IDX(attr_idx) == NULL_IDX) ? 0 :
                                          BD_RANK(ATD_ARRAY_IDX(attr_idx));
@@ -11283,8 +11282,6 @@ static TYPE get_type_desc(int	input_idx)
 # endif
 
    pe_bd_idx = ATD_PE_ARRAY_IDX(attr_idx);
-
-      fei_init_global_vars();
 
       for (i = 1; i <= BD_RANK(bd_idx); i++) {  
 
