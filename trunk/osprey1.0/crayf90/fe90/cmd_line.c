@@ -103,6 +103,7 @@ static	void process_U_option(char *);
 extern	void process_v_dbg_flags(char *);
 static	void set_system_module_path( void );
 static	void process_reshape_array(char *);
+static  void dump_options(void);
 
 
 /******************************************************************************\
@@ -123,7 +124,7 @@ static	void process_reshape_array(char *);
 |*									      *|
 \******************************************************************************/
   
-void	process_cmd_line(int   argc,
+int process_cmd_line(int   argc,
 			 char *argv[])
 {
    char		err_char;
@@ -148,7 +149,7 @@ void	process_cmd_line(int   argc,
 /* 									      */
 /******************************************************************************/
 
-   char	*opt_string="a:b:d:e:f:gi:k:m:p:q:r:s:t:u:v:x:"
+   char	*opt_string="a:b:d:e:f:ghi:k:m:p:q:r:s:t:u:v:x:"
                     "A:C:D:FG:I:J:M:N:O:P:R:S:T:U:Y:X:VZ";
 
    char	 str[7];
@@ -174,7 +175,10 @@ void	process_cmd_line(int   argc,
    while ((option = getopt (argc, argv, opt_string)) != EOF) {
 
       switch (option) {
-
+         case 'h':
+           dump_options();
+	   return 1;
+	   break;
          case 'a':					/* memory options     */
 	    process_a_option (optarg);
             break;
@@ -356,11 +360,14 @@ void	process_cmd_line(int   argc,
       err_ind = optind;
    }  /* while */
 
-# ifdef _DEBUG
+/* # ifdef _DEBUG */
+
    if (dump_flags.help_dbg) {
       dump_help_screen();
+      return 1;
    }
-# endif
+
+/* # endif */
 
    if (argc == 2  &&  cmd_line_flags.verify_option) {
 
@@ -536,7 +543,7 @@ void	process_cmd_line(int   argc,
 
    TRACE (Func_Exit, "process_cmd_line", NULL);
 
-   return;
+   return 0;
   
 }  /* process_cmd_line */
 
@@ -1143,7 +1150,6 @@ static void process_C_option (char *optargs,
    while (ch = *optargs++) {
 
       switch (ch) {
-
 	 case 'a':
 	    cif_flags = cif_flags | ALL_RECS      |
                                     XREF_RECS     | MISC_RECS |
@@ -5494,6 +5500,10 @@ static	void	process_i_option(char	*optargs)
 
    set_i_option = TRUE;
 
+  if (!EQUAL_STRS(optargs, "32"))
+      printf("HERERERERE\n");
+
+
    if (!EQUAL_STRS(optargs, "32")) {
       ntr_msg_queue(0, 78, Log_Error, 0, optargs, 'i', ARG_STR_ARG);
    }
@@ -6811,3 +6821,133 @@ static	void	process_J_option(char	*optargs)
    return;
 
 }  /* process_J_option */
+
+
+/**************************************************************\
+ * add -help option to dump out all possible opstions of
+ * Open64 frontend
+ * there are
+ * a,b,d,e,f,g,i,k,m,o,p,q,r,R,s,S,t,u,v,A,C,D,x,F,G,I,J,M,
+ * N,P,U,V,X,Y,Z options
+\*************************************************************/
+
+static void dump_options(void) 
+  {
+   int i;
+   char *all_options[] = {
+    " ",
+    "The following options are available in Open64 frontend:",
+    "-a: memory options ",
+    "	lign32",
+    "	lign64",
+    "	dalign",
+    "	static_threadprivate",
+    "	taskcommon",
+    "	pad",
+    "-b: binary file name ",
+    "-d: off flags",
+    "-e: on flags",
+    "-f: souce form ",
+    "-g: -G O",
+    "-i: integer size", 
+    "-k: Solaris profiling",
+    "-m: process message level options",
+    "-O: optimization options",
+    "-p: module path name ",
+    "-q: expression evaluator args passed via argv",
+    "-r: runtime checking options passed via argv",
+    "-R: runtime checking options passed via argv",
+    "-s: size options passed via argv",
+    "	integer8",
+    "	logical8",
+    "	real8",
+    "	complex8",
+    "	doubleprecision16",
+    "	doublecomplex16",
+    "	pointer8",
+    "	cf77types",
+    "	float64",
+    "	default64",
+    "	default32",
+    "-S: cal file option",
+    "-t: the command line truncation option passed via argv (t switch)",
+    "-u: command line dump options passed via argv(u switch)",
+    "         The following options are available in a compiler with -u: ",
+    "          ",
+    "         abort_ansi       Abort compilation after first ANSI msg.",
+    "         cray_compatible  Sgi  turns s_default64 on, int1,2 off.",
+    "         f                Unimplemented - controls fortran output.",
+    "         dsm              Set by mongoose driver - not a user option.",
+    "         fmm              Controls f-- prototype.",
+    "         fmm1             Controls f-- prototype.",
+    "         fmm2             Controls f-- prototype.",
+    "         mod_version      Prints each module version number being read in",
+    "         mp               Allow recognition of the SGI directives.",
+    "         no_dim_pad       Do not pad out missing dimensions.",
+    "         no_mod_output    Do not do module output.",
+    "         open_mp          Allow recognition of the open mp directives.",
+    "         pack_half_word   Turn on component packing for sdefault32",
+    "         preinline=       Create an inline template for this file.",
+    "         pvp_test         Used for meta development.",
+    "         show             Show input command line to frontend.",
+    "          ",
+    "         The following options are available in a debug compiler with -u:",
+    "          ",
+    "         all              Dump all tables.  Do not do any tracing.",
+    "         bd               Dump the bounds table.",
+    "         blk              Dump the Block Stack.",
+    "         cmd              Dump the commandline table.",
+    "         cn               Dump the Constant table.",
+    "         defines          Dump the build definitions.",
+    "         file=            Specify the name of the debug output file.",
+    "         fortran          Dump the output IR in a Fortran format.",
+    "         fp               Dump the File Path table.",
+    "         ftrace           Activate the function trace.",
+    "         gl               Dump the Global Line table.",
+    "         intrin           Dump the Intrinsic table.",
+    "         ir1              Dump the IR after Pass 1.",
+    "         ir2              Dump the IR after Pass 2.",
+    "         ir3              Dump the IR after inlining.",
+    "         ir4              Dump the IR after swapping dimensions.",
+    "         mem_report       Provide a report of front-end memory usage.",
+    "         msg              Issue an abort for all zero line numbers.",
+    "         mtrace           Trace front-end memory usage.",
+    "         names            Dump the local, global and hidden name tables.",
+    "         pdg              Dump all calls to the PGDCS interface.",
+    "         pdt              Dump PDT info while searching for modules.",
+    "         sb               Dump the Storage Block table.",
+    "         scp              Dump the scope table.",
+    "         src              Dump whole source program.",
+    "         stderr           Output msgs to stderr rather than ordering.",
+    "         stmt             Dump each statement.",
+    "         sytb             Dump the symbol table.",
+    "         typ              Dump the Type table.",
+    "         cnout            Dump constants as binary to stdout.",
+    "-v: pdgcs debug option",
+    "-A: add use names to the files path tables for implicit use",
+    "-C: CIF file output is requested via the -C option",
+    "-D: define a preprocessing id",
+    "-x: disregard CDIRs",
+    "-F: fortran macro expansion",
+    "-G: debug option",
+    "-I: include option",
+    "-J: .mod output locate",
+    "-M: disable message numbers",
+    "-N: fixed line size",
+    "-P: position independent code model",
+    "-U: undefine a preprocessing id",
+    "-V: version option",
+    "-X: MPP num PE's option",
+    "-Y: ccg debug options",
+    "-Z: co_array fortran",
+    " ",
+    "If you need to know arguments of option WHAT,mostly you can get the information by reading:",
+    "\"process_WHAT_option\" in the source file cmd_line.c.",
+    " ",
+    "DONE"
+   };
+
+  i=0;
+  while (strcmp(all_options[i],"DONE")) printf("%s\n",all_options[i++]);
+  return;
+ }
