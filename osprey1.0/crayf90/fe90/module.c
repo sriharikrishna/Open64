@@ -259,7 +259,8 @@ static	int	save_const_tbl_idx;
 static	boolean	search_for_duplicate_attrs;
 
 extern	char	compiler_gen_date[];
-# if (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
+# if (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX) \
+      || defined(_HOST_OS_TRU64))
 # pragma inline set_mod_link_tbl_for_typ
 # pragma inline set_mod_link_tbl_for_cn
 # pragma inline set_mod_link_tbl_for_ir
