@@ -1524,12 +1524,14 @@ void	array_dim_resolution(int 	attr_idx,
    int			stride_entry_count;
    size_offset_type	stride;
    int			type;
-
+ enum bd_array_values   ffmm;
 
    TRACE (Func_Entry, "array_dim_resolution", NULL);
 
    is_interface	= SCP_IS_INTERFACE(curr_scp_idx);
    bd_idx	= ATD_ARRAY_IDX(attr_idx);
+
+   ffmm = BD_ARRAY_CLASS(bd_idx);
 
    if (ATD_CLASS(attr_idx) == Function_Result) {
       entry_list	= ATP_NO_ENTRY_LIST(ATD_FUNC_IDX(attr_idx));

@@ -2893,6 +2893,8 @@ void gen_entry_dope_code(int	 attr_idx)
    }
    else 
 # endif
+
+
    if (ATD_IM_A_DOPE(attr_idx)) {
       OPND_FLD(opnd) = AT_Tbl_Idx;
       OPND_IDX(opnd) = attr_idx;
@@ -2926,6 +2928,7 @@ void gen_entry_dope_code(int	 attr_idx)
 			 opr,
                          After);
    }
+
 
 EXIT:
 

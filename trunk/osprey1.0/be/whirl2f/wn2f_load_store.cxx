@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.8 $
- * $Date: 2002-08-30 21:21:21 $
+ * $Revision: 1.9 $
+ * $Date: 2002-09-10 18:20:32 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.9 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -219,15 +219,10 @@ WN2F_Expr_Plus_Literal(TOKEN_BUFFER tokens,
 	 reset_WN2F_CONTEXT_no_parenthesis(context);
 	 Append_Token_Special(tokens, '(');
       }
+   if (WN_opc_operator(wn) == OPR_IMPLICIT_BND)
+        Append_Token_Special(tokens, '*');
+   else
       WN2F_translate(tokens, wn, context);
-
-# if 0 
-
-      Append_Token_Special(tokens, '+');
-      TCON2F_translate(tokens,
-		       Host_To_Targ(MTYPE_I4, 1),
-		       FALSE /*is_logical*/);
-# endif
 
       if (parenthesize)
 	 Append_Token_Special(tokens, ')');
@@ -708,6 +703,7 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* Get the lhs of the assignment (dereference address) */
    lhs_tokens = New_Token_Buffer();
+   set_WN2F_CONTEXT_has_no_arr_elmt(context); 
    WN2F_Offset_Memref(lhs_tokens, 
 		      WN_kid1(wn),           /* base-symbol */
 		      base_ty,               /* base-type */
@@ -1036,6 +1032,8 @@ WN2F_iload(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       base_ty = WN_load_addr_ty(wn);
     
    /* Get the object to be loaded (dereference address) */
+
+   set_WN2F_CONTEXT_has_no_arr_elmt(context); //otherwise should be OPR_ARRAY
    WN2F_Offset_Memref(tokens, 
 		      WN_kid0(wn),                     /* base-symbol */
 		      base_ty,                         /* base-type */
@@ -1871,6 +1869,7 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
    */
 
   kid = WN_kid0(wn);
+
 if (WN_operator(kid)==OPR_LDA)
  {
   st  =  WN_st(kid);
@@ -1888,16 +1887,13 @@ if (WN_operator(kid)==OPR_LDA)
 
   if (co_dim <= 0)
       co_dim = 0;
- if (dim >  WN_num_dim(wn) ) {
 
+ if (dim == WN_num_dim(wn))
      array_dim = dim-co_dim;
- }
- else {
-         dim =  WN_num_dim(wn);
-         array_dim = dim;
-         co_dim = 0; 
-       }
-
+ else { // this means the co_rnks were omitted
+        array_dim = WN_num_dim(wn);
+        co_dim = 0;
+      }
 
   /* Gets bounds from the slots of an OPC_ARRAY node  */
 
@@ -1908,23 +1904,10 @@ if (WN_operator(kid)==OPR_LDA)
    * memory locations.
    */
 
-
  if (array_dim > 0 ) {
     Append_Token_Special(tokens, '(');
     set_WN2F_CONTEXT_no_parenthesis(context);
 
-#if 0 //this is original code without think about co_array
-
-  for (dim = WN_num_dim(wn)-1; dim >= 0; dim--)
-  {
-    (void)WN2F_Denormalize_Array_Idx(tokens, 
-				     WN_array_index(wn, dim), 
-				     context);
-	 
-    if (dim > 0)
-      Append_Token_Special(tokens, ',');
-  }
-#endif
 
   for (dim =  WN_num_dim(wn)-1; dim >= co_dim; dim--)
   {

@@ -2908,15 +2908,14 @@ March # ifdef _DEBUG
 # define ATT_STRUCT_BIT_LEN_FLD(IDX)		attr_tbl[IDX].fld2.field22
 # endif
 
-/* # ifdef _DEBUG
+# ifdef _DEBUG
 # define ATT_STRUCT_BIT_LEN_IDX(IDX)					       \
 	((AT_OBJ_CLASS(IDX) == Derived_Type) ? 				       \
 		attr_tbl : sytb_var_error("ATT_STRUCT_BIT_LEN_IDX", IDX))      \
 		[IDX].fld.field13
 # else
-*/
 # define ATT_STRUCT_BIT_LEN_IDX(IDX)		attr_tbl[IDX].fld.field13
-/* # endif */
+# endif 
 
 # ifdef _DEBUG
 # define ATT_UNIQUE_ID(IDX)						       \

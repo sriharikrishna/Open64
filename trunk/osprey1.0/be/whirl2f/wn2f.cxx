@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.4 $
- * $Date: 2002-08-30 21:21:20 $
+ * $Revision: 1.5 $
+ * $Date: 2002-09-10 18:20:32 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.5 $";
 #endif
 
 #include <alloca.h>
@@ -752,10 +752,10 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	 {
 	    (void)WN2F_translate(tokens, addr, context); /* Array lvalue */
 
-      if (!WN2F_CONTEXT_has_no_arr_elmt(context))
-	    TY2F_Translate_ArrayElt(tokens, base_ty, offset);
-      else
-           reset_WN2F_CONTEXT_has_no_arr_elmt(context);
+            if (!WN2F_CONTEXT_has_no_arr_elmt(context))
+	          TY2F_Translate_ArrayElt(tokens, base_ty, offset);
+             else
+                  reset_WN2F_CONTEXT_has_no_arr_elmt(context);
 	 }
        }
        else if ((WN_opc_operator(addr) == OPR_LDA || 
