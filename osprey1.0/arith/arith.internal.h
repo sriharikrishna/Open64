@@ -668,6 +668,9 @@ void ar_internal_error(int msgnum,
 void ar_set_invalid_result(ar_data *result,
 						   const AR_TYPE *resulttype);
 
+extern void ar_clear_unused_bits (ar_data *opnd, 
+				  const AR_TYPE *opndtype);
+
 extern void PRINTMSG(int pseudo_line_num,
 					 int msg_number,
 					 enum message_types msg_severity,
