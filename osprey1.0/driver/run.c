@@ -78,7 +78,7 @@ static int stop_on_exit( int pid );
 static void print_mem(string phase, int num_maps);
 
 static int Pipe[2]; /* for implementing semaphore */
-#ifndef linux
+#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
 static prmap_sgi_t mapbuf[100];
 static prmap_sgi_arg_t mapbuf_desc = { (char *) mapbuf, sizeof (mapbuf)} ;
 #define DATA_ADDRESS ((char *)0x10000000)
@@ -324,9 +324,11 @@ run_simple_program (string name, char **argv, string output)
 		} else if(WIFSIGNALED(waitstatus)){
 			termsig = WTERMSIG(waitstatus);
 			error("%s died due to signal %d", name, termsig);
+#if !defined(_SOLARIS_SOLARIS)
 			if(waitstatus & WCOREFLAG) {
 				error("core dumped");
 			}
+#endif
 			if (termsig == SIGKILL) {
 				error("Probably caused by running out of swap space -- check %s", LOGFILE);
 			}
@@ -354,7 +356,7 @@ run_phase (phases_t phase, string name, string_list_t *args)
 	int waitpid;
 	int waitstatus;
 	int termsig;
-#ifndef linux
+#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
 	SIG_PF sigterm;
 	SIG_PF sigint;
 #endif
@@ -633,7 +635,7 @@ run_phase (phases_t phase, string name, string_list_t *args)
 	} else {
 		/* parent */
 		int procid;	/* id of the /proc file */
-#ifndef linux
+#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
    		sysset_t syscallSet;
 		/* copy this wait stuff from old driver */
 		sigint = sigset (SIGINT, SIG_IGN);
@@ -642,7 +644,7 @@ run_phase (phases_t phase, string name, string_list_t *args)
 		/* if we are interested in memory statistics, we need to
 		   set a stop-on-exit for the child */
 		if (memory_flag && (procid = stop_on_exit(forkpid))) {
-#ifndef linux
+#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
    		  /* now go and get the memory maps */
 		  while (1) {
    			if ((num_maps=ioctl(procid, PIOCMAP_SGI, &mapbuf_desc)) < 0) {
@@ -681,7 +683,7 @@ run_phase (phases_t phase, string name, string_list_t *args)
 				/* NOTREACHED */
 			}
 		}
-#ifndef linux
+#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
 		(void)sigset (SIGINT, sigint);
 		(void)sigset (SIGTERM, sigterm);
 #endif
@@ -818,9 +820,11 @@ run_phase (phases_t phase, string name, string_list_t *args)
 		} else if(WIFSIGNALED(waitstatus)){
 			termsig = WTERMSIG(waitstatus);
 			error("%s died due to signal %d", name, termsig);
+#if !defined(_SOLARIS_SOLARIS)
 			if(waitstatus & WCOREFLAG) {
 				error("core dumped");
 			}
+#endif
 			if (termsig == SIGKILL) {
 				error("Probably caused by running out of swap space -- check %s", LOGFILE);
 			}
@@ -970,10 +974,12 @@ stop_on_exit( int pid )
       close(procid);
       return 0;
    }
+#if !defined(_SOLARIS_SOLARIS)
    if (pstatus.pr_errno != 0) {
       warning("unknown problem\n");
       return 0;
    }
+#endif
 
 	/* at this point the child is stopped on exit */
    return procid;
@@ -1012,7 +1018,7 @@ my_vsema(void)
 static void
 print_mem(string phase, int num_maps)
 {
-#ifndef linux
+#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
 	int i,identified;
 	ulong_t mflags;
 	size_t text_size, data_size, brk_size, stack_size,

@@ -89,7 +89,11 @@ LDLIBS += -llmsgi
 endif
 
 # don't want to use common/com/defs.h
+ifeq ($(BUILD_OS), LINUX)
 LCINCS	= -I. -I$(BUILD_BASE) -I$(BUILD_AREA)/include
+else
+LCINCS	= -I. -I$(BUILD_BASE) -I$(BUILD_TOT)/include
+endif
 
 TARGETS	= driver
 
@@ -218,6 +222,10 @@ table : table.o $(SHARED_OBJECTS)
 OPTIONS.P : $(OPTIONS_SRC)
 ifeq ($(BUILD_OS), IRIX)
 	$(BUILD_BASE)/sort_options.csh $(BUILD_BASE) OPTIONS $(LCDEFS) > OPTIONS.P
+endif
+
+ifeq ($(BUILD_OS), SOLARIS)
+	$(BUILD_BASE)/sort_options.solaris.csh $(BUILD_BASE) OPTIONS $(LCDEFS) > OPTIONS.P
 else
 	$(BUILD_BASE)/sort_options.linux.csh $(BUILD_BASE) OPTIONS $(LCDEFS) > OPTIONS.P
 endif
@@ -228,3 +236,42 @@ driver: $(OBJECTS)
 # need to make generated headers before compiling src files
 $(SRC_OBJECTS) : $(GEN_HFILES)
 
+
+
+
+
+# FIXME: copied from Ji's ../be/Makefile.gbase, not sure if needed.
+ifeq ($(BUILD_OS), IRIX)
+CFLAGS += -D_SGI_SGI
+CXXFLAGS += -D_SGI_SGI 
+ ifeq ($(BUILD_COMPILER), VENDOR)
+ CFLAGS += -woff 1174,1209,3201
+ CXXFLAGS += -woff 1174,1209,3201
+ else
+ CFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+ CXXFLAGS += -D_GCC_NO_PRAGMAWEAK -D__GNU_BUG_WORKAROUND
+ endif
+endif
+
+ifeq ($(BUILD_OS), LINUX)
+CFLAGS  += -D_LINUX_LINUX
+CXXFLAGS += -D_LINUX_LINUX 
+endif
+
+ifeq ($(BUILD_OS), SOLARIS) 
+CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END -DMONGOOSE_BE \
+        -D_LONGLONG -Dlonglong -D_SVR4_SOURCE -D_NEW_SYMTAB -DTARG_SOLARIS \
+        $(LCINCS) $(OPTIMIZER) $(LCDEFS) 
+ ifeq ($(BUILD_COMPILER), VENDOR)
+ CFLAGS += -KPIC
+ ifeq ($(BUILD_SB), YES)
+ CFLAGS += -xsb
+ endif
+ endif
+ ifeq ($(BUILD_COMPILER), GNU)
+ CFLAGS += -D__GNU_BUG_WORKAROUND -fPIC 
+ endif
+CXXFLAGS = $(CFLAGS) -w
+endif
+
+  
