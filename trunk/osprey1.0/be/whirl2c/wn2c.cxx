@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.10 $
- * $Date: 2003-09-09 16:27:42 $
+ * $Revision: 1.11 $
+ * $Date: 2003-09-10 18:30:57 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.10 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.11 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -291,6 +291,8 @@ static STATUS WN2C_comma(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context);
 static STATUS WN2C_rcomma(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context);
 static STATUS WN2C_alloca(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context);
 static STATUS WN2C_dealloca(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context);
+static STATUS WN2C_extract_bits(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context);
+static STATUS WN2C_compose_bits(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context);
 
 typedef STATUS (*WN2C_HANDLER_FUNC)(TOKEN_BUFFER, const WN*, CONTEXT);
 
@@ -413,7 +415,9 @@ static const OPR2HANDLER WN2C_Opr_Handler_Map[] =
    {OPR_COMMA, &WN2C_comma},
    {OPR_RCOMMA, &WN2C_rcomma},
    {OPR_ALLOCA, &WN2C_alloca},
-   {OPR_DEALLOCA, &WN2C_dealloca}
+   {OPR_DEALLOCA, &WN2C_dealloca},
+   {OPR_EXTRACT_BITS, &WN2C_extract_bits},
+   {OPR_COMPOSE_BITS,&WN2C_compose_bits}
 }; /* WN2C_Opr_Handler_Map */
 
 
@@ -5989,6 +5993,62 @@ WN2C_dealloca(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
   return status ;
 }
 
+static STATUS
+WN2C_extract_bits(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
+{
+       //output ((... >>of) & 0xff..f)
+   STATUS status ;
+   UINT  of = WN_bit_offset(wn);
+   UINT  sz = WN_bit_size(wn)/4;
+   Is_True(WN_operator(wn) == OPR_EXTRACT_BITS,
+           ("Invalid operator for WN2C_extract_bits()"));
+
+      Append_Token_Special(tokens,'(');
+      Append_Token_Special(tokens,'(');
+      status = WN2C_translate(tokens,WN_kid0(wn),context);
+      Append_Token_Special(tokens,')');
+      Append_Token_String(tokens,">>");
+      TCON2C_translate(tokens,
+                    Host_To_Targ(MTYPE_I4,of));
+      Append_Token_Special(tokens, ')');
+      Append_Token_String(tokens,"& 0x");
+      while (sz) {
+ 	   Append_Token_Special(tokens, 'f');
+           --sz;
+       }      
+      
+   return status;
+ 
+}
+
+static STATUS
+WN2C_compose_bits(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
+{
+   // ((... & 0xff..f) << of)
+   STATUS status ;
+   UINT  of = WN_bit_offset(wn);
+          //shift of bits (for compose_bit,it is left shift (<< of)
+   UINT sz = WN_bit_size(wn)/4;
+   Is_True(WN_operator(wn) == OPR_COMPOSE_BITS,
+           ("Invalid operator for WN2C_compose_bits()"));
+
+      Append_Token_Special(tokens,'(');
+      Append_Token_Special(tokens,'(');
+      status = WN2C_translate(tokens,WN_kid1(wn),context);
+      Append_Token_Special(tokens,')');
+      Append_Token_String(tokens,"& 0x");
+
+      while (sz) {
+           Append_Token_Special(tokens, 'f');
+           --sz;
+       }
+      Append_Token_Special(tokens, ')');
+      Append_Token_String(tokens,"<<");
+      TCON2C_translate(tokens,
+                    Host_To_Targ(MTYPE_I4,of));
+
+   return status;
+}
 /*------------------------ exported routines --------------------------*/
 /*---------------------------------------------------------------------*/
 
