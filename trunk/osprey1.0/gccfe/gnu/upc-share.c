@@ -115,8 +115,7 @@ expand_upc_shared_ptr_cvt (exp, target, modifier)
     rtx target;
     enum expand_modifier modifier;
 {
- 
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_upc_shared_ptr_cvt not implemented yet\n");
   return NULL_RTX;
 }
 
@@ -239,7 +238,7 @@ expand_upc_shared_assignment (to, from, want_value, suggest_reg)
      int want_value;
      int suggest_reg;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);  
+  fatal("expand_upc_shared_assignment not implemented yet\n");  
   return NULL_RTX;
 }
 
@@ -254,7 +253,7 @@ expand_upc_shared_bit_field_assign (to, from, field_ref, bitpos, offset,
      int want_value;
      int suggest_reg;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_upc_shared_bit_field_assign not implemented yet\n");
   return NULL_RTX;
 }
 
@@ -264,7 +263,7 @@ expand_upc_fetch_shared_scalar (exp, target, mode)
     rtx target;
     enum machine_mode mode;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_upc_fetch_shared_scalar not implemented yet\n");
   return NULL_RTX;
  
 }
@@ -296,7 +295,7 @@ expand_upc_get_indirect (exp, target, mode)
     rtx target;
     enum machine_mode mode;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_upc_get_indirect not implemented yet\n");
   return NULL_RTX;
 }
 
@@ -308,7 +307,7 @@ expand_upc_shared_bit_field_ref (field_ref, bitpos, offset, target, mode)
     rtx target;
     enum machine_mode mode;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_upc_shared_bit_field_ref not implemented yet\n");
   return NULL_RTX;
 }
 
@@ -317,7 +316,7 @@ expand_upc_shared_ptr_sum (exp, modifier)
     tree exp;
     enum expand_modifier modifier;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_upc_shared_ptr_sum not implemented yet\n");
   return NULL_RTX;
 }
 
@@ -326,7 +325,7 @@ expand_upc_shared_ptr_diff (exp, modifier)
     tree exp;
     enum expand_modifier modifier;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_upc_shared_ptr_diff not implemented yet\n");
   return NULL_RTX;
 }
 
@@ -394,7 +393,7 @@ expand_cond (exp, target, mode)
      rtx target;
      enum machine_mode mode;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_cond not implemented yet\n");
   return NULL_RTX;
 }
 
@@ -424,7 +423,7 @@ expand_get (mode, target, get_loc, exp)
     rtx get_loc;
     tree exp;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_get not implemented yet\n");
   return NULL_RTX;
 }
 
@@ -435,7 +434,7 @@ expand_put (mode, put_loc, src, exp)
      rtx src;
      tree exp;
 {
-  fatal("%s  not implemented yet\n", __FUNCTION__);
+  fatal("expand_put not implemented yet\n");
   return NULL_RTX;
 }
 

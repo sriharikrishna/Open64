@@ -87,7 +87,11 @@
  *
  ****************************************************************************
  */
+#ifdef _SOLARIS_SOLARIS
+#include <strings.h>
+#else
 #include <bstring.h>
+#endif
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
