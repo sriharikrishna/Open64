@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.16 $
- * $Date: 2003-07-15 18:52:42 $
+ * $Revision: 1.17 $
+ * $Date: 2003-07-15 21:13:19 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.17 $";
 #endif
 
 #include <ctype.h>
@@ -880,7 +880,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       for (param = first_param; param < num_params -implicit_parms; param++) {
 
 	 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-	 if (params[param] ) 
+	 if (params[param] && TY_kind(ST_type(params[param]))!=KIND_POINTER) 
    
             if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
 
@@ -909,6 +909,43 @@ ST2F_func_header(TOKEN_BUFFER tokens,
              }
 
            } 
+        else
+             if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
+                     ST2F_decl_translate(header_tokens, params[param]);
+       }
+//must issue scalar args first,then issue array args---fzhao
+      for (param = first_param; param < num_params -implicit_parms; param++) {
+
+         Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+         if (params[param] && TY_kind(ST_type(params[param]))==KIND_POINTER)
+  
+            if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
+
+             ST2F_decl_translate(header_tokens, params[param]);
+
+             if (ST_is_optional_argument( params[param])) {
+                Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                Append_Token_String(header_tokens,"OPTIONAL ");
+                Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+             }
+             if (ST_is_intent_in_argument( params[param])) {
+                TOKEN_BUFFER temp_tokens = New_Token_Buffer();
+                Append_F77_Indented_Newline(temp_tokens, 1, NULL/*label*/);
+                Append_Token_String(temp_tokens,"INTENT(IN) ");
+                Append_Token_String(temp_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+                Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
+
+              }
+             if (ST_is_intent_out_argument( params[param])) {
+                 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                 Append_Token_String(header_tokens,"INTENT(OUT) ");
+                 Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+             }
+
+           }
         else
              if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
                      ST2F_decl_translate(header_tokens, params[param]);
