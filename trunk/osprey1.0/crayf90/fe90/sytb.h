@@ -953,7 +953,8 @@ struct ir_list_link_entry	{Uint                   prev_idx        : 24;
                                  boolean		flag_5		:  1;
 				 Uint			for_ref		:  3;
 
-                                 Uint                   unused          :  4;
+/*                                 Uint                   unused          :  4;*/
+                                 Uint                   multi_flags     :  4;
                                  Uint                   flag_8          :  1;
 				 boolean		flag_6          :  1;
 				 boolean		flag_7          :  1;

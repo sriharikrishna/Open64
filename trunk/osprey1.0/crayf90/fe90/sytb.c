@@ -4161,8 +4161,11 @@ int gen_compiler_tmp (int		tmp_line,
    length = sprintf(name.string, "t$%d", curr_tmp);
    length1 = sprintf(name1.string,"T$%d", curr_tmp);
 # else
-   sprintf(name.string, "t$%d", curr_tmp);
-   sprintf(name1.string, "T$%d", curr_tmp);
+/*   sprintf(name.string, "t$%d", curr_tmp);*/
+   sprintf(name.string, "t__%d", curr_tmp);
+/*   sprintf(name1.string, "T$%d", curr_tmp);*/
+   sprintf(name1.string, "T__%d", curr_tmp);
+
    length = strlen(name.string);
    length1 = strlen(name1.string);
 # endif
