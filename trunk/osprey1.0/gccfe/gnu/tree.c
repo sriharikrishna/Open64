@@ -4624,6 +4624,13 @@ build_pointer_type (to_type)
      Also, it guarantees the TYPE_SIZE is in the same obstack as the type.  */
   layout_type (t);
 
+  /* WEI: fix size for 32-bit pointer here */
+  if (is_ia32) {
+    TYPE_SIZE(t) = bitsize_int(32);
+    TYPE_SIZE_UNIT(t) = size_int(4);
+    TYPE_PRECISION(t) = 32;
+  }
+
   return t;
 }
 

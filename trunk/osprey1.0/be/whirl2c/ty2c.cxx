@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2c.c
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:41 $
+ * $Revision: 1.4 $
+ * $Date: 2003-04-22 19:15:16 $
  * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $
  *
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -62,6 +62,14 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "ty2c.h"
 #include "tcon2c.h"
 
+#if defined(__GNUC__) && (__GNUC__ == 3) 
+#include <ext/hash_set>
+using namespace __gnu_cxx;
+#elif defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
+#include <set>
+#else
+#include <hash_set>
+#endif
 
 /*------------------ macros, types, and local state -------------------*/
 /*---------------------------------------------------------------------*/
@@ -478,9 +486,9 @@ TY2C_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
    {
      //WEI:
      //For shared_ptr_idx, we want to print the name directly
-     if (ty == shared_ptr_idx) {
+     if (ty == shared_ptr_idx || strcmp(TY_name(ty),"shared_ptr_struct") == 0) {
        Prepend_Token_String(decl_tokens, "upcr_shared_ptr_t");
-     } else if (ty == pshared_ptr_idx) {
+     } else if (ty == pshared_ptr_idx || strcmp(TY_name(ty),"pshared_ptr_struct") == 0) {
        Prepend_Token_String(decl_tokens, "upcr_pshared_ptr_t");
      } else if (Type_Is_Shared_Ptr(ty)) {
        //WEI: sometimes we may see a shared variable whose type is not changed
@@ -691,18 +699,31 @@ static void TY2C_complete_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT co
       Prepend_Token_String(decl_tokens, "struct");
 }
 
+/* code to avoid duplication of struct output.  This could happen e.g. if the struct type is used both for 
+   shaerd and non-shared variables */
+struct eqstr {
+  bool operator()(const char* s1, const char* s2) const
+  {
+    return strcmp(s1, s2) == 0;
+  }
+};
+
+static hash_set<const char*, hash<const char*>, eqstr> struct_names;
+
 //If the given type is a user-defined struct, 
 //This function outputs it complete declaration to the w2c.h file
 static void TY2C_Output_Struct_Type(TY_IDX ty,
 			     INT lines_between_decls,
 			     CONTEXT context) {
 
-  if (TY_is_translated_to_c(ty)) {
+  if (TY_is_translated_to_c(ty) || struct_names.find(TY_name(ty)) != struct_names.end()) {
     //don't output duplicate struct definitions
     return;
   }
 
   if (TY_kind(ty) == KIND_STRUCT && !is_upcr_ptr(ty)) {
+    struct_names.insert(TY_name(ty));
+
     //First go through all of its fields and see if there are any struct types we need to output
     for (FLD_HANDLE fld = TY_fld(ty); ;fld = FLD_next(fld)) {
       TY2C_Output_Struct_Type(FLD_type(fld), lines_between_decls, context);

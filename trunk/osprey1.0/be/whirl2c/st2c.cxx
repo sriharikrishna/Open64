@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2c.c
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:41 $
+ * $Revision: 1.4 $
+ * $Date: 2003-04-22 19:15:16 $
  * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $
  *
@@ -72,7 +72,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -524,8 +524,11 @@ ST2C_basic_decl(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
           PU_is_inline_function(Pu_Table[ST_pu(st)]))
       {
 	 Prepend_Token_String(decl_tokens, "__inline");
-      }
-      else if (ST_sclass(st) == SCLASS_FSTATIC        || 
+      } else if (ST_sym_class(st) == CLASS_FUNC &&
+	       ST_export(st) == EXPORT_LOCAL) {
+	/* static functions */
+	Prepend_Token_String(decl_tokens, "static");
+      } else if (ST_sclass(st) == SCLASS_FSTATIC        || 
 	       ST_sclass(st) == SCLASS_PSTATIC        ||
 	       ST_sclass(st) == SCLASS_CPLINIT        ||
 	       ST_sclass(st) == SCLASS_EH_REGION      ||
@@ -533,8 +536,7 @@ ST2C_basic_decl(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
 	       ST_sclass(st) == SCLASS_DISTR_ARRAY)
       {
 	 Prepend_Token_String(decl_tokens, "static");
-      }
-      else if (ST_sclass(st) == SCLASS_EXTERN || 
+      } else if (ST_sclass(st) == SCLASS_EXTERN || 
 	       ST_sclass(st) == SCLASS_TEXT)
       {
 	 Prepend_Token_String(decl_tokens, "extern");

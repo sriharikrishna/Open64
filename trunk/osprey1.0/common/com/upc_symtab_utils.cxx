@@ -177,16 +177,24 @@ UINT64 Get_Type_Inner_Size (TY_IDX idx) {
   
   switch(TY_kind(idx)) {
   case KIND_STRUCT:
+    return Adjusted_Type_Size(idx);
   case KIND_SCALAR:
     return TY_size(idx);
   case KIND_POINTER:
     if (TY_kind(TY_pointed(idx)) == KIND_ARRAY)
       return TY_size(TY_etype(TY_pointed(idx)));
-    else 
-      return TY_size(TY_pointed(idx));
+    else { 
+      if(TY_kind(TY_pointed(idx)) == KIND_STRUCT)
+	return Adjusted_Type_Size(TY_pointed(idx));
+      else 
+	return TY_size(TY_pointed(idx));
+    }
     break;
   case KIND_ARRAY:
-    return TY_size(Get_Inner_Array_Type(idx));
+    if(TY_kind(Get_Inner_Array_Type(idx)) == KIND_STRUCT)
+      return Adjusted_Type_Size(Get_Inner_Array_Type(idx));
+    else
+      return TY_size(Get_Inner_Array_Type(idx));
  
   default:
     Is_True(0,("Unexpected type for shared ptr arithmetic",""));
@@ -205,9 +213,7 @@ void Initialize_Upc_Metadata() {
   
 }
 
-
-
-UINT Adjusted_Type_Size(TY_IDX idx) {
+UINT Adjusted_Type_Size(TY_IDX idx, unsigned int pshared, unsigned int shared) {
   
   UINT result = 0;
 
@@ -216,9 +222,16 @@ UINT Adjusted_Type_Size(TY_IDX idx) {
   case KIND_POINTER:
     if(!Type_Is_Shared_Ptr(idx))
       return TY_size(idx);
-    else 
+    else if (pshared != 0) {
+      /* called from the front end */
+      if (TY_is_shared(idx)) {
+	return TY_is_pshared(idx) ? pshared : shared;
+      } else {
+	return TY_is_pshared(TY_pointed(idx)) ? pshared : shared;
+      }
+    } else {
       return TY_size(TY_To_Sptr_Idx(idx));
-    
+    }
   case KIND_STRUCT: {
     // sum_i(Adjusted_type_size(field_i))
     if(idx == pshared_ptr_idx || idx == shared_ptr_idx)
@@ -647,10 +660,10 @@ void Find_Upc_Vars () {
 BOOL Use_32_Bit(const char* filename) {
 
   FILE* config_file = fopen(filename, "r");
-  char line[MAX_LINE_LEN];
+  char line[MAX_LINE_LEN_UPC];
   int size;
-  char param[MAX_LINE_LEN];
-  while (fgets(line, MAX_LINE_LEN, config_file) != NULL) {
+  char param[MAX_LINE_LEN_UPC];
+  while (fgets(line, MAX_LINE_LEN_UPC, config_file) != NULL) {
     if (sscanf(line, "%s\t%d", param, &size) != 2) {
       continue;
     }

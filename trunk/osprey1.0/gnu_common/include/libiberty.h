@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 #include "ansidecl.h"
+#include <malloc.h>
 
 /* Build an argument vector from a string.  Allocates memory using
    malloc.  Use freeargv to free the vector.  */
@@ -192,13 +193,14 @@ extern int pwait PARAMS ((int, int *, int));
 /* Like sprintf but provides a pointer to malloc'd storage, which must
    be freed by the caller.  */
 
-/* extern int asprintf PARAMS ((char **, const char *, ...)) ATTRIBUTE_PRINTF_2; */
+
+extern int asprintf PARAMS ((char **, const char *, ...)) __THROW ATTRIBUTE_PRINTF_2;
 
 /* Like vsprintf but provides a pointer to malloc'd storage, which
    must be freed by the caller.  */
 
-/* extern int vasprintf PARAMS ((char **, const char *, va_list))
-  ATTRIBUTE_PRINTF(2,0); */
+extern int vasprintf PARAMS ((char **, const char *, va_list)) __THROW
+  ATTRIBUTE_PRINTF(2,0) ;
 
 #ifdef __cplusplus
 }

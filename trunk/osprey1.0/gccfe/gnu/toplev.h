@@ -145,6 +145,8 @@ extern void set_fatal_function PARAMS ((void (*) (const char *, va_list)));
 
 /* needed to adjust the size for pointer arithmetic on 32-bit platforms */
 extern int is_ia32;
+extern unsigned int pshared_size, shared_size;
+extern unsigned long max_bsize;
 
 #ifdef SGI_MONGOOSE
 extern void dump_parse_tree    PARAMS ((char *, union tree_node *));

@@ -208,6 +208,13 @@ else
 LC++OPTS = $(STD_COMPILE_OPTS) $(STD_C++_OPTS) 
 endif
 
+ifeq ($(BUILD_COMPILER), GNU)
+#Most of the files are using old C++ headers, and we do not warn about them for now
+#In the future we may want to change them to the new standard c++ headers
+#This is applied to all makefiles in the backend
+CXXFLAGS += -Wno-deprecated
+endif
+
 LC++DEFS = $(HOSTDEFS) $(TARGDEFS)
 LC++INCS = $(LCINCS)
 LASOPTS = $(STD_COMPILE_OPTS)

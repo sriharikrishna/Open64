@@ -278,19 +278,23 @@ static INT64 create_bitmask(INT64 num_bits)
    return ((1LL << num_bits) - 1);
 }
 
-/* Compute FLOOR(log2(x))
- * 
- */
-static UINT64 log2(UINT64 x)
-{
-   UINT64 l;
+/* WEI: this conflicts with the log2 function in C library, so use a namespace around it */
 
-   l = 0;
-   while (x > 1) {
-     x >>= 1;
-     ++l;
-   }
-   return (l);
+namespace wn_simp_code {
+  /* Compute FLOOR(log2(x))
+   * 
+   */
+  static UINT64 log2(UINT64 x)
+    {
+      UINT64 l;
+      
+      l = 0;
+      while (x > 1) {
+	x >>= 1;
+	++l;
+      }
+      return (l);
+    }
 }
 
 /***********************************************************/
@@ -2680,6 +2684,7 @@ j & j 			j
 static simpnode  simp_band( OPCODE opc,
 		      simpnode k0, simpnode k1, BOOL k0const, BOOL k1const)
 {
+
    simpnode r = NULL;
    INT64   c1,mask_bits;
    TYPE_ID  ty;
@@ -2723,7 +2728,7 @@ static simpnode  simp_band( OPCODE opc,
 	   SIMP_DELETE(k1);
 	 } else if (Enable_extract_compose && IS_POWER_OF_2(c1+1)) {
 	   r = SIMPNODE_SimpCreateExtract(MTYPE_bit_size(ty) == 32 ? OPC_U4EXTRACT_BITS : OPC_U8EXTRACT_BITS,
-					  shift_count,log2(c1+1),
+					  shift_count,wn_simp_code::log2(c1+1),
 					  SIMPNODE_kid0(k0));
 	   SIMP_DELETE(k1);
 	   SIMP_DELETE(SIMPNODE_kid1(k0));
@@ -2922,7 +2927,7 @@ static simpnode  simp_bior( OPCODE opc,
      
      if (IS_POWER_OF_2(c1+1) && ((c2 & c1) == 0) && (((c2 | c1) & type_mask) == type_mask)) {
        SHOW_RULE("(J&mask1) | (k & mask2)");
-       r = SIMPNODE_SimpCreateDeposit(OPC_FROM_OPR(OPR_COMPOSE_BITS,ty),0,log2(c1+1),
+       r = SIMPNODE_SimpCreateDeposit(OPC_FROM_OPR(OPR_COMPOSE_BITS,ty),0,wn_simp_code::log2(c1+1),
 				      SIMPNODE_kid0(k1),SIMPNODE_kid0(k0));
        SIMP_DELETE(SIMPNODE_kid1(k0));
        SIMP_DELETE(SIMPNODE_kid1(k1));
@@ -2930,7 +2935,7 @@ static simpnode  simp_bior( OPCODE opc,
        SIMP_DELETE(k1);
      } else if (IS_POWER_OF_2(c2+1) && ((c2 & c1) == 0) && (((c2 | c1) & type_mask) == type_mask)) {
        SHOW_RULE("(J&mask2) | (k & mask1)");
-       r = SIMPNODE_SimpCreateDeposit(OPC_FROM_OPR(OPR_COMPOSE_BITS,ty),0,log2(c2+1),
+       r = SIMPNODE_SimpCreateDeposit(OPC_FROM_OPR(OPR_COMPOSE_BITS,ty),0,wn_simp_code::log2(c2+1),
 				      SIMPNODE_kid0(k0),SIMPNODE_kid0(k1));
        SIMP_DELETE(SIMPNODE_kid1(k0));
        SIMP_DELETE(SIMPNODE_kid1(k1));
@@ -3506,7 +3511,7 @@ static simpnode  simp_shift( OPCODE opc,
 	    return (r);
 	 } else if (Enable_extract_compose && IS_POWER_OF_2(c2+1)) {
 	   SHOW_RULE("(j & mask) << c1 -> COMPOSE");
-	   c2 = log2(c2+1);
+	   c2 = wn_simp_code::log2(c2+1);
 	   r = SIMPNODE_SimpCreateDeposit(OPC_FROM_OPR(OPR_COMPOSE_BITS,ty),c1,c2,
 					  SIMP_INTCONST(ty,0),SIMPNODE_kid0(k0));
 	   SIMP_DELETE(SIMPNODE_kid1(k0));
@@ -5233,7 +5238,7 @@ simpnode SIMPNODE_SimplifyIstore(OPCODE opc, WN_OFFSET offset,
          SHOW_RULE("ISTORE(LDA)->STID");
          pointed = TY_pointed(ty);
          DevAssert(pointed, ("TY_pointed of ISTORE type is NULL"));
-      r = WN_CreateStid(OPCODE_operator(opc) == OPR_ISTORE ? OPR_STID : OPR_STBITS,
+	 r = WN_CreateStid(OPCODE_operator(opc) == OPR_ISTORE ? OPR_STID : OPR_STBITS,
 			   OPCODE_rtype(opc),
 			   OPCODE_desc(opc),
                            new_offset,
@@ -5281,6 +5286,5 @@ simpnode SIMPNODE_SimplifyPstore(OPCODE opc, WN_OFFSET offset,
    }
    return (r);
 }
-
 #endif
 

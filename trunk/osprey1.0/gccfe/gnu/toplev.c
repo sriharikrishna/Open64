@@ -151,6 +151,8 @@ extern char **environ;
 
 /* indicating we're in 32-bit mode */
 int is_ia32 = 0;
+unsigned int pshared_size = 8, shared_size = 8;
+unsigned long max_bsize = 100000; 
 
 /* Carry information from ASM_DECLARE_OBJECT_NAME
    to ASM_FINISH_DECLARE_OBJECT.  */

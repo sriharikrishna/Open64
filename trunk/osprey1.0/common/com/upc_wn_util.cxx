@@ -189,7 +189,9 @@ Spill_And_Take_Address(WN *wn) {
   WN *result;
   TY_IDX spill_ty;
 
-  if(WN_operator(wn) == OPR_TAS) {
+  if(WN_operator(wn) == OPR_LDA)
+    return wn;
+  else  if(WN_operator(wn) == OPR_TAS) {
     wn = Strip_TAS(wn);
   }
 
@@ -200,7 +202,8 @@ Spill_And_Take_Address(WN *wn) {
       spill_ty = TY_To_Sptr_Idx(spill_ty);
     break;
   default:
-    Is_True(0,("",""));
+    spill_ty =  MTYPE_To_TY(WN_rtype(wn));
+    break;
   }
 
   TYPE_ID desc = TY_mtype(spill_ty);
@@ -280,6 +283,7 @@ WN_Create_Shared_Store (WN *st, BOOL src_is_shared, WN_OFFSET xtra_offst,
   //desc = WN_desc(st);
   int strictw;
   int transfer_size = 0;
+  WN *spilled_preg_ldid = 0;
   
   BOOL _64_bit_target = TY_size(MTYPE_To_TY(Pointer_type)) > 4;
 
@@ -294,8 +298,11 @@ WN_Create_Shared_Store (WN *st, BOOL src_is_shared, WN_OFFSET xtra_offst,
     op_st = WN_st(st);
     consistency = Get_Access_Consistency(WN_ty(st));
     if(TY_kind(WN_ty(st)) == KIND_POINTER && TY_is_shared(WN_ty(st))) {
-      rtype = TY_mtype(TY_To_Sptr_Idx(WN_ty(st)));
-      transfer_size = TY_size(TY_To_Sptr_Idx(WN_ty(st)));
+      if(Type_Is_Shared_Ptr(TY_pointed(WN_ty(st)))) {
+	 rtype = TY_mtype(TY_To_Sptr_Idx(TY_pointed(WN_ty(st))));
+	 transfer_size = TY_size(TY_To_Sptr_Idx(TY_pointed(WN_ty(st))));
+      } else 
+	 transfer_size = TY_size(WN_ty(st));
     }
     break;
   case OPR_ISTORE:
@@ -309,8 +316,13 @@ WN_Create_Shared_Store (WN *st, BOOL src_is_shared, WN_OFFSET xtra_offst,
 	rtype = TY_mtype(TY_To_Sptr_Idx(TY_pointed(WN_ty(st))));
 	transfer_size = TY_size(TY_To_Sptr_Idx(TY_pointed(WN_ty(st))));
       } else if(TY_kind(pt_idx) == KIND_STRUCT) {
-	rtype = MTYPE_M;
-	transfer_size = TY_size(pt_idx);
+	if(WN_field_id(st)) {
+	  rtype = TY_mtype(Get_Field_Type(pt_idx, WN_field_id(st)));
+	  transfer_size = TY_size(Get_Field_Type(pt_idx, WN_field_id(st)));
+	} else {
+	  rtype = MTYPE_M;
+	  transfer_size = TY_size(pt_idx);
+	}
       }
     }
     arg0 = Strip_TAS(arg0);
@@ -323,12 +335,16 @@ WN_Create_Shared_Store (WN *st, BOOL src_is_shared, WN_OFFSET xtra_offst,
   
   actual_shared_ptr_idx = TY_To_Sptr_Idx(WN_ty(st));
   if(TY_is_shared(WN_ty(st)) && TY_kind(WN_ty(st)) != KIND_SCALAR && TY_kind(WN_ty(st)) != KIND_STRUCT) {
-    rtype = TY_mtype(actual_shared_ptr_idx);
+    // rtype = TY_mtype(actual_shared_ptr_idx)
+      ;
     // src_is_shared = TRUE;
   }
 
   
   if(!_64_bit_target && (rtype == MTYPE_I8 ||  rtype == MTYPE_A8 || rtype == MTYPE_U8) ) {
+    transfer_size = TY_size(MTYPE_To_TY(rtype));
+    rtype = MTYPE_M;
+  } else if(consistency == RELAXED_CONSISTENCY && (rtype == MTYPE_F4 || rtype == MTYPE_F8)) {
     transfer_size = TY_size(MTYPE_To_TY(rtype));
     rtype = MTYPE_M;
   }
@@ -386,7 +402,8 @@ WN_Create_Shared_Store (WN *st, BOOL src_is_shared, WN_OFFSET xtra_offst,
     WN_kid2(call_wn) = WN_CreateParm(Integer_type,  
 				     (WN_operator(st) == OPR_MSTORE || WN_operator(st) == OPR_ISTORE ) ? 
 				     WN_COPY_Tree(WN_kid2(st)) : 
-				     WN_Intconst(Integer_type, TY_size(actual_shared_ptr_idx)),
+				     WN_Intconst(Integer_type,
+						 TY_size(actual_shared_ptr_idx)),
 				     MTYPE_To_TY(Integer_type), WN_PARM_BY_VALUE);
   } else {
     WN *value = WN_kid0(st);
@@ -399,10 +416,28 @@ WN_Create_Shared_Store (WN *st, BOOL src_is_shared, WN_OFFSET xtra_offst,
       WN_kid2 (call_wn) = WN_CreateParm(Mtype_comparison(WN_rtype(value)), value,
 					parm_ty_idx, WN_PARM_BY_VALUE);
     else { // need to extract the address of the symbol accessed by value
-      if (WN_operator(value) == OPR_LDID && WN_st_idx(value) != 0)
-	WN_kid2(call_wn) = WN_CreateParm(Pointer_Mtype, WN_Lda(Pointer_Mtype, 0, WN_st(value), 0),
+      if (WN_operator(value) == OPR_LDID && WN_st_idx(value) != 0) {
+	ST *tst;
+	//need to check here for the special case of ldid of return_preg
+	//can't take it's address - spill
+	if(ST_class(WN_st(value)) == CLASS_PREG) {
+	 //  fprintf(stderr, "BEFORE SPILL \n");
+// 	  fdump_tree(stderr, value);
+// 	  value = Spill_Shared_Load(value);
+// 	  fprintf(stderr, "AFTER  SPILL \n");
+// 	  fdump_tree(stderr, value);
+// 	  tst = WN_st(WN_kid1(value));
+// 	  spilled_preg_ldid = value;
+	  Is_True(0,("",""));
+	} else 
+	  tst = WN_st(value);
+	
+
+	WN_kid2(call_wn) = WN_CreateParm(Pointer_Mtype, 
+					 WN_Lda(Pointer_Mtype, 0, tst, 0),
 					 MTYPE_To_TY(Pointer_Mtype), WN_PARM_BY_VALUE);
-      else if(WN_operator(value) == OPR_COMMA && WN_operator(WN_kid1(value)) == OPR_LDID) {
+      } else if(WN_operator(value) == OPR_COMMA && 
+		WN_operator(WN_kid1(value)) == OPR_LDID){
 	WN *kid1 = WN_kid1(value);
 	WN *kid0 = WN_kid0(value);
 	Is_True(WN_st(kid1), ("",""));
@@ -450,7 +485,7 @@ WN_Create_Shared_Store (WN *st, BOOL src_is_shared, WN_OFFSET xtra_offst,
     TYPE_ID hdesc = TY_mtype(handle_ty_idx);
     wn1 = WN_Ldid (hdesc, -1, Return_Val_Preg, handle_ty_idx); 
     if(!init_wn)
-      init_wn = WN_CreateBlock ();
+      init_wn = WN_CreateBlock (); 
     WN_INSERT_BlockLast (init_wn, call_wn);
     init_wn = WN_CreateComma (OPR_COMMA, WN_rtype (wn1), MTYPE_V, init_wn, wn1);
     wn0 = WN_CreateBlock();
@@ -471,6 +506,7 @@ WN_Create_Shared_Store (WN *st, BOOL src_is_shared, WN_OFFSET xtra_offst,
     call_wn = wn0;
   } else if (init_wn) {
     //this should happen only for strict puts with long long cts as srcs
+    
     WN_INSERT_BlockLast (init_wn, call_wn);
     call_wn = init_wn;
   }
@@ -541,11 +577,30 @@ WN_Create_Shared_Load( WN *ld,
     ret_ty = WN_object_ty(ld);
     //shared ptr to shared
     if ((TY_kind(WN_ty(ld)) == KIND_POINTER || 
-	 TY_kind(WN_ty(ld)) == KIND_ARRAY)   && TY_is_shared(WN_ty(ld))) {
-      rtype = desc = TY_mtype(sptr_idx);
-      is_struct = (rtype == MTYPE_M);
-      ret_ty = sptr_idx;
-    }
+	 TY_kind(WN_ty(ld)) == KIND_ARRAY )   && TY_is_shared(WN_ty(ld))) 
+      {
+	TY_IDX tmp_idx = WN_ty(ld);
+	if(WN_field_id(ld)) 
+	  tmp_idx = Get_Field_Type(tmp_idx, WN_field_id(ld)); 
+	if(TY_kind(tmp_idx) == KIND_POINTER) {
+	  if (Type_Is_Shared_Ptr(TY_pointed(tmp_idx))) {
+	    tmp_idx = TY_pointed(tmp_idx);
+	    rtype = desc = TY_mtype(TY_To_Sptr_Idx(tmp_idx));
+	    is_struct = (rtype == MTYPE_M);
+	    ret_ty = TY_To_Sptr_Idx(tmp_idx);
+	  } else {
+	    ret_ty = Make_Pointer_Type(TY_pointed(tmp_idx));
+	    rtype = desc = TY_mtype(ret_ty);
+	  }
+	} else if(TY_kind(tmp_idx) == KIND_ARRAY) {
+	  Is_True(0,("",""));
+	}    
+
+      } else if (Type_Is_Shared_Ptr(ret_ty, TRUE)) {
+	ret_ty = TY_To_Sptr_Idx(ret_ty);
+	rtype = desc = TY_mtype(ret_ty);
+	is_struct = (rtype == MTYPE_M);
+      }
       
     break;
     
@@ -560,16 +615,31 @@ WN_Create_Shared_Load( WN *ld,
        ret_ty = WN_object_ty(ld);
     
     sptr_idx = (WN_operator(ld) == OPR_ILOAD) ? TY_To_Sptr_Idx(WN_load_addr_ty(ld)) : TY_To_Sptr_Idx(WN_ty(ld));
-    
-    if(// ((TY_is_shared(WN_ty(ldc)) && TY_kind(WN_ty(ldc)) == KIND_POINTER)  || 
-	(TY_is_shared(WN_ty(ld)) &&   TY_kind(WN_ty(ld)) == KIND_POINTER)
-       && !WN_field_id(ld)) {
-      ret_ty = (WN_operator(ld) == OPR_ILOAD) ? 
-	TY_To_Sptr_Idx(TY_pointed(WN_load_addr_ty(ld))) : sptr_idx;
+
+    if((TY_is_shared(WN_ty(ld)) &&   
+	(TY_kind(WN_ty(ld)) == KIND_POINTER ||TY_kind(WN_ty(ld)) == KIND_ARRAY))
+       //  && !WN_field_id(ld)
+       ) {
+      TY_IDX tmp_idx = ret_ty;
+      if(TY_kind(tmp_idx) == KIND_POINTER) {
+	  if (Type_Is_Shared_Ptr(TY_pointed(tmp_idx))) {
+	    tmp_idx = TY_pointed(tmp_idx);
+	    rtype = desc = TY_mtype(TY_To_Sptr_Idx(tmp_idx));
+	    is_struct = (rtype == MTYPE_M);
+	    ret_ty = TY_To_Sptr_Idx(tmp_idx);
+	  } else {
+	    ret_ty = Make_Pointer_Type(TY_pointed(tmp_idx));
+	    rtype = desc = TY_mtype(ret_ty);
+	  }
+	} else if(TY_kind(tmp_idx) == KIND_ARRAY) {
+	  Is_True(0,("",""));
+	}    
+    } if(Type_Is_Shared_Ptr(ret_ty, TRUE)) {
+      ret_ty = TY_To_Sptr_Idx(ret_ty);
       rtype = desc = TY_mtype(ret_ty);
       is_struct = (rtype == MTYPE_M);
-    } 
-    
+    }     
+
     break;
     
   case OPR_COMMA:
@@ -590,14 +660,15 @@ WN_Create_Shared_Load( WN *ld,
   } else if (!_64_bit_target && TY_size(MTYPE_To_TY(rtype)) > 4 && rtype != MTYPE_F8)
     {
       rtype = MTYPE_M;
-      desc = MTYPE_M; 
-    }
-
-  
-  if ((rtype == MTYPE_F8 || rtype == MTYPE_F4) && consistency == RELAXED_CONSISTENCY) { 
-  //   rtype = MTYPE_M;  
-    consistency = STRICT_CONSISTENCY;
-  } 
+      desc = MTYPE_M;
+      is_struct = TRUE;
+    } else   
+      if ((rtype == MTYPE_F8 || rtype == MTYPE_F4) && consistency == RELAXED_CONSISTENCY) { 
+	rtype = MTYPE_M;  
+	desc = MTYPE_M;
+	is_struct = TRUE;
+	// consistency = STRICT_CONSISTENCY;
+      } 
 
   iop =  WN_Type_To_Intrinsic(OPR_LDID  , dest ? MTYPE_M : rtype, 
 			      consistency == STRICT_CONSISTENCY, (sptr_idx == pshared_ptr_idx));
@@ -657,7 +728,10 @@ WN_Create_Shared_Load( WN *ld,
     // for shared ptr to shared 
     if(is_struct || (rtype == MTYPE_M && desc == MTYPE_M)) {
       Is_True(ret_ty == shared_ptr_idx || ret_ty == pshared_ptr_idx  ||
-	      (!_64_bit_target && TY_size(ret_ty) > 4), ("",""));
+	      (!_64_bit_target && TY_size(ret_ty) > 4) ||
+	      (consistency == RELAXED_CONSISTENCY && 
+	       (TY_mtype(ret_ty) == MTYPE_F4 || TY_mtype(ret_ty) == MTYPE_F8)) , ("",""));
+      
       
       //the type of the temp is given by the the type of the point-to
       //type of the load
@@ -773,9 +847,10 @@ spill:
       //Until we fix that - generate the temp with the register size/type
       //rather than the lhs type.
       if(rtype != MTYPE_F4 && rtype != MTYPE_F8) {
-	ret_ty = ( _64_bit_target) ? 
-	  (MTYPE_is_unsigned(rtype) ? MTYPE_To_TY(MTYPE_U8) : MTYPE_To_TY(MTYPE_I8)) :
-	  (MTYPE_is_unsigned(rtype) ? MTYPE_To_TY(MTYPE_U4) :MTYPE_To_TY(MTYPE_I4));
+// 	ret_ty = ( _64_bit_target) ? 
+// 	  (MTYPE_is_unsigned(rtype) ? MTYPE_To_TY(MTYPE_U8) : MTYPE_To_TY(MTYPE_I8)) :
+// 	  (MTYPE_is_unsigned(rtype) ? MTYPE_To_TY(MTYPE_U4) :MTYPE_To_TY(MTYPE_I4) )
+	  ;
       }
       ret_st = Gen_Temp_Symbol(ret_ty, (char*) ".Tspilload");
       WN_INSERT_BlockLast (wn1, WN_Stid (TY_mtype(ret_ty), 0, ret_st, 
@@ -790,14 +865,27 @@ spill:
       }
     } else WN_INSERT_BlockLast (wn1, call_wn);
     
-     
+    
+    if(TY_kind(ret_ty) == KIND_SCALAR && rtype != MTYPE_F4 && rtype != MTYPE_F8 ) {
+      if(consistency == RELAXED_CONSISTENCY && rtype == MTYPE_M && 
+	 (TY_mtype(ret_ty) == MTYPE_F4 || TY_mtype(ret_ty) == MTYPE_F8)) 
+	rtype = desc = TY_mtype(ret_ty);
+      else 
+	rtype // = desc
+	  = // TY_mtype(ret_ty)
+	  ( _64_bit_target) ? 
+ 	  (MTYPE_is_unsigned(rtype) ? MTYPE_U8 : MTYPE_I8) :
+ 	  (MTYPE_is_unsigned(rtype) ? MTYPE_U4 :MTYPE_I4 )	;
+    } else if (TY_kind(ret_ty) == KIND_SCALAR && (rtype == MTYPE_F4 ||  rtype == MTYPE_F8))
+      rtype = desc = TY_mtype(ret_ty);
+      
      call_wn  = WN_CreateComma (OPR_COMMA, rtype, MTYPE_V, wn1,
 			       WN_CreateLdid(OPR_LDID, rtype, desc, ST_ofst(ret_st), 
 					     ret_st, ret_ty, 0) );
     
   }
   
- //  fprintf(stderr,"Shared Load OUT");
+  // fprintf(stderr,"Shared Load OUT");
 //   fdump_tree(stderr, call_wn);
    
  return call_wn;
@@ -1066,7 +1154,7 @@ Spill_Shared_Load( WN *ld)
   ST* ret_st = Gen_Temp_Symbol(idx, 
 			    Index_To_Str(Save_Str2((char*)".Mreturn.",(char*)".Mreturn.")));
   WN_INSERT_BlockLast (block, WN_Stid (TY_mtype(idx), 0, ret_st, idx, ld));
-  return  WN_CreateComma (OPR_COMMA, TY_mtype(idx), MTYPE_V, block, 
+  return  WN_CreateComma (OPR_COMMA, Widen_Mtype(TY_mtype(idx)),MTYPE_V, block, 
 			  WN_Ldid(TY_mtype(idx), 0, ret_st, idx));
 }
 
