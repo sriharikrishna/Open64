@@ -201,16 +201,18 @@ void process_shared(const char* file_name) {
   char name[NAME_LEN], init[INIT_LEN], orig_type[TYPE_LEN], dim[TYPE_LEN];
   char line[LINE_LEN];
 
-  //declarations the allocation and initialization function for shared data
-  static_alloc += "void UPCRI_ALLOC_" + strip(Orig_Src_File_Name, true) + "_" + utoa(hash_val(Orig_Src_File_Name)) + "() { \n";
-  static_alloc += "UPCR_BEGIN_FUNCTION();\n";
-  static_init += "void UPCRI_INIT_" + strip(Orig_Src_File_Name, true) + "_" + utoa(hash_val(Orig_Src_File_Name)) + "() { \n";
-  static_init += "UPCR_BEGIN_FUNCTION();\n";
+  if (Compile_Upc) {
+    //declarations the allocation and initialization function for shared data
+    static_alloc += "void UPCRI_ALLOC_" + strip(Orig_Src_File_Name, true) + "_" + utoa(hash_val(Orig_Src_File_Name)) + "() { \n";
+    static_alloc += "UPCR_BEGIN_FUNCTION();\n";
+    static_init += "void UPCRI_INIT_" + strip(Orig_Src_File_Name, true) + "_" + utoa(hash_val(Orig_Src_File_Name)) + "() { \n";
+    static_init += "UPCR_BEGIN_FUNCTION();\n";
 
-  //output the internally used symbol "upc_forall_control"
-  decls += "extern int upcr_forall_control;\n";
-  decls += "#define UPCR_SHARED_SIZE_ " + utoa(shared_size) + "\n";
-  decls += "#define UPCR_PSHARED_SIZE_ " + utoa(pshared_size) + "\n";
+    //output the internally used symbol "upc_forall_control"
+    decls += "extern int upcr_forall_control;\n";
+    decls += "#define UPCR_SHARED_SIZE_ " + utoa(shared_size) + "\n";
+    decls += "#define UPCR_PSHARED_SIZE_ " + utoa(pshared_size) + "\n";
+  }
 
   if (strlen(file_name) == 0) {
     return; //no shared global variable in the program
@@ -493,11 +495,15 @@ void output_file() {
   string out_file = strip(Orig_Src_File_Name) + ".global_data.c";  
   FILE* out = fopen(out_file.c_str(), "w");
   fputs(decls.c_str(), out); 
-  fputs(static_alloc.c_str(), out);
-  fputs("}\n\n", out);
-  fputs(static_init.c_str(), out);
-  fputs(TLD_init.c_str(), out);
-  fputs("}\n", out);
+  if (static_alloc != "") {
+    fputs(static_alloc.c_str(), out);
+    fputs("}\n\n", out);
+  }
+  if (static_init != "" || TLD_init != "") {
+    fputs(static_init.c_str(), out);
+    fputs(TLD_init.c_str(), out);
+    fputs("}\n", out);
+  }
 }
 
 /**************************************
