@@ -247,9 +247,9 @@
 ***	    Return the current default mem pool.
 **/
 
-/** $Revision: 1.1.1.1 $
-*** $Date: 2002-05-22 20:06:42 $
-*** $Author: dsystem $
+/** $Revision: 1.2 $
+*** $Date: 2004-12-01 16:42:50 $
+*** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/lno/mat.h,v $
 **/
 
@@ -257,7 +257,7 @@
 #define mat_INCLUDED "mat.h"
 
 #ifdef _KEEP_RCS_ID
-static char *mat_rcs_id = mat_INCLUDED "$Revision: 1.1.1.1 $";
+static char *mat_rcs_id = mat_INCLUDED "$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 // system  headers
@@ -285,6 +285,8 @@ extern "C" {
 #ifndef frac_INCLUDED
 #include "frac.h"
 #endif
+
+extern MEM_POOL LNO_local_pool; /* see lu_mat.h */
 
 // MAT is implemented as _rx by _cx, which may be slightly larger
 // than _r by _c to ease the efficiency of add_row, add_col, rm_row, rm_col.
@@ -525,7 +527,7 @@ MAT<T> MAT<T>::operator +(const MAT<T>& a) const
 
   MAT<T> m(Rows(), Cols(), Default_Pool());
 
-  for (INT r = 0; r < Rows(); rr++) {
+  for (INT r = 0; r < Rows(); r++) {
     T* pm = &m._data[r*m._cx];
     T* p = &_data[r*_cx];
     T* pa = &a._data[r*a._cx];
