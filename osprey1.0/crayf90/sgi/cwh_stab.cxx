@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.5 $
- * $Date: 2002-08-22 20:40:35 $
+ * $Revision: 1.6 $
+ * $Date: 2002-08-30 21:27:13 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -199,7 +199,8 @@ fei_proc(char         *name_string,
 {
   INTPTR p;
 
-  if (test_flag(flags, FEI_PROC_DEFINITION)) {
+  if (test_flag(flags, FEI_PROC_DEFINITION)||
+       test_flag(flags, FEI_PROC_IN_INTERFACE)) {
      p = fei_proc_def(name_string,
                       lineno,
                       Sym_class_arg,
@@ -215,6 +216,7 @@ fei_proc(char         *name_string,
                       proc_idx,
                       flags);
   }
+
 
   if (test_flag(flags, FEI_PROC_PARENT)) {
      p = fei_proc_parent(name_string,
@@ -397,7 +399,11 @@ fei_proc_def(char         *name_string,
 
   if (test_flag(flags, FEI_PROC_RECURSE))
     Set_PU_recursive(pu);
-    
+
+//  if (test_flag(flags,FEI_PROC_IN_INTERFACE) &&
+//       test_flag(flags,FEI_PROC_M_IMPORTED))
+//       Set_ST_is_M_imported(st);
+
   cwh_auxst_alloc_proc_entry(st,num_dum_args, ret_ty);
 
   if (test_flag(flags, FEI_PROC_HASRSLT))
@@ -425,9 +431,8 @@ fei_proc_def(char         *name_string,
 /* but don't know if there is problem if comment out this function call */
 /* completely,will think about it later ----fzhao                       */
 
-# if 0 
-    cwh_block_init_pu();
-# endif
+if (test_flag(flags,FEI_PROC_IN_INTERFACE))
+        cwh_block_init_pu();
 
     if (test_flag(flags, FEI_PROC_HAS_ALT_ENTRY)) 
       Set_PU_has_altentry(pu);
@@ -1005,6 +1010,8 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
 
 
   /* F90 pointers and assumed-shape dummies are non-contiguous */
+  if (test_flag(flag_bits,FEI_OBJECT_PRIVATE))
+     Set_ST_is_private(st);
 
   if (test_flag(flag_bits,FEI_OBJECT_ASSUMD_SHAPE) ||
       test_flag(flag_bits,FEI_OBJECT_DV_IS_PTR))  {
@@ -3359,7 +3366,8 @@ fei_smt_parameter(char * name_string,
 INTPTR
 fei_interface(char  * name_string,
              INT32   nitems,
-             INT32   kind_interface)
+             INT32   kind_interface,
+             INT32 is_imported)
 {
   ST * st;
   TY_IDX  ty;
@@ -3378,6 +3386,9 @@ fei_interface(char  * name_string,
   ST_Init(st, Save_Str(name_string), CLASS_VAR, SCLASS_AUTO, EXPORT_LOCAL, ty);
   Set_ST_ofst(st, 0);
 
+  if (is_imported)
+     Set_ST_is_external(st);
+
   if (kind_interface == 1)
     Set_ST_is_assign_interface(st);
   else if (kind_interface == 2)
@@ -3392,11 +3403,10 @@ fei_interface(char  * name_string,
   wn  =  WN_Create(opc,nitems);
   WN_st_idx(wn) = ST_st_idx(st);
 
-
+ if (nitems !=0)
   for (k = nitems -1 ; k >= 0  ; k --) {
      wn1 = cwh_stk_pop_WN();
      WN_kid(wn,k) = wn1;
-
   }
 
   cwh_block_append_given_id(wn,First_Block,FALSE);

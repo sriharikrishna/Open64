@@ -140,8 +140,12 @@ typedef unsigned long          INTPTR;
 /* I need this bit -fzhao #define FEI_PROC_UNUSED_29        			29 */
 #define FEI_PROC_MODULE                                 29
 
-#define FEI_PROC_UNUSED_30        			30
-#define FEI_PROC_UNUSED_31        			31
+/* #define FEI_PROC_UNUSED_30        			30 */
+#define FEI_PROC_IN_INTERFACE  	   			30 
+
+/*#define FEI_PROC_UNUSED_31        			31*/
+#define FEI_PROC_M_IMPORTED        			31
+
 #define FEI_PROC_PASARG     				32
 #define FEI_PROC_LIMHEAP    				33
 #define FEI_PROC_ENTRY      				34
@@ -215,6 +219,7 @@ typedef unsigned long          INTPTR;
 #define FEI_OBJECT_DEFERRED_SHAPE                       36  
 #define FEI_OBJECT_IN_MODULE                            37  
 #define FEI_OBJECT_EXTERNAL                             38  
+#define FEI_OBJECT_PRIVATE                              39  
 
 #define FEI_ARRAY_DIMEN_VARY_LB      	 	 	 0
 #define FEI_ARRAY_DIMEN_VARY_EXT     	 	 	 1
@@ -476,7 +481,8 @@ typedef enum {
 typedef enum {	    
         Definition,
 	Parent,
-	Imported} PROC_CALLING_CLASS;
+	Imported,
+        In_Interface} PROC_CALLING_CLASS;
 
 typedef enum {
 	No_Dist,     
@@ -1468,7 +1474,9 @@ extern INTPTR fei_namelist         	  ( char   *name_string,
 
 extern INTPTR fei_interface               ( char   *name_string,
                                             INT32   nitems,
-                                            INT32    kind_interface);
+                                            INT32    kind_interface,
+					    INT32  is_imported);
+
 extern void  fei_gen_func_entry           (INTPTR   idx);
 
 extern void  fei_fcd             	  ( TYPE type );

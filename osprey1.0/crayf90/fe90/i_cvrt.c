@@ -12088,8 +12088,10 @@ static void  send_procedure(int			attr_idx,
    ((long64) on_off_flags.zero_init          	<< FEI_PROC_ZERO_INIT)|
    ((long64) ATP_OPTIONAL_DIR(attr_idx)        	<< FEI_PROC_OPTIONAL_DIR)|
    ((long64) (call_type == Definition)         	<< FEI_PROC_DEFINITION)|
+   ((long64) (call_type == In_Interface)         << FEI_PROC_IN_INTERFACE) |
    ((long64) (call_type == Imported)          	<< FEI_PROC_IMPORTED)|
    ((long64) AT_MODULE_OBJECT(attr_idx)          << FEI_PROC_MODULE)|
+   ((long64) (AT_MODULE_IDX(attr_idx)!= NULL)        << FEI_PROC_M_IMPORTED)|
    ((long64) (call_type == Parent)          	<< FEI_PROC_PARENT)|
    ((long64) (ATP_NOSIDE_EFFECTS(attr_idx) | ATP_PURE(attr_idx))
 						<< FEI_PROC_NOSIDE_EFFECTS)|
@@ -12102,7 +12104,7 @@ static void  send_procedure(int			attr_idx,
    }
 
 
-   if (call_type == Definition || call_type == Parent) {
+   if (call_type == Definition || call_type == Parent ||call_type == In_Interface) {
       if (SCP_ALT_ENTRY_CNT(ATP_SCP_IDX(attr_idx)) > 0) {
          flag3 = flag3 | ((long64) 1 << FEI_PROC_HAS_ALT_ENTRY);
       }
@@ -12218,6 +12220,7 @@ static void  send_procedure(int			attr_idx,
          type_desc = get_type_desc(attr_idx);
 
          if (call_type == Definition ||
+             call_type == In_Interface ||
              (call_type == Parent && 
               SB_HOSTED_STACK(ATD_STOR_BLK_IDX(ATP_RSLT_IDX(attr_idx))))) {
 
@@ -13011,7 +13014,9 @@ static void send_interface_list(int ng_attr_idx)
    int          sn_idx;
    int          kind_interface = 0;
    int          pu_in_interface=curr_scp_idx+1;
+   boolean      is_imported;
    int i;
+   int kids_count;
 
 
    TRACE (Func_Entry, "send_interface_list", NULL);
@@ -13033,22 +13038,19 @@ static void send_interface_list(int ng_attr_idx)
 
          /* Need to send generic - explicit names if generating debug tbls */
 
-
+       kids_count = ATI_NUM_SPECIFICS(ng_attr_idx);
        sn_idx = ATI_FIRST_SPECIFIC_IDX(ng_attr_idx);
             for (i = 0; i < ATI_NUM_SPECIFICS(ng_attr_idx); i++) {
-
-/*                 if (PDG_AT_IDX(SN_ATTR_IDX(sn_idx)) == NULL)  */
-
-                     send_procedure(SN_ATTR_IDX(sn_idx),
+                 if (AT_MODULE_IDX(SN_ATTR_IDX(sn_idx))==NULL){
+                        send_procedure(SN_ATTR_IDX(sn_idx),
                                     NULL_IDX,
-                                    Definition);
+                                    In_Interface);
+                       fei_gen_func_entry(PDG_AT_IDX(SN_ATTR_IDX(sn_idx)));
+                  }
+                 else kids_count--;
                
-                   fei_gen_func_entry(PDG_AT_IDX(SN_ATTR_IDX(sn_idx)));
-                    
-
                     sn_idx = SN_SIBLING_LINK(sn_idx);
             }
-/*      } */
 
      if (ATI_INTERFACE_CLASS(ng_attr_idx) == Defined_Assign_Interface)
           kind_interface = 1;
@@ -13060,12 +13062,15 @@ static void send_interface_list(int ng_attr_idx)
            else
                 kind_interface = 3;
            } 
+ 
+     is_imported = AT_MODULE_IDX(ng_attr_idx);
 
 # ifdef _ENABLE_FEI
 # if defined(GENERATE_WHIRL)
    PDG_AT_IDX(ng_attr_idx) = fei_interface(AT_OBJ_NAME_PTR(ng_attr_idx),
-                                          ATI_NUM_SPECIFICS(ng_attr_idx),
-                                          kind_interface);
+					  kids_count,
+                                          kind_interface,
+                                          is_imported);
    PDG_AT_IDX(ng_attr_idx) = NULL;
 # endif
 # endif
@@ -13711,7 +13716,8 @@ static void send_attr_ntry(int		attr_idx)
                                       << FEI_OBJECT_NOT_PT_TO_UNIQUE_MEM) |
       ((long64) AT_NAMELIST_OBJ(attr_idx) 	<< FEI_OBJECT_NAMELIST_ITEM)|
  
-      ((long64) AT_MODULE_OBJECT(attr_idx)      << FEI_OBJECT_IN_MODULE)); 
+      ((long64) AT_MODULE_OBJECT(attr_idx)      << FEI_OBJECT_IN_MODULE) |
+      ((long64) AT_PRIVATE(attr_idx)            << FEI_OBJECT_PRIVATE )); 
 
       fm = AT_MODULE_OBJECT(attr_idx);  
 

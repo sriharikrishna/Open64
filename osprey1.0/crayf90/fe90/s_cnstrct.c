@@ -428,6 +428,8 @@ boolean create_constructor_constant(opnd_type	   *top_opnd,
 
    /* create tmp init here */
 
+/* # if 0  */
+/* August keep Array_Constructor_Opr*/
    if (OPND_FLD(init_target_opnd) != NO_Tbl_Idx) {
       tmp_idx = find_left_attr(&init_target_opnd);
 
@@ -606,6 +608,8 @@ boolean create_constructor_constant(opnd_type	   *top_opnd,
    if (exp_desc->rank > 0) {
       exp_desc->contig_array = TRUE;
    }
+
+/* #endif */
 
    target_array_idx = save_target_array_idx;
 

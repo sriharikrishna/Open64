@@ -2312,7 +2312,7 @@ static void chain_thru_sn_ntries (FILE		*out_file,
 
          fprintf(out_file, "  %-16s= %-7s %-16s= %-7s \n",
                 "ATD_IM_A_DOPE", boolean_str[ATD_IM_A_DOPE(SN_ATTR_IDX(i))],
-                "ATD_POINTER", boolean_str[ATD_IM_A_DOPE(SN_ATTR_IDX(i))]);
+                "ATD_POINTER", boolean_str[ATD_POINTER(SN_ATTR_IDX(i))]);
 
          fprintf(out_file, "  %-16s= %-7d %-s\n",
                      "ATD_TYPE_IDX", ATD_TYPE_IDX(SN_ATTR_IDX(i)),

@@ -2581,6 +2581,7 @@ static void  compress_tbls(int		al_idx,
 
       if (!BD_USED_NTRY(mod_idx)) {  /* Entry from the free list */
          BD_NEXT_FREE_NTRY(mod_idx)	= ML_BD_IDX(BD_NEXT_FREE_NTRY(mod_idx));
+
          mod_idx = mod_idx + BD_NTRY_SIZE(mod_idx);
       }
       else if (BD_DIST_NTRY(mod_idx)) {
@@ -9565,7 +9566,7 @@ void	collapse_interface_blk(int	interface_idx)
    only_update_new_tbl_entries	= TRUE;
 
    ML_AT_IDX(0)         = BLK_AT_IDX(blk_stk_idx);
-   ML_BD_IDX(0)         = BLK_BD_IDX(blk_stk_idx);
+   ML_BD_IDX(0)         = BLK_BD_IDX(blk_stk_idx); 
    ML_NP_IDX(0)         = BLK_NP_IDX(blk_stk_idx);
    ML_SB_IDX(0)         = BLK_SB_IDX(blk_stk_idx);
    ML_SN_IDX(0)         = BLK_SN_IDX(blk_stk_idx);

@@ -3842,7 +3842,6 @@ void	char_len_resolution(int		attr_idx,
 
             /* Generate tmp = clen(attr).  This must go on the bound list */
             /* because this is a dummy argument.                          */
-
             NTR_IR_TBL(len_idx);
             IR_OPR(len_idx)		= Clen_Opr;
             IR_TYPE_IDX(len_idx)        = SA_INTEGER_DEFAULT_TYPE;
@@ -3913,6 +3912,8 @@ void	char_len_resolution(int		attr_idx,
                                     curr_stmt_sh_idx,
                                     FALSE,     /* Don't generate tmp = 0  */
                                     TRUE);     /* Advance ATP_FIRST_SH_IDX */
+
+
             break;
 
          case CRI__Pointee:

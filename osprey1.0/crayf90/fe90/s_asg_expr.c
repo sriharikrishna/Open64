@@ -444,7 +444,6 @@ CK_WHERE:
             PRINTMSG(line, 1638, Error, col);
             ok = FALSE;
          }
-#if 0
          else if (! check_where_conformance(&exp_desc_l)) {
 
             find_opnd_line_and_column((opnd_type *) &IR_OPND_L(ir_idx),
@@ -453,7 +452,6 @@ CK_WHERE:
             PRINTMSG(opnd_line, 195, Error, opnd_col);
             ok = FALSE;
           }
-#endif
                   
          if (ok) {
             /* set up list */
@@ -1082,7 +1080,7 @@ boolean expr_semantics (opnd_type       *result_opnd,
       COPY_OPND(opnd, (*result_opnd));
 
       if (IR_OPR(OPND_IDX((*result_opnd)))==Constant_Array_Construct_Opr ||
-          IR_OPR(OPND_IDX((*result_opnd)))== Null_Opr ||
+       IR_OPR(OPND_IDX((*result_opnd)))== Null_Opr ||
            IR_OPR(OPND_IDX((*result_opnd)))== Subscript_Opr ) /* June*/
             ok = fold_aggragate_expression(&opnd, exp_desc, FALSE) && ok; 
 /*  June      else */

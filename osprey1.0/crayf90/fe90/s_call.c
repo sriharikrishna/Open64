@@ -1152,7 +1152,7 @@ if ((ATP_INTRIN_ENUM(spec_idx)!=Kind_Intrinsic) &&
     (ATP_INTRIN_ENUM(spec_idx)!=SIK_Intrinsic) &&
     (ATP_INTRIN_ENUM(spec_idx)!=SRK_Intrinsic)){
 
-             ATP_ELEMENTAL(spec_idx) = FALSE; /* March */
+             ATP_ELEMENTAL(spec_idx) = FALSE; 
 
              goto HERE;
  }
@@ -1350,7 +1350,7 @@ HERE:
                COPY_SHAPE(save_shape, (res_exp_desc->shape), save_rank);
             }
 
-            if (! AT_ELEMENTAL_INTRIN(spec_idx)||TRUE) {  /* April */
+            if (! AT_ELEMENTAL_INTRIN(spec_idx)||TRUE) {  
                save_foldable = res_exp_desc->foldable;
                save_will_fold_later = res_exp_desc->will_fold_later;
                COPY_OPND(save_char_len, (res_exp_desc->char_len));
@@ -1418,7 +1418,7 @@ HERE:
                   }
                }
 
-                flatten_function_call(result_opnd);
+                flatten_function_call(result_opnd); 
 
                if (ATP_ELEMENTAL(spec_idx) &&
                    ATP_PROC(spec_idx) != Intrin_Proc) {
@@ -2286,7 +2286,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
       if (ATP_EXTRA_DARG(spec_idx)) {
          list_idx = IL_NEXT_LIST_IDX(list_idx);
       }
-      ok = check_elemental_conformance(list_idx, &exp_desc);
+      ok = check_elemental_conformance(list_idx, &exp_desc); 
       explicit = FALSE;
       
       if (elemental_exp_desc != NULL) {
@@ -4821,7 +4821,7 @@ int	create_tmp_asg(opnd_type     *r_opnd,
       ok = validate_char_len(r_opnd, exp_desc);
 
       if (TYP_FLD(exp_desc->type_idx) != CN_Tbl_Idx) {
-         constant_shape = FALSE;
+         constant_shape = FALSE; 
       }
    }
 
@@ -4918,7 +4918,7 @@ int	create_tmp_asg(opnd_type     *r_opnd,
                            SA_INTEGER_DEFAULT_TYPE,
                            Priv);
 
-      ATD_AUTO_BASE_IDX(tmp_idx)	= base_tmp_idx;
+      ATD_AUTO_BASE_IDX(tmp_idx)	= base_tmp_idx; 
 
       determine_tmp_size(&size_opnd, exp_desc->type_idx);
 
@@ -4946,7 +4946,6 @@ int	create_tmp_asg(opnd_type     *r_opnd,
 
       OPND_FLD(size_opnd) = IR_Tbl_Idx;
       OPND_IDX(size_opnd) = max_idx;
-
 
       NTR_IR_TBL(alloc_idx);
       IR_OPR(alloc_idx) = Alloc_Opr;
@@ -5044,12 +5043,14 @@ int	create_tmp_asg(opnd_type     *r_opnd,
 
          curr_stmt_sh_idx = SH_PREV_IDX(curr_stmt_sh_idx);
       }
-   }
+   } 
 
    if (alloc_block_start_idx &&
        save_where_dealloc_stmt) {
       curr_stmt_sh_idx = save_curr_stmt_sh_idx;
    }
+
+
 
    COPY_OPND(IR_OPND_R(asg_idx), (*r_opnd));
 
@@ -5469,7 +5470,7 @@ boolean gen_bd_entry(opnd_type		*r_opnd,
          BD_LB_FLD(bd_idx,i) = CN_Tbl_Idx;
          BD_LB_IDX(bd_idx,i) = CN_INTEGER_ONE_IDX;
 
-         if (OPND_FLD(exp_desc->shape[i-1]) == CN_Tbl_Idx) {
+         if (OPND_FLD(exp_desc->shape[i-1]) == CN_Tbl_Idx || TRUE ) { /*August*/
             BD_UB_FLD(bd_idx,i) = OPND_FLD(exp_desc->shape[i-1]);
             BD_UB_IDX(bd_idx,i) = OPND_IDX(exp_desc->shape[i-1]);
          }
