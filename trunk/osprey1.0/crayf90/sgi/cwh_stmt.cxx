@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.23 $
- * $Date: 2004-05-28 15:16:59 $
+ * $Revision: 1.24 $
+ * $Date: 2004-06-21 21:09:18 $
  * $Author: eraxxon $
  *
  * Revision history:
@@ -2199,7 +2199,8 @@ cwh_stmt_str_falsebr_util(OPERATOR opr,
 
 void
 fei_new_select(INT32 num_cases,
-               INT32 default_label_idx )
+               INT32 default_label_idx,
+               INT32 last_label_idx)
 {
   WN *parent_block;
   WN *wn;
@@ -2207,7 +2208,7 @@ fei_new_select(INT32 num_cases,
   WN *expr;
   WN *default_label;
   WN *last_node;
-  LABEL_IDX lb;
+  LABEL_IDX lb, last_lb;
   ST *tmp_st;
   TY_IDX ty;
 
@@ -2232,8 +2233,10 @@ fei_new_select(INT32 num_cases,
        parent_block = cwh_block_new_and_current();
    
        lb = cast_to_LB(default_label_idx);
+       last_lb = cast_to_LB(last_label_idx);
        default_label = WN_CreateGoto (lb);
-       wn = WN_CreateSwitch (num_cases, expr, cwh_block_current(), default_label, 0);
+       wn = WN_CreateSwitch (num_cases, expr, cwh_block_current(), 
+			     default_label, last_lb);
    
        /* Now push num_cases, the block that will contain the */ 
        /* case goto's, expr and last_node back on the stack   */
