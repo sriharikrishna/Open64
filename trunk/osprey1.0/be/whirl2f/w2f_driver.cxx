@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.7 $
- * $Date: 2003-09-18 16:48:46 $
- * $Author: fzhao $
+ * $Revision: 1.8 $
+ * $Date: 2003-12-09 19:25:59 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.8 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -524,7 +524,7 @@ struct enter_fld
   void operator() (UINT32 ty_idx, const TY* typ) const 
     {
 
-    TY & ty = (TY &) typ;
+    const TY & ty = (*typ);
 
     if (TY_kind(ty) == KIND_STRUCT)
       {
