@@ -6537,6 +6537,7 @@ CONTINUE_CO:
                       cvrt_exp_to_pdg(BD_XT_IDX(bound_idx, dim),
                                     BD_XT_FLD(bound_idx, dim));
                  else fei_implicit_expr();
+               else fei_implicit_expr();
               }
 
               if (ATD_IM_A_DOPE(attr_idx)) {
