@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_pdgcs
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:09 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-12-09 19:15:50 $
+ * $Author: eraxxon $
  * $Source: 
  *
  * Revision history:
@@ -59,7 +59,7 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -571,9 +571,8 @@ cwh_pdgcs_pu_mem(void)
  *
  *===============================================
  */ 
-#if 0
 static char *
-basename ( char * const s )
+o64_basename ( char * const s )
 {
   char * p;
   char * last;
@@ -610,11 +609,10 @@ basename ( char * const s )
 
     return name;
   }
-} /* basename */
-#endif
+} /* o64_basename */
 
 static char *
-dirname ( char * const s )
+o64_dirname ( char * const s )
 {
   char * p;
   char * name;
@@ -652,7 +650,7 @@ dirname ( char * const s )
 
     return ".";
   }
-} /* dirname */
+} /* o64_dirname */
 
 /*
  * Skip over leading lines upto and including the terminator (a line that
@@ -714,7 +712,7 @@ update_rii_file ( void )
   char * new_rii_file_name;
   int    ch;
 
-  rii_dir_name = dirname ( rii_file_name );
+  rii_dir_name = o64_dirname ( rii_file_name );
   f_old_rii_file = fopen ( rii_file_name, "r" );
 
   if ( f_old_rii_file == NULL ) {
