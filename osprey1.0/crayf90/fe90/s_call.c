@@ -1418,7 +1418,7 @@ HERE:
                   }
                }
 
-/* April try                flatten_function_call(result_opnd); */
+/*                 flatten_function_call(result_opnd); */
 
                if (ATP_ELEMENTAL(spec_idx) &&
                    ATP_PROC(spec_idx) != Intrin_Proc) {
@@ -1445,8 +1445,12 @@ HERE:
                   attr_idx = find_base_attr(result_opnd, &line, &col);
    
                   if (res_exp_desc->type == Character) {
+# if 0
                      IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(attr_idx); 
                      res_exp_desc->type_idx = ATD_TYPE_IDX(attr_idx);
+# endif
+                     res_exp_desc->type_idx = IR_TYPE_IDX(ir_idx) ;
+
                      res_exp_desc->type	= TYP_TYPE(res_exp_desc->type_idx);
                      res_exp_desc->linear_type = 
                                           TYP_LINEAR(res_exp_desc->type_idx);
