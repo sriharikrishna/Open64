@@ -36,9 +36,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:31 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:45:09 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
  * Revision history:
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -462,6 +462,8 @@ fei_proc_imp(INT32 lineno,
   PROC_CLASS     Class;
   FUNCTION_SYM   sym_class;
 
+  INT map = 0;
+  
 
   sym_class = (FUNCTION_SYM) Sclass_arg;
   Class = (PROC_CLASS) Class_arg;
@@ -470,6 +472,7 @@ fei_proc_imp(INT32 lineno,
   switch (Class) {
   case PDGCS_Proc_Imported:      /* external subroutine */
   case PDGCS_Proc_Intern_Ref:
+  case PDGCS_Proc_SrcIntrin: /* fzhao add June*/
     
     st = cwh_auxst_find_item(Top_Text,name_string);
 
@@ -485,16 +488,31 @@ fei_proc_imp(INT32 lineno,
 
 
       INT32  level = HOST_LEVEL ;
-      if (Class == PDGCS_Proc_Intern_Ref){
 
+      if (Class == PDGCS_Proc_Intern_Ref ||
+          Class == PDGCS_Proc_SrcIntrin )
+     {                              /*add PDGCS_Proc_SrcIntrin for intrinsics*/
+                                    /* June fzhao*/
 	level  = INTERNAL_LEVEL;
 	eclass = EXPORT_LOCAL_INTERNAL;
+        
       }
-      
+    while (map < NUM_INAMEMAP &&
+               (strcmp(Iname_Map[map].oldname,name_string)))
+        ++map;
+
+   if (map < NUM_INAMEMAP )
+     st = cwh_stab_mk_fn_0args(Iname_Map[map].newname,
+                                eclass,
+                                level,
+                                cast_to_TY(t_TY(result_type)));
+
+  else
       st = cwh_stab_mk_fn_0args(name_string,
 				eclass,
 				level,
 				cast_to_TY(t_TY(result_type)));
+     
 
       cwh_auxst_add_to_list(&Top_Text,st,FALSE);
    }
@@ -749,6 +767,7 @@ fei_object(char * name_string,
 {
   TY_IDX  ty ;
   ST * st ;
+  ST * st1;
   ST * base_st ;
 
   BOOL hosted ;
@@ -899,8 +918,11 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   /* figure out which symbol table this object goes in           */
   /* ie: is it in COMMON somehow perhpas via CRI_Pointer as base */
 
-  if (in_common || (sym_class == Name)) {
+  if (in_common || (sym_class == Name)||
+                                (test_flag(flag_bits, FEI_OBJECT_IN_MODULE))) {
 
+// fzhao add test_flag(flag_bits, FEI_OBJECT_IN_MODULE) to keep the initial 
+// variables in module still to be in global ST table --June
      st_level = GLOBAL_SYMTAB ;
 
   } else {
@@ -919,14 +941,18 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
           cast_to_SCLASS(p->item), 
 	  EXPORT_LOCAL, 
 	  ty);
-
  if (test_flag(flag_bits,FEI_OBJECT_IN_COMMON))
 
   if (sym_class == Name) {
      Set_ST_is_not_used (st);
   }
 
-  Set_ST_base(st,st);
+ if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE)) //fzhao June
+     st1 = Scope_tab[CURRENT_SYMTAB].st;
+ else st1 = st;
+    
+  Set_ST_base(st,st1);
+//  Set_ST_base(st,st);
   Set_ST_ofst(st, off);
 
   cwh_stab_set_linenum(st,lineno);  
@@ -1143,13 +1169,12 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   if (p->form == is_ST) {
     Set_ST_sclass(st, ST_sclass(cast_to_ST(p->item)));
 
-
+//# if 0
     if (!test_flag(flag_bits,FEI_OBJECT_IN_COMMON)&& (
            ST_sclass(cast_to_ST(p->item))==SCLASS_COMMON ||
            ST_sclass(cast_to_ST(p->item))==SCLASS_MODULE ))
-     Set_ST_sclass(st,SCLASS_AUTO); 
-                     // common block 
-
+         Set_ST_sclass(st,SCLASS_AUTO);  
+//# endif
 
     Set_ST_base(st, cast_to_ST(p->item));
 
@@ -1308,14 +1333,15 @@ fei_seg (char        * name_string,
 {
   INT32 rt   ;
   ST   *st   ;
+  ST  *st1;
   STB_pkt *p ;
   SEGMENT_TYPE seg_type;
   TY_IDX  ty;
 
   seg_type = (SEGMENT_TYPE) Seg_type_arg;
 
-  if ((seg_type == Seg_Common ) ||
-       (seg_type == Seg_Module )) {
+  if ((seg_type == Seg_Common ) ) { // June ||
+// June      (seg_type == Seg_Module )) {
 
     BOOL is_duplicate = test_flag(flag_bits,FEI_SEG_DUPLICATE);
 
@@ -1338,7 +1364,6 @@ fei_seg (char        * name_string,
       if (test_flag(flag_bits,FEI_SEG_EXTERNAL))
         Set_ST_is_external(st);   
 
-// cannot cut this one  cwh_auxst_add_to_list(&Commons_Already_Seen,st,FALSE); 
       cwh_auxst_add_to_list(&Commons_Already_Seen,st,FALSE); 
 
       ty = ST_type(st);
@@ -1356,7 +1381,6 @@ fei_seg (char        * name_string,
 
     /* add to list of COMMONs requiring DST info */
 
-//  safe to cut  cwh_auxst_add_item(Procedure_ST,st,l_DST_COMLIST);
   cwh_auxst_add_item(Procedure_ST,st,l_DST_COMLIST);
 
     p = cwh_stab_packet(st,is_ST);
@@ -1377,7 +1401,10 @@ fei_seg (char        * name_string,
       st = New_ST(level);  
       cwh_auxst_clear(st);
       ST_Init(st, Save_Str(name_string), CLASS_VAR, SCLASS_AUTO, EXPORT_LOCAL,0);
-      Set_ST_base(st, st);
+if (test_flag(flag_bits,FEI_SEG_MODULE)) //June
+      st1 = Scope_tab[CURRENT_SYMTAB].st;
+else st1 = st;
+      Set_ST_base(st, st1);
 
       Set_ST_ofst(st, 0);
 
@@ -1557,7 +1584,7 @@ fei_namelist(char  * name_string,
       WN_st_idx(wn1) = ST_st_idx(st);
       WN_kid(wn,i) = wn1;
             i++;
-    printf("namelist %s\n",ST_name(st)); 
+//    printf("namelist %s\n",ST_name(st)); 
                    
                  }
   cwh_block_append_given_id(wn,First_Block,FALSE);

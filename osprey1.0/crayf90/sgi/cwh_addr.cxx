@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:30 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:45:07 $
+ * $Author: fzhao $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -147,7 +147,7 @@ static char *source_file = __FILE__;
  */ 
 
 extern void
-fei_seq_subscr( TYPE result_type )
+fei_seq_subscr( TYPE result_type ,INT32 kidsnum)
 {
   WN *ex  ;
   WN *lb  ;
@@ -216,7 +216,7 @@ enum item_class fm;
     st = cwh_stk_pop_ST();
     ty = ST_type(st);
     ad = cwh_addr_address_ST(st) ;
-    ar = cwh_addr_array(op,ad,ty);
+    ar = cwh_addr_array1(op,ad,ty,kidsnum);
     SET_ARRAY_NAME_MAP(ar,ST_name(st));
     cwh_addr_insert_bounds_check(bounds_assertion,ar);
     ar = cwh_addr_add_bound(ar,ex,sb);
@@ -227,7 +227,7 @@ enum item_class fm;
     st = cwh_stk_pop_ST();
     ty = ST_type(st);
     ad = cwh_addr_address_ST(st) ;
-    ar = cwh_addr_array(op,ad,ty);
+    ar = cwh_addr_array1(op,ad,ty,kidsnum);
     SET_ARRAY_NAME_MAP(ar,ST_name(st));
     cwh_addr_insert_bounds_check(bounds_assertion,ar);
     ar = cwh_addr_add_bound(ar,ex,sb);
@@ -262,7 +262,7 @@ enum item_class fm;
       
     }
 
-    ar = cwh_addr_array(op,ad,det.type) ;
+    ar = cwh_addr_array1(op,ad,det.type,kidsnum) ;
     if (strlen(field_name) > 0) {
 
        if (array_name) {
@@ -875,6 +875,11 @@ cwh_addr_array(OPCODE op, WN * addr, TY_IDX ty)
 
   TY& t = Ty_Table[aty];
   nkids = 2 * TY_AR_ndims(t) +1 ;
+
+/*since co_array's co_rank could be not appearing,we cannot */
+/*use TY_AR_ndims as kids number,have to use kids number    */
+/* from Cray IR -----June                                   */
+
   wn = WN_Create ( op, nkids );
   WN_element_size(wn) = TY_size(TY_etype(t));
 
@@ -887,6 +892,35 @@ cwh_addr_array(OPCODE op, WN * addr, TY_IDX ty)
   return wn ;
 }
 
+
+static WN *
+cwh_addr_array1(OPCODE op, WN * addr, TY_IDX ty,INT32 kidsnum)
+{
+  WN * wn   ;
+  TY_IDX aty  ;
+  INT16 nkids,i ;
+
+  aty = cwh_types_array_TY(ty);
+
+  TY& t = Ty_Table[aty];
+//  nkids = 2 * TY_AR_ndims(t) +1 ;
+  nkids = 2 * kidsnum +1 ;
+
+/*since co_array's co_rank could be not appearing,we cannot */
+/*use TY_AR_ndims as kids number,have to use kids number    */
+/* from Cray IR -----June                                   */
+
+  wn = WN_Create ( op, nkids );
+  WN_element_size(wn) = TY_size(TY_etype(t));
+
+  WN_kid(wn,0) = addr ;
+
+  FOREACH_AXIS(i,nkids) {
+    WN_kid(wn,i+SZ_OFF(nkids))  = NULL ;
+    WN_kid(wn,i+SUB_OFF(nkids)) = NULL ;
+  }
+  return wn ;
+}
 
 
 

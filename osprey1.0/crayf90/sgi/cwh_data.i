@@ -56,7 +56,7 @@ typedef struct {
 } b_and_o;
 
 struct data_element_s {
-  INT64 offset;
+  INT64 offset; 
   INT64 initv_size;
   union {
     b_and_o  bo;

@@ -256,6 +256,7 @@ static BOOL check_bounds_this_access;
 
 static WN * cwh_addr_add_bound(WN * ar, WN * sz, WN *sub);
 static WN * cwh_addr_array(OPCODE op, WN * ad,  TY_IDX  ty) ;
+static WN * cwh_addr_array1(OPCODE op, WN * ad,  TY_IDX  ty,INT32 kidsnum) ;
 static WN * cwh_addr_triplet(WN *lb,WN *ub,WN *str) ;
 static WN * cwh_addr_src_triplet(WN *lb,WN *ub,WN *str) ;
 static WN * cwh_addr_zero_based(WN *sub, WN * lb);

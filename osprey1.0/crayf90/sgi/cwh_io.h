@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_io.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:31 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:45:09 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_io.h,v $
  *
  * Revision history:
@@ -54,7 +54,7 @@
 #ifndef CWH_IO_INCLUDED
 #define CWH_IO_INCLUDED
 #ifdef _KEEP_RCS_ID
-  static char *rcs_id = " $Id: cwh_io.h,v 1.1.1.1 2002-05-22 20:07:31 dsystem Exp $ ";
+  static char *rcs_id = " $Id: cwh_io.h,v 1.2 2002-07-12 16:45:09 fzhao Exp $ ";
 #endif /* _KEEP_RCS_ID */
 
 extern INT cwh_io_in_ioblock; /* are we processing an I/O statement? */

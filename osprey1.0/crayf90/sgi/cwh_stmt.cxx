@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:31 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:45:10 $
+ * $Author: fzhao $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -551,6 +551,11 @@ fei_store ( TYPE result_type )
   ST   * rhs_st;
   TY_IDX  ty;
   TY_IDX  ts;
+  WN   *wt;
+  WN * wtl;
+  WN * wd;
+  TY_IDX ts1;
+  TY_IDX ts2;
   
   FLD_det det ;
 
@@ -585,6 +590,20 @@ fei_store ( TYPE result_type )
       wn = F90_Wrap_ARREXP(wn) ;
       cwh_addr_store_WN(wn,0,ts,rhs);  
       break  ;
+
+  case STR_item: //June
+    cwh_stk_pop_STR();
+    wtl = cwh_stk_pop_WN();
+    ts1 = cwh_stk_get_TY();
+    wt  = cwh_stk_pop_WN();
+    wt = cwh_expr_extract_arrayexp(wt,DELETE_ARRAYEXP_WN);
+
+    cwh_stk_pop_STR();
+    wtl = cwh_stk_pop_WN();
+    ts2 = cwh_stk_get_TY();
+    cwh_addr_store_WN(wt,0,ts2,rhs);
+    break;
+
 
     case DEREF_item:
       ts = cwh_stk_get_TY();

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:32 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:45:10 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -144,11 +144,14 @@ fei_descriptor (INT32        flag_matrix,
     break;
 
   case Array:
-    Is_True((top_of_decl_bounds != ANULL),("Bad array info"));
+     Is_True((top_of_decl_bounds != ANULL),("Bad array info"));
     ty_idx = cwh_types_mk_array_TY(decl_bounds,
-				   top_of_decl_bounds + 1,
-				   ty_dim1,
-				   bit_to_byte(last_bitsize));
+                                   top_of_decl_bounds + 1,
+                                   ty_dim1,
+                                   bit_to_byte(last_bitsize));
+
+  
+    
     if (hosted)
       (void) cwh_types_mk_pointer_TY(ty_idx,TRUE);
 
@@ -263,6 +266,8 @@ fei_array_dimen(INT32  flag_bits,
   hosted = test_flag(flag_bits,FEI_ARRAY_DIMEN_HOSTED_TYPE) || in_hosted_dtype ;
 
   top_of_decl_bounds = axis - 1 ;
+  co_top_decl_bounds = ANULL;
+
   if (top_of_decl_bounds == 0) {
      decl_bounds = New_ARB();
      p = decl_bounds;
@@ -448,8 +453,184 @@ fei_co_array_dimen(INT32  flag_bits,
                 INT    distribution,
                 INT64  upper_bound)
 {
-    printf("fei_co_array_dimen:do nothing right now \n");
-    return( 0);
+  ST * st;
+  STB_pkt *b;
+  WN  *wn ;
+  BOOL hosted ;
+  ST_IDX st_idx;
+  ARB_HANDLE p;
+  BOOL flow_dependent;
+
+  hosted = test_flag(flag_bits,FEI_ARRAY_DIMEN_HOSTED_TYPE) || in_hosted_dtype ;
+
+  if (top_of_decl_bounds == ANULL && axis == 1) { /*no array rank */
+     decl_bounds = New_ARB();
+     p = decl_bounds;
+  } else {
+     p = New_ARB();
+  }
+
+  co_top_decl_bounds = axis ;
+//  if (top_of_decl_bounds != ANULL)
+//     top_of_decl_bounds = top_of_decl_bounds + co_top_decl_bounds;
+//  else 
+//     top_of_decl_bounds = co_top_decl_bounds-1;
+
+
+  flow_dependent = test_flag(flag_bits,FEI_ARRAY_DIMEN_FLOW_DEPENDENT);
+
+  ARB_Init (p, 1, 1, 1);
+
+  if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_LB)) {
+
+    b = cast_to_STB(low_bound) ;
+    Is_True((b->form == is_ST),("Odd lbound"));
+
+    st = cast_to_ST(b->item);
+    Clear_ARB_const_lbnd(p);
+    Set_ARB_lbnd_var(p, ST_st_idx(st));
+
+    if (!hosted && !flow_dependent)
+	cwh_types_copyin_pragma(st);
+
+  } else {
+  if (test_flag(flag_bits,FEI_ARRAY_DIMEN_EMPTY_LB)) {
+     Clear_ARB_const_lbnd(p);
+     Set_ARB_empty_lbnd(p);
+   } else {
+
+    Set_ARB_const_lbnd(p);
+    Set_ARB_lbnd_val (p, low_bound);
+  }
+ }
+  
+  if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_UB)) {
+
+    b = cast_to_STB(upper_bound) ;
+    if (b != NULL) {
+      Is_True((b->form == is_ST),("Odd extent"));
+      
+      st = cast_to_ST(b->item);
+
+      Clear_ARB_const_ubnd(p);
+      Set_ARB_ubnd_var(p, ST_st_idx(st));
+
+      if (!hosted && !flow_dependent)
+  	  cwh_types_copyin_pragma(st);
+
+    }
+   } else {
+   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_EMPTY_UB)) {
+        Clear_ARB_const_ubnd(p);
+     Set_ARB_empty_ubnd(p);
+    }
+   else {  /* constant ub */
+    
+    Set_ARB_const_ubnd(p);
+    Set_ARB_ubnd_val (p, upper_bound);
+  }
+ }
+
+
+  /* set pragma on extent, for MP/LNO, doesn't go into ARB */
+
+  if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_EXT)) {
+
+    b = cast_to_STB(extent) ;
+    if (b != NULL) {
+      Is_True((b->form == is_ST),("Odd extent"));
+      
+      st = cast_to_ST(b->item);
+
+      if (!hosted && !flow_dependent)
+	cwh_types_copyin_pragma(st);
+    }
+  }
+
+  /* update stride - the argument is the bitsize of the */
+  /* current axis, but a TY has the size of an element  */
+  /* so save the bitsize till next dimension. If stride */
+  /* isn't constant bitsize becomes 0, and the TY tree  */
+  /* seems to require the element size */
+  if (axis == 1 && top_of_decl_bounds == ANULL) {
+     
+     ty_dim1 = cast_to_TY(t_TY(span_type)) ;
+     
+     Set_ARB_const_stride(p);
+     Set_ARB_stride_val(p, TY_size(Ty_Table[ty_dim1]));
+     
+  } else { 
+     ARB_HANDLE q = p[-1];
+     if (ARB_const_ubnd(p) && 
+	 ARB_const_lbnd(p) && 
+	 ARB_const_stride(q)) {
+	
+	Set_ARB_const_stride(p);
+	Set_ARB_stride_val(p, bit_to_byte(last_bitsize));
+	
+     } else {
+	
+	Set_ARB_const_stride(p);
+	Set_ARB_stride_val(p, ARB_stride_val(decl_bounds[0]));
+     }
+  }
+  
+  last_bitsize = bitsize ;
+
+  if (axis == 1 && top_of_decl_bounds == ANULL) {     /* initialize */
+
+    distribute_onto=FALSE;
+    decl_distributed_pragma_id=WN_PRAGMA_UNDEFINED;
+    decl_distribute_pragmas =NULL;
+  }
+
+ if (top_of_decl_bounds == ANULL) 
+        top_of_decl_bounds = axis-1;
+ else
+        top_of_decl_bounds++;
+
+  if (test_flag(flag_bits,FEI_ARRAY_DIMEN_ONTO_EXPR)) {
+    distribute_onto=TRUE;
+    /* get the WN for the constant */
+    wn = cwh_expr_operand(NULL);
+    Is_True( (WN_operator(wn)==OPR_INTCONST),("ONTO: expected integer constant"));
+    Is_True( (distribution!=Star_Dist),("ONTO: unexpected for * distribution"));
+    decl_onto[top_of_decl_bounds]=wn;
+  }
+
+  /* if this array is distributed, save the distribution information */
+  switch(distribution) {
+    case Block_Dist:
+	decl_distribution[top_of_decl_bounds] = DISTRIBUTE_BLOCK;
+	break;
+    case Star_Dist:
+	decl_distribution[top_of_decl_bounds]=DISTRIBUTE_STAR;
+	break;
+    case Cyclic_Dist:
+	if (test_flag(flag_bits,FEI_ARRAY_DIMEN_DIST_EXPR)) {
+	  /* get the WN for the constant */
+	  wn = cwh_expr_operand(NULL);
+	  if(WN_operator(wn)==OPR_INTCONST) {
+	    decl_cyclic_val[top_of_decl_bounds].val=WN_const_val(wn);
+	    decl_distribution[top_of_decl_bounds]=DISTRIBUTE_CYCLIC_CONST;
+	  } else {
+	    /* this is a expression */
+	    decl_cyclic_val[top_of_decl_bounds].wn=wn;
+	    decl_distribution[top_of_decl_bounds]=DISTRIBUTE_CYCLIC_EXPR;
+	  } 
+	} else {
+	  /* cyclic by itself is same as cyclic(1) */
+	  decl_cyclic_val[top_of_decl_bounds].val=1;
+	  decl_distribution[top_of_decl_bounds]=DISTRIBUTE_CYCLIC_CONST;
+	}
+	break;
+  }
+  
+  if (distribution != No_Dist) {
+    decl_distributed_pragma_id=test_flag(flag_bits,FEI_ARRAY_DIMEN_DIST_RESHAPE)?WN_PRAGMA_DISTRIBUTE_RESHAPE:WN_PRAGMA_DISTRIBUTE;
+  }
+
+  return(cast_to_int(&p));
 }
 
 
@@ -1015,14 +1196,40 @@ cwh_types_mk_array_TY(ARB_HANDLE bounds,INT16 n,TY_IDX base_idx, INT64 size)
   }
 
   // Step 2, set the first, last and dimension bits
-  for (i = 0; i < n ; i++) {
+if (co_top_decl_bounds != ANULL) {
+  for (i = 0; i <= co_top_decl_bounds ; i++) {
      Clear_ARB_first_dimen(bounds[i]);
      Clear_ARB_last_dimen(bounds[i]);
      Set_ARB_dimension(bounds[i],n-i);
+     Set_ARB_co_dimension(bounds[i],co_top_decl_bounds);
      const_str = const_str && ARB_const_stride(bounds[i]);
   }
+  for (i = co_top_decl_bounds+1; i < n ; i++) {
+     Clear_ARB_first_dimen(bounds[i]);
+     Clear_ARB_last_dimen(bounds[i]);
+     Set_ARB_dimension(bounds[i],n-i);
+     Set_ARB_co_dimension(bounds[i],co_top_decl_bounds);
+     const_str = const_str && ARB_const_stride(bounds[i]);
+  }
+ } else
+    {  for (i = 0; i < n ; i++) {
+       Clear_ARB_first_dimen(bounds[i]);
+       Clear_ARB_last_dimen(bounds[i]);
+       Set_ARB_dimension(bounds[i],n-i);
+       Set_ARB_co_dimension(bounds[i],0);
+       const_str = const_str && ARB_const_stride(bounds[i]);
+      }
+  }
+
+
+// June
+
   Set_ARB_first_dimen(bounds[0]);
-  Set_ARB_last_dimen(bounds[n-1]);
+ if (co_top_decl_bounds == ANULL)
+       Set_ARB_last_dimen(bounds[n-1]);
+ else   
+       Set_ARB_last_dimen(bounds[n-1]);
+//       Set_ARB_last_dimen(bounds[top_of_decl_bounds-co_top_decl_bounds]);
 
   if ( const_str ) {
     

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_directive
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:30 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:45:08 $
+ * $Author: fzhao $
  *
  * Description: contains routines to support directives, converting
  *              from Cray IR to WHIRL. Entry points from

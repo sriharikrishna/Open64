@@ -166,6 +166,8 @@ MTYPE_V		/* Vector_Mask     */
 
 static ARB_HANDLE    decl_bounds;  
 static INT32  top_of_decl_bounds = ANULL ;
+static INT32  co_top_decl_bounds = ANULL ;
+
 static TY_IDX ty_dim1 ;
 static INT64  last_bitsize; 
 
