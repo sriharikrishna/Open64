@@ -71,9 +71,9 @@
 ***
 **/
 
-/** $Revision: 1.5 $
-*** $Date: 2004-05-24 17:03:47 $
-*** $Author: fzhao $
+/** $Revision: 1.6 $
+*** $Date: 2004-06-28 18:39:47 $
+*** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wintrinsic.h,v $
 **/
 
@@ -1233,7 +1233,6 @@ typedef enum {
   
   /* this one somehow gets missing */
   INTRN_SUB_PI = 881,
-#ifdef KEY
   /* gcc stuff */
   INTRN_U4READFRAMEPOINTER = 882,
   INTRN_U8READFRAMEPOINTER = 883,
@@ -1260,10 +1259,7 @@ typedef enum {
   INTRN_SUBSU2          = 896,
   INTRN_SUBSV16I2       = 897,
                                                                                                        
-  INTRINSIC_LAST  =897 
-#else
-  INTRINSIC_LAST = 881
-#endif
+  INTRINSIC_LAST  = 897 
 
 } INTRINSIC;
 

@@ -791,9 +791,7 @@ DST_mk_subprogram(USRCPOS      decl,
 		  DST_vtable_elem_location vtable_elem_location,
 		  BOOL         is_declaration,
 		  BOOL         is_prototyped,
-#ifdef KEY
                   BOOL         is_artificial,
-#endif
 		  BOOL         is_external)
 {
    DST_INFO_IDX    info_idx;
@@ -1053,7 +1051,6 @@ DST_add_specification_to_variable (DST_INFO_IDX variable_def,
    DST_VARIABLE_def_specification(def_attr) = field_decl;
 }
 
-#ifdef KEY
 /* Adds a linkage name attribute to a variaable
  */
 void
@@ -1078,8 +1075,6 @@ DST_add_linkage_name_to_variable (DST_INFO_IDX variable_def,
         DST_VARIABLE_def_linkage_name(attr) = DST_mk_name(linkage_name);
    }
 }
-
-#endif
 
 /* Creates a DW_TAG_entry_point entry and returns its idx
 */
@@ -1390,9 +1385,7 @@ DST_mk_variable(USRCPOS      decl,     /* Source location */
       DST_VARIABLE_decl_decl(attr) = decl;
       DST_VARIABLE_decl_name(attr) = DST_mk_name(name);
       DST_VARIABLE_decl_type(attr) = type;
-#ifdef KEY
       DST_VARIABLE_decl_linkage_name(attr) = DST_INVALID_IDX;
-#endif
       DST_SET_declaration(flag);
    }   
    else
@@ -1403,9 +1396,7 @@ DST_mk_variable(USRCPOS      decl,     /* Source location */
       DST_VARIABLE_def_offs(attr) = offs;
       DST_VARIABLE_def_abstract_origin(attr) = abstract_origin;
       DST_VARIABLE_def_specification(attr) = DST_INVALID_IDX;
-#ifdef KEY
       DST_VARIABLE_def_linkage_name(attr) = DST_INVALID_IDX;
-#endif
 
 #if defined(_SUPPORT_IPA) || defined(_STANDALONE_INLINER)
    /* for IPA, low_pc is pointer
