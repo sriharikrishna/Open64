@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.20 $
- * $Date: 2003-12-09 16:17:53 $
+ * $Revision: 1.21 $
+ * $Date: 2004-01-06 20:33:14 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -371,14 +371,9 @@ TY2F_Append_ARB(TOKEN_BUFFER decl_tokens, ARB_HANDLE arb, BOOL purple_assumed_si
 static void
 TY2F_Append_ARB (TOKEN_BUFFER decl_tokens,ARB_HANDLE arb,BOOL purple_assumed_size)
   {
-     BOOL lb_one = FALSE;
-
      WN2F_CONTEXT context = INIT_WN2F_CONTEXT;
 
        if (ARB_const_lbnd(arb))
-           if (ARB_lbnd_val(arb) == 1)
-                 lb_one = TRUE;
-           else
               TCON2F_translate(decl_tokens,
                               Host_To_Targ(MTYPE_I4,
                                              ARB_lbnd_val(arb)),
@@ -388,11 +383,8 @@ TY2F_Append_ARB (TOKEN_BUFFER decl_tokens,ARB_HANDLE arb,BOOL purple_assumed_siz
                                   ARB_lbnd_var(arb),
                                   purple_assumed_size);
             }
-      if (!lb_one) {
-          Append_Token_Special(decl_tokens, ':');
-          lb_one = FALSE;
-        }
 
+      Append_Token_Special(decl_tokens, ':');
       if (purple_assumed_size )
            Append_Token_Special(decl_tokens,'*');
       else     
@@ -1370,6 +1362,13 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
              kind_spec = Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
 	 Prepend_Token_String(decl_tokens,Concat2_Strings(base_name,kind_spec));
       } else {
+        if (TY_is_character(ty))
+            Prepend_Token_String(
+                              decl_tokens,
+                              Concat3_Strings(Concat2_Strings(base_name, "("),
+                                              Number_as_String(TY_size(ty), "%lld"),
+                                              ")"));
+        else
 	 Prepend_Token_String(
 			      decl_tokens, 
 			      Concat3_Strings(base_name,
@@ -1409,10 +1408,11 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
       if (TY_size(ty) > 0) /* ... of known size */
 	 Prepend_Token_String(
 	    decl_tokens,
-	    Concat2_Strings("CHARACTER*",
-			    Number_as_String(TY_size(ty), "%lld")));
+	    Concat3_Strings("CHARACTER(",
+			    Number_as_String(TY_size(ty), "%lld"),
+                             ")"));
       else /* ... of unknown size */
-	 Prepend_Token_String(decl_tokens, "CHARACTER*(*)");
+	 Prepend_Token_String(decl_tokens, "CHARACTER(*)");
    }
    else
    {
