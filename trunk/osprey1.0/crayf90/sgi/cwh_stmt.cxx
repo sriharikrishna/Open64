@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.16 $
- * $Date: 2003-04-28 16:47:07 $
+ * $Revision: 1.17 $
+ * $Date: 2003-05-23 22:17:30 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -905,7 +905,13 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
       wa = cwh_stk_pop_WN();
       wc = WN_COPY_Tree(wa); 
       args[--clen] = cwh_intrin_wrap_value_parm(wa);
-      wa = cwh_stk_pop_ADDR();
+
+      /* the STR_item could be  ADDR_item or ST_item beneath */
+      if (cwh_stk_get_class()== ADDR_item) 
+             wa = cwh_stk_pop_ADDR();
+      else
+             wa = cwh_expr_address(f_T_PASSED); 
+
       args[k] = cwh_intrin_wrap_char_parm(wa,wc);
       break ;
 
@@ -1002,6 +1008,8 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
  	case CHECK_CONTIG_FLAG: 
            WN_Set_Parm_Check_Contig_Flag(args[k]);
 	    break;
+        default:
+            break;
       }
 
   }
@@ -3124,9 +3132,16 @@ fei_concat(INT32 numops)
 
   cwh_stk_push_STR(rsz,wwnn,ty,WN_item);
 
-  free(sz);
-  free(wn);
+/* when free memory as this sequence,malloc will issue seg
+ * fault when the wwnn apperance as a parameter in io stmt
+ * this only occurs on mapy--fzhao
+ */
+//  free(sz);
+//  free(wn);
+
   free(va);
+  free(wn);
+  free(sz);
 }
 
 /*===============================================
