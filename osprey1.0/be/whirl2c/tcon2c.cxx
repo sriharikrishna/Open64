@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: tcon2c.c
- * $Revision: 1.3 $
- * $Date: 2003-02-25 21:12:35 $
- * $Author: jle $
+ * $Revision: 1.4 $
+ * $Date: 2003-11-20 02:55:44 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/tcon2c.cxx,v $
  *
  * Revision history:
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/tcon2c.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/tcon2c.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -131,6 +131,10 @@ TCON2C_append_string_char(char *str, char ch)
      escaped_ch = 'n';
      escape = TRUE;
      break;
+  case '\0':
+     escaped_ch = '0';
+     escape = TRUE;
+     break;
   case '\t':
      escaped_ch = 't';
      escape = TRUE;
@@ -189,7 +193,11 @@ TCON2C_Append_String_Const(TOKEN_BUFFER tokens,
    *(str++) = '\"';
    for (stridx = 0; stridx < strlen; stridx++)
       str = TCON2C_append_string_char(str, orig_str[stridx]);
-   while (str[-1] == '\0') str--;
+//   while (str[-1] == '\0') str--;
+   if (orig_str[strlen-1] == '\0'){
+       str--;
+       str--;
+     }
    *(str++) = '\"';
    *(str++) = '\0';
    Append_Token_String(tokens, str_base);
