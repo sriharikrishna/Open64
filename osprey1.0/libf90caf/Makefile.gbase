@@ -239,6 +239,17 @@ include $(COMMONRULES)
 VPATH = $(BUILD_BASE) $(COMMON_UTIL_DIR) $(COMMON_COM_DIR) $(COMMON_COM_TARG_DIR)
 
 
+ifeq ($(BUILD_OS), IRIX)
+  ifeq ($(BUILD_COMPILER), VENDOR)
+libf90caf.a: $(OBJECTS) 
+	$(EDG_PRELINK) $(OBJECTS)
+	ar -r $@ $(OBJECTS)
+  else 
 libf90caf.a: $(OBJECTS) 
 	ar -r $@ $(OBJECTS)
+  endif
+else
+libf90caf.a: $(OBJECTS) 
+	ar -r $@ $(OBJECTS)
+endif
 
