@@ -1,3 +1,5 @@
+/*  tagging test */
+
 /*
 
   Copyright (C) 2000, 2001 Silicon Graphics, Inc.  All Rights Reserved.
@@ -39,9 +41,9 @@
  * ====================================================================
  *
  * Module: xstats.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:34 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2004-01-14 23:04:44 $
+ * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/xstats.h,v $
  *
  * Description:
@@ -53,7 +55,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *xstats_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/xstats.h,v $ $Revision: 1.2 $";
+static char *xstats_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/xstats.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "opcode.h"
