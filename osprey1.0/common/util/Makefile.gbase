@@ -124,6 +124,10 @@ CFILES	= \
 	tracing.c 	\
 	util.c 		\
 	vstring.c 	\
+	x_math.c        \
+	x_stdlib.c      \
+	x_stdio.c       \
+	x_string.c      \
 	$(CFIL)
 
 HFILES	= 		\
@@ -142,7 +146,11 @@ HFILES	= 		\
 	mstack.h 	\
 	tracing.h 	\
 	util.h 		\
-	vstring.h
+	vstring.h       \
+	x_math.h        \
+	x_stdlib.h      \
+	x_stdio.h       \
+	x_string.h
 
 CXXFILES = \
    cxx_memory.cxx	\
