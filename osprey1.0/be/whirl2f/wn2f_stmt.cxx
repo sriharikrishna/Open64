@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.16 $
- * $Date: 2002-10-11 21:42:12 $
+ * $Revision: 1.17 $
+ * $Date: 2002-10-21 19:30:57 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.17 $";
 #endif
 
 #include <alloca.h>
@@ -1227,8 +1227,9 @@ struct write_st {
 private:
   TOKEN_BUFFER tokens;
   UINT         lines_between_decls;
+  SYMTAB_IDX   symtab; 
 public:
-  write_st(TOKEN_BUFFER tb,UINT lbd) : tokens(tb), lines_between_decls(lbd) {}
+  write_st(TOKEN_BUFFER tb,UINT lbd,SYMTAB_IDX symtab) : tokens(tb), lines_between_decls(lbd),symtab(symtab) {}
 
 // A function object to declare an identifier from the ST 
 // table, provided it represents a function, or a variable
@@ -1256,8 +1257,6 @@ public:
      BOOL variabledefinemodule = !strcmp(stbasename,scope_name);
 
 
-//     nomodulevar = (strstr(stbasename,scope_name)==NULL &&
-//                    strstr(scope_name,stbasename)==NULL );
 
        nomodulevar = !ST_is_in_module(st)||strcmp(stbasename,scope_name);
   
@@ -1280,8 +1279,14 @@ int ffmm2 = ST_has_nested_ref(st);
             && ST_sclass(st)!= SCLASS_DGLOBAL
             && ST_sclass(st)!= SCLASS_PSTATIC
             &&(nomodulevar 
-                || !strcmp(ST_name(st),stbasename)))  
+                || !strcmp(ST_name(st),stbasename))
+            && (ST_sclass(st) != SCLASS_EXTERN||
+                   symtab ==  GLOBAL_SYMTAB)) 
 	  return ;
+
+     if (ST_sclass(st) == SCLASS_EXTERN &&
+         symtab ==  GLOBAL_SYMTAB)
+         return;
 
      if (ST_is_in_module(st) && nomodulevar && !Stab_Is_Common_Block(stbase))
           return;
@@ -1377,7 +1382,7 @@ WN2F_Append_Symtab_Vars(TOKEN_BUFFER tokens,
     * that have been referenced/used.
     */
 
-   For_all(St_Table,symtab,write_st(tokens,lines_between_decls));
+   For_all(St_Table,symtab,write_st(tokens,lines_between_decls,symtab));
 
 
 } /* WN2F_Append_Symtab_Vars */
