@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.21 $
- * $Date: 2004-10-04 22:01:18 $
+ * $Revision: 1.22 $
+ * $Date: 2004-10-12 15:23:29 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.21 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.22 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -2419,7 +2419,6 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
      bool extern_void_fun = (ST_sym_class(st) == CLASS_FUNC && ST_sclass(st) == SCLASS_EXTERN); 
      extern_void_fun = extern_void_fun && (TY_mtype(TY_ret_type(ST_pu_type(st))) != MTYPE_F8);
      global = global || extern_void_fun;
-     global = Compile_Upc && global;
 
      TY_IDX st_ty  = ST_class(st) == CLASS_VAR ? ST_type(st) :
        ST_class(st) == CLASS_FUNC ? ST_pu_type(st) : ST_type(st);
@@ -2437,7 +2436,8 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
 	 !(ST_sym_class(st) == CLASS_FUNC && lookup(ST_name(st))) &&
 	 (Stab_External_Def_Linkage(st)                        || 
 	  (ST_sym_class(st) == CLASS_VAR && ST_sclass(st) == SCLASS_CPLINIT) ||
-	  BE_ST_w2fc_referenced(st)))
+	  BE_ST_w2fc_referenced(st)) || 
+          global )
        {
 	 tmp_tokens = New_Token_Buffer();
 	 if (ST_is_weak_symbol(st))
