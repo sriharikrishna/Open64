@@ -33,7 +33,7 @@
 #
 #
 
-#ident "$Revision: 1.3 $"
+#ident "$Revision: 1.4 $"
 # 
 # This file has been heavily hacked for building on Linux
 #
@@ -198,7 +198,7 @@ GCDEFS	=
 # locally specified include directories are searched before the globally
 # specified ones.
 #
-CFLAGS	= $(CVERSION) $(VCFLAGS) $(LCFLAGS) $(GCFLAGS)
+CFLAGS	+= $(CVERSION) $(VCFLAGS) $(LCFLAGS) $(GCFLAGS)
 
 #
 # Each of these three components is divided into defines (-D's and -U's),
@@ -225,8 +225,8 @@ CINCS	= $(VCINCS) $(LCINCS) $(GCINCS)
 #
 # CXX flags are decomposed using the same hierarchy as C flags.
 #
-C++FLAGS  = $(CVERSION) $(VCXXFLAGS) $(LCXXFLAGS) $(GCXXFLAGS)
-CXXFLAGS  = $(C++FLAGS)
+C++FLAGS  += $(CVERSION) $(VCXXFLAGS) $(LCXXFLAGS) $(GCXXFLAGS)
+CXXFLAGS  += $(C++FLAGS)
 
 VCXXFLAGS = $(VCXXDEFS) $(VCXXINCS) $(VCXXOPTS) $(VC++FLAGS)
 LCXXFLAGS = $(LCXXDEFS) $(LCXXINCS) $(LCXXOPTS) $(LC++FLAGS)

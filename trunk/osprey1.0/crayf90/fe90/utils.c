@@ -37,6 +37,8 @@
 static char USMID[] = "\n@(#)5.0_pl/sources/utils.c	5.9	10/14/99 12:53:57\n";
 
 # include <stdio.h>             /* for tempnam */
+# include <stdlib.h>
+
 
 # include "defines.h"           /* Machine dependent ifdefs */
 
@@ -464,24 +466,40 @@ char *	 convert_to_string (long_type	*the_constant,
 |*                                                                            *|
 \******************************************************************************/
 
+
 boolean get_temp_file(char       *open_status,
                       FILE      **file_ptr,
                       char       *file_name)
 {
    boolean      result;
-   char        *tmp_file_name;
-
-
+   char tmp_file_name[MAXPATHLEN];
+   int fd_temp;
+   FILE *tmp_file_ptr;
 
    TRACE (Func_Entry, "get_temp_file", NULL);
 
    result = FALSE;
+   fd_temp = -1;
+   strcpy(tmp_file_name, "/tmp/Open64_XXXXXX");
+   fd_temp = mkstemp(tmp_file_name);
+   
+   if (fd_temp != -1) {
+     *file_ptr = fdopen(fd_temp, /*"rw"*/ open_status);
+     if (*file_ptr != NULL) {
+       result = TRUE;
+     }
+     if (file_name != NULL) {
+       strcpy(file_name, tmp_file_name);
+     }
+   }
 
+
+   /*
    tmp_file_name = (char *) tempnam(NULL, NULL);
 
 
    if (tmp_file_name != NULL) {
-
+   
       if (file_name != NULL) {
          strcpy(file_name, tmp_file_name);
       }
@@ -490,6 +508,7 @@ boolean get_temp_file(char       *open_status,
          result = TRUE;
       }
    }
+   */
 
    TRACE (Func_Exit, "get_temp_file", NULL);
 
