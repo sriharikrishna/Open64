@@ -934,7 +934,7 @@ void    sin_intrinsic(opnd_type     *result_opnd,
          break;
    }
 
-# if 0 
+# if 0 /* March */
 
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
    IR_OPND_R(ir_idx) = null_opnd;
@@ -3007,7 +3007,7 @@ void    num_images_intrinsic(opnd_type     *result_opnd,
 
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-/*# if 0  March */
+/* # if 0  fzhao cannot get ride of this code ???*/
 
    if (ATP_INTRIN_ENUM(*spec_idx) == Rem_Images_Intrinsic) {
       ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
@@ -3208,7 +3208,7 @@ EXIT:
    /* must reset foldable and will_fold_later because there is no */
    /* folder for this intrinsic in constructors.                  */
 
-/* # endif */
+/* # endif  */
 
    res_exp_desc->foldable = FALSE;
    res_exp_desc->will_fold_later = FALSE;
@@ -4006,7 +4006,6 @@ void    max_intrinsic(opnd_type     *result_opnd,
       opr = Min_Opr;
    }
 
-/* # if 0 /* March */
 
    if (fold_it &&
        res_exp_desc->type == Integer &&
@@ -4065,7 +4064,6 @@ void    max_intrinsic(opnd_type     *result_opnd,
       }
    }
 
-/* # endif /* March */
 
          res_exp_desc->foldable = FALSE;   /* March */
          res_exp_desc->will_fold_later = FALSE;
@@ -7122,9 +7120,9 @@ void    ceiling_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
+
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
-
 
    IR_OPR(ir_idx) = Ceiling_Opr;
 
@@ -17313,7 +17311,7 @@ void    repeat_intrinsic(opnd_type     *result_opnd,
 
    TRACE (Func_Entry, "repeat_intrinsic", NULL);
 
-   ATP_EXTERNAL_INTRIN(*spec_idx) = TRUE;
+   ATP_EXTERNAL_INTRIN(*spec_idx) = TRUE; 
    ir_idx = OPND_IDX((*result_opnd));
    list_idx1 = IR_IDX_R(ir_idx);
    list_idx2 = IL_NEXT_LIST_IDX(list_idx1);
@@ -17347,7 +17345,7 @@ void    repeat_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 /* March */
+//# if 0  
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx &&
        IL_FLD(list_idx2) == CN_Tbl_Idx &&
@@ -17395,15 +17393,14 @@ void    repeat_intrinsic(opnd_type     *result_opnd,
    cast_to_cg_default(&opnd, &(arg_info_list[info_idx2].ed));
    COPY_OPND(IL_OPND(list_idx2), opnd);
 
+//# endif
+
    res_exp_desc->type_idx = type_idx;
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-#endif
-
-      res_exp_desc->foldable = FALSE;
-      res_exp_desc->will_fold_later = FALSE;
-
+//      res_exp_desc->foldable = FALSE;
+//      res_exp_desc->will_fold_later = FALSE;
    TRACE (Func_Exit, "repeat_intrinsic", NULL);
 
 }  /* repeat_intrinsic */

@@ -825,7 +825,7 @@ static void init_compiler (int	 argc,
 # ifdef _DEBUG
 
 #if 0
- /* ftry Feb12   verify_semantic_tbls(); */	/* Make sure flags and messages agree. */
+ /*  verify_semantic_tbls(); */	/* Make sure flags and messages agree. */
 
    if (strcmp(operator_str[The_Last_Opr], "The_Last_Opr") != 0) {
       PRINTMSG(1, 689, Internal, 0);

@@ -206,7 +206,7 @@ static	boolean	do_elf_notes_section(Elf_Data *, int, int);
 static	boolean	do_elf_object(Elf *, Elf32_Ehdr	*, int, int);
 # endif
 
-/* ftry# if defined(_DEBUG) */
+/* # if defined(_DEBUG) */
 static	void	dump_pdt(FILE *);
 static	void	print_mod_tbl(void);
 /* # endif */
@@ -4268,12 +4268,12 @@ EXIT:
    free_attr_list(attr_list_free_list);
    free_attr_list(SCP_USED_MODULE_LIST(curr_scp_idx));
 
-/* ftry 2002   SCP_USED_MODULE_LIST(curr_scp_idx)	= NULL_IDX; */
+/*   SCP_USED_MODULE_LIST(curr_scp_idx)	= NULL_IDX; */
    SCP_USED_MODULE_LIST(curr_scp_idx)	= NULL_IDX;
 
-/* ftry 2002   TBL_FREE(rename_only_tbl); */
+/*   TBL_FREE(rename_only_tbl); */
   
-/* ftry 2002   keep_module_procs			= FALSE; */
+/*    keep_module_procs			= FALSE; */
    keep_module_procs			= FALSE;
 
    TRACE (Func_Exit, "use_stmt_semantics", NULL);
@@ -5866,7 +5866,7 @@ static	boolean	srch_for_module_tbl(int		 module_attr_idx,
          if (dump_flags.pdt_dump) {
             dump_pdt(mod_file_ptr);
          }
-/* ftry# endif */
+/* # endif */
          /* Not a module information table.  Find the next loader */
          /* table in this file.  Reset to start of this table and */
          /* then seek to the end of this table.  If the header    */
@@ -5915,7 +5915,7 @@ static	boolean	srch_for_module_tbl(int		 module_attr_idx,
          break;
       }
 
-/*  ftry# if defined(_DEBUG) */
+/*  # if defined(_DEBUG) */
 
       if (dump_flags.pdt_dump) {
          dump_pdt(mod_file_ptr);
@@ -6229,7 +6229,7 @@ static	boolean  read_in_module_tbl(int		 fp_file_idx,
                                sizeof(mit_header_type),
                                1,
                                mod_file_ptr);
-/*  ftry# if defined(_DEBUG) */
+/*  # if defined(_DEBUG) */
 
          if (dump_flags.pdt_dump) {
             dump_pdt(mod_file_ptr);
@@ -7402,7 +7402,7 @@ static void  assign_new_idxs_after_input(int	module_attr_idx)
       AT_DEF_LINE(attr_idx)		= line;
       AT_DEF_COLUMN(attr_idx)		= column;
       AT_NAME_IDX(attr_idx)		= np_idx + AT_NAME_IDX(attr_idx);
-      fm = AT_NAME_IDX(attr_idx);  /* ftry */
+      fm = AT_NAME_IDX(attr_idx);  
       AT_ORIG_NAME_IDX(attr_idx)	= np_idx + AT_ORIG_NAME_IDX(attr_idx);
       fm = AT_ORIG_NAME_IDX(attr_idx); 
       AT_ATTR_LINK(attr_idx)		= (AT_ATTR_LINK(attr_idx) == NULL_IDX) ?
@@ -10601,7 +10601,7 @@ static	void  check_il_for_attrs(int	list_idx)
 |*	NOTHING								      *|
 |*									      *|
 \******************************************************************************/
-/* ftry# if defined(_DEBUG) */
+/* # if defined(_DEBUG) */
 
 static	void	dump_pdt(FILE	*mod_file_ptr)
 {
@@ -10864,4 +10864,4 @@ static	void	print_mod_tbl()
 
 }   /* print_mod_tbl */
 
-/*  ftry# endif */
+/*  # endif */

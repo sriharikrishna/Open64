@@ -6454,9 +6454,9 @@ void flatten_function_call(opnd_type     *result)
    curr_stmt_sh_idx = new_stmt_idx;
 
 #if 0
-//   if (FUNCTION_MUST_BE_SUBROUTINE(attr_idx) || // March
-//       ATP_ELEMENTAL(spec_idx)) {
-//     if (ATP_ELEMENTAL(spec_idx)) {
+   if (FUNCTION_MUST_BE_SUBROUTINE(attr_idx) || 
+       ATP_ELEMENTAL(spec_idx)) {
+     if (ATP_ELEMENTAL(spec_idx)) {
 #endif
 
       bd_idx = ATD_ARRAY_IDX(attr_idx);
@@ -6540,12 +6540,10 @@ void flatten_function_call(opnd_type     *result)
 
          ATD_TYPE_IDX(tmp_idx)	   = type_idx;
          ATD_ARRAY_IDX(tmp_idx)    = bd_idx;
-/*         ATD_IM_A_DOPE(tmp_idx)    = ATD_IM_A_DOPE(attr_idx); */
-
-         ATD_IM_A_DOPE(tmp_idx)    = FALSE; /* March */
+         ATD_IM_A_DOPE(tmp_idx)    = ATD_IM_A_DOPE(attr_idx); 
 
          AT_ACTUAL_ARG(tmp_idx)    = TRUE;
-/*         ATD_POINTER(tmp_idx)      = ATD_POINTER(attr_idx); */
+         ATD_POINTER(tmp_idx)      = ATD_POINTER(attr_idx); 
          ATD_POINTER(tmp_idx)      = FALSE;
          AT_SEMANTICS_DONE(tmp_idx)= TRUE;
       }
@@ -6999,7 +6997,7 @@ void flatten_function_call(opnd_type     *result)
 
       }
 /*   } */
-# if 0 /* April */
+# if 0 
    else {
       tmp_idx = get_stmt_tmp(ATD_TYPE_IDX(attr_idx),
                              FALSE,

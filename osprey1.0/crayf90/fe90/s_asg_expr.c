@@ -291,6 +291,7 @@ void assignment_stmt_semantics (void)
       COPY_OPND(r_opnd, IR_OPND_R(ir_idx));
       exp_desc_r.rank = 0;
       ok &= expr_semantics(&r_opnd, &exp_desc_r);
+      ok &= TRUE;
       COPY_OPND(IR_OPND_R(ir_idx), r_opnd);
 
       if (! ok) {
@@ -444,14 +445,14 @@ CK_WHERE:
             ok = FALSE;
          }
 #if 0
-//         else if (! check_where_conformance(&exp_desc_l)) {
-//
-//            find_opnd_line_and_column((opnd_type *) &IR_OPND_L(ir_idx),
-//                                      &opnd_line,
-//                                      &opnd_col);
-//            PRINTMSG(opnd_line, 195, Error, opnd_col);
-//            ok = FALSE;
-// ftry         }
+         else if (! check_where_conformance(&exp_desc_l)) {
+
+            find_opnd_line_and_column((opnd_type *) &IR_OPND_L(ir_idx),
+                                      &opnd_line,
+                                      &opnd_col);
+            PRINTMSG(opnd_line, 195, Error, opnd_col);
+            ok = FALSE;
+          }
 #endif
                   
          if (ok) {
@@ -1035,6 +1036,8 @@ boolean expr_semantics (opnd_type       *result_opnd,
    int			save_target_char_len_idx;
    int                  save_target_type_idx;
 
+  operator_type   fm2;
+  fld_type  fm1; 
 
    TRACE (Func_Entry, "expr_semantics", NULL);
 
@@ -1073,10 +1076,21 @@ boolean expr_semantics (opnd_type       *result_opnd,
         OPND_FLD(init_target_opnd) != NO_Tbl_Idx ||
         target_array_idx != NULL_IDX)) {
 
+     fm1 = OPND_FLD((*result_opnd)); /* for test only June */
+     fm2 = IR_OPR(OPND_IDX((*result_opnd)));
+
       COPY_OPND(opnd, (*result_opnd));
-     ok = fold_aggragate_expression(&opnd, exp_desc, FALSE) && ok; 
+
+      if (IR_OPR(OPND_IDX((*result_opnd)))==Constant_Array_Construct_Opr ||
+          IR_OPR(OPND_IDX((*result_opnd)))== Null_Opr ||
+           IR_OPR(OPND_IDX((*result_opnd)))== Subscript_Opr ) /* June*/
+            ok = fold_aggragate_expression(&opnd, exp_desc, FALSE) && ok; 
+/*  June      else */
+/*             exp_desc->foldable=FALSE; */
+
       COPY_OPND((*result_opnd), opnd);
    }
+
 
    TRACE (Func_Exit, "expr_semantics", NULL);
 
@@ -2763,7 +2777,7 @@ boolean  gen_whole_subscript (opnd_type *opnd, expr_arg_type *exp_desc)
       IL_IDX(tlst3_idx)      = CN_INTEGER_ONE_IDX;
    }
 
-/* # if defined(_TARGET_OS_MAX) May */
+# if defined(_TARGET_OS_MAX) 
 
 # ifdef COARRAY_FORTRAN
    if (save_pe_dv_list_idx != NULL_IDX) {
@@ -2817,7 +2831,7 @@ boolean  gen_whole_subscript (opnd_type *opnd, expr_arg_type *exp_desc)
       io_item_must_flatten = TRUE;
    }
 # endif
-/* # endif May */
+# endif 
 
    if (ok && 
        TYP_TYPE(ATD_TYPE_IDX(attr_idx)) == Character) {

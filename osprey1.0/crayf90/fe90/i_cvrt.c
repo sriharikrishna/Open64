@@ -13550,7 +13550,7 @@ static void send_attr_ntry(int		attr_idx)
  
       ((long64) AT_MODULE_OBJECT(attr_idx)      << FEI_OBJECT_IN_MODULE)); 
 
-      fm = AT_MODULE_OBJECT(attr_idx);  /*ftry June*/
+      fm = AT_MODULE_OBJECT(attr_idx);  
 
 
       if (AT_MODULE_IDX(attr_idx)!=NULL_IDX ||

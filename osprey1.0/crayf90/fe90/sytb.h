@@ -610,7 +610,7 @@ union	attr_tbl_entry	{
 \***************/
 
 
-union	bounds_tbl_entry {			/* TOTAL 2 64 bit words */
+union	bounds_tbl_entry {			/* TOTAL 2 64 bit  */
 
 			struct	{Uint		rank		:  8;
 				 Uint		array_class	:  3;
