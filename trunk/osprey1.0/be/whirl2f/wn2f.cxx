@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.9 $
- * $Date: 2002-09-20 20:49:26 $
+ * $Revision: 1.10 $
+ * $Date: 2002-09-26 21:27:36 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.10 $";
 #endif
 
 #include <alloca.h>
@@ -652,7 +652,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
       }
       else
       {
-	 if (!Stab_Is_Common_Block(st) && !Stab_Is_Equivalence_Block(st))
+//Sept	 if (!Stab_Is_Common_Block(st) && !Stab_Is_Equivalence_Block(st))
 	 {
 	    /* Base the path at the st object, and separate it from 
 	     * the remainder of the path with the field selection 
@@ -661,6 +661,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
 	    (void)translate_var_ref(tokens, st);
 	    Append_Token_Special(tokens, WN2F_F90_pu ? '%' : '.');
 	 }
+# if 0
 	 if (Stab_Is_Equivalence_Block(st) &&
 	     (ST_is_return_var(st) ||
 	      (PUinfo_current_func != NULL && 
@@ -668,10 +669,13 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
 	    TY2F_Translate_Fld_Path(tokens, fld_path, 
 				    deref_fld,FALSE, TRUE,context);
 	 else
+# endif
+
 	    TY2F_Translate_Fld_Path(tokens, fld_path, 
 				    deref_fld, 
-				    (Stab_Is_Common_Block(st) || 
-				     Stab_Is_Equivalence_Block(st)),
+//				    (Stab_Is_Common_Block(st) || 
+//				     Stab_Is_Equivalence_Block(st)),
+                                    FALSE ,
 				    FALSE/*as_is*/,
 				    context);
 
@@ -780,6 +784,7 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
                   reset_WN2F_CONTEXT_has_no_arr_elmt(context);
 	 }
        }
+
        else if ((WN_opc_operator(addr) == OPR_LDA || 
 		 WN_opc_operator(addr) == OPR_LDID) &&
 		(TY_kind(base_ty) != KIND_STRUCT) &&
@@ -802,6 +807,7 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 				  offset + WN_lda_offset(addr), /* offset */
 				  context);
        }
+
        else /* Neither common-block nor equivalence field-access */
        {
 	 /* Find the path to the field we wish to access and append
