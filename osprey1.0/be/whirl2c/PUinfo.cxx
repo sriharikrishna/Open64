@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: PUinfo.c
- * $Revision: 1.6 $
- * $Date: 2003-06-19 19:22:34 $
+ * $Revision: 1.7 $
+ * $Date: 2003-06-19 19:43:30 $
  * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
@@ -67,12 +67,12 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>
 
-#include "unparse_common.h"
+#include "common_include.h"
 #include "w2cf_parentize.h" /* For W2CF_Parent_Map */
 #include "mempool.h"
 #include "const.h"
