@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.4 $
- * $Date: 2002-08-23 21:58:49 $
+ * $Revision: 1.5 $
+ * $Date: 2002-08-30 21:21:21 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.5 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -622,11 +622,11 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
    /* First operand */
    if (binary_op)
      {
-      set_WN2F_CONTEXT_no_parenthesis(context);
+// August    set_WN2F_CONTEXT_no_parenthesis(context);
       WN2F_Translate_Arithmetic_Operand(tokens, wn0, wn0_ty, 
 					TRUE/*call-by-value*/,
 					context);
-      reset_WN2F_CONTEXT_no_parenthesis(context);
+//      reset_WN2F_CONTEXT_no_parenthesis(context);
       } 
 
    /* Operation */
@@ -634,7 +634,6 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
    /* Second operand, or only operand for unary operation */
 
-   reset_WN2F_CONTEXT_no_parenthesis(context);
    WN2F_Translate_Arithmetic_Operand(tokens, wn1, wn1_ty, 
 				     TRUE/*call-by-value*/,
 				     context);

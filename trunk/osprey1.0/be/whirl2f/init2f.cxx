@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: init2f.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:33 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-30 21:21:20 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $
  *
  * Revision history:
@@ -75,7 +75,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.3 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -227,13 +227,14 @@ INIT2F_Prepend_Equivalence(TOKEN_BUFFER tokens,
     * where a temporary variable is equivalenced to some other
     * memory reference.
     */
-   Prepend_F77_Indented_Newline(tokens, 1, NULL/*label*/);
+//   Prepend_F77_Indented_Newline(tokens, 1, NULL/*label*/);
    Prepend_Token_Special(tokens, ')');
    Prepend_Token_String(tokens, W2CF_Symtab_Nameof_Tempvar(tmpvar_idx));
    Prepend_Token_Special(tokens, ',');
    Prepend_And_Copy_Token_List(tokens, name1_tokens);
    Prepend_Token_Special(tokens, '(');
    Prepend_Token_String(tokens, "EQUIVALENCE");
+   Prepend_F77_Indented_Newline(tokens, 1, NULL/*label*/);
 } /* INIT2F_Prepend_Equivalence */
 
 

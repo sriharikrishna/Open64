@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.4 $
- * $Date: 2002-08-22 15:48:38 $
+ * $Revision: 1.5 $
+ * $Date: 2002-08-30 21:21:20 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,9 +86,10 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.5 $";
 #endif
 
+#include <ctype.h>
 #include "whirl2f_common.h"
 #include "PUinfo.h"
 #include "tcon2f.h"
@@ -337,6 +338,16 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
        Append_F77_Indented_Newline(tokens, 0, NULL);
        Append_And_Reclaim_Token_List(tokens,&decl_tokens); }
 
+
+   if (ST_is_private(st)) {
+       TOKEN_BUFFER decl_tokens=New_Token_Buffer();
+       Append_Token_String(decl_tokens,"PRIVATE");
+       Append_Token_String(decl_tokens,ST_name(st));
+       Append_Token_Special(tokens, '\n');
+       Append_F77_Indented_Newline(tokens, 0, NULL);
+       Append_And_Reclaim_Token_List(tokens,&decl_tokens); }
+
+
    if (ST_is_my_pointer(st)) {
        TOKEN_BUFFER decl_tokens=New_Token_Buffer();
        Append_Token_String(decl_tokens,"POINTER");
@@ -344,6 +355,8 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
        Append_Token_Special(tokens, '\n');
        Append_F77_Indented_Newline(tokens, 0, NULL);
        Append_And_Reclaim_Token_List(tokens,&decl_tokens); }
+
+
    if (ST_is_f90_target(st)) {
        TOKEN_BUFFER decl_tokens=New_Token_Buffer();
        Append_Token_String(decl_tokens,"TARGET");
@@ -657,6 +670,9 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    WN *stmt;
    ST *rslt = NULL;
    BOOL needcom=1;
+   const char * func_name= W2CF_Symtab_Nameof_St(st);
+   char * cptl_func_name = ST_name(st);
+
 
    ASSERT_DBG_FATAL(TY_kind(funtype) == KIND_FUNCTION,
 		    (DIAG_W2F_UNEXPECTED_SYMBOL, "ST2F_func_header"));
@@ -728,6 +744,11 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    }
 
     if (rslt !=NULL) {
+      for (int i=0;i<strlen(func_name);i++) 
+         cptl_func_name[i] = toupper(func_name[i]);
+     }
+  
+    if (rslt !=NULL && strcmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st))) { 
         Append_Token_String(header_tokens,"result(");
         Append_Token_String(header_tokens,
                              W2CF_Symtab_Nameof_St(rslt));
@@ -825,35 +846,36 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    if (!is_altentry)
    {
       /* Emit parameter declarations, indented and on a new line */
+# if 0
       Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
       Append_Token_String(header_tokens, "IMPLICIT NONE");
-
-
+# endif
       for (param = first_param; param < num_params -implicit_parms; param++)
       {
 	 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-	 if (params[param] != NULL) {
-	   ST2F_decl_translate(header_tokens, params[param]);
-           if (ST_is_optional_argument( params[param])) {
-              Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-              Append_Token_String(header_tokens,"OPTIONAL ");
-              Append_Token_String(header_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-           }
-        if (ST_is_intent_in_argument( params[param])) {
-              Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-              Append_Token_String(header_tokens,"INTENT(in) ");
-              Append_Token_String(header_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-           }
-       if (ST_is_intent_out_argument( params[param])) {
-              Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-              Append_Token_String(header_tokens,"INTENT(out) ");
-              Append_Token_String(header_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-           }
+	 if (params[param] != NULL && !ST_is_return_var(params[param])) {
 
-        } 
+	     ST2F_decl_translate(header_tokens, params[param]);
+             if (ST_is_optional_argument( params[param])) {
+                Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                Append_Token_String(header_tokens,"OPTIONAL ");
+                Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+             }
+             if (ST_is_intent_in_argument( params[param])) {
+                Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                Append_Token_String(header_tokens,"INTENT(in) ");
+                Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+              }
+             if (ST_is_intent_out_argument( params[param])) {
+                 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                 Append_Token_String(header_tokens,"INTENT(out) ");
+                 Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+             }
+
+           } 
       }
    }
 
@@ -904,6 +926,14 @@ ST2F_Declare_Tempvar(TY_IDX ty, UINT idx)
    }
    Append_Token_String(tmp_tokens, W2CF_Symtab_Nameof_Tempvar(idx)); /* name */
    TY2F_translate(tmp_tokens, ty);                                   /* type */
+  if (ST_is_in_module(Scope_tab[Current_scope].st) &&
+      !PU_is_nested_func(Pu_Table[ST_pu(Scope_tab[Current_scope].st)]))
+     {
+       Append_F77_Indented_Newline(tmp_tokens, 1, NULL/*label*/);
+       Append_Token_String(tmp_tokens,"PRIVATE ");
+       Append_Token_String(tmp_tokens, W2CF_Symtab_Nameof_Tempvar(idx));
+     }
+
    Append_And_Reclaim_Token_List(PUinfo_local_decls, &tmp_tokens);
    Set_Current_Indentation(current_indent);
 } /* ST2F_Declare_Tempvar */
