@@ -109,10 +109,10 @@
  */
 
 #include <stdarg.h>
-#ifdef _SOLARIS_SOLARIS
-#include <cdefs.h>      /* use crayf90/fe90/cdefs.h */
+#if defined(__sun) || defined(__alpha)
+# include <cdefs.h>      /* use crayf90/fe90/cdefs.h */
 #else
-#include <sys/cdefs.h>  /* use system's header      */
+# include <sys/cdefs.h>  /* use system's header */
 #endif
 
 __BEGIN_DECLS
