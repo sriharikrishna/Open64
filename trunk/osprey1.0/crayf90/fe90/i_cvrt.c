@@ -11731,7 +11731,7 @@ static TYPE get_type_desc(int	input_idx)
                 (xt_empty  << FEI_ARRAY_DIMEN_EMPTY_EXT)|
                 (ub_empty   << FEI_ARRAY_DIMEN_EMPTY_UB);
 
-         flag |= (BD_FLOW_DEPENDENT(bd_idx) << FEI_ARRAY_DIMEN_FLOW_DEPENDENT);
+         flag |= (BD_FLOW_DEPENDENT(pe_bd_idx) << FEI_ARRAY_DIMEN_FLOW_DEPENDENT);
 
          temp_attr_idx = attr_idx;
          if (ATD_CLASS(attr_idx) == CRI__Pointee &&
