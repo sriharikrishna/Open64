@@ -84,9 +84,9 @@ char DRA_file_name[MAXPATHLEN];
 
 static void DRA_Make_File_Name();
 
-static char* basename(char *const s);
+static char* o64_basename(char *const s);
 
-static char* dirname(char *const s);
+static char* o64_dirname(char *const s);
 
 
 // =====================================================================
@@ -237,13 +237,8 @@ DRA_Set_Write_Location(void)
 void 
 DRA_Mem_Unmap_File()
 {
-
-/* Solaris porting  */
-#ifdef _SOLARIS_SOLARIS
+  // Note: Solaris CC, against Unix standard, wants first arg to be (char*)
   (void) munmap(DRA_file_mmap, (size_t)DRA_file_size);
-#else 
-  (void) munmap((void*)DRA_file_mmap, (size_t)DRA_file_size);
-#endif
 }
 
 
@@ -291,11 +286,11 @@ DRA_Make_File_Name()
   char *obj_file_name = Obj_File_Name ? 
     Obj_File_Name : New_Extension (Src_File_Name, ".o");
   
-  char *dir = dirname(obj_file_name);
+  char *dir = o64_dirname(obj_file_name);
   strcpy (DRA_file_name, dir);
   strcat (DRA_file_name, DRA_DIRECTORY);
 
-  char *base = basename(obj_file_name);
+  char *base = o64_basename(obj_file_name);
   INT baselen = strlen(base);
   
   if (base[baselen-2] == '.' && base[baselen-1] == 'o')
@@ -313,7 +308,7 @@ static char tempbuf[MAXPATHLEN];
 
 
 static char*
-basename(char *const s)
+o64_basename(char *const s)
 {
   register char *p;
   register char *const t = tempbuf;
@@ -335,7 +330,7 @@ basename(char *const s)
 
 
 static char*
-dirname(char *const s)
+o64_dirname(char *const s)
 {
   register char *p;
   register char *const t = tempbuf;
