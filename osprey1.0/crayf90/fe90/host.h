@@ -82,10 +82,10 @@ typedef unsigned long                   Ulong;
 # include <string.h>
 # include <limits.h>
 # include <unistd.h>
+# include <sys/param.h>   
 
 # if defined(_HOST_OS_UNICOS) || defined(_HOST_OS_MAX) || (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
 # include <math.h>
-# include <sys/param.h>
 
 # if !(defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX)) && defined(_DEBUG)
 # include <malloc.h>             /* Needed for malloc_check */
