@@ -33,78 +33,19 @@
 #
 
 #
-#  Makefile for targ_mips_irix
+#  Makefile for whirl2c
 #
 
 #
-#  These directories must be "built" first because they generate header files
-#  which other directories depend on.
+#  Define build parameters
 #
-INCLUDE_SUBDIRS = \
-	include \
-	targ_info
+PWD = $(shell pwd)
 
-#
-#  Next, all of the libraries are built because the tools depend on them.
-#
-LIBRARY_SUBDIRS = \
-	arith \
-	g++3-include \
-	libcif \
-	libcmplrs \
-	libcomutil \
-	libdwarf \
-	libelf \
-	libelfutil \
-	libiberty \
-	libunwind \
-	libunwindP \
-	libunwind_gdb
+BUILD_AREA     = ..
+BUILD_TOT      = $(PWD)/../..
+BUILD_BASE     = $(BUILD_TOT)/be/whirl2c
 
+include $(BUILD_AREA)/Makefile.platform
 
-#
-#  Finally, the compiler tools (components) are built.
-#
-#  Note that be_driver must come last since it depends on other components
-#  being built first.
-#
-TOOL_SUBDIRS = \
-	be \
-	cg \
-	crayf90/libf90sgi \
-	crayf90/fe90 \
-	crayf90/sgi \
-	driver \
-	dwarfdump \
-	elfdump \
-	fec_238 \
-	g++fe \
-	gccfe \
-	ipa \
-	ipl \
-	ir_tools \
-	lno \
-	lw_inline \
-	medusa \
-	whirl2c \
-	whirl2f \
-	wopt \
-	gdb \
-	be_driver \
-	libf90caf
-
-#	ld64
-
-
-SUBDIRS=$(INCLUDE_SUBDIRS) $(LIBRARY_SUBDIRS) $(TOOL_SUBDIRS)
-
-CurrentDirectory=$(shell pwd)
-
-default clean clobber:
-	@for d in $(SUBDIRS); do \
-	    if [ -d $$d ] ; then \
-	    	echo "===> cd $$d; $(MAKE) $@"; \
-	    	cd $$d; $(MAKE) $@; cd $(CurrentDirectory); \
-	    fi; \
-	done
+include $(BUILD_TOT)/Makefile.gsetup
 
