@@ -493,7 +493,8 @@ enum TY_FLAGS
     TY_IS_SEQUENCE           = 0x8000,
     TY_IS_SHARED        = 0x10000,       // UPC shared type
     TY_IS_STRICT        = 0x20000,
-    TY_IS_RELAXED       = 0x40000
+    TY_IS_RELAXED       = 0x40000,
+    TY_IS_CO_ARRAY      = 0x80000
 };
 
 

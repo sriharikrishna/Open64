@@ -1268,6 +1268,19 @@ Set_TY_is_f90_deferred_shape(TY_IDX tyi)  { Set_TY_is_f90_deferred_shape(Ty_Tabl
 inline void
 Clear_TY_is_f90_deferred_shape(TY_IDX tyi){ Clear_TY_is_f90_deferred_shape(Ty_Table[tyi]);}
 
+inline BOOL
+TY_is_co_array(const TY& ty)   { return ty.flags & TY_IS_CO_ARRAY;}
+inline void
+Set_TY_is_co_array(TY& ty)     { ty.flags |= TY_IS_CO_ARRAY; }
+inline void
+Clear_TY_is_co_array(TY& ty)   { ty.flags &= ~TY_IS_CO_ARRAY; }
+inline BOOL
+TY_is_co_array(const TY_IDX tyi){ return TY_is_co_array(Ty_Table[tyi]);}
+inline void
+Set_TY_is_co_array(TY_IDX tyi)  { Set_TY_is_co_array(Ty_Table[tyi]); }
+inline void
+Clear_TY_is_co_array(TY_IDX tyi){ Clear_TY_is_co_array(Ty_Table[tyi]);}
+
 
 inline BOOL
 TY_is_external(const TY& ty)   { return ty.flags & TY_IS_EXTERNAL; }
