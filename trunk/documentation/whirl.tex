@@ -1,17 +1,17 @@
-\documentclass{article}
-\usepackage{makeidx}
-\makeindex
-\oddsidemargin 0in
-\textheight 9in
-\textwidth 6.5in
-\topmargin 0in
-\begin{document}
-\title{Whirl Intermediate Form\\ for the Open64 Compiler}
-\maketitle
-\clearpage
-
-\tableofcontents
-\clearpage
+%\documentclass{article}
+%\usepackage{makeidx}
+%\makeindex
+%\oddsidemargin 0in
+%\textheight 9in
+%\textwidth 6.5in
+%\topmargin 0in
+%\begin{document}
+%\title{Whirl Intermediate Form\\ for the Open64 Compiler}
+%\maketitle
+%\clearpage
+%\tableofcontents
+%\clearpage
+\chapter{Whirl Abstract Syntax Tree}
 
 \section{Introduction}
 
@@ -47,7 +47,7 @@ package. The generated WHIRL code should not assume any semantics
 other than what is specified in this document; otherwise it
 is considered incorrect WHIRL.
 
-A separate document describes the symbol table portion of WHIRL.
+The WHIRL symbol table is described in Chapter~\ref{chap:symtab}
 
 \section{Compilation Targets}
 
@@ -1962,6 +1962,7 @@ The bit-field deposition is specified by the fields bit\_offset and
 bit\_size.
 
 \section{Pseudo-registers}
+\label{sect:preg}
 
 One important task of the compilation process is to identify
 candidates for allocation to registers. WHIRL programs can use an
@@ -2065,7 +2066,8 @@ each call that sets its value. In VH and H WHIRL, preg -1 suffices
 because a function can return only one item, even though it may be
 a composite item. After lowering to M WHIRL, depending on the
 linkage convention, more than one item can be returned in multiple
-dedicated registers. See Section~\ref{} regarding restrictions on
+dedicated registers. See Section~\ref{sect:preg}
+regarding restrictions on
 where negative pregs can appear.
 
 \end{itemize}
@@ -3492,6 +3494,7 @@ ELSE
   END\_BLOCK
 END_IF
 \end{verbatim}
+~
 \end{minipage}
 
 \begin{minipage}{3in}
@@ -3530,7 +3533,4 @@ BODY
 \caption{ASCII Formats for Structured Control Flow Statements}
 \end{figure}
 
-\clearpage
-\addcontentsline{toc}{section}{Index}
-\printindex
-\end{document}
+%\end{document}
