@@ -4,8 +4,8 @@ SHELL = /bin/sh
 # For detailed description of the following BUILD parameters, see
 # osprey1.0/Makefile.gsetup
 #
-# Usually, to port the F90 front end to different platform, onl
-# need to change "BUILD_TARGET", "BUILD_OS" and "BUILD_COMPILER"
+# Usually, to port the F90 front end to a different platform, one only
+# needs to change "BUILD_TARGET", "BUILD_OS" and "BUILD_COMPILER"
 #----------------------------------------------------------------------- 
 
 BUILD_ABI      = 32BIT
@@ -26,6 +26,7 @@ BUILD_SB       = NO
 #
 #-----------------------------------------------------------------------
 
-MAKE = gmake
+# Use $(MAKE), automatically defined by GNU make
+#MAKE = gmake 
 
 PLATFORM_DIRTS_SPECIFIC = 

@@ -31,7 +31,8 @@ TOOLROOT       = $(BUILD_TOT)
 #  Note: the path is machine-dependent!
 #-----------------------------------------------------------------------
 
-MAKE = gmake
+# Use $(MAKE), automatically defined by GNU make
+#MAKE = gmake
 
 PLATFORM_DIRTS_SPECIFIC = 
 

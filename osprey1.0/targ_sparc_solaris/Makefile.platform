@@ -17,6 +17,7 @@ BUILD_SB       = NO
 #  is not in the default search path of chosen compiler, define it
 #-----------------------------------------------------------------------
 
-MAKE = gmake
+# Use $(MAKE), automatically defined by GNU make
+#MAKE = gmake
 
 PLATFORM_DIRTS_SPECIFIC = # SunWS_*
