@@ -33,7 +33,7 @@
 #
 #
 
-#ident "$Revision: 1.1.1.1 $"
+#ident "$Revision: 1.2 $"
 # 
 # This file has been heavily hacked for building on Linux
 #
@@ -97,9 +97,9 @@ ENDIAN = -D_MIPSEB
 endif
 
 ifeq ($(BUILD_COMPILER), GNU)
-ASNAME = /local/gcc-3.0.4/inst/bin/gcc
-CCNAME = /local/gcc-3.0.4/inst/bin/gcc
-C++NAME =/local/gcc-3.0.4/inst/bin/g++
+ASNAME = gcc
+CCNAME = gcc
+C++NAME = g++
 F77 = g77	# Some machines don't have g77 installation
 F90 = g77	# GNU f90 is not available yet
 endif
@@ -160,9 +160,8 @@ M4	= m4
 # The native C compiler, which must be used when building programs that are
 # run on the build host from a makefile.
 #
-HOST_CC  = /local/gcc-3.0.4/inst/bin/gcc -funsigned-char -D_SGI_SOURCE -D__GNU_BUG_WORKAROUND -D_LONGLONG -D_MIPS_SZPTR=32 -D_MIPS_SZINT=32 -D_MIPS_SZLONG=32 -D_LANGUAGE_C
-
-HOST_C++ = /local/gcc-3.0.4/inst/bin/g++ -funsigned-char -D_SGI_SOURCE -D__GNU_BUG_WORKAROUND -D_NOTHREADS -D_LONGLONG -D_MIPS_SZPTR=32 -D_MIPS_SZINT=32 -D_MIPS_SZLONG=32 -D_LANGUAGE_C_PLUS_PLUS
+HOST_CC  = gcc -funsigned-char -D_SGI_SOURCE -D__GNU_BUG_WORKAROUND -D_LONGLONG -D_MIPS_SZPTR=32 -D_MIPS_SZINT=32 -D_MIPS_SZLONG=32 -D_LANGUAGE_C
+HOST_C++ = g++ -funsigned-char -D_SGI_SOURCE -D__GNU_BUG_WORKAROUND -D_NOTHREADS -D_LONGLONG -D_MIPS_SZPTR=32 -D_MIPS_SZINT=32 -D_MIPS_SZLONG=32 -D_LANGUAGE_C_PLUS_PLUS
 HOST_CXX = $(HOST_C++)
 
 ifeq ($(BUILD_COMPILER), VENDOR)
