@@ -37,8 +37,8 @@
 /* ====================================================================
  *
  * Module: DaVinci.cxx
- * $Revision: 1.2 $
- * $Date: 2003-11-04 16:09:33 $
+ * $Revision: 1.3 $
+ * $Date: 2003-12-09 19:16:19 $
  *
  * Description:
  *	Interface to daVinci, a visualization system for displaying
@@ -47,11 +47,6 @@
  * ====================================================================
  * ====================================================================
  */
-
-// Solaris workaround
-#ifdef _SOLARIS_SOLARIS
-extern char * sys_errlist[];
-#endif
 
 #include <sys/types.h>		    // for pid_t
 #include <sys/wait.h>		    // for waitpid()
@@ -742,9 +737,8 @@ DaVinci::DaVinci(MEM_POOL *m, FILE *_trace_fp, bool usage_check) :
     }
     // error to stdout so it appears on pipe read by parent proc.
     // use message syntax that DaVinci::Parse_Event() recognizes.
-    //   more? detected if errno out of range for sys_errlist.
     printf("communication_error(\"execlp of daVinci: %s %s\")\n",
-	   sys_errlist[errno], "(define $DAVINCIHOME; need daVinci on $PATH)");
+	   strerror(errno), "(define $DAVINCIHOME; need daVinci on $PATH)");
     exit (1);
 
   default:	                // parent
