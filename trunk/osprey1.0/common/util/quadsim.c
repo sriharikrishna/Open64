@@ -37,8 +37,8 @@
  * =======================================================================
  *
  *  Module: quadsim.c
- *  $Revision: 1.1.1.1 $
- *  $Date: 2002-05-22 20:07:09 $
+ *  $Revision: 1.2 $
+ *  $Date: 2003-11-04 16:16:49 $
  *
  * =======================================================================
  * =======================================================================
@@ -106,7 +106,8 @@ static const	du	twop64 =
 static const	du	twopm916 =
 {0x06b00000,	0x00000000};
 
-static const	du	infinity =
+/* Note: the name 'infinity' may conflict with <math.h> */
+static const	du	myinfinity =
 {0x7ff00000,	0x00000000};
 
 extern	INT	c_q_le(QUAD x, QUAD y, INT *p_err );
@@ -127,7 +128,7 @@ extern	QUAD	c_q_extd(double x, INT *p_err );
 extern	QUAD	c_q_trunc(QUAD x, INT *p_err );
 extern	double	trunc(double x);
 
-#if defined(_GCC_NO_PRAGMAWEAK)
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 #define c_q_trunc __c_q_trunc
 #define c_q_ge __c_q_ge
@@ -156,7 +157,7 @@ INT32	result;
 		return ( (INT32)x.hi );
 	}
 
-	if ( fabs(x.hi) == infinity.d )
+	if ( fabs(x.hi) == myinfinity.d )
 	{
 		*p_err = 1;
 
@@ -197,7 +198,7 @@ UINT32	result;
 		return ( (UINT32)x.hi );
 	}
 
-	if ( fabs(x.hi) == infinity.d )
+	if ( fabs(x.hi) == myinfinity.d )
 	{
 		*p_err = 1;
 
@@ -247,7 +248,7 @@ INT64	t;
 		return ( (INT64)x.hi );
 	}
 
-	if ( fabs(x.hi) == infinity.d )
+	if ( fabs(x.hi) == myinfinity.d )
 	{
 		*p_err = 1;
 
@@ -317,7 +318,7 @@ UINT64	t;
 		return ( (UINT64)x.hi );
 	}
 
-	if ( fabs(x.hi) == infinity.d )
+	if ( fabs(x.hi) == myinfinity.d )
 	{
 		*p_err = 1;
 
