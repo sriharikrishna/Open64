@@ -623,7 +623,8 @@ public:
 #define	PU_MP_NEEDS_LNO		0x00020000	// PU needs LNO processing
 #define	PU_HAS_ALLOCA		0x00040000	// PU has alloca in it
 #define	PU_IN_ELF_SECTION	0x00080000	// PU is in its own Elf section
-#define	PU_HAS_MP		0x00100000	// Symtab has MP region/do within it
+#define	PU_HAS_MP		0x00100000	// Symtab has MP region/do 
+                                                // within it
 #define	PU_MP			0x00200000	// PU is an MP region/do
 #define	PU_HAS_NAMELIST		0x00400000	// PU has namelist
 #define	PU_HAS_RETURN_ADDRESS	0x00800000	// __return_address was used
@@ -632,25 +633,35 @@ public:
 #define	PU_CALLS_SETJMP		0x04000000	// PU has calls to setjmp(2)
 #define	PU_CALLS_LONGJMP	0x08000000	// PU has calls to longjmp(2)
 #define PU_IPA_ADDR_ANALYSIS    0x10000000      // IPA has done address analysis
-#define PU_SMART_ADDR_ANALYSIS  0x20000000      // Unnecessary addr flags are reset
+#define PU_SMART_ADDR_ANALYSIS  0x20000000      // Unnecessary addr flags are
+                                                // reset
 
 #define	PU_HAS_SYSCALL_LINKAGE	0x40000000	// preserve input regs
 #define PU_HAS_GLOBAL_PRAGMAS	0x80000000	// PU is a dummy pu with global
 						//   pragmas
-#define	PU_HAS_USER_ALLOCA	0x0000000100000000LL
+#define	PU_HAS_USER_ALLOCA		0x0000000100000000LL
 						// PU has user alloca in it
 #define	PU_HAS_UNKNOWN_CONTROL_FLOW	0x0000000200000000LL
 						// PU has unknown control flow
 						//  which disables tail call 
 						// optimization
-#define PU_IS_THUNK		0x0000000400000000LL // pu is a C++ thunk
-#define PU_DECL_VIEW		0x0000000800000000LL // pu is a multiply copy for declare "external" 
-#define PU_NEED_UNPARSED	0x0000001000000000LL // pu flag for unparser to discard some unwanted PU
-#define PU_NEEDS_MANUAL_UNWINDING       0x0000000800000000LL // PU has cleanups in outermost scope and
-                                                             //hence needs to call _Unwind_Resume itself
+#define PU_IS_THUNK			0x0000000400000000LL
+                                                // pu is a C++ thunk
+#define PU_DECL_VIEW			0x0000000800000000LL
+                                                // pu is a multiply copy 
+                                                // for declare "external" 
+#define PU_NEED_UNPARSED		0x0000001000000000LL
+                                                // pu flag for unparser to 
+                                                // discard some unwanted PU
+#define PU_NEEDS_MANUAL_UNWINDING       0x0000002000000000LL
+                                                // PU has cleanups in outermost
+                                                // scope and hence needs to 
+                                                // call _Unwind_Resume itself
 #ifdef TARG_X8664
-#define PU_FF2C_ABI             0x0000001000000000LL 
-                                               // PU use g77 linkage convention for returns of complex and float
+# define PU_FF2C_ABI             	0x0000004000000000LL
+                                                // PU use g77 linkage
+                                                // convention for returns of
+                                                // complex and float
 #endif
 
 
