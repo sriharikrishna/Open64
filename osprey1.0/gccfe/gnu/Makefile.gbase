@@ -290,7 +290,9 @@ default: first $(TARGETS) last
 #  built.
 #----------------------------------------------------------------------
 first:
+ifeq ($(BUILD_OS), LINUX)
 	cd $(BUILD_AREA)/include && $(MAKE)
+endif
 	cd $(TARG_LIBIBERTY_DIR) && $(MAKE)
 
 #----------------------------------------------------------------------
