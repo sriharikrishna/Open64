@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2c.c
- * $Revision: 1.6 $
- * $Date: 2003-06-19 19:22:34 $
- * $Author: broom $
+ * $Revision: 1.7 $
+ * $Date: 2003-09-16 21:26:19 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $
  *
  * Revision history:
@@ -72,7 +72,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -331,6 +331,10 @@ ST2C_Get_Common_Ty2c_List(COMMON_BLOCK *common,
       //WTH is this for???
       //Set_TY_name_idx(Ty_Table[ty], 0);
       TY2C_translate(TY2C_LIST_tokens(ty2c_list), ty, context);
+
+      //add "global struct" variable name output here----fzhao
+      Append_Token_String(TY2C_LIST_tokens(ty2c_list),ST_name(common_st));
+
       //Set_TY_name_idx(Ty_Table[ty], name_idx);
       Set_TY_is_translated_to_c(ty);
       Set_Current_Indentation(indentation);
@@ -500,12 +504,12 @@ ST2C_basic_decl(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
    
    Append_Token_String(decl_tokens, 
 		       W2CF_Symtab_Nameof_St(st));    /* name */
+
    
    //WEI:
    //If type of st is struct, make it incomplete because the complete type will be 
    //declared in w2c.h (see WN2C_Append_Symtab_Types)
    TY_IDX ty = ST_class(st) == CLASS_FUNC ? ST_pu_type(st) : ST_type(st);
-
    if (Compile_Upc) {
      if (TY_kind(ty) == KIND_STRUCT ||
 	 (TY_kind(ty) == KIND_FUNCTION && 
@@ -591,7 +595,6 @@ ST2C_decl_var(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
 {
    INITO_IDX inito;
    Is_True(ST_sym_class(st)==CLASS_VAR, ("expected CLASS_VAR ST"));
-
    if (ST_is_initialized(st) && !Stab_No_Linkage(st)) /* initialize */
    {
       ST2C_basic_decl(tokens, st, context); /*type, name, storage class*/
@@ -666,6 +669,7 @@ ST2C_use_var(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
      /* Do not mark the variable as referenced, since we do not
       * want to declare it in the local scope.
       */
+
      Append_Token_String(tokens, ST2C_Get_Common_Block_Name(st));
 
    }
