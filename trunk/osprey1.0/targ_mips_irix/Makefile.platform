@@ -24,6 +24,8 @@ BUILD_ROOTS    = TARGET
 ROOT           = /
 TOOLROOT       = $(BUILD_TOT)
 
+EDG_PRELINK = /usr/lib/DCC/edg_prelink
+
 #-----------------------------------------------------------------------
 #  If C++ Standard Template Library Extension (slist, hashtable, etc)
 #  is not in the default search dirs of the chosen compiler, define it.
