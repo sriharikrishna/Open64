@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:28 $
+ * $Revision: 1.4 $
+ * $Date: 2002-09-25 21:53:57 $
  * $Author: open64 $
  *
  * Revision history:
@@ -1543,7 +1543,6 @@ cwh_addr_pstid(ST *st, OFFSET_64 off, TY_IDX ty , WN * rhs)
   TYPE_ID bt;
   OPCODE  op;
 
-  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty));
 
   if (BIG_OFFSET(off)) {
     wn = cwh_addr_lda(st,off,ty);
@@ -1618,7 +1617,7 @@ cwh_addr_stid(ST *st, OFFSET_64 off, TY_IDX ty , WN * rhs)
   TYPE_ID bt;
   OPCODE  op;
 
-  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
+//  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
 
   if (BIG_OFFSET(off)) {
     wn = cwh_addr_lda(st,off,ty);
@@ -1736,7 +1735,6 @@ cwh_addr_pstore(WN * lhs, OFFSET_64 off, TY_IDX ty, WN * rhs)
      lhs = cwh_expr_bincalc(OPR_ADD,lhs,WN_Intconst(Pointer_Mtype,off));
      off = 0;
   }
-  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty));
   op  = PStore_Opcode [TY_mtype(ty)];
   wn  = WN_CreatePstore(op,off,tp,rhs,lhs);
 

@@ -2650,7 +2650,8 @@ static void  compress_tbls(int		al_idx,
          mod_idx = mod_idx + BD_RANK(mod_idx) + 1;  /* 1 for header */
       }
       else {
-         mod_idx++;
+/*         mod_idx++;*/
+         mod_idx = mod_idx + BD_RANK(mod_idx) + 1;
       }
    }
 

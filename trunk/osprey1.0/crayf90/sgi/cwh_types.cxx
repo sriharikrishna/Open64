@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.9 $
- * $Date: 2002-09-20 20:03:00 $
+ * $Revision: 1.10 $
+ * $Date: 2002-09-25 21:53:58 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.10 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -704,6 +704,10 @@ fei_user_type(char         *name_string,
   TY& ty = Ty_Table[ty_idx];
 
   TY_Init (ty, bit_to_byte(size), KIND_STRUCT, MTYPE_M, Save_Str(name_string));
+
+  if (sequence == Seq_Mixed)
+       Set_TY_is_sequence(ty);
+
 
     st = New_ST(CURRENT_SYMTAB);
 
@@ -3404,6 +3408,7 @@ cwh_types_make_pointer_type(TY_IDX ty, BOOL f90_pointer)
    if (f90_pointer) {
       return Make_F90_Pointer_Type (ty);
    } else {
+
       return Make_Pointer_Type (ty);
    }
 }

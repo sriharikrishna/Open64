@@ -773,6 +773,22 @@ static INTPTR fei_proc_def     ( char          *name_string,
                                  INT32         st_idx,
                                  INT64	       flags );
 
+static INTPTR fei_proc_interface     ( char          *name_string,
+                                 INT32         lineno,
+                                 INT32         sym_class,
+                                 INT32         Class,
+                                 INT32         unused1,
+                                 INT32         unused2,
+                                 INT32         num_dum_args,
+                                 INT32         parent_stx,
+                                 INT32         first_st_idx,
+                                 INT32         aux_idx,
+                                 TYPE          result_type,
+                                 INT32         cmcs_node,
+                                 INT32         st_idx,
+                                 INT64         flags );
+
+
 static INTPTR fei_proc_imp     ( INT32         lineno,
                                  char          *name_string,
                                  INT32         unused1,
