@@ -130,7 +130,7 @@ void allocate_stmt_semantics (void)
    int		  	bd_idx;
    int		  	bd_list_idx;
    int			cn_idx;
-   int		  	col;
+   int		  	col = 0;
    opnd_type      	dope_opnd;
    int		  	dv_idx;
    expr_arg_type  	exp_desc;
@@ -140,7 +140,7 @@ void allocate_stmt_semantics (void)
    int		  	ir_idx;
    int		  	lb_list_idx;
    opnd_type		len_opnd;
-   int		  	line;
+   int		  	line = 0;
    int		  	list_idx;
    int		  	list_idx2;
    int		  	loc_idx;
