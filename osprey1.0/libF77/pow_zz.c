@@ -81,3 +81,8 @@ void pow_zz_(dcomplex *r, dcomplex *a, dcomplex *b)
 {
   *r = __powzz(a->dreal, a->dimag, b->dreal, b->dimag);
 }
+
+void pow_zz__(dcomplex *r, dcomplex *a, dcomplex *b)
+{
+  *r = __powzz(a->dreal, a->dimag, b->dreal, b->dimag);
+}

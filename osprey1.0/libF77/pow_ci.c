@@ -86,6 +86,12 @@ pow_ci_(complex *p, complex *a, int32 *b)
         *p = __powci(a->real, a->imag, *b);
 }
 
+void
+pow_ci__(complex *p, complex *a, int32 *b)
+{
+        *p = __powci(a->real, a->imag, *b);
+}
+
 complex __powcl(float areal, float aimag, int64 n)   /* __powcl = a**n  */
 {
   float_t t;
@@ -130,6 +136,12 @@ void pow_cl(complex *p, complex *a, int64 *b)   /* p = a**b  */
 
 void
 pow_cl_(complex *p, complex *a, int64 *b)
+{
+        *p = __powcl(a->real, a->imag, *b);
+}
+
+void
+pow_cl__(complex *p, complex *a, int64 *b)
 {
         *p = __powcl(a->real, a->imag, *b);
 }
