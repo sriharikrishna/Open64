@@ -1,8 +1,0 @@
-# dependences for compilation
-../include/bstring.h
-../include/stddef.h
-../include/stdio.h
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../common/com/defs.h
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../common/util/dso.c
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../common/util/dso.h
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/be/../../include/cmplrs/rcodes.h
