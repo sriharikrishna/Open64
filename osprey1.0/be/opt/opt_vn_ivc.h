@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_vn_ivc.h
-// $Revision: 1.2 $
-// $Date: 2002-09-06 22:34:54 $
-// $Author: open64 $
+// $Revision: 1.3 $
+// $Date: 2003-02-19 22:10:35 $
+// $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn_ivc.h,v $
 //
 // ====================================================================
@@ -102,6 +102,7 @@
 #define opt_vn_ivc_INCLUDED "opt_vn_ivc.h"
 
 #include <vector>
+#include <iterator>
 #include "opt_vn_expr.h"    // For VN_VALNUM, VN_EXPR, and VN_EXPR_MAP
 #include "opt_vn.h"         // For VN
 
@@ -256,16 +257,17 @@ struct NEXT_EQCLASS_MEMBER
 // -- Forward iterator adaptor for containers of elements with next field ---
 // --------------------------------------------------------------------------
 
-template <class Container, class Next>
+template <class Category, class Container, class Next>
 class forward_to_next_iterator : 
-   public forward_iterator<
+   public iterator<
+     typename iterator_traits<typename Container::iterator>::iterator_category,
      typename iterator_traits<typename Container::iterator>::value_type,
      typename iterator_traits<typename Container::iterator>::difference_type>
 {
 public:
 
    typedef typename Container::iterator iterator_type;
-   typedef forward_to_next_iterator<Container, Next> Self;
+   typedef forward_to_next_iterator<Category, Container, Next> Self;
 
 protected:
 
@@ -313,9 +315,9 @@ public:
 }; // forward_to_next_iterator
 
 
-template <class Container, class Next>
-bool operator== (const forward_to_next_iterator<Container,Next> &it1,
-                 const forward_to_next_iterator<Container,Next> &it2)
+template <class Category, class Container, class Next>
+bool operator== (const forward_to_next_iterator<Category,Container,Next> &it1,
+                 const forward_to_next_iterator<Category,Container,Next> &it2)
 {
    return (it1.container() == it2.container() &&
 	   it1.current_idx() == it2.current_idx());
@@ -375,7 +377,7 @@ private:
    
 public:
 
-   typedef forward_to_next_iterator<IVC_EQCLASS_MEMB, 
+   typedef forward_to_next_iterator<forward_iterator_tag, IVC_EQCLASS_MEMB, 
                                     NEXT_EQCLASS_MEMBER> members_iterator;
    
    VN_IVC(IVC_KIND kind, VN *vn, MEM_POOL *lpool):
