@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.18 $
- * $Date: 2002-10-24 19:46:08 $
- * $Author: open64 $
+ * $Revision: 1.19 $
+ * $Date: 2003-01-10 02:47:30 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.18 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.19 $";
 #endif
 
 #include <alloca.h>
@@ -2511,9 +2511,12 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    TY_IDX       arg_ty;
    BOOL         return_to_param;
    BOOL         is_user_call = FALSE;
+   BOOL has_stat = FALSE;
+   BOOL is_allocate_stmt = FALSE; 
    OPCODE    tempopc;
    WN *kidofparm;
    TY_IDX kid_ty;
+   BOOL first_nonemptyarg = FALSE;
 
    /* Emit any relevant call-site directives
     */
@@ -2597,12 +2600,14 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
 	 ST2F_use_translate(call_tokens, WN_st(wn));
         else {
-          if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE")== 0 )    
-             Append_Token_String(call_tokens,"ALLOCATE");
+          if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE")== 0 ) {
+	     is_allocate_stmt = TRUE;
+             Append_Token_String(call_tokens,"ALLOCATE"); }
           else if (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE")== 0)
            {
             Append_Token_String(call_tokens,"DEALLOCATE");
             set_WN2F_CONTEXT_has_no_arr_elmt(context);
+            is_allocate_stmt = TRUE;
            }
          }
 
@@ -2660,8 +2665,9 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       {
           arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
 
-          if (TY_Is_Character_Reference(arg_ty) ||
+          if ((TY_Is_Character_Reference(arg_ty) ||
 	      TY_Is_Chararray_Reference(arg_ty))
+              && !is_allocate_stmt)
              {
 	         total_implicit_args++;
              }
@@ -2713,11 +2719,14 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	 /* Call-by value, but argument should be emitted without
 	  * the %val() qualifier.
 	  */
-         if (WN_kid(wn, arg_idx)!=NULL)
+         if (WN_kid(wn, arg_idx)!=NULL) {
+              first_nonemptyarg = TRUE;
 	      WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+         }
       } 
-      else if (WN_operator(kidofparm) !=OPR_CALL &&TY_Is_Character_Reference(arg_ty)||
-               WN_operator(kidofparm)==OPR_CALL &&Func_Return_Character(arg_ty) )
+      else if ((WN_operator(kidofparm) !=OPR_CALL &&TY_Is_Character_Reference(arg_ty)||
+               WN_operator(kidofparm)==OPR_CALL &&Func_Return_Character(arg_ty) ) &&
+               !is_allocate_stmt)
       {
 	 /* Handle substring arguments here.  These are always assumed
 	  * to be passed by reference. For a function result, the length
@@ -2741,8 +2750,12 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
          }
          else                
  	   len_idx = last_arg_idx - (total_implicit_args - implicit_args); 
-
-
+if (first_nonemptyarg && !has_stat )
+  Append_Token_Special(call_tokens, ','); //fzhao Nov
+else
+        has_stat = FALSE;
+     
+        first_nonemptyarg = TRUE;
 	 WN2F_String_Argument(call_tokens,
 			      WN_kid(wn, cur_idx), /* string base */
 			      WN_kid(wn, len_idx), /* string length */
@@ -2754,8 +2767,14 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       {
 	 /* Need to explicitly note this as a value parameter.
 	  */
-         if (WN_kid(wn, arg_idx)!=NULL)
+         if (WN_kid(wn, arg_idx)!=NULL) {
+              if (first_nonemptyarg && !has_stat)
+                  Append_Token_Special(call_tokens, ','); //fzhao Nov
+              else
+                  has_stat=FALSE;
+              first_nonemptyarg = TRUE;
 	      WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+         }
 //	 Append_Token_Special(call_tokens, ')');
       }
       else /* TY_Is_Pointer(arg_ty) */
@@ -2763,22 +2782,32 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	 /* There is also an implicit string length when the argument
 	  * is an array of character strings.
 	  */
-	 if (TY_Is_Chararray_Reference(arg_ty))
+	 if (TY_Is_Chararray_Reference(arg_ty) &&
+              !is_allocate_stmt)
 	    implicit_args++;
 
 	 /* Assume call-by-reference parameter passing */
-        if (WN_kid(wn, arg_idx)!=NULL)
+        if (WN_kid(wn, arg_idx)!=NULL){
+           if (first_nonemptyarg && !has_stat)
+                  Append_Token_Special(call_tokens, ','); //fzhao Nov
+            else
+                  has_stat = FALSE;
+
+           first_nonemptyarg = TRUE;
 	    WN2F_Offset_Memref(call_tokens, 
 			    WN_kid(wn, arg_idx), /* address expression */
 			    arg_ty,              /* address type */
 			    TY_pointed(arg_ty),  /* object type */
 			    0,                   /* offset from address */
 			    context);
+        }
       }
 //      if ((arg_idx+implicit_args) < last_arg_idx)
 //	 Append_Token_Special(call_tokens, ',');
+
      if ((arg_idx+implicit_args) < (last_arg_idx-1) && WN_kid(wn, arg_idx)!=NULL)
-         Append_Token_Special(call_tokens, ',');
+          ;
+//Nov          Append_Token_Special(call_tokens, ',');
      else 
       if ((arg_idx+implicit_args) == (last_arg_idx-1)) { 
         if (WN_operator(wn) == OPR_CALL &&
@@ -2787,6 +2816,7 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
          if ((WN_opc_operator(WN_kid0(WN_kid(wn, (last_arg_idx)))))==OPR_LDA) {
           Append_Token_Special(call_tokens, ',');
           Append_Token_String(call_tokens,"STAT=");
+          has_stat=TRUE;
          } else
         arg_idx++;
           ;
@@ -2794,8 +2824,10 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
           }
         else 
          if (WN_kid(wn, arg_idx)!=NULL && WN_kid(wn,arg_idx+1)!=NULL)
+               ;
+
            /* argument could be "optional" argument,so there could be NULL wn */
-              Append_Token_Special(call_tokens, ',');
+//Nov              Append_Token_Special(call_tokens, ',');
       }
     }
    }
@@ -2996,7 +3028,6 @@ WN2F_namelist_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    int k ;
 
    const char *st_name =  W2CF_Symtab_Nameof_St(WN_st(wn));
-//   const char *st_name1;
     ASSERT_DBG_FATAL(WN_operator(wn) == OPR_NAMELIST,
                      (DIAG_W2F_UNEXPECTED_OPC, "WN2F_namelist_stmt"));
    if (ST_is_external(WN_st(wn)))
@@ -3008,7 +3039,6 @@ WN2F_namelist_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
      Append_Token_String(tokens, "NAMELIST /");
      Append_Token_String(tokens, st_name);
      Append_Token_String(tokens, " /");
-     
 
      for(k=0;k< WN_kid_count(wn);k++ )
 

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.9 $
- * $Date: 2002-10-21 19:30:57 $
- * $Author: open64 $
+ * $Revision: 1.10 $
+ * $Date: 2003-01-10 02:47:29 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.10 $";
 #endif
 
 #include <ctype.h>
@@ -441,9 +441,12 @@ ST2F_decl_func(TOKEN_BUFFER tokens, ST *st)
    /* Specify whether or not the function is EXTERNAL */
 
    if ((ST_sclass(st) == SCLASS_EXTERN) &&
+       (!ST_is_in_module(st))           &&
       (strcmp(ST_name(st),"_ALLOCATE")!=0) &&
       (strcmp(ST_name(st),"_END")!=0) &&
-      (strcmp(ST_name(st),"_DEALLOCATE") !=0))
+      (strcmp(ST_name(st),"_DEALLOCATE") !=0)&&
+      (strcmp(ST_name(st),"_CLOSE") !=0 )    &&
+      (strcmp(ST_name(st),"_OPEN")!=0   ))
    {
       Append_Token_String(tokens, "EXTERNAL");
       Append_Token_String(tokens, func_name);
@@ -670,7 +673,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    WN *stmt;
    ST *rslt = NULL;
    BOOL needcom=1;
-   const char * func_name= W2CF_Symtab_Nameof_St(st);
+   const char * func_n_name= W2CF_Symtab_Nameof_St(st);
 
 
    ASSERT_DBG_FATAL(TY_kind(funtype) == KIND_FUNCTION,
@@ -848,18 +851,17 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    if (!is_altentry)
    {
       /* Emit parameter declarations, indented and on a new line */
-# if 0
       Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
       Append_Token_String(header_tokens, "IMPLICIT NONE");
-# endif
       for (param = first_param; param < num_params -implicit_parms; param++)
       {
 	 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-	 if (params[param] != NULL && 
-                 strcasecmp(W2CF_Symtab_Nameof_St(params[param]),func_name)) {
-//	 if (params[param] != NULL ) {
+	 if (params[param] != NULL && TY_kind(ST_type(params[param]))!=KIND_POINTER) {
+   
+            if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
 
 	     ST2F_decl_translate(header_tokens, params[param]);
+
              if (ST_is_optional_argument( params[param])) {
                 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
                 Append_Token_String(header_tokens,"OPTIONAL ");
@@ -867,21 +869,68 @@ ST2F_func_header(TOKEN_BUFFER tokens,
                               W2CF_Symtab_Nameof_St(params[param]));
              }
              if (ST_is_intent_in_argument( params[param])) {
-                Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-                Append_Token_String(header_tokens,"INTENT(in) ");
-                Append_Token_String(header_tokens,
+                TOKEN_BUFFER temp_tokens = New_Token_Buffer();
+                Append_F77_Indented_Newline(temp_tokens, 1, NULL/*label*/);
+                Append_Token_String(temp_tokens,"INTENT(IN) ");
+                Append_Token_String(temp_tokens,
                               W2CF_Symtab_Nameof_St(params[param]));
+                Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
+
               }
              if (ST_is_intent_out_argument( params[param])) {
                  Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-                 Append_Token_String(header_tokens,"INTENT(out) ");
+                 Append_Token_String(header_tokens,"INTENT(OUT) ");
                  Append_Token_String(header_tokens,
                               W2CF_Symtab_Nameof_St(params[param]));
              }
 
            } 
-      }
+     else
+       if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
+           ST2F_decl_translate(header_tokens, params[param]);
+     }
+    }
+
+      for (param = first_param; param < num_params -implicit_parms; param++)
+      {
+         Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+         if (params[param] != NULL && TY_kind(ST_type(params[param]))==KIND_POINTER) {
+  
+            if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
+
+             ST2F_decl_translate(header_tokens, params[param]);
+
+             if (ST_is_optional_argument( params[param])) {
+                Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                Append_Token_String(header_tokens,"OPTIONAL ");
+                Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+             }
+             if (ST_is_intent_in_argument( params[param])) {
+                TOKEN_BUFFER temp_tokens = New_Token_Buffer();
+                Append_F77_Indented_Newline(temp_tokens, 1, NULL/*label*/);
+                Append_Token_String(temp_tokens,"INTENT(IN) ");
+                Append_Token_String(temp_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+                Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
+
+              }
+             if (ST_is_intent_out_argument( params[param])) {
+                 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                 Append_Token_String(header_tokens,"INTENT(OUT) ");
+                 Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+             }
+
+           }
+     else
+       if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
+           ST2F_decl_translate(header_tokens, params[param]);
+     }
+    }
+
    }
+
 
    Append_Token_Special(tokens, '\n');
    Append_F77_Indented_Newline(tokens, 0, NULL);

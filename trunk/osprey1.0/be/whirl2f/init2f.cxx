@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: init2f.c
- * $Revision: 1.3 $
- * $Date: 2002-08-30 21:21:20 $
- * $Author: open64 $
+ * $Revision: 1.4 $
+ * $Date: 2003-01-10 02:47:29 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $
  *
  * Revision history:
@@ -75,7 +75,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.4 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -523,7 +523,7 @@ INITVKIND_val(TOKEN_BUFFER tokens,
    {
       /* The normal case, where INITVs match the object initialized
        */
-      TCON2F_translate(val_tokens, *tcon, TY_is_logical(Ty_Table[object_ty]));
+      TCON2F_translate(val_tokens, *tcon, TY_is_logical(Ty_Table[object_ty]),object_ty);
    }
    INIT2F_Append_Initializer(tokens, &val_tokens, repeat);
 } /* INITVKIND_val */

@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: tcon2f.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:33 $
+ * $Revision: 1.3 $
+ * $Date: 2003-01-10 02:47:29 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/tcon2f.h,v $
  *
@@ -57,6 +57,9 @@ void
    TCON2F_hollerith(TOKEN_BUFFER tokens, TCON tvalue);
 
 extern void 
+   TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object_ty);
+
+extern void
    TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical);
 
 #endif /* tcon2f_INCLUDED */
