@@ -158,6 +158,8 @@
 extern "C" {
 #if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
 extern double   floor(double);
+#elif defined(_SGI_SGI) && !defined(__GNUC__)
+extern double   floor(double);
 #else
 extern double   floor(double) __THROW;
 #endif
@@ -166,6 +168,8 @@ extern double   floor(double) __THROW;
 #endif /* __MATH_HAS_NO_SIDE_EFFECTS */
 
 #if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
+extern double   ceil(double);
+#elif defined(_SGI_SGI) && !defined(__GNUC__)
 extern double   ceil(double);
 #else
 extern double   ceil(double) __THROW;
