@@ -2519,6 +2519,7 @@ void write_stmt_semantics (void)
 # endif
 
    ir_idx = SH_IR_IDX(curr_stmt_sh_idx);
+   line = IR_LINE_NUM(ir_idx);
 
    COPY_OPND(opnd, IR_OPND_L(ir_idx));
    semantically_correct = io_ctl_list_semantics(&opnd, Write, FALSE);
@@ -2956,7 +2957,16 @@ int fm;
                               i   == FMT_IDX &&
                               !(namelist_expected) &&
                ( io_type == Write || io_type == Read)){  
-             IL_IDX(list_idx)=ATD_TMP_IDX(ATL_FORMAT_TMP(IL_IDX(list_idx))); 
+            if (ATD_CLASS(IL_IDX(list_idx)) == Constant)
+                 IL_IDX(list_idx) = ATD_CONST_IDX(IL_IDX(list_idx));
+            else 
+            if (ATD_CLASS(IL_IDX(list_idx)) ==Atd_Unknown &&
+                AT_ATTR_LINK(IL_IDX(list_idx)) != NULL   &&
+                ATD_CLASS(AT_ATTR_LINK(IL_IDX(list_idx)))== Constant )
+                 IL_IDX(list_idx) = ATD_CONST_IDX(AT_ATTR_LINK(IL_IDX(list_idx)));
+            else
+                 IL_IDX(list_idx)=ATD_TMP_IDX(ATL_FORMAT_TMP(IL_IDX(list_idx))); 
+
              IL_FLD(list_idx) = CN_Tbl_Idx; 
 
        }
