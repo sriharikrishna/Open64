@@ -11120,7 +11120,7 @@ static TYPE get_basic_type(int	type_idx,
 
 static TYPE get_type_desc(int	input_idx)
 {
-   int			bd_idx;
+   int			bd_idx = 0;
    int			dist_idx;
    int			distribution	= 0;
    int			kind_type	= 0;
@@ -11781,7 +11781,7 @@ static TYPE get_type_desc(int	input_idx)
       pdg_array_idx = fei_co_array_dimen(flag,
                                       lbound,
                                       extent,
-                                      BD_RANK(bd_idx)+1,
+                                      bd_idx?BD_RANK(bd_idx)+1:-1,
  				      i,
                                       type_idx,
                                       span,
