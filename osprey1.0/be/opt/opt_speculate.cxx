@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_speculate.h
-// $Revision: 1.2 $
-// $Date: 2002-09-06 22:34:54 $
-// $Author: open64 $
+// $Revision: 1.3 $
+// $Date: 2003-02-19 22:06:21 $
+// $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_speculate.cxx,v $
 //
 // ====================================================================
@@ -50,7 +50,7 @@
 #include "config_wopt.h"
 #include "opt_etable.h"
 #undef max
-#include "algo.h"
+#include <algorithm>
 #include "connected_components.h"
 
 using SGI::find_representative_and_compress_path;
