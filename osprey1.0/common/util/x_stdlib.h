@@ -1,4 +1,4 @@
-/* $Id: x_stdlib.h,v 1.1 2003-11-04 15:59:37 eraxxon Exp $ */
+/* $Id: x_stdlib.h,v 1.2 2004-02-28 21:05:05 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -8,8 +8,8 @@
  * ====================================================================
  *
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_stdlib.h,v $
- * $Revision: 1.1 $
- * $Date: 2003-11-04 15:59:37 $
+ * $Revision: 1.2 $
+ * $Date: 2004-02-28 21:05:05 $
  *
  * Nathan Tallent.
  *
@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
   /* Unix */
-  int ux_mkstemp(char *strtemplate);
+  extern int ux_mkstemp(char *strtemplate);
 
 #if defined(__cplusplus)
 } /* extern "C" */
