@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.10 $
- * $Date: 2002-09-24 17:58:49 $
+ * $Revision: 1.11 $
+ * $Date: 2002-09-25 21:47:22 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -978,6 +978,11 @@ TY2F_Translate_Structure(TY_IDX ty)
       Append_Token_String(struct_tokens, "STRUCTURE");
       Append_Token_String(struct_tokens, 
 			  Concat3_Strings("/", W2CF_Symtab_Nameof_Ty(ty), "/"));
+   }
+
+  if (TY_is_sequence(ty_rt)) {
+     Append_F77_Indented_Newline(struct_tokens, 1, NULL/*label*/);
+     Append_Token_String(struct_tokens,"SEQUENCE");
    }
 
    /* Emit structure body */

@@ -488,7 +488,8 @@ enum TY_FLAGS
     TY_IS_F90_ASSUMED_SHAPE  = 0x0800,  
     TY_IS_F90_ASSUMED_SIZE   = 0x1000,
     TY_IS_F90_DEFERRED_SHAPE = 0x2000,
-    TY_IS_EXTERNAL           = 0x4000
+    TY_IS_EXTERNAL           = 0x4000,
+    TY_IS_SEQUENCE           = 0x8000
 };
 
 

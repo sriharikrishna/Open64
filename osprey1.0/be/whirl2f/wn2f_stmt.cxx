@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.13 $
- * $Date: 2002-09-20 20:49:26 $
+ * $Revision: 1.14 $
+ * $Date: 2002-09-25 21:47:22 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.14 $";
 #endif
 
 #include <alloca.h>
@@ -3136,9 +3136,8 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
 
 
-//   const char *st_name =  W2CF_Symtab_Nameof_St(WN_st(wn));
     
-   const char *st_name = ST_name(st);
+   const char *intface_name = ST_name(st);
 
     ASSERT_DBG_FATAL(WN_operator(wn) == OPR_INTERFACE,
                      (DIAG_W2F_UNEXPECTED_OPC, "WN2F_interface_blk"));
@@ -3164,8 +3163,8 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
      if (ST_is_u_operator_interface(st)) 
         Append_Token_Special(tokens,'.');
 
-     if (strcmp(st_name,unnamed_interface)) 
-         Append_Token_String(tokens, st_name);
+     if (strcmp(intface_name,unnamed_interface)) 
+         Append_Token_String(tokens, intface_name);
 
      if (ST_is_u_operator_interface(st))
          Append_Token_Special(tokens,'.');
@@ -3210,13 +3209,17 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
         * in Fortran, so we use the corresponding integral type
         * instead.
         */
-
           if (TY_Is_Pointer(return_ty))
              TY2F_translate(header_tokens,
                          Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-          else
-             TY2F_translate(header_tokens, return_ty);
-         }
+          else {
+                 if (TY_kind(return_ty)==KIND_ARRAY)
+                   TY2F_translate(header_tokens,TY_AR_etype(return_ty));
+                 else
+                   TY2F_translate(header_tokens, return_ty);
+               }
+
+          }
        else /* subroutine */
          {
            Append_Token_String(header_tokens, "SUBROUTINE");
