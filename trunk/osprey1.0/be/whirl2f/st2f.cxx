@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.26 $
- * $Date: 2003-12-09 16:17:53 $
- * $Author: fzhao $
+ * $Revision: 1.27 $
+ * $Date: 2003-12-09 19:25:10 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,11 +86,16 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.26 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.27 $";
 #endif
 
 #include <ctype.h>
-#include <set>
+#include <alloca.h>
+#include <set>    // STL
+#include <vector> // STL
+using std::set;
+using std::vector;
+
 #include "whirl2f_common.h"
 #include "PUinfo.h"
 #include "tcon2f.h"
@@ -762,9 +767,9 @@ void ReorderParms(ST **parms,INT32 num_params)
   ST_IDX real_index;
   PARMSET::iterator runner;
 
-  PARMSET dependset[num_params];
-  std::map<ST_IDX,int>  st_idx_to_parms;
-  PARMSET  workset,tempst;
+  vector<PARMSET> dependset(num_params);
+  map<ST_IDX,int>  st_idx_to_parms;
+  PARMSET  workset, tempst;
 
   workset.clear();
   reorder_parms = (ST **)alloca((num_params + 1) * sizeof(ST *));
@@ -866,8 +871,8 @@ void ReorderParms(ST **parms,INT32 num_params)
   reorder_parms[keep] = NULL;
   for(INT32 k=0; k<num_params; k++)
       parms[k] = reorder_parms[k];
-   
-   return;
+
+  return;
 }
 
 void
@@ -1303,11 +1308,4 @@ ST2F_Declare_Return_Type(TOKEN_BUFFER tokens,TY_IDX return_ty, const char *name)
     }
   }
 }
-
-
-
-
-
-
-
 
