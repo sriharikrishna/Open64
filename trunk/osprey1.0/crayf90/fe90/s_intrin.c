@@ -934,7 +934,7 @@ void    sin_intrinsic(opnd_type     *result_opnd,
          break;
    }
 
-# if 0 /* March */
+# if 0 
 
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
    IR_OPND_R(ir_idx) = null_opnd;
@@ -956,7 +956,7 @@ void    sin_intrinsic(opnd_type     *result_opnd,
 
 # endif
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "sin_intrinsic", NULL);
@@ -1075,7 +1075,7 @@ res_exp_desc->shape_known = TRUE; /* April try */
    }
 
 # endif
-         res_exp_desc->foldable = FALSE;  /* March */
+         res_exp_desc->foldable = FALSE;  
          res_exp_desc->will_fold_later = FALSE;
 
 
@@ -1155,7 +1155,7 @@ void    atan2_intrinsic(opnd_type     *result_opnd,
          break;
    }
 
-# if 0 /* March */
+# if 0 
 
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
    IR_OPND_R(ir_idx) = null_opnd;
@@ -1222,7 +1222,7 @@ void    aimag_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Aimag_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -1349,7 +1349,7 @@ void   int_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-   IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)); /* March */
+   IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)); 
 
    if (arg_info_list[info_idx1].ed.type == Real) {
       COPY_OPND(opnd, IL_OPND(list_idx1));
@@ -1739,7 +1739,7 @@ void    iand_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -1839,9 +1839,9 @@ void    iand_intrinsic(opnd_type     *result_opnd,
    }
 
    }
-# endif /* March */
+# endif 
 
-         res_exp_desc->foldable = FALSE;  /* March */
+         res_exp_desc->foldable = FALSE;  
          res_exp_desc->will_fold_later = FALSE;
 
 
@@ -1987,7 +1987,7 @@ void    free_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = TYPELESS_DEFAULT_TYPE;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    if (!ATP_EXTERNAL_INTRIN(*spec_idx)) {
       IR_OPR(ir_idx) = Free_Opr;
@@ -2046,7 +2046,7 @@ void    malloc_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    res_exp_desc->linear_type = TYP_LINEAR(res_exp_desc->type_idx);
@@ -2120,7 +2120,7 @@ void    null_intrinsic(opnd_type     *result_opnd,
       IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
       IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /*  March */
+# if 0 
 
       res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
       res_exp_desc->type = TYP_TYPE(res_exp_desc->type_idx);
@@ -2160,7 +2160,7 @@ void    null_intrinsic(opnd_type     *result_opnd,
       ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)) = 
                     arg_info_list[info_idx1].ed.type_idx;
 
-# if 0 /* March */
+# if 0 
 
       ATD_POINTER(ATP_RSLT_IDX(*spec_idx)) = TRUE;
 
@@ -2182,7 +2182,7 @@ void    null_intrinsic(opnd_type     *result_opnd,
       IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
       IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
       res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
       res_exp_desc->type = 
@@ -2213,7 +2213,7 @@ void    null_intrinsic(opnd_type     *result_opnd,
       OPND_FLD((*result_opnd)) = OPND_FLD(dv_opnd);
 
 # endif
-         res_exp_desc->foldable = FALSE;    /* March */
+         res_exp_desc->foldable = FALSE;    
          res_exp_desc->will_fold_later = FALSE;
    }
 
@@ -2372,7 +2372,7 @@ void    nint_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -2407,7 +2407,7 @@ void    nint_intrinsic(opnd_type     *result_opnd,
    }
 
 # endif
-         res_exp_desc->foldable = FALSE;    /* March */
+         res_exp_desc->foldable = FALSE;    
          res_exp_desc->will_fold_later = FALSE;
 
 
@@ -2489,7 +2489,7 @@ void    sign_intrinsic(opnd_type     *result_opnd,
                IR_COL_NUM(ir_idx));
    }
 
-# if 0 /* March */
+# if 0 
 
    if (!ATP_EXTERNAL_INTRIN(*spec_idx)) {
       if (arg_info_list[info_idx1].ed.type == Integer &&
@@ -2544,7 +2544,7 @@ void    sign_intrinsic(opnd_type     *result_opnd,
    }
 
 # endif
-         res_exp_desc->foldable = FALSE;  /* March */
+         res_exp_desc->foldable = FALSE;  
          res_exp_desc->will_fold_later = FALSE;
 
 
@@ -2611,7 +2611,7 @@ void    modulo_intrinsic(opnd_type     *result_opnd,
                IR_COL_NUM(ir_idx));
    }
 
-# if 0 /* March */
+# if 0 
 
    if (arg_info_list[info_idx1].ed.type == Integer &&
        IL_FLD(list_idx1) == CN_Tbl_Idx &&
@@ -2650,7 +2650,7 @@ void    modulo_intrinsic(opnd_type     *result_opnd,
    }
 
 # endif 
-         res_exp_desc->foldable = FALSE;    /* March */
+         res_exp_desc->foldable = FALSE;    
          res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "modulo_intrinsic", NULL);
@@ -2838,7 +2838,7 @@ void    shift_intrinsic(opnd_type     *result_opnd,
    IR_RANK(ir_idx) = res_exp_desc->rank;
    IR_TYPE_IDX(ir_idx) = type_idx;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -2928,7 +2928,7 @@ void    shift_intrinsic(opnd_type     *result_opnd,
    }
 
 # endif
-         res_exp_desc->foldable = FALSE;  /* March */
+         res_exp_desc->foldable = FALSE;  
          res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "shift_intrinsic", NULL);
@@ -3267,7 +3267,7 @@ void    leadz_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    if (ATP_INTRIN_ENUM(*spec_idx) == Popcnt_Intrinsic) {
       IR_OPR(ir_idx) = Popcnt_Opr;
@@ -3440,7 +3440,7 @@ void    not_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = IR_TYPE_IDX(ir_idx);
    res_exp_desc->linear_type = TYP_LINEAR(IR_TYPE_IDX(ir_idx));
@@ -3533,7 +3533,7 @@ void    not_intrinsic(opnd_type     *result_opnd,
    }
 
 # endif
-         res_exp_desc->foldable = FALSE;   /* March */
+         res_exp_desc->foldable = FALSE;   
          res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "not_intrinsic", NULL);
@@ -3598,7 +3598,7 @@ void    aint_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    res_exp_desc->linear_type = TYP_LINEAR(res_exp_desc->type_idx);
@@ -3616,7 +3616,7 @@ void    aint_intrinsic(opnd_type     *result_opnd,
    res_exp_desc->will_fold_later = FALSE;
 
 # endif
-         res_exp_desc->foldable = FALSE;   /* March */
+         res_exp_desc->foldable = FALSE;   
          res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "aint_intrinsic", NULL);
@@ -3666,7 +3666,7 @@ void    ilen_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    res_exp_desc->linear_type = 
@@ -3679,7 +3679,7 @@ void    ilen_intrinsic(opnd_type     *result_opnd,
    io_item_must_flatten = TRUE;
 
 # endif
-         res_exp_desc->foldable = FALSE;   /* March */
+         res_exp_desc->foldable = FALSE;   
          res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "ilen_intrinsic", NULL);
@@ -3754,7 +3754,7 @@ void    dim_intrinsic(opnd_type     *result_opnd,
                IR_COL_NUM(ir_idx));
    }
 
-# if 0 /* March */
+# if 0 
 
    if (arg_info_list[info_idx1].ed.type == Integer &&
        IL_FLD(list_idx1) == CN_Tbl_Idx &&
@@ -3850,7 +3850,7 @@ void    dim_intrinsic(opnd_type     *result_opnd,
    }
 
 # endif
-         res_exp_desc->foldable = FALSE;    /* March */
+         res_exp_desc->foldable = FALSE;    
          res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "dim_intrinsic", NULL);
@@ -4065,7 +4065,7 @@ void    max_intrinsic(opnd_type     *result_opnd,
    }
 
 
-         res_exp_desc->foldable = FALSE;   /* March */
+         res_exp_desc->foldable = FALSE;   
          res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "max_intrinsic", NULL);
@@ -4181,14 +4181,14 @@ void    ranget_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
    if (ATP_INTRIN_ENUM(*spec_idx) == Ranget_Intrinsic) {
-/* March      IR_OPR(ir_idx) = Ranget_Opr; */
+/*       IR_OPR(ir_idx) = Ranget_Opr; */
    }
    else {
-/* March      IR_OPR(ir_idx) = Ranset_Opr; */
+/*       IR_OPR(ir_idx) = Ranset_Opr; */
    }
 #if 0
-//   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
-//   IR_OPND_R(ir_idx) = null_opnd;
+   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
+   IR_OPND_R(ir_idx) = null_opnd;
 #endif
 
    /* must reset foldable and will_fold_later because there is no */
@@ -4240,7 +4240,7 @@ void    ranf_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Ranf_Opr;
 
@@ -4376,7 +4376,7 @@ void    real_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Real_Opr;
 
@@ -4469,7 +4469,7 @@ void    mask_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 /* March */
+# if 0 
 
    type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    if (IL_FLD(list_idx1) == CN_Tbl_Idx &&
@@ -4550,7 +4550,7 @@ void    conjg_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Conjg_Opr;
 
@@ -4641,7 +4641,7 @@ void    dprod_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Dprod_Opr;
 
@@ -4703,27 +4703,27 @@ void    length_intrinsic(opnd_type     *result_opnd,
 
 
 #if 0
-//   COPY_OPND(opnd, IR_OPND_R(ir_idx));
-//   final_arg_work(&opnd, IR_IDX_L(ir_idx), IR_LIST_CNT_R(ir_idx), NULL);
-//   COPY_OPND(IR_OPND_R(ir_idx), opnd);
+   COPY_OPND(opnd, IR_OPND_R(ir_idx));
+   final_arg_work(&opnd, IR_IDX_L(ir_idx), IR_LIST_CNT_R(ir_idx), NULL);
+   COPY_OPND(IR_OPND_R(ir_idx), opnd);
 #endif
 
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 #if 0
-//   IR_OPR(ir_idx) = Length_Opr;
+   IR_OPR(ir_idx) = Length_Opr;
 
-//   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
-//   IR_OPND_R(ir_idx) = null_opnd;
+   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
+   IR_OPND_R(ir_idx) = null_opnd;
 #endif
 # else 
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 #if 0
-//   IR_OPR(ir_idx) = Length_Opr;
+   IR_OPR(ir_idx) = Length_Opr;
 
-//   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
-//   IR_OPND_R(ir_idx) = null_opnd;
+   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
+   IR_OPND_R(ir_idx) = null_opnd;
 #endif
 # endif
 
@@ -4776,7 +4776,7 @@ void    getpos_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Getpos_Opr;
 
@@ -4842,19 +4842,19 @@ void    unit_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 #if 0
-//   IR_OPR(ir_idx) = Unit_Opr;
+   IR_OPR(ir_idx) = Unit_Opr;
 
-//   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
-//   IR_OPND_R(ir_idx) = null_opnd;
+   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
+   IR_OPND_R(ir_idx) = null_opnd;
 #endif
 # else
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 #if 0
-//   IR_OPR(ir_idx) = Unit_Opr;
+   IR_OPR(ir_idx) = Unit_Opr;
 
-//   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
-//   IR_OPND_R(ir_idx) = null_opnd;
+   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
+   IR_OPND_R(ir_idx) = null_opnd;
 #endif
 # endif
 
@@ -4959,7 +4959,7 @@ void    cmplx_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    if (arg_info_list[info_idx1].ed.type == Integer) { 
       COPY_OPND(opnd, IL_OPND(list_idx1));
@@ -5251,7 +5251,7 @@ void    char_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->char_len.fld = CN_Tbl_Idx;
    res_exp_desc->char_len.idx = CN_INTEGER_ONE_IDX;
@@ -5363,7 +5363,7 @@ void    index_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -5510,7 +5510,7 @@ void    lge_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -5688,7 +5688,7 @@ void    loc_intrinsic(opnd_type     *result_opnd,
       goto EXIT;
    }
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Loc_Opr;
 
@@ -5755,7 +5755,7 @@ void    fcd_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Fcd_Opr;
 
@@ -5832,7 +5832,7 @@ void    fetch_and_add_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
    io_item_must_flatten = TRUE;
 
    if (ATP_INTRIN_ENUM(*spec_idx) == Fetch_And_Add_Intrinsic) {
@@ -5928,7 +5928,7 @@ void    numarg_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Numarg_Opr;
 
@@ -5985,7 +5985,7 @@ void    readsm_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Readsm_Opr;
 
@@ -6043,7 +6043,7 @@ void    memory_barrier_intrinsic(opnd_type     *result_opnd,
    IR_RANK(ir_idx) = res_exp_desc->rank;
    IR_OPR(ir_idx) = Memory_Barrier_Opr;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPND_L(ir_idx) = null_opnd;
    IR_OPND_R(ir_idx) = null_opnd;
@@ -6097,7 +6097,7 @@ void    remote_write_barrier_intrinsic(opnd_type     *result_opnd,
 
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0
 
    IR_OPR(ir_idx) = Remote_Write_Barrier_Opr;
 
@@ -6152,7 +6152,7 @@ void    write_memory_barrier_intrinsic(opnd_type     *result_opnd,
 
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Write_Memory_Barrier_Opr;
 
@@ -6206,7 +6206,7 @@ void    synchronize_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = TYPELESS_DEFAULT_TYPE;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Synchronize_Opr;
 
@@ -6273,7 +6273,7 @@ void    rtc_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Rtc_Opr;
 
@@ -6330,7 +6330,7 @@ void    my_pe_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = My_Pe_Opr;
 
@@ -6545,7 +6545,7 @@ void    cvmgp_intrinsic(opnd_type     *result_opnd,
            break;
    }
 
-# if 0 /* March */
+# if 0 
 
    if (ATP_INTRIN_ENUM(*spec_idx) != Cvmgt_Intrinsic) {
 
@@ -6620,7 +6620,7 @@ void    compare_and_swap_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Compare_And_Swap_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -6775,7 +6775,7 @@ void    csmg_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -6811,7 +6811,7 @@ void    csmg_intrinsic(opnd_type     *result_opnd,
    }
 # endif
 
-   res_exp_desc->foldable = FALSE;      /* March */
+   res_exp_desc->foldable = FALSE;      
    res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "csmg_intrinsic", NULL);
@@ -6906,7 +6906,7 @@ void    mergee_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    if (TYP_TYPE(type_idx) == Character) {
       COPY_OPND((res_exp_desc->char_len),
@@ -6982,7 +6982,7 @@ void    adjustl_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 /* March */
+# if 0 
 
    COPY_OPND(res_exp_desc->char_len, arg_info_list[info_idx1].ed.char_len);
    res_exp_desc->type_idx = type_idx;
@@ -7185,7 +7185,7 @@ void    digits_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Real_4:
@@ -7287,7 +7287,7 @@ void    epsilon_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = arg_info_list[info_idx1].ed.type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Real_4:
@@ -7360,7 +7360,7 @@ void    exponent_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Exponent_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -7490,7 +7490,7 @@ void    fraction_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0   /* March */
+# if 0   
 
    IR_OPR(ir_idx) = Fraction_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -7549,7 +7549,7 @@ void    huge_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = arg_info_list[info_idx1].ed.type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Real_4:
@@ -7717,7 +7717,7 @@ void    ibits_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx &&
        IL_FLD(list_idx2) == CN_Tbl_Idx &&
@@ -7947,7 +7947,7 @@ void    btest_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    num = storage_bit_size_tbl[TYP_LINEAR(typeless_idx)] - 1;
 
@@ -8154,7 +8154,7 @@ void    ibset_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0  /* March */
+# if 0  
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx &&
        IL_FLD(list_idx2) == CN_Tbl_Idx) {
@@ -8474,7 +8474,7 @@ void    ishft_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    if (TYP_LINEAR(ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx))) !=
           TYP_LINEAR(arg_info_list[info_idx1].ed.type_idx)) {
@@ -8734,7 +8734,7 @@ void    ishft_intrinsic(opnd_type     *result_opnd,
 
 # endif
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
 
@@ -8846,7 +8846,7 @@ void    ishftc_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (TYP_LINEAR(ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)))) {
       case Integer_1:
@@ -9250,7 +9250,7 @@ void    ishftc_intrinsic(opnd_type     *result_opnd,
 
 # endif
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "ishftc_intrinsic", NULL);
@@ -9371,7 +9371,7 @@ void    mvbits_intrinsic(opnd_type     *result_opnd,
                arg_info_list[info_idx4].col);
    }
 
-# if 0 /* March */
+# if 0 
 
    if (TYP_LINEAR(type_idx) !=
           TYP_LINEAR(arg_info_list[info_idx1].ed.type_idx)) {
@@ -9817,7 +9817,7 @@ void    random_seed_intrinsic(opnd_type     *result_opnd,
          if (! arg_info_list[info_idx3].ed.reference &&
              ! arg_info_list[info_idx3].ed.tmp_reference) {
 
-# if 0 /* March */
+# if 0 
 
             tmp_attr = create_tmp_asg(&old_opnd,
                          (expr_arg_type *)&(arg_info_list[info_idx3].ed),
@@ -9832,13 +9832,13 @@ void    random_seed_intrinsic(opnd_type     *result_opnd,
          }
 
          if (arg_info_list[info_idx3].ed.rank > 0) {
-/* April??       make_base_subtree(&old_opnd, &base_opnd, &unused1, &unused2); */
+/*       make_base_subtree(&old_opnd, &base_opnd, &unused1, &unused2); */
          }
          else {
 /*            COPY_OPND(base_opnd, old_opnd); */
          }
 
-# if 0 /* March */
+# if 0 
          loc_idx = gen_ir(OPND_FLD(base_opnd), OPND_IDX(base_opnd), 
                        Aloc_Opr, CRI_Ptr_8, line, column,
                           NO_Tbl_Idx, NULL_IDX);
@@ -9865,7 +9865,7 @@ void    random_seed_intrinsic(opnd_type     *result_opnd,
          if (! arg_info_list[info_idx2].ed.reference &&
              ! arg_info_list[info_idx2].ed.tmp_reference) {
 
-# if 0 /* March */
+# if 0 
 
             tmp_attr = create_tmp_asg(&old_opnd,
                          (expr_arg_type *)&(arg_info_list[info_idx2].ed),
@@ -9885,7 +9885,7 @@ void    random_seed_intrinsic(opnd_type     *result_opnd,
 /*            COPY_OPND(base_opnd, old_opnd); */
          }
 
-# if 0 /* March */
+# if 0 
 
          ranset_idx = gen_ir(OPND_FLD(base_opnd), OPND_IDX(base_opnd),
                           Ranset_Opr, TYPELESS_DEFAULT_TYPE, line, column,
@@ -9909,7 +9909,7 @@ void    random_seed_intrinsic(opnd_type     *result_opnd,
                      arg_info_list[info_idx1].col);
          }
 
-# if 0 /* March */
+# if 0 
 
 # if defined(GENERATE_WHIRL)
          cn_idx = C_INT_TO_CN(CG_INTEGER_DEFAULT_TYPE, 64);
@@ -9929,7 +9929,7 @@ void    random_seed_intrinsic(opnd_type     *result_opnd,
       }     
       else {
 
-# if 0 /* March */
+# if 0 
          ranf_idx = gen_ir(NO_Tbl_Idx, NULL_IDX,
                        Ranf_Opr, REAL_DEFAULT_TYPE, line, column,
                            NO_Tbl_Idx, NULL_IDX);
@@ -10017,7 +10017,7 @@ void    get_ieee_status_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 /* March */
+# if 0 
 
    switch (ATP_INTRIN_ENUM(*spec_idx)) {
 
@@ -10157,7 +10157,7 @@ void    test_ieee_interrupt_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 /* March */
+# if 0 
 
    switch (ATP_INTRIN_ENUM(*spec_idx)) {
 
@@ -10176,8 +10176,8 @@ void    test_ieee_interrupt_intrinsic(opnd_type     *result_opnd,
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
 #if 0
-//   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
-//   IR_OPND_R(ir_idx) = null_opnd;
+   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
+   IR_OPND_R(ir_idx) = null_opnd;
 #endif
 
    /* must reset foldable and will_fold_later because there is no */
@@ -10231,7 +10231,7 @@ void    set_ieee_exception_intrinsic(opnd_type     *result_opnd,
                  res_exp_desc,
                  spec_idx,
                  FALSE);
-# if 0 /* March */
+# if 0 
 
    switch (ATP_INTRIN_ENUM(*spec_idx)) {
 
@@ -10452,7 +10452,7 @@ void    ieee_real_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0  /* March */
+# if 0  
 
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
    IR_OPND_R(ir_idx) = null_opnd;
@@ -10534,7 +10534,7 @@ void    ieee_finite_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    if (ATP_INTRIN_ENUM(*spec_idx) != Fp_Class_Intrinsic) {
       COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -10583,11 +10583,11 @@ void    lock_release_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = REAL_DEFAULT_TYPE;
 
 #if 0
-//   IR_OPR(ir_idx) = Lock_Release_Opr;
-//   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
-//    IR_OPND_R(ir_idx) = null_opnd;
+   IR_OPR(ir_idx) = Lock_Release_Opr;
+   COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
+    IR_OPND_R(ir_idx) = null_opnd;
 
-//   io_item_must_flatten = TRUE;
+    io_item_must_flatten = TRUE;
 #endif
 
    /* must reset foldable and will_fold_later because there is no */
@@ -10655,7 +10655,7 @@ void    random_number_intrinsic(opnd_type     *result_opnd,
                arg_info_list[info_idx1].col);
    }
 
-# if 0 /* March */
+# if 0 
 
    ranf_idx = gen_ir(NO_Tbl_Idx, NULL_IDX,
                  Ranf_Opr, IR_TYPE_IDX(ir_idx), IR_LINE_NUM(ir_idx),
@@ -10882,7 +10882,7 @@ void    tiny_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Real_4:
@@ -10911,7 +10911,7 @@ void    tiny_intrinsic(opnd_type     *result_opnd,
 
 # endif
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "tiny_intrinsic", NULL);
@@ -10962,7 +10962,7 @@ void    spacing_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Spacing_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -11142,7 +11142,7 @@ void    cshift_intrinsic(opnd_type     *result_opnd,
                  res_exp_desc,
                  spec_idx,
                  FALSE);
-# if 0 /* March */
+# if 0 
 
    COPY_OPND(res_exp_desc->shape[0], arg_info_list[info_idx1].ed.shape[0]);
    COPY_OPND(res_exp_desc->shape[1], arg_info_list[info_idx1].ed.shape[1]);
@@ -11279,7 +11279,7 @@ void    eoshift_intrinsic(opnd_type     *result_opnd,
    }
    else {  /* boundary not present */
 
-# if 0 /* March */
+# if 0 
 
       switch (arg_info_list[info_idx1].ed.type) {
          case Structure :  
@@ -11464,7 +11464,7 @@ void    eoshift_intrinsic(opnd_type     *result_opnd,
    }
    else {  /* DIM is not present */
 
-# if 0 /* March */
+# if 0 
 
       cn_idx = (CG_INTEGER_DEFAULT_TYPE == INTEGER_DEFAULT_TYPE) ?  
                 CN_INTEGER_ONE_IDX : C_INT_TO_CN(INTEGER_DEFAULT_TYPE, 1);
@@ -11494,7 +11494,7 @@ void    eoshift_intrinsic(opnd_type     *result_opnd,
 
    }
 
-# if 0 /* March */
+# if 0 
 
    if (IL_FLD(list_idx4) != CN_Tbl_Idx) {
       ATP_EXTERNAL_INTRIN(*spec_idx) = TRUE; 
@@ -11584,7 +11584,7 @@ void    minexponent_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Real_4:
@@ -11610,7 +11610,7 @@ void    minexponent_intrinsic(opnd_type     *result_opnd,
    res_exp_desc->foldable = TRUE;
 
 # endif
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "minexponent_intrinsic", NULL);
@@ -11660,7 +11660,7 @@ void    maxexponent_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Real_4:
@@ -11687,7 +11687,7 @@ void    maxexponent_intrinsic(opnd_type     *result_opnd,
 
 # endif
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "maxexponent_intrinsic", NULL);
@@ -11734,7 +11734,7 @@ void    radix_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
    cn_idx = C_INT_TO_CN(INTEGER_DEFAULT_TYPE, RADIX_F90);
 
    OPND_IDX((*result_opnd)) = cn_idx;
@@ -11745,7 +11745,7 @@ void    radix_intrinsic(opnd_type     *result_opnd,
    res_exp_desc->foldable = TRUE;
 
 # endif
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "radix_intrinsic", NULL);
@@ -11795,7 +11795,7 @@ void    range_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Complex_4:
@@ -11861,7 +11861,7 @@ void    range_intrinsic(opnd_type     *result_opnd,
 
 # endif
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "range_intrinsic", NULL);
@@ -11911,7 +11911,7 @@ void    precision_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Complex_4:
            num = PRECISION_REAL4_F90;
@@ -11949,7 +11949,7 @@ void    precision_intrinsic(opnd_type     *result_opnd,
 
 # endif
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "precision_intrinsic", NULL);
@@ -12164,7 +12164,7 @@ void    bit_size_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Integer_1:
@@ -12194,7 +12194,7 @@ void    bit_size_intrinsic(opnd_type     *result_opnd,
    res_exp_desc->foldable = TRUE;
 
 # endif
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "bit_size_intrinsic", NULL);
@@ -12335,7 +12335,7 @@ void    lbound_intrinsic(opnd_type     *result_opnd,
          }
       }
 
-# if 0 /* March */
+# if 0 
 
       if (IL_FLD(list_idx2) == CN_Tbl_Idx) { /* DIM is a constant */
 
@@ -12787,7 +12787,7 @@ void    lbound_intrinsic(opnd_type     *result_opnd,
    }
    else { /* DIM is not present */
 
-# if 0 /* March */
+# if 0 
 
       res_exp_desc->shape[0].fld = CN_Tbl_Idx;
       res_exp_desc->shape[0].idx = C_INT_TO_CN(CG_INTEGER_DEFAULT_TYPE,
@@ -12962,7 +12962,7 @@ void    lbound_intrinsic(opnd_type     *result_opnd,
 
    }
 
-# if 0 /* March */
+# if 0 
 
    if (make_const_tmp) {
       ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
@@ -13112,7 +13112,7 @@ EXIT:
    IR_TYPE_IDX(ir_idx) = INTEGER_DEFAULT_TYPE;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-   res_exp_desc->foldable = FALSE;  /* March */
+   res_exp_desc->foldable = FALSE;  
    res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "lbound_intrinsic", NULL);
@@ -13253,7 +13253,7 @@ void    ubound_intrinsic(opnd_type     *result_opnd,
          }
       }
 
-# if 0 /* March */
+# if 0 
 
       if (IL_FLD(list_idx2) == CN_Tbl_Idx) { /* DIM is a constant */
          dim = (long) CN_INT_TO_C(IL_IDX(list_idx2));
@@ -13660,7 +13660,7 @@ void    ubound_intrinsic(opnd_type     *result_opnd,
    }
    else { /* DIM is not present */
 
-# if 0 /* March */
+# if 0 
 
       res_exp_desc->shape[0].fld = CN_Tbl_Idx;
       res_exp_desc->shape[0].idx = C_INT_TO_CN(CG_INTEGER_DEFAULT_TYPE,
@@ -13688,7 +13688,7 @@ void    ubound_intrinsic(opnd_type     *result_opnd,
             IR_FLD_L(IL_IDX(list_idx1)) == IR_Tbl_Idx        &&
             IR_OPR(IR_IDX_L(IL_IDX(list_idx1))) == Whole_Subscript_Opr))) {
 
-# if 0 /* March */
+# if 0 
 
          COPY_OPND(opnd, IL_OPND(list_idx1));
          array_attr = find_base_attr(&opnd, &line, &col);
@@ -13785,7 +13785,7 @@ void    ubound_intrinsic(opnd_type     *result_opnd,
           ((IL_FLD(list_idx1) == IR_Tbl_Idx) &&
            (IR_OPR(IL_IDX(list_idx1)) != Whole_Subscript_Opr))) {
 
-# if 0 /* March */
+# if 0 
 
          res_exp_desc->will_fold_later = TRUE;
          res_exp_desc->foldable = TRUE;
@@ -13820,7 +13820,7 @@ void    ubound_intrinsic(opnd_type     *result_opnd,
       }
    }
 
-# if 0 /* March */
+# if 0 
 
    if (make_const_tmp) {
       ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
@@ -13971,7 +13971,7 @@ EXIT:
    IR_TYPE_IDX(ir_idx) = INTEGER_DEFAULT_TYPE;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "ubound_intrinsic", NULL);
@@ -14315,7 +14315,7 @@ EXIT:
    IR_TYPE_IDX(ir_idx) = INTEGER_DEFAULT_TYPE;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-    res_exp_desc->foldable = FALSE;  /* March */
+    res_exp_desc->foldable = FALSE;  
     res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "size_intrinsic", NULL);
@@ -14382,7 +14382,7 @@ void    shape_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    res_exp_desc->type = TYP_TYPE(res_exp_desc->type_idx);
@@ -14632,7 +14632,7 @@ void    shape_intrinsic(opnd_type     *result_opnd,
       cast_opnd_to_type_idx(result_opnd, INTEGER_DEFAULT_TYPE);
    }
 
-    res_exp_desc->foldable = FALSE;  /* March */
+    res_exp_desc->foldable = FALSE;  
     res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "shape_intrinsic", NULL);
@@ -14755,12 +14755,9 @@ void    present_intrinsic(opnd_type     *result_opnd,
    }
 
 
-#if 0
-//    IR_OPR(ir_idx) = Present_Opr;
-//   IR_TYPE_IDX(ir_idx) = LOGICAL_DEFAULT_TYPE;
-#endif
+    IR_OPR(ir_idx) = Present_Opr;
+   IR_TYPE_IDX(ir_idx) = LOGICAL_DEFAULT_TYPE;
 
-/* # if 0 //March */
 
    IR_IDX_L(ir_idx) = attr_idx;          
    IR_FLD_L(ir_idx) = AT_Tbl_Idx;         
@@ -14835,7 +14832,7 @@ void    logical_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Logical_Opr;
 
@@ -14901,7 +14898,7 @@ void    len_trim_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -14931,9 +14928,9 @@ void    len_trim_intrinsic(opnd_type     *result_opnd,
       IR_OPND_R(ir_idx) = null_opnd;
    }
 
-# endif  /* March */
+# endif  
 
-   res_exp_desc->foldable = FALSE;   /* March */
+   res_exp_desc->foldable = FALSE;   
    res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "len_trim_intrinsic", NULL);
@@ -14987,7 +14984,7 @@ void    nearest_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Nearest_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -15985,7 +15982,7 @@ void    omp_get_max_threads_intrinsic(opnd_type     *result_opnd,
 
    IR_TYPE_IDX(ir_idx) = type_idx;
 
-# if 0 /*  March */
+# if 0 
 
    IR_RANK(ir_idx) = res_exp_desc->rank;
    res_exp_desc->type_idx = type_idx;
@@ -16055,7 +16052,7 @@ void    omp_set_lock_intrinsic(opnd_type     *result_opnd,
                arg_info_list[info_idx1].col);
    }
 
-# if 0 /* March */
+# if 0 
 
    if (ATP_INTRIN_ENUM(*spec_idx) == Omp_Test_Lock_Intrinsic) {
       ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)) = LOGICAL_DEFAULT_TYPE;
@@ -16270,7 +16267,7 @@ void    pack_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 /* March */
+# if 0 
 
    if (cmd_line_flags.runtime_conformance) {
       gen_runtime_conformance(&IL_OPND(list_idx1),
@@ -16398,7 +16395,7 @@ void    unpack_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 /* March */
+# if 0 
 
    if (cmd_line_flags.runtime_conformance) {
       gen_runtime_conformance(&IL_OPND(list_idx2),
@@ -16475,7 +16472,7 @@ void    trim_intrinsic(opnd_type     *result_opnd,
    list_idx1 = IR_IDX_R(ir_idx);
    info_idx1 = IL_ARG_DESC_IDX(IR_IDX_R(ir_idx));
    ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)) = Character_1;
-   type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)); /* March */
+   type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)); 
 
    if (arg_info_list[info_idx1].ed.rank != 0) {
       PRINTMSG(arg_info_list[info_idx1].line, 654,  Error, 
@@ -16487,7 +16484,7 @@ void    trim_intrinsic(opnd_type     *result_opnd,
                  res_exp_desc,
                  spec_idx,
                  FALSE); 
-# if 0 /* March */
+# if 0 
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx &&
        folder_driver((char *)&CN_CONST(IL_IDX(list_idx1)),
@@ -16536,7 +16533,7 @@ void    trim_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-   res_exp_desc->foldable = FALSE;  /* March */
+   res_exp_desc->foldable = FALSE;  
    res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "trim_intrinsic", NULL);
@@ -16592,7 +16589,7 @@ void    transpose_intrinsic(opnd_type     *result_opnd,
                  res_exp_desc,
                  spec_idx,
                  FALSE);
-# if 0 /* March */
+# if 0 
 
    res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    res_exp_desc->type = TYP_TYPE(res_exp_desc->type_idx);
@@ -16695,7 +16692,7 @@ void    spread_intrinsic(opnd_type     *result_opnd,
                   arg_info_list[info_idx2].col);
       }
 
-# if 0 /* March */
+# if 0 
 
       j = 1;
       for (i = 1; i <= res_exp_desc->rank; i++) {
@@ -16741,7 +16738,7 @@ void    spread_intrinsic(opnd_type     *result_opnd,
 
 # endif
    }
-# if 0 /* March */
+# if 0 
 
    COPY_OPND(opnd, IL_OPND(list_idx2));
    cast_to_cg_default(&opnd, &(arg_info_list[info_idx2].ed));
@@ -17345,7 +17342,7 @@ void    repeat_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-//# if 0  
+/* # if 0   */
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx &&
        IL_FLD(list_idx2) == CN_Tbl_Idx &&
@@ -17393,14 +17390,12 @@ void    repeat_intrinsic(opnd_type     *result_opnd,
    cast_to_cg_default(&opnd, &(arg_info_list[info_idx2].ed));
    COPY_OPND(IL_OPND(list_idx2), opnd);
 
-//# endif
+/*# endif */
 
    res_exp_desc->type_idx = type_idx;
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-//      res_exp_desc->foldable = FALSE;
-//      res_exp_desc->will_fold_later = FALSE;
    TRACE (Func_Exit, "repeat_intrinsic", NULL);
 
 }  /* repeat_intrinsic */
@@ -17453,7 +17448,7 @@ void    dot_product_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if  0 /* March */
+# if  0 
 
    res_exp_desc->rank = 0;
    res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
@@ -17575,7 +17570,7 @@ void    matmul_intrinsic(opnd_type     *result_opnd,
    }
 # endif
 
-# if 0 /* March */
+# if 0 
 
    if (!ATP_EXTERNAL_INTRIN(*spec_idx)) {
       io_item_must_flatten = TRUE;
@@ -17706,7 +17701,7 @@ void    transfer_intrinsic(opnd_type     *result_opnd,
       fold_it = fold_it && arg_info_list[info_idx3].ed.foldable;
    }
 
-# if 0 /* March */
+# if 0 
 
    if (fold_it) {
       COPY_OPND(opnd, IL_OPND(list_idx1));
@@ -18291,7 +18286,7 @@ void    associated_intrinsic(opnd_type     *result_opnd,
 
    if (list_idx2 == NULL_IDX) {
       /* TARGET is not present */
-# if 0 /* March */
+# if 0 
       COPY_OPND(opnd, IL_OPND(list_idx1));
       line = IR_LINE_NUM(ir_idx);
       col = IR_COL_NUM(ir_idx);
@@ -18338,7 +18333,7 @@ void    associated_intrinsic(opnd_type     *result_opnd,
          PRINTMSG(arg_info_list[info_idx2].line, 783,  Error, 
                   arg_info_list[info_idx2].col);
       }
-# if 0 /* March */
+# if 0 
       IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
       res_exp_desc->rank = 0;
       IR_RANK(ir_idx) = res_exp_desc->rank;
@@ -18599,7 +18594,7 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
       }
    }
 
-# if 0 /* March */
+# if 0 
 
    switch (res_exp_desc->rank) { 
          case 0: ATD_ARRAY_IDX(ATP_RSLT_IDX(*spec_idx)) = NULL_IDX;
@@ -18678,7 +18673,7 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
       }
    }
 
-# if 0 /* March */
+# if 0 
 
    if (fold_it) { 
 
@@ -18969,7 +18964,7 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
       res_exp_desc->char_len.idx = TYP_IDX(type_idx);
    }
 
-      res_exp_desc->foldable = FALSE;  /* March */
+      res_exp_desc->foldable = FALSE;  
       res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "reshape_intrinsic", NULL);
@@ -19072,7 +19067,7 @@ void    mldmx_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Mldmx_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -19187,7 +19182,7 @@ void    mul_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Mul_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
@@ -19244,7 +19239,7 @@ void    mclr_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 /* March */
+# if 0 
 
    IR_OPR(ir_idx) = Mcbl_Opr;
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
