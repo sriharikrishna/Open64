@@ -36,9 +36,9 @@
 //-*-c++-*-
 /**
 *** Module: cxx_graph.h
-*** $Revision: 1.1.1.1 $
-*** $Date: 2002-05-22 20:06:30 $
-*** $Author: dsystem $
+*** $Revision: 1.2 $
+*** $Date: 2004-12-01 16:42:38 $
+*** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/cxx_graph.h,v $
 *** 
 *** Revision history:
@@ -57,11 +57,6 @@
 *** 
 *** Exported Types and Functions:
 ***
-***     VINDEX16
-***     EINDEX16
-***
-***         Type of a index to a vertex/edge in the graph
-*** 
 ***     VERTEX16
 *** 
 ***         Type of a vertex in the graph.
@@ -113,11 +108,14 @@
 #define cxx_graph_INCLUDED "cxx_graph.h"
 
 #ifdef _KEEP_RCS_ID
-static char *cxx_graph_rcs_id = cxx_graph_INCLUDED "$Revision: 1.1.1.1 $";
+static char *cxx_graph_rcs_id = cxx_graph_INCLUDED "$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifndef defs_INCLUDED
 #include "defs.h"
+#endif
+#ifndef cxx_graph_i_INCLUDED
+#include "cxx_graph.i"
 #endif
 #ifndef graph_template_INCLUDED
 #include "graph_template.h"
@@ -135,13 +133,6 @@ static char *cxx_graph_rcs_id = cxx_graph_INCLUDED "$Revision: 1.1.1.1 $";
  * 5. increase LNO_Graph_Capacity in lnodriver.c.
  */
 
-
-
-typedef mUINT16 VINDEX16;
-typedef mUINT16 EINDEX16;
-
-extern const VINDEX16 INVALID_VINDEX16;
-extern VINDEX16 GRAPH16_CAPACITY;
 
 class VERTEX16 {
   friend 	class DIRECTED_GRAPH16<class EDGE16, class VERTEX16>;

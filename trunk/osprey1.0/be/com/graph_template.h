@@ -37,9 +37,9 @@
 //
 /**
 *** Module: graph_template.h
-*** $Revision: 1.1.1.1 $
-*** $Date: 2002-05-22 20:06:31 $
-*** $Author: dsystem $
+*** $Revision: 1.2 $
+*** $Date: 2004-12-01 16:42:38 $
+*** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/graph_template.h,v $
 *** 
 *** Revision history:
@@ -214,7 +214,7 @@
 #define graph_template_INCLUDED "graph_template.h"
 
 #ifdef _KEEP_RCS_ID
-static char *graph_template_rcs_id = graph_template_INCLUDED "$Revision: 1.1.1.1 $";
+static char *graph_template_rcs_id = graph_template_INCLUDED "$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifndef defs_INCLUDED
@@ -226,13 +226,11 @@ static char *graph_template_rcs_id = graph_template_INCLUDED "$Revision: 1.1.1.1
 #ifndef cxx_template_INCLUDED
 #include "cxx_template.h"
 #endif
-#ifndef cxx_graph_INCLUDED
-#include "cxx_graph.h"
+#ifndef cxx_graph_i_INCLUDED
+#include "cxx_graph.i"
 #endif
 #include "cxx_memory.h"
 
-typedef mUINT16 VINDEX16;
-typedef mUINT16 EINDEX16;
 
 template <class EDGE_TYPE, class VERTEX_TYPE>
 class DIRECTED_GRAPH16 {
