@@ -85,16 +85,16 @@ ST_visible_outside_dso(const ST &s)
 	  ST_export(s) != EXPORT_LOCAL_INTERNAL);
 }
 inline BOOL
-ST_visible_outside_dso(const ST *s)	{ return ST_visible_outside_dso(*s); }
+ST_visible_outside_dso(const ST *s) { return ST_visible_outside_dso(*s); }
 
+
+// implementation still incomplete.
 ST *
-Gen_Intrinsic_Function(TY_IDX, char *function_name); // implementation
-						     // still
-						     // incomplete.
+Gen_Intrinsic_Function(TY_IDX, const char *function_name);
 
+// implementation still incomplete.
 TY_IDX
-Make_Function_Type(TY_IDX return_ty_idx);  // implementation still
-					   // incomplete.
+Make_Function_Type(TY_IDX return_ty_idx); 
 
 TY_IDX
 Make_Array_Type(TYPE_ID element_type, INT32 ndim, INT64 len);
