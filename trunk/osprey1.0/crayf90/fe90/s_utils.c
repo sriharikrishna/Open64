@@ -539,7 +539,6 @@ boolean resolve_ext_opr(opnd_type 	*opnd,
              !ATP_RSLT_NAME(spec_idx)) {
             PRINTMSG(IR_LINE_NUM(ir_idx), 344, Ansi, IR_COL_NUM(ir_idx));
          }
-
          if (!ATP_RECURSIVE(spec_idx) && !AT_DCL_ERR(spec_idx) &&
              !on_off_flags.recursive) {
             PRINTMSG(IR_LINE_NUM(ir_idx), 343, Error, IR_COL_NUM(ir_idx));

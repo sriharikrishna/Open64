@@ -859,3 +859,5 @@
 #	define		CDIR_VFUNCTION			FALSE
 
 # endif 
+
+#define _ACCEPT_CMD_J TRUE /*temp use for co-array ----fzhao*/

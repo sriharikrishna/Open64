@@ -1749,6 +1749,7 @@ typedef struct	opt_flags_entry			opt_flags_type;
 typedef union	target_machine_entry		target_machine_type;
 typedef union	id_str_entry			id_str_type;
 
+
 union   id_str_entry		{char		string[MAX_ID_LEN+1];
                                  long           words[NUM_ID_WDS];
 				};
@@ -1970,6 +1971,7 @@ struct	on_off_flags_entry {
 	boolean		zero_init		: 1;		/* -e0	      */
 	boolean		d_lines			: 1;
 	};
+
 
 /*************\
 |* OPND TYPE *|

@@ -2968,6 +2968,8 @@ int fm;
                 else
                    IL_IDX(list_idx)=ATD_TMP_IDX(ATL_FORMAT_TMP(IL_IDX(list_idx))); 
                }
+            else 
+             IL_IDX(list_idx)=ATD_TMP_IDX(ATL_FORMAT_TMP(IL_IDX(list_idx)));
 
              IL_FLD(list_idx) = CN_Tbl_Idx; 
 

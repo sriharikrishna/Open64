@@ -2388,11 +2388,14 @@ boolean merge_intrinsic(boolean	chk_semantics,
 
       /* The INTRINSIC has not been copied down yet. - So copy it. */
 
+# if 0 /* keep intrinsic function has an attribut table entry,don't merge with 
+        * user defined interface attribute entry
+        */
+
       host_attr_idx = srch_host_sym_tbl(AT_OBJ_NAME_PTR(attr_idx),
                                         AT_NAME_LEN(attr_idx),
                                         &host_name_idx,
                                         TRUE);
-
       if (host_attr_idx != NULL_IDX) {
 
          /* go directly to the INTRINSIC scope if not interface */
@@ -2400,20 +2403,24 @@ boolean merge_intrinsic(boolean	chk_semantics,
 
          if (AT_OBJ_CLASS(host_attr_idx) != Interface ||
              !ATI_GENERIC_INTRINSIC(host_attr_idx)) {
+
+#endif
             save_curr_scp_idx = curr_scp_idx;
             curr_scp_idx = INTRINSIC_SCP_IDX;
             host_attr_idx = srch_sym_tbl(AT_OBJ_NAME_PTR(attr_idx),
                                          AT_NAME_LEN(attr_idx),
                                          &host_name_idx);
             curr_scp_idx = save_curr_scp_idx;
-         }
+
+/*         } */
 
          if (host_attr_idx != NULL_IDX &&
              AT_IS_INTRIN(host_attr_idx) &&
              ATI_FIRST_SPECIFIC_IDX(host_attr_idx) == NULL_IDX) {
             complete_intrinsic_definition(host_attr_idx);
          }
-      }
+
+/*      } */
 
       if (host_attr_idx == NULL_IDX) {
 
@@ -2495,7 +2502,6 @@ boolean merge_intrinsic(boolean	chk_semantics,
                type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(attr_idx));
             }
          }
-
          COPY_VARIANT_ATTR_INFO(host_attr_idx,
                                 attr_idx, 
                                 Interface);

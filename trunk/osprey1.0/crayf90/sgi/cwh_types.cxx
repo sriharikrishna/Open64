@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.13 $
- * $Date: 2003-05-10 00:27:41 $
- * $Author: dotsenko $
+ * $Revision: 1.14 $
+ * $Date: 2003-06-03 20:15:22 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.14 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */

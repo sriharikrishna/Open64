@@ -1064,7 +1064,6 @@ EXIT:
                 !ATP_RSLT_NAME(spec_idx)) {
                PRINTMSG(line, 344, Ansi, col);
             }
-
             if (!ATP_RECURSIVE(spec_idx) && !AT_DCL_ERR(spec_idx) &&
                 !on_off_flags.recursive) {
                PRINTMSG(line, 343, Error, col);
@@ -1372,7 +1371,7 @@ HERE:
                res_exp_desc->dope_vector = FALSE; /* March */
 #endif
                res_exp_desc->will_fold_later = FALSE;
-               res_exp_desc->foldable        = FALSE; /* April */
+               res_exp_desc->foldable        = save_foldable;
 
                if (ATD_ARRAY_IDX(rslt_idx) != NULL_IDX) {
                   res_exp_desc->assumed_shape =
@@ -1418,7 +1417,7 @@ HERE:
                   }
                }
 
-         if (ATP_PROC(spec_idx) != Intrin_Proc)
+          if (ATP_PROC(spec_idx) != Intrin_Proc)
                flatten_function_call(result_opnd);  
 /* flatten_function_call cannot work on intrinsic function *
  * need think about how to change it    ---fzhao Jan       */
@@ -6522,6 +6521,8 @@ void flatten_function_call(opnd_type     *result)
          PRINTMSG(line, 939, Error, col, AT_OBJ_NAME_PTR(attr_idx));
       }
 
+#if 0
+
       if ( /* ATP_PROC(IR_IDX_L(ir_idx)) != Intrin_Proc && */
           (TYP_TYPE(type_idx) == Character &&
            TYP_CHAR_CLASS(type_idx) == Var_Len_Char ||
@@ -6573,7 +6574,7 @@ void flatten_function_call(opnd_type     *result)
 
       /* need to make it a subroutine */
 
-# if 0 /*August */
+//# if 0 /*August */
 
       tmp_idx = get_stmt_tmp(type_idx,
                              ATD_IM_A_DOPE(attr_idx),

@@ -629,12 +629,10 @@ static void	attr_link_resolution(void)
 # endif
 
       attr_idx = LN_ATTR_IDX(name_idx);
-
 # ifdef _DEBUG
       if (attr_idx <= 0 || attr_idx > attr_tbl_idx) {
          PRINTMSG(stmt_start_line, 34, Internal, stmt_start_col); 
       }
-
       if (LN_NAME_IDX(name_idx) != AT_NAME_IDX(attr_idx)) {
          PRINTMSG(AT_DEF_LINE(attr_idx), 516, Internal,
                   AT_DEF_COLUMN(attr_idx),
