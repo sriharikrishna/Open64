@@ -432,7 +432,6 @@ int ntr_sym_tbl(token_type *token,
    name_tbl_base = (long *) loc_name_tbl;
 # endif
 
-#  pragma _CRI ivdep
    for (i = loc_name_tbl_idx; i >= name_idx; i--) {
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
       name_tbl_base [i] = name_tbl_base [i-1];
@@ -613,7 +612,6 @@ int ntr_host_in_sym_tbl(token_type     *token,
    name_tbl_base = (long *) loc_name_tbl;
 # endif
 
-#  pragma _CRI ivdep
    for (i = loc_name_tbl_idx; i >= name_idx; i--) {
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
       name_tbl_base [i] = name_tbl_base [i-1];
@@ -666,7 +664,6 @@ void remove_ln_ntry(int         name_idx)
 
    /* Remove name */
 
-#  pragma _CRI ivdep
    for (i = name_idx; i < SCP_LN_LW_IDX(curr_scp_idx); i++) {
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
       name_tbl_base [i] = name_tbl_base [i+1];
@@ -768,7 +765,6 @@ int srch_kwd_name(char		*name,
 
    switch (id_wd_len) {
       case 1:
-#        pragma _CRI ivdep
          for (i = 0; i < num_dargs; i++) {
             np_idx = SN_NP_IDX(*sn_idx + i);  
 
@@ -790,7 +786,6 @@ int srch_kwd_name(char		*name,
          break;
 
       case 2:
-#        pragma _CRI ivdep
 
          for (i = 0; i < num_dargs; i++) {
             np_idx = SN_NP_IDX(*sn_idx + i);  
@@ -807,7 +802,6 @@ int srch_kwd_name(char		*name,
          break;
 
       case 3:
-#        pragma _CRI ivdep
 
          for (i = 0; i < num_dargs; i++) {
             np_idx = SN_NP_IDX(*sn_idx + i);  
@@ -825,7 +819,6 @@ int srch_kwd_name(char		*name,
          break;
 
       case 4: 
-#        pragma _CRI ivdep
          for (i = 0; i < num_dargs; i++) {
             np_idx = SN_NP_IDX(*sn_idx + i);  
             if (SN_LEN(*sn_idx + i) == id_char_len) {
@@ -997,7 +990,6 @@ int srch_stor_blk_tbl (char		*name_str,
 
    switch (id_wd_len) {
       case 1:
-#        pragma _CRI ivdep
          for (i = 1; i <= stor_blk_tbl_idx; i++) {
             np_idx = SB_NAME_IDX(i);  
 
@@ -1014,7 +1006,6 @@ int srch_stor_blk_tbl (char		*name_str,
          break;
 
       case 2:
-#        pragma _CRI ivdep
          for (i = 1; i <= stor_blk_tbl_idx; i++) {
             np_idx = SB_NAME_IDX(i);  
 
@@ -1032,7 +1023,6 @@ int srch_stor_blk_tbl (char		*name_str,
          break;
 
       case 3:
-#        pragma _CRI ivdep
          for (i = 1; i <= stor_blk_tbl_idx; i++) {
             np_idx = SB_NAME_IDX(i);  
 
@@ -1051,7 +1041,6 @@ int srch_stor_blk_tbl (char		*name_str,
          break;
 
       case 4: 
-#        pragma _CRI ivdep
          for (i = 1; i <= stor_blk_tbl_idx; i++) {
             np_idx = SB_NAME_IDX(i);  
 
@@ -1072,7 +1061,6 @@ int srch_stor_blk_tbl (char		*name_str,
 
 # ifdef _HOST32
       case 5:
-#        pragma _CRI ivdep
          for (i = 1; i <= stor_blk_tbl_idx; i++) {
             np_idx = SB_NAME_IDX(i);
 
@@ -1092,7 +1080,6 @@ int srch_stor_blk_tbl (char		*name_str,
          }
          break;
       case 6:
-#        pragma _CRI ivdep
          for (i = 1; i <= stor_blk_tbl_idx; i++) {
             np_idx = SB_NAME_IDX(i);
 
@@ -1113,7 +1100,6 @@ int srch_stor_blk_tbl (char		*name_str,
          }
          break;
       case 7:
-#        pragma _CRI ivdep
          for (i = 1; i <= stor_blk_tbl_idx; i++) {
             np_idx = SB_NAME_IDX(i);
 
@@ -1135,7 +1121,6 @@ int srch_stor_blk_tbl (char		*name_str,
          }
          break;
       case 8:
-#        pragma _CRI ivdep
          for (i = 1; i <= stor_blk_tbl_idx; i++) {
             np_idx = SB_NAME_IDX(i);
 
@@ -1168,7 +1153,6 @@ int srch_stor_blk_tbl (char		*name_str,
                 SB_SCP_IDX(i) == scp_idx && !SB_HIDDEN(i)) {
                tst_val = 0;
 
-#        pragma _CRI ivdep
                for (j = 0; j < id_wd_len; j++) {
                   tst_val = tst_val | (id[j] - name_pool[np_idx+j].name_long);
                }
@@ -4913,10 +4897,6 @@ int	compare_names(long	*id1,
 
    TRACE (Func_Entry, "compare_names", NULL);
 
-# if !(defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
-#  pragma _CRI shortloop
-# endif
-
    for (i = 0; i < WORD_LEN((id1_len > id2_len) ? id1_len : id2_len); i++) {
       matched = id1[i] - id2[i];
 
@@ -5450,10 +5430,6 @@ int srch_linked_sn(char		*name,
 
       if (SN_NAME_LEN(*sn_idx) == length) {
          id1 = (long *) &(name_pool[SN_NAME_IDX(*sn_idx)]);
-
-# if !(defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
-#        pragma _CRI shortloop
-# endif
 
          for (i = 0; i < id_wd_len; i++) {
             matched = id[i] - id1[i];
@@ -6614,7 +6590,6 @@ void	ntr_global_name_tbl(int		attr_idx,
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
    global_tbl_base	= (long *) global_name_tbl;
 
-#  pragma _CRI ivdep
    for (i = global_name_tbl_idx; i >= name_idx; i--) {
       global_tbl_base[i]	= global_tbl_base[i-1];
    }
@@ -7856,7 +7831,6 @@ void ntr_hidden_name_tbl(int    attr_idx,
    name_tbl_base = (long *) hidden_name_tbl;
 # endif
 
-#  pragma _CRI ivdep
    for (i = hidden_name_tbl_idx; i >= name_idx; i--) {
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
       name_tbl_base [i] = name_tbl_base [i-1];
@@ -7909,7 +7883,6 @@ void remove_hidden_name_ntry(int         name_idx)
 
    /* Remove name */
 
-#  pragma _CRI ivdep
    for (i = name_idx; i < SCP_HN_LW_IDX(curr_scp_idx); i++) {
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
       name_tbl_base [i] = name_tbl_base [i+1];

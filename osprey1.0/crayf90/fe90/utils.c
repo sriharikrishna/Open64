@@ -661,8 +661,6 @@ int srch_name_tbl(char		       *name_str,
    switch (id_len) {
       case 1:
          while (seg_len > 32) {
-#           pragma _CRI ivdep
-#           pragma _CRI shortloop
             for (idx = first + stride -1 ; idx <= last; idx += stride) {
                tst_val = DIFF(1);
                if (tst_val >= 0) {
@@ -680,8 +678,6 @@ int srch_name_tbl(char		       *name_str,
             stride  = STRIDE_CALC(seg_len);
          }  /* end while seg_len > 32  */
 
-#        pragma _CRI ivdep
-#        pragma _CRI shortloop
          for (idx = first; idx <= last; idx += 1) {
 /*
             fprintf(stderr, "idx = %d, name_idx = %d, %d, value = %ld\n",
@@ -697,8 +693,6 @@ int srch_name_tbl(char		       *name_str,
 
       case 2:
          while (seg_len > 32) {
-#           pragma _CRI ivdep
-#           pragma _CRI shortloop
             for (idx = first + stride -1 ; idx <= last; idx += stride) {
                tst_val = DIFF(1);
                mask    = -(RIGHT_JUSTIFY_SIGN_BIT(DIFF(1) | -DIFF(1)));
@@ -718,8 +712,6 @@ int srch_name_tbl(char		       *name_str,
             stride  = STRIDE_CALC(seg_len);
          }  /* end while seg_len > 32  */
 
-#        pragma _CRI ivdep
-#        pragma _CRI shortloop
          for (idx = first; idx <= last; idx += 1) {
             tst_val = DIFF(1);
             mask    = -(RIGHT_JUSTIFY_SIGN_BIT(DIFF(1) | -DIFF(1)));
@@ -732,8 +724,6 @@ int srch_name_tbl(char		       *name_str,
 
       case 3:
          while (seg_len > 32) {
-#           pragma _CRI ivdep
-#           pragma _CRI shortloop
             for (idx = first + stride -1 ; idx <= last; idx += stride) {
                tst_val = DIFF(1);
                mask    = -(RIGHT_JUSTIFY_SIGN_BIT(DIFF(1) | -DIFF(1)));
@@ -755,8 +745,6 @@ int srch_name_tbl(char		       *name_str,
             stride  = STRIDE_CALC(seg_len);
          }  /* end while seg_len > 32  */
 
-#        pragma _CRI ivdep
-#        pragma _CRI shortloop
          for (idx = first; idx <= last; idx += 1) {
             tst_val = DIFF(1);
             mask    = -(RIGHT_JUSTIFY_SIGN_BIT(DIFF(1) | -DIFF(1)));
@@ -771,8 +759,6 @@ int srch_name_tbl(char		       *name_str,
 
       case 4:
          while (seg_len > 32) {
-#           pragma _CRI ivdep
-#           pragma _CRI shortloop
             for (idx = first + stride -1 ; idx <= last; idx += stride) {
                tst_val = DIFF(1);
                mask    = -(RIGHT_JUSTIFY_SIGN_BIT(DIFF(1) | -DIFF(1)));
@@ -796,8 +782,6 @@ int srch_name_tbl(char		       *name_str,
             stride  = STRIDE_CALC(seg_len);
          }  /* end while seg_len > 32  */
 
-#        pragma _CRI ivdep
-#        pragma _CRI shortloop
          for (idx = first; idx <= last; idx += 1) {
             tst_val = DIFF(1);
             mask    = -(RIGHT_JUSTIFY_SIGN_BIT(DIFF(1) | -DIFF(1)));
