@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.5 $
- * $Date: 2003-06-12 15:27:50 $
- * $Author: broom $
+ * $Revision: 1.6 $
+ * $Date: 2003-06-23 20:21:55 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.6 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -1185,6 +1185,44 @@ W2F_Outfile_Init(void)
    }
 
    W2F_Outfile_Initialized = TRUE;
+
+/* In unparsed code adding a module named " w2f__types" to solve
+ * the real kind problem.
+ * by defining a bounch of integer parameter to give different kinds 
+ * names,by calling intrinsic functions
+ *      selected_int_kind
+ *      selected_real_kind
+ * to set the kind values
+ *------fzhao
+ */
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+                "	module w2f__types\n\n");
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		"	integer :: w2f__4, w2f__8, w2f__16\n");
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		"	parameter (w2f__4 = kind(0.0))\n");
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+  		"	parameter (w2f__8 = kind(0.0d0))\n"); 
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		"	parameter (w2f__16 = selected_real_kind(p=30))\n\n");
+
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		"	integer :: w2f__i1, w2f__i2, w2f__i4,w2f__i8\n");
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		"	parameter (w2f__i1 = selected_int_kind(r=2))\n");
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		"	parameter (w2f__i2 = selected_int_kind(r=3))\n");
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		"	parameter (w2f__i4 = selected_int_kind(r=8))\n");
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		"	parameter (w2f__i8 = selected_int_kind(r=16))\n\n");
+
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+                "	end module w2f__types\n");
+   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+                "C **********************************************"
+                "*************\n");
+
 
 } /* W2F_Outfile_Init */
 
