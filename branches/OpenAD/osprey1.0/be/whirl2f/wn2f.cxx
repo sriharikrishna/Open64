@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.19 $
- * $Date: 2004-04-26 21:44:52 $
+ * $Revision: 1.19.2.1 $
+ * $Date: 2004-07-27 21:45:11 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.19.2.1 $";
 #endif
 
 #include <alloca.h>
@@ -1406,7 +1406,7 @@ WN2F_End_Routine_Strings(TOKEN_BUFFER tokens, INT32 func_id)
       char * p ;
 
       if (PU_is_mainpu(pu)) 
-	p = "END";
+	p = "END PROGRAM";
 
       else {
 	TY_IDX rt = PUINFO_RETURN_TY;
