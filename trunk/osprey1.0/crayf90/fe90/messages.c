@@ -2283,4 +2283,12 @@ void fold_f_abort_(int *oper)
    return;
 
 }  /* fold_f_abort_ */
+
+
+void fold_f_abort__(int *oper)
+
+{
+  fold_f_abort_(oper);
+}
+
 # endif

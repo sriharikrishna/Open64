@@ -81,6 +81,11 @@ void pow_zi_(dcomplex *p, dcomplex *a, int32 *b)   /* p = a**b  */
   *p = __powzi(a->dreal, a->dimag,*b);
 }
 
+void pow_zi__(dcomplex *p, dcomplex *a, int32 *b)   /* p = a**b  */
+{
+  *p = __powzi(a->dreal, a->dimag,*b);
+}
+
 dcomplex __powzl(double adreal, double adimag, int64 n)
 /* __powzl = a**n  */
 {
@@ -120,6 +125,11 @@ dcomplex __powzl(double adreal, double adimag, int64 n)
 }
 
 void pow_zl_(dcomplex *p, dcomplex *a, int64 *b)   /* p = a**b  */
+{
+  *p = __powzl(a->dreal, a->dimag,*b);
+}
+
+void pow_zl__(dcomplex *p, dcomplex *a, int64 *b)   /* p = a**b  */
 {
   *p = __powzl(a->dreal, a->dimag,*b);
 }

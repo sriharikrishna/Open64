@@ -78,3 +78,8 @@ void pow_cc_(complex *r, complex *a, complex *b)
 {
   *r = __powcc(a->real, a->imag, b->real, b->imag);
 }
+
+void pow_cc__(complex *r, complex *a, complex *b)
+{
+  *r = __powcc(a->real, a->imag, b->real, b->imag);
+}
