@@ -58,6 +58,7 @@
 #include "defs.h"
 #include "tracing.h"			// for TFile
 #include "irbdata.h"
+#include "ir_a2b_util.h"                // for b2a and a2b utilities
 
 
 INITO_IDX
@@ -410,6 +411,55 @@ For_all_initv (INITV_IDX idx, const OP& op)
 	op (initv);
 	idx = INITV_next (initv);
     }
+}
+
+
+// eraxxon (2005.01): InitvKind_Name, Name_To_InitvKind: Implement
+// these routines to support conversion in both directions.
+
+// The type for enumeration value -> string tables
+struct EnumToStr_t : public ir_a2b::enum2str_tbl_entry_t {
+  EnumToStr_t(INT val_ = 0, const char* str_ = 0) 
+    : val(val_), str(str_) { }
+
+  virtual ~EnumToStr_t() { }
+
+  virtual INT getEnumVal() const     { return val; }
+  virtual const char* getStr() const { return str; }
+
+  INT         val;
+  const char* str;
+};
+
+
+EnumToStr_t InitvKindToNameTbl[INITVKIND_COUNT] = {
+  EnumToStr_t(INITVKIND_UNK,       "INITV_UNK"),
+  EnumToStr_t(INITVKIND_SYMOFF,    "INITV_SYMOFF"),
+  EnumToStr_t(INITVKIND_ZERO,      "INITV_ZERO"),
+  EnumToStr_t(INITVKIND_ONE,       "INITV_ONE"),
+  EnumToStr_t(INITVKIND_VAL,       "INITV_VAL"),
+  EnumToStr_t(INITVKIND_BLOCK,     "INITV_BLOCK"),
+  EnumToStr_t(INITVKIND_PAD,       "INITV_PAD"),
+  EnumToStr_t(INITVKIND_SYMDIFF,   "INITV_SYMDIFF"),
+  EnumToStr_t(INITVKIND_SYMDIFF16, "INITV_SYMDIFF16"),
+  EnumToStr_t(INITVKIND_LABEL,     "INITV_LABEL"),
+};
+
+
+const char *
+InitvKind_Name (INITVKIND knd)
+{
+  using namespace ir_a2b;
+  return MapEnumToStr<EnumToStr_t, InitvKindToNameTbl,
+                      INITVKIND_COUNT>("InitvKindToNameTbl", (INT)knd);
+}
+
+INITVKIND
+Name_To_InitvKind (const char* nm) 
+{
+  using namespace ir_a2b;
+  return (INITVKIND)MapStrToEnum<EnumToStr_t, InitvKindToNameTbl, 
+                                 INITVKIND_COUNT>("InitvKindToNameTbl", nm);
 }
 
 
