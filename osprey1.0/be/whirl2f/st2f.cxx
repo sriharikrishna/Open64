@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.13 $
- * $Date: 2003-03-06 16:29:31 $
+ * $Revision: 1.12 $
+ * $Date: 2003-02-26 16:47:29 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.12 $";
 #endif
 
 #include <ctype.h>
@@ -675,7 +675,6 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    WN *stmt;
    ST *rslt = NULL;
    BOOL needcom=1;
-   BOOL has_result = 0;
    const char * func_n_name= W2CF_Symtab_Nameof_St(st);
 
 
@@ -754,7 +753,6 @@ ST2F_func_header(TOKEN_BUFFER tokens,
  */
   
     if (rslt !=NULL && strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st))) { 
-        has_result = 1;
         Append_Token_String(header_tokens,"result(");
         Append_Token_String(header_tokens,
                              W2CF_Symtab_Nameof_St(rslt));
@@ -785,23 +783,15 @@ ST2F_func_header(TOKEN_BUFFER tokens,
 	* instead.
 	*/
 
-       if (has_result)
-           has_result = 0; 
-       else {
-          if (TY_Is_Pointer(return_ty))
-	      TY2F_translate(header_tokens, 
+       if (TY_Is_Pointer(return_ty))
+	 TY2F_translate(header_tokens, 
 			Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-           else { 
-                 if (TY_kind(return_ty)==KIND_ARRAY)  {
-                       if (TY_is_character(TY_AR_etype(return_ty))) 
-                             ;
-                       else
-                          TY2F_translate(header_tokens,TY_AR_etype(return_ty));
-                  }
+       else {
+              if (TY_kind(return_ty)==KIND_ARRAY && !TY_is_character(return_ty)) /*try Oct*/
+                   TY2F_translate(header_tokens,TY_AR_etype(return_ty));
                  else
 	           TY2F_translate(header_tokens, return_ty);
             }
-	}
      }
    }
    else /* subroutine */

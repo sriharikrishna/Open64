@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: wn2f.h
- * $Revision: 1.7 $
- * $Date: 2003-03-04 20:03:04 $
+ * $Revision: 1.6 $
+ * $Date: 2003-02-28 22:54:55 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.h,v $
  *
@@ -192,20 +192,6 @@ typedef struct WN2F_Context
    ((c).flags = (c).flags | WN2F_CONTEXT_IS_LOGICAL_ARG)
 #define reset_WN2F_CONTEXT_is_logical_arg(c)\
    ((c).flags = (c).flags & ~WN2F_CONTEXT_IS_LOGICAL_ARG)
-
-/* this flag indicates that we need to print out logical
- * operations such as .eqv. instead of arith operations like .eq.
- *   ------fzhao
- */
-#define WN2F_CONTEXT_IS_LOGICAL_OPERATION 0x00020000
-#define WN2F_CONTEXT_is_logical_operation(c)\
-   ((c).flags & WN2F_CONTEXT_IS_LOGICAL_OPERATION)
-#define set_WN2F_CONTEXT_is_logical_operation(c)\
-   ((c).flags = (c).flags | WN2F_CONTEXT_IS_LOGICAL_OPERATION)
-#define reset_WN2F_CONTEXT_is_logical_operation(c)\
-   ((c).flags = (c).flags & ~WN2F_CONTEXT_IS_LOGICAL_OPERATION)
-
-
 
 /* This flag indicates that we are in a context where we need not
  * enclose a Fortran expression in parenthesis (subexpressions may
