@@ -364,7 +364,7 @@ WFE_Expand_Exit_Loop_If_False (struct nesting *whichloop, tree cond)
   loop_info_stack [loop_info_i].exit_loop_if_false = TRUE;
   test       = WFE_Expand_Expr_With_Sequence_Point (cond, Boolean_type);
   while_body = WFE_Stmt_Pop (wfe_stmk_while_body);
-  WN* forall_prag = WN_CreatePragma(WN_PRAGMA_UPC_FORALL, (ST_IDX) 0, 0, 0);
+   WN* forall_prag = WN_CreatePragma(WN_PRAGMA_UPC_FORALL, (ST_IDX) 0, 0, 0);
 
   switch (loop_info_stack [loop_info_i].continue_info) {
     case CONTINUE_NONE:
@@ -395,7 +395,6 @@ WFE_Expand_Exit_Loop_If_False (struct nesting *whichloop, tree cond)
       break;
   }
 
-  //WFE_Stmt_Append (forall_prag, Get_Srcpos());
   WFE_Stmt_Append (while_stmt, Get_Srcpos());
 
 

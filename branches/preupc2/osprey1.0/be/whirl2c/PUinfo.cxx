@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: PUinfo.c
- * $Revision: 1.3 $
- * $Date: 2002-08-21 03:10:54 $
- * $Author: open64 $
+ * $Revision: 1.3.4.1 $
+ * $Date: 2003-04-11 00:31:53 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.3.4.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>
@@ -309,12 +309,9 @@ Accumulate_Preg_Info(TY_IDX preg_ty, INT16 preg_num)
    preg_info = Get_Preg_Info(preg_num);
    if (preg_info == NULL)
    {
-
       /* Add a new entry to the hash-table */
-      if (Free_Preg_Info == NULL) {
-        
+      if (Free_Preg_Info == NULL)
 	 preg_info = TYPE_ALLOC_N(PREG_INFO, 1);
-      }
       else
       {
 	 preg_info = Free_Preg_Info;
@@ -322,28 +319,22 @@ Accumulate_Preg_Info(TY_IDX preg_ty, INT16 preg_num)
       }
 
       /* Reset the usage and also set the other fields */
-
       for (usage_kind = (INT)FIRST_PREG_USAGE_KIND; 
 	   usage_kind <= (INT)LAST_PREG_USAGE_KIND; 
 	   usage_kind++)
       {
 	 PREG_INFO_decl(preg_info, usage_kind) = FALSE;
 	 PREG_INFO_use(preg_info, usage_kind) = FALSE;
-
       }
       PREG_INFO_preg_num(preg_info) = preg_num;
       PREG_INFO_next(preg_info) = 
 	 Preg_Info_Hash_Tbl[PREG_INFO_HASH_IDX(preg_num)];
       Preg_Info_Hash_Tbl[PREG_INFO_HASH_IDX(preg_num)] = preg_info;
-//    }
+   }
    
    /* Record this usage */
-
    usage_kind = (INT)Mtype_to_Ukind(TY_mtype(preg_ty));
-
    PREG_INFO_use(preg_info, usage_kind) = TRUE;
-
-  }
 } /* Accumulate_Preg_Info */
 
 
@@ -578,10 +569,9 @@ Does_Stmt_Store_From_Preg(const WN *wn, STAB_OFFSET preg_num)
 {
    if ((WN_opc_operator(wn) == OPR_STID || 
 	WN_opc_operator(wn) == OPR_ISTORE)            &&
-       WN_opc_operator(WN_kid0(wn)) == OPR_LDID )  /*     && */
-/*       ST_sym_class(WN_st(WN_kid0(wn))) == CLASS_PREG &&
+       WN_opc_operator(WN_kid0(wn)) == OPR_LDID       &&
+       ST_sym_class(WN_st(WN_kid0(wn))) == CLASS_PREG &&
        WN_load_offset(WN_kid0(wn)) == preg_num)
-*/
       return wn;
    else
       return NULL;
@@ -750,7 +740,7 @@ Append_CallSite(WN_ITER *stmt_iter, const WN *next_stmt)
       /* If the return-value is composed of two return-registers, then
        * see if both return registers are stored into a temporary variable.
        */
-/*      if (store1 != NULL) */
+      if (store1 != NULL)
       {
 	 /* Check if the first return register is stored off into a variable */
 	 Var_Stored_In(next_stmt, &save_var1, &save_offset1);
@@ -999,7 +989,6 @@ Accumulate_Expr_PUinfo(WN *root)
    const WN *gparent;
    const WN *next_return_ldid = NULL;
    CALLSITE *last_callsite = NULL;
-   ST * stz;
    
    /* Walk the entire tree to get expression-level information */
    for (wn_iter = WN_WALK_TreeIter(root); 
@@ -1016,7 +1005,6 @@ Accumulate_Expr_PUinfo(WN *root)
 	 switch(WN_opc_operator(wn))
 	 {
 	 case OPR_STID:
-              stz = WN_st(wn);
 	    if (ST_sym_class(WN_st(wn)) == CLASS_PREG)
 	       Accumulate_Preg_Info(ST_type(WN_st(wn)), WN_store_offset(wn));
 
@@ -1041,9 +1029,8 @@ Accumulate_Expr_PUinfo(WN *root)
 	    break;
 	    
 	 case OPR_LDID:
-/*	    if (ST_sym_class(WN_st(wn)) == CLASS_PREG)
+	    if (ST_sym_class(WN_st(wn)) == CLASS_PREG)
 	    {
-*/
 	       Accumulate_Preg_Info(ST_type(WN_st(wn)), WN_load_offset(wn));
 
 	       /* If we encounter an unexpected load of a return
@@ -1053,9 +1040,9 @@ Accumulate_Expr_PUinfo(WN *root)
                 
 	       if (next_return_ldid == wn)
 		 next_return_ldid = NULL;
-	       else if (last_callsite != NULL ) /* && IS_RETURN_PREG(wn))  */
+	       else if (last_callsite != NULL && IS_RETURN_PREG(wn)) 
 		   CALLSITE_in_regs(last_callsite) = TRUE;
-/*	    } */
+	    }
 	    break;
 
 	 case OPR_LDA:

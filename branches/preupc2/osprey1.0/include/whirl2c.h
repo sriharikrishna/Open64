@@ -44,18 +44,21 @@
 #include <math.h> /* Declares math functions */
 #endif /* _FORTRAN2C */
 
+/* use platform independent types from inttypes.h */
+#include <inttypes.h>
 /*----------- Types used in the whirl2c output files ---------- */
 
 typedef void __UNKNOWN_TYPE;
 typedef char _BOOLEAN;
-typedef signed char _INT8;
-typedef signed short _INT16;
-typedef signed int _INT32;
-typedef signed long long _INT64;
-typedef unsigned char _UINT8;
-typedef unsigned short _UINT16;
-typedef unsigned int _UINT32;
-typedef unsigned long long _UINT64;
+
+typedef int8_t _INT8;
+typedef int16_t _INT16;
+typedef int32_t _INT32;
+typedef int64_t _INT64;
+typedef uint8_t _UINT8;
+typedef uint16_t _UINT16;
+typedef uint32_t _UINT32;
+typedef uint64_t _UINT64;
 typedef float _IEEE32;
 typedef double _IEEE64;
 typedef long double _QUAD;
@@ -262,9 +265,9 @@ static const _COMPLEX32 _One_C4 = {1.0F, 0.0F};
  * remainder operation.
  */
 #define _I4MOD(v1, v2) \
-   ((((v1)%(v2) != 0) && (v1)>0 ^ (v2)>0)? (((v1)%(v2)) + (v2)) : ((v1)%(v2)))
+   ((((v1)%(v2) != 0) && ((v1)>0) ^ ((v2)>0))? (((v1)%(v2)) + (v2)) : ((v1)%(v2)))
 #define _I8MOD(v1, v2) \
-   ((((v1)%(v2) != 0LL) && (v1)>0LL ^ (v2)>0LL)? (((v1)%(v2)) + (v2)) : ((v1)%(v2)))
+   ((((v1)%(v2) != 0LL) && ((v1)>0LL) ^ ((v2)>0LL))? (((v1)%(v2)) + (v2)) : ((v1)%(v2)))
 
 /*
  * INTRN_DIVFLOOR(x,y)

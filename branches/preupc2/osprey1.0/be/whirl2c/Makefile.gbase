@@ -86,7 +86,7 @@ HOSTDEFS += -Dlonglong
 # need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
 HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
 # need to define BUILD_WHIRL2C to get appropriate code from common sources
-HOSTDEFS += -DMONGOOSE_BE -DBUILD_WHIRL2C -DCOMPILE_UPC
+HOSTDEFS += -DBACKEND -DMONGOOSE_BE -DBUILD_WHIRL2C
 
 ifeq ($(BUILD_OPTIMIZE), DEBUG)
 HOSTDEFS += -DIs_True_On
@@ -169,7 +169,7 @@ WHIRL2C_DRIVER_SRCS = \
   whirl2c.c		\
 
 WHIRL2C_MAIN_SRCS = \
-  whirl2c_main.cxx	\
+  whirl2c_main.cxx \
 
 
 WHIRL2C_CXX_OBJS = $(WHIRL2C_CXX_SRCS:.cxx=.o)
@@ -306,7 +306,7 @@ else
 endif
   
 whirl2c.so:  $(WHIRL2C_CXX_OBJS) $(BE_WHIRL2C_DIR)/Exported \
-		$(WHIRL2C_DSOS) $(BE_BE_DIR)/so_locations
+		$(WHIRL2C_DSOS) $(BE_BE_DIR)/so_locations 
 		$(CXX) $(STD_DSO_LOADOPTS) -o $@ $(EXPORT_LIST)  \
 		$(WHIRL2C_CXX_OBJS) $(WHIRL2C_DSOS) $(LLDLIBS)
 
@@ -374,6 +374,10 @@ ifeq ($(BUILD_OS), LINUX)
 CFLAGS  += -D_LINUX_LINUX
 CXXFLAGS += -D_LINUX_LINUX 
 LD_QUICKSTART_INFO=
+endif
+
+ifeq ($(BUILD_COMPILER), GNU)
+CXXFLAGS += -Wno-deprecated
 endif
 
 ifeq ($(BUILD_OS), SOLARIS) 

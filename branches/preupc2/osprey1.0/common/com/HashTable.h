@@ -14,6 +14,17 @@
 #define xDEBUG(flag,code) { if (flag) {code; fflush(stdout);} }
 #define DEB_HashTable 0
 
+#ifndef TYPENAME
+#if defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ > 0
+  /* g++ 3.1 requires "typename" to appear according to C++ spec,
+     anywhere within a template declaration where templatename::membername
+     is used as a type (no implicit typenames) */
+  #define TYPENAME typename
+#else
+  #define TYPENAME
+#endif
+#endif //ndef TYPENAME
+
 namespace stlCompatibility {
 
 using namespace std;
@@ -105,7 +116,7 @@ public:
 public:
   void clear() {
     if (size() == 0) return;
-    Ht::iterator htIterator;
+    TYPENAME Ht::iterator htIterator;
     for ( htIterator = ht.begin();
 	  htIterator != ht.end();
 	  htIterator ++ ) {
@@ -125,18 +136,18 @@ public:
 
   size_t count(const Key& k) const {
     size_t h = keyHash(k);
-    Ht::const_iterator htIterator = ht.find(h);
+    TYPENAME Ht::const_iterator htIterator = ht.find(h);
     if (htIterator == ht.end()) return 0;
     return htIterator->second.size();
   } // count
 
   ValueBoolPair find(const Key& k) const {
     size_t h = keyHash(k);
-    Ht::const_iterator htIterator = ht.find(h);
+    TYPENAME Ht::const_iterator htIterator = ht.find(h);
     if (htIterator == ht.end()) return ValueBoolPair((const Value)NULL, false);
 
     const KeyValuePairVector& kvpv = htIterator->second;
-    KeyValuePairVector::const_iterator kvpvIterator;
+    TYPENAME KeyValuePairVector::const_iterator kvpvIterator;
     for ( kvpvIterator = kvpv.begin(); 
 	  kvpvIterator != kvpv.end(); 
 	  kvpvIterator ++ ) {
@@ -148,13 +159,13 @@ public:
 
   ValueBoolPair insert(const KeyValuePair& p) {
     size_t h = keyHash(p.first);
-    Ht::iterator htIterator = ht.find(h);
+    TYPENAME Ht::iterator htIterator = ht.find(h);
     if (htIterator != ht.end()) {
       KeyValuePairVector& kvpv = htIterator->second;
       xDEBUG(DEB_HashTable, 
 	     printf("insert: h=%u, ht.size()=%u, ht[h].size()=%u\n", h, ht.size(), kvpv.size());
 	     );
-      KeyValuePairVector::iterator kvpvIterator;
+      TYPENAME KeyValuePairVector::iterator kvpvIterator;
       for ( kvpvIterator = kvpv.begin(); 
 	    kvpvIterator != kvpv.end(); 
 	    kvpvIterator ++ ) {
@@ -169,7 +180,7 @@ public:
 	     printf("insert: h=%u, ht.size()=%u, ht[h].size()=%u\n", h, ht.size(), 0));
       KeyValuePairVector kvpv;
       kvpv.push_back(p);
-      pair<Ht::iterator, bool> tmp1 = ht.insert(Ht::value_type(h, kvpv));
+      pair<TYPENAME Ht::iterator, bool> tmp1 = ht.insert(TYPENAME Ht::value_type(h, kvpv));
       assert(tmp1.second == true);
     }
     _size ++;
@@ -180,11 +191,11 @@ public:
     size_t h = keyHash(k);
     xDEBUG(DEB_HashTable, printf("erase: h=%u\n", h));
 
-    Ht::iterator htIterator = ht.find(h);
+    TYPENAME Ht::iterator htIterator = ht.find(h);
     if (htIterator == ht.end()) return ValueBoolPair((const Value)NULL, false);
 
     KeyValuePairVector& kvpv = htIterator->second;
-    KeyValuePairVector::iterator kvpvIterator;
+    TYPENAME KeyValuePairVector::iterator kvpvIterator;
     for ( kvpvIterator = kvpv.begin(); 
 	  kvpvIterator != kvpv.end(); 
 	  kvpvIterator ++ ) {
@@ -231,8 +242,8 @@ class ForAllAction {
 
 // oreder is NOT defined
   void forAll(ForAllAction & action) {
-    Ht::iterator htIterator;
-    KeyValuePairVector::iterator kvpvIterator;
+    TYPENAME Ht::iterator htIterator;
+    TYPENAME KeyValuePairVector::iterator kvpvIterator;
 
     for ( htIterator = ht.begin();
 	  htIterator != ht.end();

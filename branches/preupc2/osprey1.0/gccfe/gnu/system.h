@@ -71,7 +71,7 @@ Boston, MA 02111-1307, USA.  */
 # undef fputs
 # define fputs(String, Stream) fputs_unlocked (String, Stream)
 # if defined (HAVE_DECL_FPUTS_UNLOCKED) && !HAVE_DECL_FPUTS_UNLOCKED
-extern int fputs_unlocked PARAMS ((const char *, FILE *));
+extern int fputs_unlocked PARAMS ((const char *, FILE *)) __THROW;
 # endif
 #endif
 
@@ -432,7 +432,7 @@ extern PTR realloc PARAMS ((PTR, size_t));
    libiberty but no declaration is supplied. */
 #if defined (HAVE_DECL_STRSIGNAL) && !HAVE_DECL_STRSIGNAL
 # ifndef strsignal
-extern const char *strsignal PARAMS ((int));
+extern char *strsignal PARAMS ((int)) __THROW;
 # endif
 #endif
 

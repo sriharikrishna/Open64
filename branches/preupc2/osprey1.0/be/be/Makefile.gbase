@@ -118,7 +118,7 @@ HOSTDEFS += -DBACK_END
 HOSTDEFS += -Dlonglong
 
 HOSTDEFS += -DSTD_MONGOOSE_LOC='"$(STD_MONGOOSE_LOC)"' 
-HOSTDEFS += -DMONGOOSE_BE -DCOMPILE_UPC
+HOSTDEFS += -DMONGOOSE_BE
 
 # need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
 HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
@@ -263,7 +263,6 @@ BE_VHO_CXX_SRCS = \
   wb_f90_lower.cxx	\
 
 COMMON_COM_CXX_SRCS = \
-  com_whirlview.cxx     \
   config.cxx		\
   config_cache.cxx	\
   dra_demangle.cxx	\
@@ -277,7 +276,6 @@ COMMON_COM_CXX_SRCS = \
   opcode.cxx		\
   opcode_core.cxx	\
   wutil.cxx		\
-  DaVinci.cxx           \
   upc_wn_util.cxx	\
   upc_symtab_utils.cxx
 
@@ -387,7 +385,9 @@ BE_COM_CXX_SRCS = 	\
   printsrc.cxx		\
   timing.cxx	 	\
   weak.cxx		\
-  wn_instrument.cxx
+  com_whirlview.cxx     \
+  DaVinci.cxx		\
+  wn_instrument.cxx	
 
 BE_COM_PCH_CXX_SRCS = 	\
   be_symtab.cxx		\
@@ -481,7 +481,7 @@ BE_DRIVER_CXX_SRCS =    \
   iter.cxx	        \
   phase.cxx
 
-BE_DRIVER_C_SRCS = 
+BE_DRIVER_C_SRCS = 	\
 #  phase.c        
 
 BE_DRIVER_CXX_OBJS = $(BE_DRIVER_CXX_SRCS:.cxx=.o) 
@@ -657,10 +657,17 @@ CFLAGS  += -D_LINUX_LINUX
 CXXFLAGS += -D_LINUX_LINUX 
 endif
 
+ifeq ($(BUILD_COMPILER), GNU)
+#Most of the files are using old C++ headers, and we do not warn about them for now
+#In the future we may want to change them to the new standard c++ headers
+#This is applied to all makefiles in the backend
+CXXFLAGS += -Wno-deprecated
+endif
+
 ifeq ($(BUILD_OS), SOLARIS) 
 CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END -DMONGOOSE_BE \
 	-D_LONGLONG -Dlonglong -D_SVR4_SOURCE -D_NEW_SYMTAB -DTARG_SOLARIS \
-	-DCOMPILE_UPC $(LCINCS) $(OPTIMIZER)
+	$(LCINCS) $(OPTIMIZER)
  ifeq ($(BUILD_COMPILER), VENDOR)
  CFLAGS += -KPIC
  ifeq ($(BUILD_SB), YES)

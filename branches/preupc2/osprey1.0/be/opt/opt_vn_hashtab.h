@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_vn_hashtab.h
-// $Revision: 1.2 $
-// $Date: 2003-02-19 22:46:29 $
+// $Revision: 1.2.4.1 $
+// $Date: 2003-04-11 00:31:53 $
 // $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn_hashtab.h,v $
 //
@@ -162,17 +162,22 @@
 #ifndef opt_vn_hashtab_INCLUDED
 #define opt_vn_hashtab_INCLUDED "opt_vn_hashtab.h"
 
+#if defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 2)))
 #include <ext/hash_map>
+#else 
+#include <hash_map.h>
+#endif
+
 #include "mempool_allocator.h"
 #include "opt_vn_expr.h"
 
-#ifdef __STL_USE_NAMESPACES
+//#ifdef __STL_USE_NAMESPACES
 #if defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 2)))
 using __gnu_cxx::hash_map;
 #else
 using std::hash_map;
 #endif
-#endif
+//#endif
 
 
 // Function object for determining equality between hash table keys.

@@ -25,6 +25,9 @@ Boston, MA 02111-1307, USA.  */
 /* Support #pragma weak iff ASM_WEAKEN_LABEL and ASM_OUTPUT_DEF are
    defined.  */
 #if defined (ASM_WEAKEN_LABEL) && defined (ASM_OUTPUT_DEF)
+#ifdef HANDLE_PRAGMA_WEAK
+#undef HANDLE_PRAGMA_WEAK
+#endif /* HANDLE_PRAGMA_WEAK */
 #define HANDLE_PRAGMA_WEAK SUPPORTS_WEAK
 #endif
 

@@ -29,7 +29,7 @@ extern int compiling_upc;
 #define  UPCR_BARRIERFLAG_ANONYMOUS 1 /* keep this consistent with upcr.h */
 #define UPCR_BARRIERVAL_ANONYMOUS 0xdeadbeef
 
-#define MAX_LINE_LEN 100
+#define MAX_LINE_LEN_UPC 100
 
 // extern const char *upc_ptradd_name;
 extern char *shared_ptr_name;
@@ -80,7 +80,7 @@ extern UINT Adjust_Field_Offset(TY_IDX struct_idx, UINT field_id);
 extern UINT Adjust_Field_Offset(TY&  struct_idx, UINT field_id);
 extern TY_IDX MTYPE_TO_Shared_TY_array[MTYPE_LAST+1];
 extern TY_IDX Get_Field_Type (TY_IDX struct_type, UINT field_id);
-extern UINT Adjusted_Type_Size(TY_IDX idx);
+extern UINT Adjusted_Type_Size(TY_IDX idx, unsigned int pshared = 0, unsigned int shared = 0);
 extern bool is_upcr_ptr(TY_IDX ty);
 
 #define MTYPE_To_Shared_TY(t)  MTYPE_TO_Shared_TY_array[t]

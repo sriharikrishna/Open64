@@ -3291,6 +3291,14 @@ init_decl_processing ()
 
   lang_get_alias_set = c_get_alias_set;
 
+  {
+    /* special UPC_MAX_BLOCK_SIZE variable */
+    tree max_block_var = build_decl(CONST_DECL, get_identifier("UPC_MAX_BLOCK_SIZE"), unsigned_type_node);
+    DECL_INITIAL(max_block_var) = build_int_2(max_bsize, 0);
+    pushdecl(max_block_var);
+
+  }
+
 
 
   /* Initialize consistency value. */
@@ -4149,7 +4157,7 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
       if (id == ridpointers[(int) RID_CHAR])
 	explicit_char = 1;
 
-      if (TREE_CODE (id) == IDENTIFIER_NODE)
+      if (TREE_CODE (id) == IDENTIFIER_NODE) {
 	for (i = (int) RID_FIRST_MODIFIER; i < (int) RID_MAX; i++)
 	  {
 	    if (ridpointers[i] == id)
@@ -4171,6 +4179,9 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 		goto found;
 	      }
 	  }
+      }
+
+
       if (TREE_CODE (id) == TREE_LIST) /* a blocking factor, keep it */
 	{
 	  if (layout_specifier)

@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_vn_expr_taxonomy.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:52 $
-// $Author: dsystem $
+// $Revision: 1.1.1.1.4.1 $
+// $Date: 2003-04-11 00:31:52 $
+// $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn_expr_taxonomy.h,v $
 //
 // ====================================================================
@@ -112,7 +112,8 @@
 #include "opt_vn_expr.h"
 #include "wutil.h"
 
-#ifdef __STL_USE_NAMESPACES
+#if defined(__GNUC__)
+//#ifdef __STL_USE_NAMESPACES
 using std::pair;
 #endif
 

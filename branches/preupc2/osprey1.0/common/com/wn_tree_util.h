@@ -92,6 +92,18 @@
 #include "defs.h"                      // INT etc
 #include "wn.h"                        // whirl node
 #include "cxx_memory.h"                // for CXX_NEW etc
+
+#ifndef TYPENAME
+#if defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ > 0
+  /* g++ 3.1 requires "typename" to appear according to C++ spec,
+     anywhere within a template declaration where templatename::membername
+     is used as a type (no implicit typenames) */
+  #define TYPENAME typename
+#else
+  #define TYPENAME
+#endif
+#endif //ndef TYPENAME
+
 // ======================================================================
 // TYPEDEFS, DEFINES, FORWARD_DEFINITIONS and EXTERN interfaces
 // ======================================================================

@@ -560,6 +560,10 @@ add_file_args (string_list_t *args, phases_t index)
 		    //WEI: need to let the front end know we're on 32-bit platform
 		    add_string(args, "-ia32");
 		  }
+		  if (config_file_name != "") {
+		    char file_arg[MAX_FILE_NAME + 10] = "-fconfig-";
+		    add_string(args, strncat(file_arg, config_file_name, MAX_FILE_NAME));
+		  }
 		}
 #if !(defined(TARG_IA64) || defined(TARG_IA32))
 		if (abi == ABI_64) add_string(args, "-mabi=64");

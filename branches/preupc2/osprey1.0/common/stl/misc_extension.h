@@ -155,7 +155,9 @@ operator+(Integer x, const int_iterator<Integer>& y) {
   return y + x;
 }
 
-#ifdef __STL_FUNCTION_TMPL_PARTIAL_ORDER
+//WEI: The symbol causes 
+//#ifdef __STL_FUNCTION_TMPL_PARTIAL_ORDER
+#ifdef __GNUC__
 
 template <class Integer>
 inline bool
