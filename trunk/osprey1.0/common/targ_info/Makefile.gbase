@@ -73,7 +73,7 @@ endif
 #  Compiler Options
 #----------------------------------------------------------------------
 
-HOSTDEFS =
+HOSTDEFS +=-DKEY
 
 TARGDEFS =
 
@@ -278,6 +278,8 @@ endif
 endif
 
 ifeq ($(BUILD_OS), LINUX)
+  CFLAGS +=-DKEY
+  CXXFLAGS +=-DKEY
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
