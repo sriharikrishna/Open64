@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.8 $
- * $Date: 2002-09-18 17:51:41 $
+ * $Revision: 1.9 $
+ * $Date: 2002-09-20 20:49:26 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.9 $";
 #endif
 
 #include <alloca.h>
@@ -513,6 +513,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
    BOOL       deref_fld;
    void     (*translate_var_ref)(TOKEN_BUFFER, ST *);
 
+
  #ifdef __USE_COMMON_BLOCK_NAME__
 
    /* Do the symbol translation from the base of BASED symbols */
@@ -536,6 +537,10 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
       st = ST_full(st);
       Set_BE_ST_w2fc_referenced(st);
       base_ty = ST_type(st);
+
+      if (TY_is_Pointer(base_ty))
+         base_ty = TY_pointed(base_ty);
+
       if (TY_is_f90_pointer(base_ty)) //Sept
          base_ty = TY_pointed(base_ty);
 
@@ -593,7 +598,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
       else
       {
 	 translate_var_ref(tokens, st);
-	 TY2F_Translate_ArrayElt(tokens, base_ty, offset);
+//Sept	 TY2F_Translate_ArrayElt(tokens, base_ty, offset);
       }
    }
    else /* incompatible base and object types */
