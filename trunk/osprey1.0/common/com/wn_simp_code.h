@@ -982,7 +982,6 @@ static simpnode make_identity(OPERATOR opr,TYPE_ID ty)
       r = SIMP_INTCONST(ty,-1);
       break;
     default:
-      #pragma mips_frequency_hint NEVER
       FmtAssert(FALSE,
 		("unknown identity value requested in simplifier"));
       /*NOTREACHED*/

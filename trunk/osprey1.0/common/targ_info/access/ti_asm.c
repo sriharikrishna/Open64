@@ -35,7 +35,7 @@
 
 #ifdef _KEEP_RCS_ID
 static const char source_file[] = __FILE__;
-static const char rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_asm.c,v $ $Revision: 1.1.1.1 $";
+static const char rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_asm.c,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <stdio.h>
@@ -89,7 +89,6 @@ INT TI_ASM_Pack_Inst(
 
   pinfo = ISA_PACK_Info(topcode);
   if (!pinfo) {
-    #pragma mips_frequency_hint NEVER
     sprintf(TI_errmsg, "no ISA_PACK_INFO for %s", TOP_Name(topcode));
     return TI_RC_ERROR;
   }
@@ -132,7 +131,6 @@ INT TI_ASM_Pack_Inst(
 	break;
 
       default:
-	#pragma mips_frequency_hint NEVER
 	sprintf(TI_errmsg, "Unhandled packing component %d for %s",
 			   comp, TOP_Name(topcode));
 	return TI_RC_ERROR;
@@ -164,7 +162,6 @@ INT TI_ASM_Print_Inst(
   const ISA_PRINT_INFO *pinfo = ISA_PRINT_Info(topcode);
 
   if (!pinfo) {
-    #pragma mips_frequency_hint NEVER
     sprintf(TI_errmsg, "no ISA_PRINT_INFO for %s", TOP_Name(topcode));
     return TI_RC_ERROR;
   }
@@ -196,7 +193,6 @@ INT TI_ASM_Print_Inst(
       break;
 
     default:
-      #pragma mips_frequency_hint NEVER
       sprintf(TI_errmsg, "Unhandled listing component %d for %s",
 			 comp, TOP_Name(topcode));
       return TI_RC_ERROR;

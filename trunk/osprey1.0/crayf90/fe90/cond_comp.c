@@ -4365,14 +4365,10 @@ static int ntr_cc_sym_tbl(cc_token_type *token,
 
    name_tbl_base = (long *) cc_ln_tbl;
 
-#  pragma _CRI ivdep
-
    for (i = cc_ln_tbl_idx; i >= name_idx; i--) {
       name_tbl_base [i] = name_tbl_base [i-1];
    }
 # else
-
-#  pragma _CRI ivdep
 
    for (i = cc_ln_tbl_idx; i >= name_idx; i--) {
       cc_ln_tbl [i]  = cc_ln_tbl [i-1];

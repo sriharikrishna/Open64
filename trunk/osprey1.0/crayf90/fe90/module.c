@@ -259,19 +259,6 @@ static	int	save_const_tbl_idx;
 static	boolean	search_for_duplicate_attrs;
 
 extern	char	compiler_gen_date[];
-# if (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX) \
-      || defined(_HOST_OS_TRU64))
-# pragma inline set_mod_link_tbl_for_typ
-# pragma inline set_mod_link_tbl_for_cn
-# pragma inline set_mod_link_tbl_for_ir
-# pragma inline set_mod_link_tbl_for_bd
-# else 
-# pragma _CRI inline set_mod_link_tbl_for_typ
-# pragma _CRI inline set_mod_link_tbl_for_cn
-# pragma _CRI inline set_mod_link_tbl_for_ir
-# pragma _CRI inline set_mod_link_tbl_for_bd
-# endif
-
 
 /******************************************************************************\
 |*									      *|
@@ -4505,7 +4492,6 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
             name_tbl_base		= (long *) loc_name_tbl;
 # endif
 
-#  pragma _CRI ivdep
             for (i = loc_name_tbl_idx; i >= name_idx; i--) {
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
                name_tbl_base [i] = name_tbl_base [i-1];
@@ -4695,7 +4681,6 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
          name_tbl_base			= (long *) loc_name_tbl;
 # endif
 
-#  pragma _CRI ivdep
          for (i = loc_name_tbl_idx; i >= new_name_idx; i--) {
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
             name_tbl_base [i] = name_tbl_base [i-1];
