@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: token_buffer.c
- * $Revision: 1.4 $
- * $Date: 2003-04-22 19:15:16 $
- * $Author: jle $
+ * $Revision: 1.5 $
+ * $Date: 2003-06-13 23:05:29 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/token_buffer.cxx,v $
  *
  * Revision history:
@@ -100,7 +100,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/token_buffer.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/token_buffer.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <stdio.h>
@@ -112,6 +112,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "mempool.h"
 #include "wn.h"
 #include "ir_reader.h"
+#include "unparse_target.h"
 
 
 /*------------------ macros, types, and local state -------------------*/
@@ -136,32 +137,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #define TB_FREE(ptr)\
    MEM_POOL_FREE(Malloc_Mem_Pool, ptr)
 
-/* Commonly used character constants */
-#define SPACE ' '
-#define NEWLINE '\n'
-#define COMMA ','
-#define SEMICOLON ';'
-#define LEFT_PAREN '('
-#define RIGHT_PAREN ')'
-#define LEFT_BRACKET '['
-#define RIGHT_BRACKET ']'
-#define LEFT_BRACE '{'
-#define RIGHT_BRACE '}'
-#define PLUS '+'
-#define MINUS '-' 
-#define MULTIPLY '*'
-#define DIVIDE '/'
-#define BITAND '&'
-#define BITOR '|'
-#define MODULUS '%'
-#define EQUAL '='
-#define QUESTION_MARK '?'
-#define COLON ':'
-#define LESS_THAN '<'
-#define LARGER_THAN '>'
-#define NOT '!'
-#define BIT_COMPLEMENT '~'
-#define FORTRAN_COMMENT_CHAR 'C'
+#include "token_names.h"
 
 /* The buffer structure and its index types */
 typedef mUINT32 STRING_IDX;
@@ -410,36 +386,8 @@ dbg_tokens(TOKEN_BUFFER buf, BOOL with_token_name)
 #define NEED_TO_SPLIT_LINE \
    (!USE_UNLIMITED_LINE_LENGTH && Current_Output_Col > Max_Line_Length)
 
-#ifdef BUILD_WHIRL2F
 #define is_binary_or_tertiary_op(c) \
-   (c==PLUS          || \
-    c==MINUS         || \
-    c==MULTIPLY      || \
-    c==DIVIDE        || \
-    c==BITAND        || \
-    c==BITOR         || \
-    c==EQUAL         || \
-    c==NOT           || \
-    c==QUESTION_MARK || \
-    c==COLON         || \
-    c==LESS_THAN     || \
-    c==LARGER_THAN)
-#else
-#define is_binary_or_tertiary_op(c) \
-   (c==PLUS          || \
-    c==MINUS         || \
-    c==MULTIPLY      || \
-    c==DIVIDE        || \
-    c==BITAND        || \
-    c==BITOR         || \
-    c==MODULUS       || \
-    c==EQUAL         || \
-    c==NOT           || \
-    c==QUESTION_MARK || \
-    c==COLON         || \
-    c==LESS_THAN     || \
-    c==LARGER_THAN)
-#endif
+	 W2X_Unparse_Target->Is_Binary_Or_Tertiary_Op(c)
 
 #define is_begin_grouping(c) \
    (c==LEFT_PAREN    || \

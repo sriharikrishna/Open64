@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: PUinfo.c
- * $Revision: 1.4 $
- * $Date: 2003-04-22 19:15:15 $
- * $Author: jle $
+ * $Revision: 1.5 $
+ * $Date: 2003-06-13 23:05:29 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
  * Revision history:
@@ -67,22 +67,19 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>
 
-#ifdef BUILD_WHIRL2C
-# include "whirl2c_common.h"
-#else /*BUILD_WHIRL2F*/
-# include "whirl2f_common.h"
-#endif
+#include "unparse_common.h"
 #include "w2cf_parentize.h" /* For W2CF_Parent_Map */
 #include "mempool.h"
 #include "const.h"
 #include "wn_util.h"
 #include "PUinfo.h"
 #include "targ_sim.h"
+#include "unparse_target.h"
 
 #define IS_RETURN_PREG(wn) \
         (ST_class(WN_st(wn)) == CLASS_PREG \
@@ -407,10 +404,9 @@ Enter_Local_Syms_Into_Symtab(const ST *func_st)
       if ((ST_sym_class(st) == CLASS_VAR || ST_sym_class(st) == CLASS_FUNC) &&
 	  !Stab_Is_Based_At_Common_Or_Equivalence(st))
       {
-#ifdef BUILD_WHIRL2F
-	 if (TY_Is_Pointer(ST_type(st)))
+	 if (W2X_Unparse_Target->Enter_Symtab_Pointee_Names() &&
+	     TY_Is_Pointer(ST_type(st)))
 	    (void)W2CF_Symtab_Nameof_St_Pointee(st);
-#endif /*BUILD_WHIRL2F*/
 	 (void)W2CF_Symtab_Nameof_St(st);
       }
    }

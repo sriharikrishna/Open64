@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.c
- * $Revision: 1.4 $
- * $Date: 2003-06-12 15:27:49 $
+ * $Revision: 1.5 $
+ * $Date: 2003-06-13 23:05:29 $
  * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
@@ -76,18 +76,13 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
 #include <string.h>
 
-#ifdef BUILD_WHIRL2C
-#include "whirl2c_common.h" /* For defs.h, config.h, erglob.h, etc. */
-#endif
-#ifdef BUILD_WHIRL2F
-#include "whirl2f_common.h" /* For defs.h, config.h, erglob.h, etc. */
-#endif
+#include "unparse_common.h"
 
 #include "mempool.h"
 #include "unparse_target.h"
