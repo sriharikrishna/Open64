@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.c
- * $Revision: 1.6.2.1 $
- * $Date: 2004-07-27 22:39:25 $
+ * $Revision: 1.6.2.2 $
+ * $Date: 2004-11-24 20:53:11 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
@@ -76,7 +76,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.6.2.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.6.2.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
@@ -918,10 +918,8 @@ W2CF_Symtab_Nameof_Ty(TY_IDX ty)
    }
    
    /* Return the resultant disambiguated name */
-if (Run_w2f)
     return valid_name; 
-else
-    return W2CF_SYMBOL_name_string(symtab, symbol);
+//    return W2CF_SYMBOL_name_string(symtab, symbol);
    
 } /* W2CF_Symtab_Nameof_Ty */
 
@@ -963,10 +961,10 @@ W2CF_Symtab_Nameof_Fld(FLD_HANDLE fld)
    W2CF_Get_Symbol(&symtab, &symhdr, &symbol, &match_symbol, symname);
    
    /* Return the resultant disambiguated name */
-if (Run_w2f)
+//if (Run_w2f)
    return valid_name;
-else
-   return W2CF_SYMBOL_name_string(symtab, symbol);
+//else
+//   return W2CF_SYMBOL_name_string(symtab, symbol);
    
 } /* W2CF_Symtab_Nameof_Fld */
 
