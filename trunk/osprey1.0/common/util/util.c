@@ -35,7 +35,7 @@
 
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/util.c,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/util.c,v $ $Revision: 1.3 $";
 #include <unistd.h>
 #include <errno.h>
 #include "defs.h"
@@ -282,7 +282,8 @@ TARG_INT_Pop_Count(
  * significant one.  Notice -1 for out of range 0.
  */
 static const mUINT8 UINT8_most_sig_one [256] = {
-  -1, 0,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  3,  3,  3,  3,  
+  (mUINT8)-1, 
+      0,  1,  1,  2,  2,  2,  2,  3,  3,  3,  3,  3,  3,  3,  3,  
   4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  
   5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  
   5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  
@@ -336,7 +337,8 @@ TARG_INT_Most_Sig_One(
  * bit:
  */
 const mUINT8 UINT8_least_sig_one [256] = {
-  -1, 0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,  
+  (mUINT8)-1, 
+      0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,  
   4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,  
   5,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,  
   4,  0,  1,  0,  2,  0,  1,  0,  3,  0,  1,  0,  2,  0,  1,  0,  
@@ -414,7 +416,7 @@ INT32 nearest_power_of_two(INT32 n)
  * ==================================================================== */
 BOOL Immediate_Has_All_Ones(INT64 imm, INT32 ub, INT32 lb)
 {
-  TARG_UINT	field= ~0;
+  TARG_UINT	field= (TARG_UINT)~0;
   INT32		fieldsize= ub - lb + 1;
 
   Is_True((fieldsize>0), ("nonsensical ub,lb for immediate"));
