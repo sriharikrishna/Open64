@@ -250,18 +250,18 @@
 #include "config_host.h"	/* in TARGET/com */
 #include "config_targ.h"	/* in TARGET/com */
 
-/* Solaris workaround
- * no <endian.h>, just define BIG_ENDIAN and LITTLE_ENDIAN
+/* Define BIG_ENDIAN and LITTLE_ENDIAN manually because they are not
+ * reliably defined.
+ *   available in <endian.h>: Linux, IRIX, MacOS
+ *   available in <sys/param>: cygwin (no <endian.h>)
+ *   unavailable: Solaris, Tru64 (no <endian.h>)
  */
-#ifndef _SOLARIS_SOLARIS
-#ifndef linux
-#include <sys/endian.h>		/* for BIG_ENDIAN, LITTLE_ENDIAN */
-#else
-#include <endian.h>		/* for BIG_ENDIAN, LITTLE_ENDIAN */
+#ifndef LITTLE_ENDIAN
+# define LITTLE_ENDIAN 1234
 #endif
-#else  /* for SOLARIS */
-#define BIG_ENDIAN 1
-#define LITTLE_ENDIAN 2
+
+#ifndef BIG_ENDIAN
+# define BIG_ENDIAN 4321
 #endif 
 
 #include "mempool.h"	/* Include the "fundamental" routines */
