@@ -37,11 +37,7 @@
 #ifndef	_LIBERRNO_H
 #define	_LIBERRNO_H
 
-#ifdef	_LITTLE_ENDIAN
-#include <asm/errno.h>
-#else
-#include <sys/errno.h>
-#endif
+#include <errno.h> /* includes asm/errno.h or sys/errno.h if appropriate */
 
 /*
  * Symbolic library run-time error codes
