@@ -69,9 +69,11 @@ include $(COMMONDEFS)
 #
 #----------------------------------------------------------------------
 ifeq ($(BUILD_COMPILER), VENDOR)
-CVERSION  =  -xansi
+  ifeq ($(BUILD_OS), IRIX)
+    CVERSION  =  -xansi
+  endif
 else
-CVERSION  =  
+  CVERSION  =  
 endif
 
 #----------------------------------------------------------------------
@@ -83,8 +85,8 @@ HOSTDEFS += -Dlonglong
 HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE -D_WORD32 -D_ADDR32 -D__=__P
 
 ifeq ($(BUILD_ARCH), MIPS3)
-TARGDEFS  = -DTARG_MIPS
-WOFF = -woff 1107,1174,1209,1685,1185,1155,1506,1552,1196,1498,1692
+  TARGDEFS  = -DTARG_MIPS
+  WOFF = -woff 1107,1174,1209,1685,1185,1155,1506,1552,1196,1498,1692
 endif
 
 
@@ -96,7 +98,11 @@ ifeq ($(BUILD_OS), LINUX)
   FE90_INCLUDES          = -I$(BUILD_TOT)/linux/mfef90_includes
 endif
 FE90_INCLUDES           += -I$(BUILD_TOT)/include
+
 ifeq ($(BUILD_OS), SOLARIS)
+  FE90_INCLUDES         += -I$(BUILD_TOT)/crayf90/fe90
+endif
+ifeq ($(BUILD_OS), TRU64)
   FE90_INCLUDES         += -I$(BUILD_TOT)/crayf90/fe90
 endif
 
@@ -242,15 +248,15 @@ LCINCS += $(FE90_INCLUDES)
 LCDEFS = $(HOSTDEFS) $(TARGDEFS) -D_LIBU
 
 ifeq ($(BUILD_OS), IRIX)
-LCDEFS += -D_BIG_ENDIAN
-LF77OPTS = $(STD_COMPILE_OPTS)
-LCOPTS += $(STD_COMPILE_OPTS)
+  LCDEFS += -D_BIG_ENDIAN
+  LF77OPTS = $(STD_COMPILE_OPTS)
+  LCOPTS += $(STD_COMPILE_OPTS)
 endif
 
 ifeq ($(BUILD_OS), LINUX)
-LCDEFS += -fwritable-strings -D_LITTLE_ENDIAN
-LCDEFS += -DTARG_IA64 -D__NLS_INTERNALS -D_SGI_SOURCE
-LF77OPTS = $(LCDEFS) -ansi $(LCINCS)
+  LCDEFS += -fwritable-strings -D_LITTLE_ENDIAN
+  LCDEFS += -DTARG_IA64 -D__NLS_INTERNALS -D_SGI_SOURCE
+  LF77OPTS = $(LCDEFS) -ansi $(LCINCS)
 endif
 
 

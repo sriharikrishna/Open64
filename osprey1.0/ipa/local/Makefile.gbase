@@ -259,7 +259,7 @@ endif
 
 TARGETS = ipl.so
 
-LDIRT = be.so wopt.so be ipl ii_files
+LDIRT = be.so wopt.so be ipl
 
 ifeq ($(BUILD_COMPILER), EDG)
 LLDLIBS = -none

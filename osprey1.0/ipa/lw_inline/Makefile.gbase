@@ -224,7 +224,7 @@ GLDOPTS = $(STD_LOAD_OPTS) $(LD_QUICKSTART_INFO)
 
 TARGETS = lw_inline
 
-LDIRT = be.so ii_files
+LDIRT = be.so
 
 ifeq ($(BUILD_OS), IRIX)
 LLDLIBS = -lmangle -lgen

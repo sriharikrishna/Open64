@@ -46,27 +46,29 @@ CVERSION =
 LCOPTS += $(STD_COMPILE_OPTS)
 
 ifeq ($(BUILD_COMPILER), VENDOR)
-WOFF += -fullwarn
+  ifeq ($(BUILD_OS), IRIX)
+    WOFF += -fullwarn
+  endif
 else
-WOFF +=
+  WOFF +=
 endif
 
 HOSTDEFS += -DIR_TOOLS
 HOSTDEFS += -D_NEW_SYMTAB
 
 ifeq ($(BUILD_COMPILER), GNU)
-HOSTDEFS += -D__GNU_BUG_WORKAROUND
+  HOSTDEFS += -D__GNU_BUG_WORKAROUND
 endif
 
 ifeq ($(BUILD_TARGET), IA64)
-TARGDEFS += -D__MIPS_AND_IA64_ELF_H
+  TARGDEFS += -D__MIPS_AND_IA64_ELF_H
 endif
 ifeq ($(BUILD_TARGET), IA32)
-TARGDEFS += -D__MIPS_AND_IA64_ELF_H
+  TARGDEFS += -D__MIPS_AND_IA64_ELF_H
 endif
 
 ifeq ($(BUILD_VARIANT), DEBUG)
-LCDEFS += -DInsist_On -DDEBUG_IR
+  LCDEFS += -DInsist_On -DDEBUG_IR
 endif
 
 LCDEFS += $(HOSTDEFS) $(TARGDEFS)
@@ -76,16 +78,20 @@ GLDOPTS = $(STD_LOAD_OPTS)
 
 LIBCOMUTIL = $(BUILD_AREA)/libcomutil/libcomutil.a
 
+LLDLIBS = $(LIBCOMUTIL)
+
 ifeq ($(BUILD_COMPILER), VENDOR)
-LLDLIBS	= $(LIBCOMUTIL) -lgen -lm
+  ifeq ($(filter IRIX SOLARIS, $(BUILD_OS)), $(BUILD_OS))
+    LLDLIBS += -lgen
+  endif
+  LLDLIBS += -lm
 endif
 
 ifeq ($(BUILD_COMPILER),GNU)
-ifeq ($(BUILD_OS), IRIX)
-LLDLIBS	= $(LIBCOMUTIL) -lgen -lm  # -lgen needed for basename() on IRIX
-else
-LLDLIBS = $(LIBCOMUTIL) -lm
-endif
+  ifeq ($(BUILD_OS), IRIX)
+    LLDLIBS += -lgen # -lgen needed for basename() on IRIX
+  endif
+  LLDLIBS += -lm
 endif
 
 LCXXOPTS = $(LCOPTS)
@@ -113,7 +119,7 @@ LIBCOMUTIL_DIR= $(BUILD_TOT)/libcomutil
 
 TARG_COMUTIL_DIR	= $(TARGDIR)/libcomutil
 
-LDIRT = $(IR_A2B_EXE) $(IR_SEL_EXE)
+LDIRT = $(IR_A2B_EXE) $(IR_SEL_EXE) cxx_repository
 
 
 #----------------------------------------------------------------------
@@ -123,11 +129,11 @@ LCINCS = -I$(BUILD_BASE) -I$(COMMON_COM_DIR) -I$(COMMON_COM_TARG_DIR) \
 	-I$(COMMON_UTIL_DIR) -I$(BUILD_TOT)/include $(XINC) 
 
 ifeq ($(BUILD_OS), LINUX)
-LCINCS += -I$(BUILD_AREA)/include -I$(BUILD_AREA)/include/libelf
+  LCINCS += -I$(BUILD_AREA)/include -I$(BUILD_AREA)/include/libelf
 endif
 
 ifneq ($(STL_EXT_PATH),)
-LCINCS += -I$(STL_EXT_PATH)
+  LCINCS += -I$(STL_EXT_PATH)
 endif
 
 LCXXINCS := $(LCINCS)
@@ -188,29 +194,29 @@ CXXFILES =		\
 #----------------------------------------------------------------------
 
 ifeq ($(BUILD_OS), IRIX)
-CFLAGS += -D_SGI_SGI
-CXXFLAGS += -D_SGI_SGI 
- ifeq ($(BUILD_COMPILER), VENDOR)
- CFLAGS += -woff 1174,1178,1552,1183
- CXXFLAGS += -woff 1174,1178,1552,1183
- endif
+  CFLAGS += -D_SGI_SGI
+  CXXFLAGS += -D_SGI_SGI 
+  ifeq ($(BUILD_COMPILER), VENDOR)
+    CFLAGS += -woff 1174,1178,1552,1183
+    CXXFLAGS += -woff 1174,1178,1552,1183
+  endif
 endif
 
 ifeq ($(BUILD_OS), LINUX)
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
-CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -DIR_TOOLS -D_NEW_SYMTAB \
+  CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -DIR_TOOLS -D_NEW_SYMTAB \
 	-Dlonglong -D_LONGLONG -D_PDGCS -DUSE_STANDARD_TYPES $(LCINCS)
- ifeq ($(BUILD_COMPILER), VENDOR)
- ifeq ($(BUILD_SB), YES)
- CFLAGS += -xsb
- endif
- endif
- ifeq ($(BUILD_COMPILER), GNU)
- CFLAGS +=  -D__GNU_BUG_WORKAROUND
- endif
-CXXFLAGS = $(CFLAGS) -w
+  ifeq ($(BUILD_COMPILER), VENDOR)
+  ifeq ($(BUILD_SB), YES)
+    CFLAGS += -xsb
+  endif
+  endif
+  ifeq ($(BUILD_COMPILER), GNU)
+    CFLAGS +=  -D__GNU_BUG_WORKAROUND
+  endif
+  CXXFLAGS = $(CFLAGS) -w
 endif
 #----------------------------------------------------------------------
 

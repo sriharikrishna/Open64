@@ -343,7 +343,7 @@ ifeq ($(BUILD_OS), LINUX)
 endif
 
 # extra files to be removed with make clobber
-LDIRT = ii_files *.pch
+LDIRT = *.pch
 
 VPATH    =  $(SRC_DIRS)
 

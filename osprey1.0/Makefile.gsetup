@@ -51,9 +51,9 @@
 #                      (and almost always the source files)
 #     BUILD_ROOTS    = specifies which ROOT & TOOLROOT to use
 #     BUILD_ABI      = specifies ABI to build for (32BIT/N32BIT/64BIT/
-#                      I32BIT/I64BIT)
+#                      I32BIT/I64BIT/A64BIT)
 #     BUILD_ARCH     = specifies machine architecture for build 
-#		       (MIPS1/MIPS2/MIPS3/MIPS4/IA32/IA64/SPARC)
+#		       (MIPS1/MIPS2/MIPS3/MIPS4/IA32/IA64/SPARC/ALPHA)
 #     BUILD_TYPE     = specifies type of build (SHARED/NONSHARED)
 #     BUILD_OPTIMIZE = specifies default, debug or override optimization 
 #                      options
@@ -140,9 +140,9 @@ endif
 #
 
 ifdef BUILD_TOT
- ifeq ($(BUILD_TOT), "")
-   ABORT_BUILD = BUILD_TOT has no value!
- endif
+  ifeq ($(BUILD_TOT), "")
+    ABORT_BUILD = BUILD_TOT has no value!
+  endif
 else
   ABORT_BUILD = BUILD_TOT not defined!
 endif
@@ -153,9 +153,9 @@ endif
 #
 
 ifdef BUILD_BASE
- ifeq ($(BUILD_BASE), "")
-   ABORT_BUILD = BUILD_BASE has no value!
- endif
+  ifeq ($(BUILD_BASE), "")
+    ABORT_BUILD = BUILD_BASE has no value!
+  endif
 else
   ABORT_BUILD = BUILD_BASE not defined!
 endif
@@ -166,17 +166,19 @@ endif
 #
 
 ifdef BUILD_ABI
- ifneq ($(BUILD_ABI), 32BIT)
- ifneq ($(BUILD_ABI), N32BIT)
- ifneq ($(BUILD_ABI), 64BIT)
- ifneq ($(BUILD_ABI), I32BIT)
- ifneq ($(BUILD_ABI), I64BIT)
-   ABORT_BUILD = BUILD_ABI has bad value - $(BUILD_ABI)!
- endif
- endif
- endif
- endif
- endif
+  ifneq ($(BUILD_ABI), 32BIT)
+  ifneq ($(BUILD_ABI), N32BIT)
+  ifneq ($(BUILD_ABI), 64BIT)
+  ifneq ($(BUILD_ABI), I32BIT)
+  ifneq ($(BUILD_ABI), I64BIT)
+  ifneq ($(BUILD_ABI), A64BIT)
+    ABORT_BUILD = BUILD_ABI has bad value - $(BUILD_ABI)!
+  endif
+  endif
+  endif
+  endif
+  endif
+  endif
 else
   ABORT_BUILD = BUILD_ABI not defined!
 endif
@@ -186,17 +188,19 @@ endif
 #
 
 ifdef BUILD_ARCH
- ifneq ($(BUILD_ARCH), SPARC)
- ifneq ($(BUILD_ARCH), MIPS3)
- ifneq ($(BUILD_ARCH), MIPS4)
- ifneq ($(BUILD_ARCH), IA32)
- ifneq ($(BUILD_ARCH), IA64)
-   ABORT_BUILD = BUILD_ARCH has bad value - $(BUILD_ARCH)!
- endif
- endif
- endif
- endif
- endif
+  ifneq ($(BUILD_ARCH), SPARC)
+  ifneq ($(BUILD_ARCH), MIPS3)
+  ifneq ($(BUILD_ARCH), MIPS4)
+  ifneq ($(BUILD_ARCH), IA32)
+  ifneq ($(BUILD_ARCH), IA64)
+  ifneq ($(BUILD_ARCH), ALPHA)
+    ABORT_BUILD = BUILD_ARCH has bad value - $(BUILD_ARCH)!
+  endif
+  endif
+  endif
+  endif
+  endif
+  endif
 else
   ABORT_BUILD = BUILD_ARCH not defined!
 endif
@@ -206,14 +210,14 @@ endif
 #
 
 ifeq ($(BUILD_OS), IRIX)
- ifneq (,$(findstring MIPS,$(BUILD_ARCH)))
-  ifndef ROOT
-    ABORT_BUILD = ROOT and/or TOOLROOT not defined!
+  ifneq (,$(findstring MIPS,$(BUILD_ARCH)))
+    ifndef ROOT
+      ABORT_BUILD = ROOT and/or TOOLROOT not defined!
+    endif
+    ifndef TOOLROOT
+      ABORT_BUILD = ROOT and/or TOOLROOT not defined!
+    endif
   endif
-  ifndef TOOLROOT
-    ABORT_BUILD = ROOT and/or TOOLROOT not defined!
-  endif
- endif
 endif
 
 
@@ -222,15 +226,15 @@ endif
 #
 
 ifdef BUILD_CPU
- ifneq ($(BUILD_CPU), R4000)
- ifneq ($(BUILD_CPU), R5000)
- ifneq ($(BUILD_CPU), R8000)
- ifneq ($(BUILD_CPU), R10000)
+  ifneq ($(BUILD_CPU), R4000)
+  ifneq ($(BUILD_CPU), R5000)
+  ifneq ($(BUILD_CPU), R8000)
+  ifneq ($(BUILD_CPU), R10000)
     ABORT_BUILD = BUILD_CPU has bad value - $(BUILD_CPU)!
- endif
- endif
- endif
- endif
+  endif
+  endif
+  endif
+  endif
 endif
 
 #
@@ -238,11 +242,11 @@ endif
 #
 
 ifdef BUILD_TYPE
- ifneq ($(BUILD_TYPE), SHARED)
- ifneq ($(BUILD_TYPE), NONSHARED)
-   ABORT_BUILD = BUILD_TYPE has bad value - $(BUILD_TYPE)!
- endif
- endif
+  ifneq ($(BUILD_TYPE), SHARED)
+  ifneq ($(BUILD_TYPE), NONSHARED)
+    ABORT_BUILD = BUILD_TYPE has bad value - $(BUILD_TYPE)!
+  endif
+  endif
 else
   ABORT_BUILD = BUILD_TYPE not defined!
 endif
@@ -252,15 +256,15 @@ endif
 #
 
 ifdef BUILD_TARGET
- ifneq ($(BUILD_TARGET), SPARC)
- ifneq ($(BUILD_TARGET), MIPS)
- ifneq ($(BUILD_TARGET), IA32)
- ifneq ($(BUILD_TARGET), IA64)
-   ABORT_BUILD = BUILD_TARGET has bad value - $(BUILD_TARGET)!
- endif
- endif
- endif
- endif
+  ifneq ($(BUILD_TARGET), SPARC)
+  ifneq ($(BUILD_TARGET), MIPS)
+  ifneq ($(BUILD_TARGET), IA32)
+  ifneq ($(BUILD_TARGET), IA64)
+    ABORT_BUILD = BUILD_TARGET has bad value - $(BUILD_TARGET)!
+  endif
+  endif
+  endif
+  endif
 else
    ABORT_BUILD = BUILD_TARGET has no value!
 endif
@@ -279,13 +283,13 @@ BUILD_TARGET_DIR = ia64
 #
 
 ifdef BUILD_OPTIMIZE
- ifeq ($(BUILD_OPTIMIZE), DEFAULT)
-   BUILD_OPTIMIZE = NODEBUG
- else
-  ifeq ($(BUILD_OPTIMIZE), "")
-    ABORT_BUILD = BUILD_OPTIMIZE has no value!
+  ifeq ($(BUILD_OPTIMIZE), DEFAULT)
+    BUILD_OPTIMIZE = NODEBUG
+  else
+    ifeq ($(BUILD_OPTIMIZE), "")
+      ABORT_BUILD = BUILD_OPTIMIZE has no value!
+    endif
   endif
- endif
 else
   ABORT_BUILD = BUILD_OPTIMIZE not defined!
 endif
@@ -296,14 +300,21 @@ endif
 #
 
 ifeq ($(BUILD_OPTIMIZE), DEBUG)
-   OPTIMIZER = -g -D_DEBUG
+  OPTIMIZER = -g -D_DEBUG
+
+  ifeq ($(BUILD_COMPILER), VENDOR)
+  ifeq ($(BUILD_OS), TRU64)
+    CXX_OPTIMIZER = -gall
+  endif
+  endif
+
 else
- ifeq ($(BUILD_OPTIMIZE), NODEBUG)
-# -IPA can't be used on libraries, not default
-   OPTIMIZER = -O0
- else
-   OPTIMIZER = $(BUILD_OPTIMIZE)
- endif
+  ifeq ($(BUILD_OPTIMIZE), NODEBUG)
+#   -IPA can't be used on libraries, not default
+    OPTIMIZER = -O0
+  else
+    OPTIMIZER = $(BUILD_OPTIMIZE)
+  endif
 endif
 
 #
@@ -312,11 +323,11 @@ endif
 #
 
 ifdef BUILD_PCH
- ifneq ($(BUILD_PCH), DEFAULT)
- ifneq ($(BUILD_PCH), USE_PCH)
-   ABORT_BUILD = BUILD_PCH has bad value - $(BUILD_PCH)!
- endif
- endif
+  ifneq ($(BUILD_PCH), DEFAULT)
+  ifneq ($(BUILD_PCH), USE_PCH)
+    ABORT_BUILD = BUILD_PCH has bad value - $(BUILD_PCH)!
+  endif
+  endif
 else
   BUILD_PCH = DEFAULT
 endif
@@ -337,9 +348,9 @@ endif
 #
 
 ifdef BUILD_INSTALL
- ifeq ($(BUILD_INSTALL), "")
-   ABORT_BUILD = BUILD_INSTALL has no value!
- endif
+  ifeq ($(BUILD_INSTALL), "")
+    ABORT_BUILD = BUILD_INSTALL has no value!
+  endif
 else
   ABORT_BUILD = BUILD_INSTALL not defined!
 endif
@@ -354,7 +365,9 @@ endif
 ifneq ($(BUILD_OS), SOLARIS)
 ifneq ($(BUILD_OS), IRIX)
 ifneq ($(BUILD_OS), LINUX)
+ifneq ($(BUILD_OS), TRU64)
   ABORT_BUILD = BUILD_OS has bad value - $(BUILD_OS)!
+endif
 endif
 endif
 endif
@@ -372,7 +385,9 @@ ifneq ($(BUILD_HOST), SPARC)
 ifneq ($(BUILD_HOST), MIPS)
 ifneq ($(BUILD_HOST), IA32)
 ifneq ($(BUILD_HOST), IA64)
+ifneq ($(BUILD_HOST), ALPHA)
    ABORT_BUILD = BUILD_HOST has bad value - $(BUILD_HOST)!
+endif
 endif
 endif
 endif
@@ -382,8 +397,8 @@ endif
 # eraxxon: For now, cygwin piggy-backs upon linux build files.  The
 # following variables are needed due to differences between cygwin and
 # conventional unices.
-REAL_BUILD_OS = $(findstring CYGWIN, $(shell uname -s))
-ifeq ($(REAL_BUILD_OS),CYGWIN)
+REAL_BUILD_OS = $(shell uname -s)
+ifeq ($(findstring CYGWIN, $(REAL_BUILD_OS)),CYGWIN)
   BUILD_OS_CYGWIN = 1
   # DSOs *must* have the dll extension in order to link correctly.
   EXEext = .exe
@@ -406,30 +421,35 @@ COMMONDEFS = $(BUILD_TOT)/linux/make/gcommondefs
 #
 
 ifndef ABORT_BUILD
- ifeq ($(BUILD_ABI), N32BIT)
- ifneq ($(BUILD_ARCH), MIPS3)
- ifneq ($(BUILD_ARCH), MIPS4)
-   ABORT_BUILD = N32BIT requires MIPS3 or MIPS4!
- endif
- endif
- endif
- ifeq ($(BUILD_ABI), 64BIT)
- ifneq ($(BUILD_ARCH), MIPS3)
- ifneq ($(BUILD_ARCH), MIPS4)
-   ABORT_BUILD = 64BIT requires MIPS3 or MIPS4!
- endif
- endif
- endif
- ifeq ($(BUILD_ABI), I32BIT)
- ifneq ($(BUILD_ARCH), IA32)
-  ABORT_BUILD = BUILD_ABI=I32BIT requires BUILD_ARCH=IA32
- endif
- endif
- ifeq ($(BUILD_ABI), I64BIT)
- ifneq ($(BUILD_ARCH), IA64)
-  ABORT_BUILD = BUILD_ABI=I64BIT requires BUILD_ARCH=IA64
- endif
- endif
+  ifeq ($(BUILD_ABI), N32BIT)
+    ifneq ($(BUILD_ARCH), MIPS3)
+    ifneq ($(BUILD_ARCH), MIPS4)
+      ABORT_BUILD = N32BIT requires MIPS3 or MIPS4!
+    endif
+    endif
+  endif
+  ifeq ($(BUILD_ABI), 64BIT)
+    ifneq ($(BUILD_ARCH), MIPS3)
+    ifneq ($(BUILD_ARCH), MIPS4)
+      ABORT_BUILD = 64BIT requires MIPS3 or MIPS4!
+    endif
+    endif
+  endif
+  ifeq ($(BUILD_ABI), I32BIT)
+    ifneq ($(BUILD_ARCH), IA32)
+      ABORT_BUILD = BUILD_ABI=I32BIT requires BUILD_ARCH=IA32
+    endif
+  endif
+  ifeq ($(BUILD_ABI), I64BIT)
+    ifneq ($(BUILD_ARCH), IA64)
+      ABORT_BUILD = BUILD_ABI=I64BIT requires BUILD_ARCH=IA64
+    endif
+  endif
+  ifeq ($(BUILD_ABI), A64BIT)
+    ifneq ($(BUILD_ARCH), ALPHA)
+      ABORT_BUILD = BUILD_ABI=A64BIT requires BUILD_ARCH=ALPHA
+    endif
+  endif
 endif
 
 #
@@ -438,7 +458,7 @@ endif
 
 ifeq ($(BUILD_COMPILER), VENDOR)
 ifeq ($(BUILD_ABI), N32BIT)
-LWOFF = ,1174,1185,1506,1209,3088,1048,1140,1172,1552,1685
+  LWOFF = ,1174,1185,1506,1209,3088,1048,1140,1172,1552,1685
 endif
 endif
 
@@ -453,17 +473,21 @@ endif
 #  is the equivalent for gcc. On Solaris, -KPIC equals to -xcode=pic32
 #
 ifeq ($(BUILD_COMPILER), VENDOR)
- ifeq ($(BUILD_TYPE), SHARED)
-   STD_COMPILE_OPTS = -KPIC
- else
-   STD_COMPILE_OPTS = -non_shared
- endif
+  ifeq ($(BUILD_TYPE), SHARED)
+    ifeq ($(filter IRIX SOLARIS, $(BUILD_OS)), $(BUILD_OS))
+      STD_COMPILE_OPTS = -KPIC
+    else 
+      STD_COMPILE_OPTS =
+    endif
+  else
+    STD_COMPILE_OPTS = -non_shared
+  endif
 else
- ifeq ($(BUILD_TYPE), SHARED)
-   STD_COMPILE_OPTS = -fPIC
- else
-   STD_COMPILE_OPTS = 
- endif
+  ifeq ($(BUILD_TYPE), SHARED)
+    STD_COMPILE_OPTS = -fPIC
+  else
+    STD_COMPILE_OPTS = 
+  endif
 endif
 
 # use compiler's default instead -
@@ -498,7 +522,7 @@ endif
 STD_COMPILE_OPTS += -DTARG_$(BUILD_TARGET)
 
 ifeq ($(BUILD_TARGET), IA32)
-STD_COMPILE_OPTS += -DEMULATE_LONGLONG
+  STD_COMPILE_OPTS += -DEMULATE_LONGLONG
 endif
 
 #
@@ -506,9 +530,9 @@ endif
 #
 
 ifeq ($(BUILD_ABI), N32BIT)
-STD_C++_OPTS =  # LANG:exceptions=OFF use compiler's default instead -
+  STD_C++_OPTS =  # LANG:exceptions=OFF use compiler's default instead -
 else
-STD_C++_OPTS = 
+  STD_C++_OPTS = 
 endif
 
 #
@@ -559,19 +583,19 @@ endif
 #endif
 
 ifeq ($(BUILD_ARCH), IA32)
- ifeq ($(BUILD_TYPE), SHARED)
-   STD_LOAD_OPTS +=
- else
-   STD_LOAD_OPTS +=
- endif
+  ifeq ($(BUILD_TYPE), SHARED)
+    STD_LOAD_OPTS +=
+  else
+    STD_LOAD_OPTS +=
+  endif
 endif
 
 ifeq ($(BUILD_ABI), I64BIT)
- ifeq ($(BUILD_TYPE), SHARED)
-   STD_LOAD_OPTS +=
- else
-   STD_LOAD_OPTS +=
- endif
+  ifeq ($(BUILD_TYPE), SHARED)
+    STD_LOAD_OPTS +=
+  else
+    STD_LOAD_OPTS +=
+  endif
 endif
 
 
@@ -609,40 +633,40 @@ endif
 #
 
 ifeq ($(BUILD_ABI), N32BIT)
-STD_DSO_LOC = /usr/lib32
+  STD_DSO_LOC = /usr/lib32
 else
-STD_DSO_LOC = /usr/lib64
+  STD_DSO_LOC = /usr/lib64
 endif
 
 ifdef BUILD_CPU
- ifeq ($(BUILD_ARCH), MIPS4)
-  ifeq ($(BUILD_CPU), R5000)
-    LINK = mips4/r5000/$(DSO)
-    IDBTAG = -idb "mach(CPUARCH=R5000)"
+  ifeq ($(BUILD_ARCH), MIPS4)
+    ifeq ($(BUILD_CPU), R5000)
+      LINK = mips4/r5000/$(DSO)
+      IDBTAG = -idb "mach(CPUARCH=R5000)"
+    endif
+    ifeq ($(BUILD_CPU), R8000)
+      LINK = mips4/r8000/$(DSO)
+      IDBTAG = -idb "mach(CPUARCH=R8000)"
+    endif
+    ifeq ($(BUILD_CPU), R10000)
+      LINK = mips4/r10000/$(DSO)
+      IDBTAG = -idb "mach(CPUARCH=R10000)"
+    endif
+  else
   endif
-  ifeq ($(BUILD_CPU), R8000)
-    LINK = mips4/r8000/$(DSO)
-    IDBTAG = -idb "mach(CPUARCH=R8000)"
-  endif
-  ifeq ($(BUILD_CPU), R10000)
-    LINK = mips4/r10000/$(DSO)
-    IDBTAG = -idb "mach(CPUARCH=R10000)"
-  endif
- else
- endif
 else
- ifeq ($(BUILD_ARCH), MIPS4)
-  ifeq ($(BUILD_ABI), 64BIT)
-    LINK = mips4/$(DSO)
-    IDBTAG = -idb "mach(CPUARCH=R8000 CPUARCH=R10000)"
-  else # N32BIT 
-    LINK = mips4/$(DSO)
-    IDBTAG = -idb "mach(CPUARCH=R8000 CPUARCH=R10000 CPUARCH=R5000)"
+  ifeq ($(BUILD_ARCH), MIPS4)
+    ifeq ($(BUILD_ABI), 64BIT)
+      LINK = mips4/$(DSO)
+      IDBTAG = -idb "mach(CPUARCH=R8000 CPUARCH=R10000)"
+    else # N32BIT 
+      LINK = mips4/$(DSO)
+      IDBTAG = -idb "mach(CPUARCH=R8000 CPUARCH=R10000 CPUARCH=R5000)"
+    endif
+  else # MIPS3
+    LINK = mips3/$(DSO)
+    IDBTAG = -idb "mach(CPUARCH=R4000)"
   endif
- else # MIPS3
-   LINK = mips3/$(DSO)
-   IDBTAG = -idb "mach(CPUARCH=R4000)"
- endif
 endif
 
 LBOOT64=-idb "mach(MODE=64bit)"
@@ -654,54 +678,54 @@ LBOOT64=-idb "mach(MODE=64bit)"
 #
 
 ifeq ($(BUILD_ABI), 64BIT)
- ifeq ($(BUILD_ARCH), MIPS4)
-   DEF_LIBRARY_LOC := /usr/lib64
-   ifdef BUILD_CPU
-    ifeq ($(BUILD_CPU), R5000)
-      STD_LIBRARY_LOC := /usr/lib64/mips4/r5000
-    endif
-    ifeq ($(BUILD_CPU), R8000)
-      STD_LIBRARY_LOC := /usr/lib64/mips4/r8000
-    endif
-    ifeq ($(BUILD_CPU), R10000)
-      STD_LIBRARY_LOC := /usr/lib64/mips4/r10000
-    endif
-   else
+  ifeq ($(BUILD_ARCH), MIPS4)
+    DEF_LIBRARY_LOC := /usr/lib64
+    ifdef BUILD_CPU
+      ifeq ($(BUILD_CPU), R5000)
+        STD_LIBRARY_LOC := /usr/lib64/mips4/r5000
+      endif
+      ifeq ($(BUILD_CPU), R8000)
+        STD_LIBRARY_LOC := /usr/lib64/mips4/r8000
+      endif
+      ifeq ($(BUILD_CPU), R10000)
+        STD_LIBRARY_LOC := /usr/lib64/mips4/r10000
+      endif
+    else
       STD_LIBRARY_LOC := /usr/lib64/mips4
-   endif
- else # MIPS3
+    endif
+  else # MIPS3
     STD_LIBRARY_LOC := /usr/lib64/mips3
     DEF_LIBRARY_LOC := /usr/lib64
- endif
+  endif
 endif
 ifeq ($(BUILD_ABI), N32BIT)
- ifeq ($(BUILD_ARCH), MIPS4)
-   DEF_LIBRARY_LOC := /usr/lib32
-   ifdef BUILD_CPU
-    ifeq ($(BUILD_CPU), R5000)
-      STD_LIBRARY_LOC := /usr/lib32/mips4/r5000
-    endif
-    ifeq ($(BUILD_CPU), R8000)
-      STD_LIBRARY_LOC := /usr/lib32/mips4/r8000
-    endif
-    ifeq ($(BUILD_CPU), R10000)
-      STD_LIBRARY_LOC := /usr/lib32/mips4/r10000
-    endif
-   else
+  ifeq ($(BUILD_ARCH), MIPS4)
+    DEF_LIBRARY_LOC := /usr/lib32
+    ifdef BUILD_CPU
+      ifeq ($(BUILD_CPU), R5000)
+        STD_LIBRARY_LOC := /usr/lib32/mips4/r5000
+      endif
+      ifeq ($(BUILD_CPU), R8000)
+        STD_LIBRARY_LOC := /usr/lib32/mips4/r8000
+      endif
+      ifeq ($(BUILD_CPU), R10000)
+        STD_LIBRARY_LOC := /usr/lib32/mips4/r10000
+      endif
+    else
       STD_LIBRARY_LOC := /usr/lib32/mips4
-   endif
- else # MIPS3
+    endif
+  else # MIPS3
     STD_LIBRARY_LOC := /usr/lib32/mips3
     DEF_LIBRARY_LOC := /usr/lib32
- endif
+  endif
 endif
 ifndef STD_LIBRARY_LOC
-STD_LIBRARY_LOC := /usr/lib
-DEF_LIBRARY_LOC := /usr/lib
+  STD_LIBRARY_LOC := /usr/lib
+  DEF_LIBRARY_LOC := /usr/lib
 endif
 ifeq ($(BUILD_TYPE), NONSHARED)
-STD_LIBRARY_LOC := $(STD_LIBRARY_LOC)/nonshared
-DEF_LIBRARY_LOC := $(DEF_LIBRARY_LOC)/nonshared
+  STD_LIBRARY_LOC := $(STD_LIBRARY_LOC)/nonshared
+  DEF_LIBRARY_LOC := $(DEF_LIBRARY_LOC)/nonshared
 endif
 
 
@@ -711,10 +735,10 @@ endif
 STD_PHASE_LOC = /usr/lib64/cmplrs
 STD_MONGOOSE_LOC = /usr/lib32/cmplrs
 ifeq ($(BUILD_TARGET), IA32)
-STD_MONGOOSE_LINUX_LOC = $(ROOT)/usr/ia32-sgi-linux/bin
+  STD_MONGOOSE_LINUX_LOC = $(ROOT)/usr/ia32-sgi-linux/bin
 endif
 ifeq ($(BUILD_TARGET), IA64)
-STD_MONGOOSE_LINUX_LOC = $(ROOT)/usr/ia64-sgi-linux/lib/gcc-lib/ia64-sgi-linux/sgicc-1.0
+  STD_MONGOOSE_LINUX_LOC = $(ROOT)/usr/ia64-sgi-linux/lib/gcc-lib/ia64-sgi-linux/sgicc-1.0
 endif
 
 #
@@ -723,9 +747,9 @@ endif
 #
 
 ifeq ($(BUILD_INSTALL), DEFAULT)
-STD_INSTALL = $(INSTALL)
+  STD_INSTALL = $(INSTALL)
 else
-STD_INSTALL = $(INSTALL) -root $(BUILD_INSTALL)
+  STD_INSTALL = $(INSTALL) -root $(BUILD_INSTALL)
 endif
 
 #
@@ -735,11 +759,11 @@ endif
 #
 
 ifndef STD_INSTALL_READ_MASK
-STD_INSTALL_READ_MASK = -m 444
+  STD_INSTALL_READ_MASK = -m 444
 endif
 
 ifndef STD_INSTALL_EXEC_MASK
-STD_INSTALL_EXEC_MASK =
+  STD_INSTALL_EXEC_MASK =
 endif
 
 #
@@ -754,15 +778,19 @@ Abort .DEFAULT:
 	@exit 1
 
 else
- ifeq ($(BUILD_OS), IRIX)
+  ifeq ($(BUILD_OS), IRIX)
 .MAKEFLAGS: ROOT=$(ROOT) TOOLROOT=$(TOOLROOT) COMP_TARGET_ROOT=$(ROOT)
- endif
+  endif
 
-include $(BUILD_BASE)/Makefile.gbase
+  include $(BUILD_BASE)/Makefile.gbase
 endif
 
 # turn off flags from commondefs
 CSTYLE=
 NO_OBJECT_STYLE=""
 
-XDIRT= ii_files
+# C++ template repositories 
+#   cxx_repository: Compaq C++
+#   ii_files:       SGI C++
+#   SunWS_cache:    Solaris C++
+XDIRT = cxx_repository ii_files SunWS_cache

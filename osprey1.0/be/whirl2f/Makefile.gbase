@@ -70,12 +70,14 @@ include $(COMMONDEFS)
 #----------------------------------------------------------------------
 #  Set environment variables
 #----------------------------------------------------------------------
-ifdef LOCAL_BE_DIR
-CVERSION  =  -xansi
-TARG_BE_DIR = $(TARGDIR)/$(LOCAL_BE_DIR)
+ifeq ($(BUILD_COMPILER), VENDOR)
+  ifeq ($(BUILD_OS), IRIX)
+    CVERSION  =  -xansi
+    HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE # for compilation with -ansi
+  endif
 else
-CVERSION =
-TARG_BE_DIR = $(TARGDIR)/be
+  CVERSION =
+  HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE # for compilation with -ansi
 endif
 
 #----------------------------------------------------------------------
@@ -83,14 +85,12 @@ endif
 #----------------------------------------------------------------------
 HOSTDEFS += -Dsgi
 HOSTDEFS += -Dlonglong
-# need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
-HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
 # need to define BUILD_WNPREFETCH to get appropriate code from common sources
 HOSTDEFS += -DMONGOOSE_BE -D_LIBELF_XTND_64
 
 ifeq ($(BUILD_VARIANT), DEBUG)
-HOSTDEFS += -DIs_True_On
-HOSTDEFS += -DInsist_On 
+  HOSTDEFS += -DIs_True_On
+  HOSTDEFS += -DInsist_On 
 endif
 
 #----------------------------------------------------------------------
@@ -210,11 +210,11 @@ HEADER_DIRS += $(BUILD_TOT)/include
 LCINCS = $(addprefix -I, $(HEADER_DIRS))
 
 ifeq ($(BUILD_OS), LINUX)
-LCINCS += -I$(BUILD_AREA)/include
+  LCINCS += -I$(BUILD_AREA)/include
 endif
 
 ifneq ($(STL_EXT_PATH),)
-LCINCS += -I$(STL_EXT_PATH)
+  LCINCS += -I$(STL_EXT_PATH)
 endif
 
 LCXXINCS := $(LCINCS)
@@ -231,9 +231,9 @@ LASOPTS = $(STD_COMPILE_OPTS)
 GLDOPTS = $(STD_LOAD_OPTS) $(LD_QUICKSTART_INFO)
 
 ifeq ($(BUILD_OS), IRIX)
-DSOSTARTOPT = -check_registry $(TARGDIR)/be/so_locations -no_unresolved
+  DSOSTARTOPT = -check_registry $(TARGDIR)/be/so_locations -no_unresolved
 else
-DSOSTARTOPT = 
+  DSOSTARTOPT = 
 endif
 DSOSTARTOPT_32 = -32 $(DSOSTARTOPT)
 DSOSTARTOPT_N32 = -n32 $(DSOSTARTOPT)
@@ -245,9 +245,9 @@ LDFLAGS += -32
 # File containing the list of symbols exported outside of whirl2f.so
 #----------------------------------------------------------------------
 ifeq ($(BUILD_COMPILER), VENDOR)
-EXPORT_LIST = -exports_file $(BE_WHIRL2F_DIR)/Exported
+  EXPORT_LIST = -exports_file $(BE_WHIRL2F_DIR)/Exported
 else
-EXPORT_LIST =
+  EXPORT_LIST =
 endif
 
 #----------------------------------------------------------------------
@@ -264,30 +264,36 @@ WHIRL2F90_EXE = $(addsuffix $(EXEext), whirl2f90)
 TARGETS = $(WHIRL2F_EXE) $(WHIRL2F_BE_EXE) $(WHIRL2F_DSO) $(WHIRL2F90_EXE)
 
 ifdef LOCAL_TARG_INFO_DIR
-TARG_TARG_INFO_DIR = $(TARGDIR)/$(LOCAL_TARG_INFO_DIR)
+  TARG_TARG_INFO_DIR = $(TARGDIR)/$(LOCAL_TARG_INFO_DIR)
 else
-TARG_TARG_INFO_DIR = $(TARGDIR)/targ_info
+  TARG_TARG_INFO_DIR = $(TARGDIR)/targ_info
 endif
 
 ifeq ($(BUILD_TARGET), MIPS)
-TARGET_SO = $(addsuffix $(DSOext), r10000)
+  TARGET_SO = $(addsuffix $(DSOext), r10000)
 endif
 ifeq ($(BUILD_TARGET), IA64)
-TARGET_SO = $(addsuffix $(DSOext), itanium)
+  TARGET_SO = $(addsuffix $(DSOext), itanium)
 endif
 ifeq ($(BUILD_TARGET), IA32)
-TARGET_SO = $(addsuffix $(DSOext), pentium)
+  TARGET_SO = $(addsuffix $(DSOext), pentium)
 endif
 
 # extra files to be removed with make clobber
-LDIRT += $(BE_EXE) $(BE_DSO) $(TARGET_SO) whirl2c_be
+LDIRT += $(BE_EXE) $(BE_DSO) $(TARGET_SO) $(WHIRL2F90_EXE) whirl2c_be \
+	so_locations
 
 
 #----------------------------------------------------------------------
 #  Variables describing additional sources, objects, and libraries
 #----------------------------------------------------------------------
+
+LLDLIBS	+= -lc
+
+ifeq ($(BUILD_OS), IRIX)
 ifeq ($(BUILD_COMPILER), VENDOR)
-LLDLIBS	= -none -lc
+  LLDLIBS := -none $(LLDLIBS)
+endif
 endif
 
 #---------------------------------------------------------------------
@@ -301,23 +307,22 @@ ifeq ($(BUILD_OS), IRIX)
 endif
 
 ifeq ($(BUILD_OS), LINUX)
-CFLAGS  += -D_LINUX_LINUX
-CXXFLAGS += -D_LINUX_LINUX
+  CFLAGS  += -D_LINUX_LINUX
+  CXXFLAGS += -D_LINUX_LINUX
 endif
-
 
 ifeq ($(BUILD_OS), SOLARIS)
 CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_SVR4_SOURCE \
 	-DMONGOOSE_BE -DBUILD_WNPREFETCH -D_LIBELF_XTND_64 $(LCINCS) $(OPTIMIZER)
- ifeq ($(BUILD_COMPILER), VENDOR)
- ifeq ($(BUILD_SB), YES)
- CFLAGS += -xsb
- endif
- endif
- ifeq ($(BUILD_COMPILER), GNU)
- CFLAGS +=  -D__GNU_BUG_WORKAROUND
- endif
-CXXFLAGS = $(CFLAGS) -w
+  ifeq ($(BUILD_COMPILER), VENDOR)
+  ifeq ($(BUILD_SB), YES)
+    CFLAGS += -xsb
+  endif
+  endif
+  ifeq ($(BUILD_COMPILER), GNU)
+    CFLAGS +=  -D__GNU_BUG_WORKAROUND
+  endif
+  CXXFLAGS = $(CFLAGS) -w
 endif
 
 #---------------------------------------------------------------------
@@ -361,21 +366,19 @@ install:: default
 # add -G for dynamic shared object, remove $(STD_DSO_LOADOPTS) $(EXPORT_LIST)
 # $(LDFLAGS) $(LLDLIBS), LLDLIBS = -none -lc  
 #----------------------------------------------------------------------
-ifeq ($(BUILD_OS), LINUX)
-WHIRL2F_LIBS = $(BE_DSO)
+ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
+  WHIRL2F_LIBS = $(BE_DSO)
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
-$(WHIRL2F_DSO): $(WHIRL2F_C_OBJS) \
-                $(BE_WHIRL2F_DIR)/Exported $(BE_BE_DIR)/so_locations
-ifeq ($(BUILD_COMPILER), VENDOR)
-	$(CXX) -o $@ -G $(WHIRL2F_C_OBJS) -lc
-else
-	$(CXX) -o $@ -G $(WHIRL2F_C_OBJS)
+  WHIRL2F_SO_LOC = $(BE_WHIRL2F_DIR)/Exported $(BE_BE_DIR)/so_locations
 endif
-else # irix and linux
-$(WHIRL2F_DSO): $(WHIRL2F_C_OBJS) $(WHIRL2F_LIBS)
-	$(CXX) -shared -o $@ $(WHIRL2F_C_OBJS) $(WHIRL2F_LIBS) -lc
+
+$(WHIRL2F_DSO): $(WHIRL2F_C_OBJS) $(WHIRL2F_LIBS) $(WHIRL2F_SO_LOC)
+ifeq ($(BUILD_OS), SOLARIS)
+	$(CXX) -G      -o $@ $(WHIRL2F_C_OBJS) $(WHIRL2F_LIBS)
+else
+	$(CXX) -shared -o $@ $(WHIRL2F_C_OBJS) $(WHIRL2F_LIBS)
 endif
 
 

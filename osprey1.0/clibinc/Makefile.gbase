@@ -54,7 +54,7 @@ PUBLIC_HFILES= \
 #
 # List of subdirectories to run makes in.
 #
-BUILD_SUBDIRS=cray
+BUILD_SUBDIRS = cray
 
 default: first
 

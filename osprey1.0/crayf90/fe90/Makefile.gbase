@@ -71,7 +71,9 @@ include $(COMMONDEFS)
 #  Set environment variables
 #----------------------------------------------------------------------
 ifeq ($(BUILD_COMPILER), VENDOR)
-CVERSION  =  -xansi
+ifeq ($(BUILD_OS), IRIX)
+  CVERSION  =  -xansi
+endif
 endif
 
 #----------------------------------------------------------------------
@@ -79,17 +81,14 @@ endif
 #----------------------------------------------------------------------
 HOSTDEFS += -Dlonglong
 
-# need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
-HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
-
 ifeq ($(BUILD_VARIANT), DEBUG)
-HOSTDEFS += -DIs_True_On
-HOSTDEFS += -DInsist_On 
+  HOSTDEFS += -DIs_True_On
+  HOSTDEFS += -DInsist_On 
 endif
 
 ifeq ($(BUILD_ARCH), MIPS3)
-TARGDEFS  = -DTARG_MIPS
-WOFF = -woff 1107,1174,1209,1685,1185,1155,1506,1552,1196,1498,1692
+  TARGDEFS  = -DTARG_MIPS
+  WOFF = -woff 1107,1174,1209,1685,1185,1155,1506,1552,1196,1498,1692
 endif
 
 #----------------------------------------------------------------------
@@ -101,19 +100,22 @@ CRAYF90_DIR             = $(BUILD_TOT)/crayf90
 FE90_DIR                = $(CRAYF90_DIR)/fe90
 CLIBINC                 = $(BUILD_TOT)/clibinc/cray
 ifeq ($(BUILD_OS), LINUX)
-FE90_INCLUDES           = $(BUILD_TOT)/linux/mfef90_includes
-INCLUDE_DIR             = $(BUILD_TOT)/include
+  FE90_INCLUDES           = $(BUILD_TOT)/linux/mfef90_includes
+  INCLUDE_DIR             = $(BUILD_TOT)/include
 else
-INCLUDE_DIR 		= $(BUILD_TOT)/include
+  INCLUDE_DIR 		= $(BUILD_TOT)/include
 endif
+
 
 HEADER_DIRS = \
   $(FE90_DIR)	\
   $(ARITH_DIR)
 
-
+ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
+  HEADER_DIRS := $(CLIBINC) $(HEADER_DIRS)
+endif
 ifeq ($(BUILD_OS), LINUX)
-HEADER_DIRS := $(FE90_INCLUDES) $(CLIBINC) $(HEADER_DIRS)
+  HEADER_DIRS := $(FE90_INCLUDES) $(HEADER_DIRS)
 endif
 
 HEADER_DIRS += $(INCLUDE_DIR)
@@ -121,10 +123,11 @@ HEADER_DIRS += $(INCLUDE_DIR)
 #----------------------------------------------------------------------
 #  List of source files.  Please keep them in alphabetical order.
 #----------------------------------------------------------------------
-ifeq ($(BUILD_OS), LINUX)  # only Linux needs the fold.f hacking #
-FOLD = fold.f
+ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
+  # only Linux needs the fold.f hacking #
+  FOLD = fold.f
 else
-FOLD =
+  FOLD =
 endif
 
 FE90_SRCS = \
@@ -190,17 +193,22 @@ VPATH    =  $(FE90_DIR)
 # Compiler Options
 #---------------------------------------------------------------------------
 ifneq ($(BUILD_COMPILER), VENDOR)
-LCDEFS = -ansi -funsigned-char
+ifeq ($(BUILD_OS), IRIX)
+  LCDEFS = -ansi -funsigned-char
+
+  # need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
+  HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
+endif
 endif
 
-ifeq ($(BUILD_OS), LINUX)
-LCDEFS += -D_LINUX_LINUX
+ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
+  LCDEFS += -D_LINUX_LINUX
 else
-LCDEFS += $(HOSTDEFS) $(TARGDEFS) -D_SGI_SGI
+  LCDEFS += $(HOSTDEFS) $(TARGDEFS) -D_SGI_SGI
 endif
 
 ifeq ($(BUILD_TARGET), MIPS)
-LCDEFS += -D_TARGET_MONGOOSE
+  LCDEFS += -D_TARGET_MONGOOSE
 endif
 
 LCOPTS += $(STD_COMPILE_OPTS)
@@ -219,19 +227,20 @@ GLDOPTS = $(STD_LOAD_OPTS)
 #---------------------------------------------------------------------------
 
 ifeq ($(BUILD_OS), IRIX)
- ifeq ($(BUILD_COMPILER), VENDOR)
- WOFF = -woff 1107,1174,1209,1685,1185,1155,1506,1552,1196,1498,1692,3201,3496 
- endif
+ifeq ($(BUILD_COMPILER), VENDOR)
+  WOFF = -woff 1107,1174,1209,1685,1185,1155,1506,1552,1196,1498,1692,3201,3496
+endif
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
-CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_SVR4_SOURCE \
-	-DNL_MSGSET=NL_SETD -DNL_ERR_MALLOC=NL_CAT_LOCALE $(LCINCS) $(OPTIMIZER)
- ifeq ($(BUILD_COMPILER), VENDOR)
- ifeq ($(BUILD_SB), YES)
- CFLAGS += -xsb
- endif
- endif
+  CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG \
+      -D_SVR4_SOURCE -DNL_MSGSET=NL_SETD -DNL_ERR_MALLOC=NL_CAT_LOCALE \
+      $(LCINCS) $(OPTIMIZER)
+  ifeq ($(BUILD_COMPILER), VENDOR)
+  ifeq ($(BUILD_SB), YES)
+    CFLAGS += -xsb
+  endif
+  endif
 endif
 
 CF90CATPATH = '"'$(PWD)/../sgi/cf90.cat'"'  # put it in targ dir

@@ -554,7 +554,7 @@ endif
 #		$(CG_C_OBJS) $(CG_CXX_OBJS) -o $@ be.so $(TARGET_SO) $(LLDLIBS)
 #endif
 
-LDIRT += cg.so be.so $(TARGET_SO) be ii_files
+LDIRT += cg.so be.so $(TARGET_SO) be
 
 ifdef LINK_DSO
 debug-cg: cg.so
