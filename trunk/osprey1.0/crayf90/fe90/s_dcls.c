@@ -12490,7 +12490,20 @@ static	boolean	compare_darg_or_rslt_types(int	idx1,
          if (rank1 != rank2) {
             same = FALSE;
          }
+       }
+
+# if defined(COARRAY_FORTRAN) 
+      if (same){
+         rank1 = (ATD_PE_ARRAY_IDX(idx1) == NULL_IDX)?
+		  0 : BD_RANK(ATD_PE_ARRAY_IDX(idx1));
+	 rank2 = (ATD_PE_ARRAY_IDX(idx2) == NULL_IDX) ?
+                  0 : BD_RANK(ATD_PE_ARRAY_IDX(idx2));
+         if (rank1 != rank2) {
+             same = FALSE;
+         }
       }
+# endif
+
    }
 
 DONE: 

@@ -4476,7 +4476,8 @@ long	attr_msg_num[Obj_Done] [Attr_Done]	= {
 
 	    0,	/* Obj_Assum_Shp_Arr	 	Attr_Type		*/
 
-	  550,	/* Obj_Assum_Shp_Arr	 	Attr_Co_Array		*/
+/*	  550,	 Obj_Assum_Shp_Arr	 	Attr_Co_Array		*/
+	  0,	/* Obj_Assum_Shp_Arr	 	Attr_Co_Array		*/
 	  550,	/* Obj_Assum_Shp_Arr	 	Attr_Automatic		*/
 	    0	/* Obj_Assum_Shp_Arr		Attr_Volatile		*/
 	},
@@ -4490,7 +4491,8 @@ long	attr_msg_num[Obj_Done] [Attr_Done]	= {
 	    0,	/* Obj_Co_Array		Attr_Explicit_Shp_Arr	*/
 	    0,	/* Obj_Co_Array		Attr_Assumed_Size_Arr	*/
 	    0,	/* Obj_Co_Array		Attr_Deferred_Shp_Arr	*/
-	  550,	/* Obj_Co_Array		Attr_Assumed_Shp_Arr	*/
+/*	  550,	 Obj_Co_Array		Attr_Assumed_Shp_Arr	*/
+	    0,	/* Obj_Co_Array		Attr_Assumed_Shp_Arr	*/
 	    0,	/* Obj_Co_Array		Attr_Allocatable	*/
 	  550,	/* Obj_Co_Array		Attr_Parameter		*/
 	    0,	/* Obj_Co_Array		Attr_Intent		*/
