@@ -301,16 +301,7 @@ DST_append_child(DST_INFO_IDX parent, DST_INFO_IDX child)
    *last_child_field = child;
 }
 
-/*
- * Solaris CC workaround
- * CC still mangles the function's name although it's declared as
- * extern "C". This will cause "undefined name" error.
- * Adding extern "C" into the definition again seems to fix this
- * problem.
- */
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
 extern "C" {
-#endif
 
 void
 DST_preorder_visit(
@@ -345,9 +336,7 @@ DST_preorder_visit(
    }
 }
 
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
 }  /* extern "C" */
-#endif
 
 /* #endif * MONGOOSE_BE || _STANDALONE_INLINER || _SUPPORT_IPA */
 

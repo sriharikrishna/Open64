@@ -32,41 +32,11 @@
 
 */
 
-// Solaris workaround
-// the following definitions are in IRIX elf.h but not in Solaris elf.h
-
-#ifdef _SOLARIS_SOLARIS
-# include <limits.h>
-# ifdef __GNUC__
-#  define INT64_MAX       0x7fffffffffffffffll    /* Max 64-bit int */
-# endif
-# define ELF_BSS         ".bss"
-# define ELF_TEXT        ".text"
-# define ELF_DATA        ".data"
-# define ELF_GOT         ".got"
-# define ELF_RODATA      ".rodata"
-# define MIPS_SDATA              ".sdata"
-# define MIPS_SRDATA             ".srdata"
-# define MIPS_LIT4               ".lit4"
-# define MIPS_LIT8               ".lit8"
-# define MIPS_LIT16              ".lit16"
-# define MIPS_SBSS               ".sbss"
-# define SHF_MIPS_GPREL          0x10000000
-# define SHF_MIPS_MERGE          SHF_IRIX_MERGE
-# define SHF_IRIX_MERGE          0x20000000
-# define SHF_MIPS_NAMES          SHF_IRIX_NAMES
-# define SHF_IRIX_NAMES          0x02000000
-# define SHF_MIPS_LOCAL          SHF_IRIX_LOCAL
-# define SHF_IRIX_LOCAL          0x04000000
-#endif
-
-#include <elf.h>
+#include <iostream>
+#include <elf.h>       /* Open64 version */
 #include "sections.h"
 
-#define SHF_IA_64_SHORT	SHF_MIPS_GPREL
 #define INST_BYTES 16
-
-#include <iostream>
 
 
 #if defined(__CYGWIN__)

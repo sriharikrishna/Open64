@@ -32,28 +32,16 @@
 
 */
 
-// Solaris workaround
-// define it as 1 to keep it the same as in ir_reader.cxx, etc
-#ifdef _SOLARIS_SOLARIS
-#define SHT_MIPS_WHIRL        1
-#endif
-
 #include <elf.h>
 #include <errno.h>		    /* for sys_errlist */
 #include <sys/stat.h>
 #include <sys/elf_whirl.h>
+#include <algorithm>
+using namespace std;
 
 #if !defined(__CYGWIN__)
   // Cygwin doesn't yet have libgen.h or basename(). Sigh.
 # include <libgen.h>		    /* for basename() */
-#endif
-
-// Solaris CC workaround
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-#include <algorithm>
-using namespace std;
-#else
-#include <algo.h>
 #endif
 
 #include "defs.h"

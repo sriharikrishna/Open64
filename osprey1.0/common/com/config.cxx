@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: config.c
- * $Revision: 1.4 $
- * $Date: 2003-11-04 16:12:49 $
+ * $Revision: 1.5 $
+ * $Date: 2003-12-09 19:23:29 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $
  *
@@ -61,12 +61,13 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 
 #define USE_STANDARD_TYPES 1
 #include "defs.h"
+#undef USE_STANDARD_TYPES
 
 #ifdef FRONT_END	/* For setting fullwarn, woff in front end */
 # ifndef FRONT_F90
@@ -77,11 +78,11 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #  endif /* EDGSRC */
 # endif /* ~FRONT_F90 */
 #endif /*  FRONT_END */
-#include <ctype.h>	/* For isdigit */
-#include <elf.h>
+#include <ctype.h>	// For isdigit
+#include <elf.h>        // Open64 version 
 
 #include "x_string.h" // for strcasecmp()
-#include "em_elf.h"
+#include "em_elf.h"   
 #include "config.h"
 #include "config_platform.h"
 #include "config_targ.h"

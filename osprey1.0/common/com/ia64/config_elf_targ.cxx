@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: config_elf_targ.cxx
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:03 $
+ * $Revision: 1.2 $
+ * $Date: 2003-12-09 19:23:29 $
  *
  * Description:
  *
@@ -47,25 +47,6 @@
  * ====================================================================
  * ====================================================================
  */
-
-/* Solaris workaround
- * define EF_IRIX_ABI64 as in IRIX 's <elf.h> to allow compilation on 
- * Solaris.
- */
-#ifdef _SOLARIS_SOLARIS
-#define   EF_IRIX_ABI64           0x00000010
-#endif
-
-/* IRIX workaround
- * when compiling on irix, couldn't resolve EM_IA_64 (didn't have this
- * problem before before <elf.h> should use osprey1.0/linux/include/
- * elf.h which has the definition
- */
-
-#ifdef _SGI_SGI
-#define EM_IA_64 50     /* intel IA64 */
-#endif
-
 
 #include <elf.h>
 #include <sys/elf_whirl.h>
