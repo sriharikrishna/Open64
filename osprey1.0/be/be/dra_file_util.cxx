@@ -55,6 +55,7 @@
 #include <sys/param.h>          // MAXPATHLEN
 
 #include "defs.h"               // Standard definitions
+#include "x_libgen.h"           // for basename(), dirname()
 #include "glob.h"               // Src_File_Name
 #include "erbe.h"               // EC_DRA_*
 #include "erglob.h"             // EC_No_Mem
@@ -83,11 +84,6 @@ char DRA_file_name[MAXPATHLEN];
 // =====================================================================
 
 static void DRA_Make_File_Name();
-
-static char* o64_basename(char *const s);
-
-static char* o64_dirname(char *const s);
-
 
 // =====================================================================
 // 
@@ -286,11 +282,11 @@ DRA_Make_File_Name()
   char *obj_file_name = Obj_File_Name ? 
     Obj_File_Name : New_Extension (Src_File_Name, ".o");
   
-  char *dir = o64_dirname(obj_file_name);
+  char *dir = ux_dirname(obj_file_name);
   strcpy (DRA_file_name, dir);
   strcat (DRA_file_name, DRA_DIRECTORY);
 
-  char *base = o64_basename(obj_file_name);
+  char *base = ux_basename(obj_file_name);
   INT baselen = strlen(base);
   
   if (base[baselen-2] == '.' && base[baselen-1] == 'o')
@@ -301,61 +297,3 @@ DRA_Make_File_Name()
   strcat (DRA_file_name, base);
 } 
 
-
-
-
-static char tempbuf[MAXPATHLEN];
-
-
-static char*
-o64_basename(char *const s)
-{
-  register char *p;
-  register char *const t = tempbuf;
-
-  if (s == NULL || *s == 0) {
-    return strcpy(t, ".");
-  } else {
-    p = strcpy(t, s);
-    p += strlen(p);
-    while( p != t  &&  *--p == '/' )        // skip trailing /s 
-      *p = '\0';
-    while( p != t ) {
-      if( *--p == '/' )
-        return  ++p;
-    }
-    return p;
-  }
-}
-
-
-static char*
-o64_dirname(char *const s)
-{
-  register char *p;
-  register char *const t = tempbuf;
-
-  if (s == NULL || *s == 0) {
-	return strcpy(t, ".");
-  } else {
-	p = strcpy(t, s);
-	p += strlen(p);
-    while( p != t  &&  *--p == '/' )        // skip trailing /s 
-      ;
-
-    if ( p == t && *p == '/' )
-      return strcpy(t, "/");
-
-    while( p != t ) {
-      if( *--p == '/' ) {
-		if ( p == t )
-          return strcpy(t, "/");
-		while ( *p == '/' )
-          p--;
-		*++p = '\0';
-		return  t;
-      }
-	}
-	return strcpy(t, ".");
-  }
-}
