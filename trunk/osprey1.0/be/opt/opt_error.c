@@ -2,9 +2,9 @@
  * ====================================================================
  *
  * Module: opt_error.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:48 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-11-04 16:10:15 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_error.c,v $
  *
  * Revision history:
@@ -47,7 +47,7 @@
  */
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_error.c,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_error.c,v $ $Revision: 1.2 $";
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -228,12 +228,13 @@ catch (int sig, int error_num)
 
 void Opt_Catch_Signals (void)
 {
+    // Note: SIGABRT replaces SIGIOT
     if (signal(SIGHUP , SIG_IGN) != SIG_IGN) signal(SIGHUP , catch);
     if (signal(SIGINT , SIG_IGN) != SIG_IGN) signal(SIGINT , catch);
     if (signal(SIGQUIT, SIG_IGN) != SIG_IGN) signal(SIGQUIT, catch);
     if (signal(SIGILL , SIG_IGN) != SIG_IGN) signal(SIGILL , catch);
     if (signal(SIGTRAP, SIG_IGN) != SIG_IGN) signal(SIGTRAP, catch);
-    if (signal(SIGIOT , SIG_IGN) != SIG_IGN) signal(SIGIOT , catch);
+    if (signal(SIGABRT, SIG_IGN) != SIG_IGN) signal(SIGABRT, catch);
     if (signal(SIGEMT , SIG_IGN) != SIG_IGN) signal(SIGEMT , catch);
     if (signal(SIGFPE , SIG_IGN) != SIG_IGN) signal(SIGFPE , catch);
     if (signal(SIGBUS , SIG_IGN) != SIG_IGN) signal(SIGBUS , catch);
