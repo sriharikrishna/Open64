@@ -75,7 +75,7 @@ static int			prevflen;
 #endif
 
 
-main()
+int main()
 {
   prevflen = 0;
 
@@ -86,6 +86,7 @@ main()
 #endif
   printf("Intrinsic test results:\n%6d passed\n%6d FAILED!!!\n",pass,fail);
   exit(fail);
+  return 0; /* not reached */
 }
 
 #if !defined(HAVE_FORTRAN_H)
@@ -417,13 +418,22 @@ check_ar_result(fname, flen, ar_result, ar_error, answer, rsize)
      ((answer[0]>>52)&0x7ff) == 0x7ff) ierr=0;
   
   if(ierr!=0 || xor!=0) {
+    const char* conversion = NULL;
+
     fprintf(stderr,
 	    "\n***** ERROR *** ERROR *** ERROR *** ERROR *****\n");
     fprintf(stderr,
 	    "   arith.a %*.*s result does not match expected result of",
 	    flen, flen, fname);
+    
+#ifdef _CRAY /* see arith.h */
+    conversion = " %8.8lx";
+#else
+    conversion = " %8.8llx";
+#endif
+      
     for(i=0; i<rsize; i++)
-      fprintf(stderr," %8.8x %8.8x",answer[i]);
+      fprintf(stderr, conversion, (AR_HOST_UINT64)answer[i]);
     fprintf(stderr,"\n");
     if(ierr != 0)
       fprintf(stderr,
@@ -432,7 +442,7 @@ check_ar_result(fname, flen, ar_result, ar_error, answer, rsize)
     else {
       fprintf(stderr,"   The arith.a routine returned a result of");
       for(i=0; i<rsize; i++)
-	fprintf(stderr," %8.8x %8.8x",ar_result[i]);
+	fprintf(stderr, conversion, (AR_HOST_UINT64)ar_result[i]);
       fprintf(stderr,"\n");
     }
     fail++;
@@ -444,4 +454,4 @@ check_ar_result(fname, flen, ar_result, ar_error, answer, rsize)
 
 
 static char USMID [] = "\n%Z%%M%	%I%	%G% %U%\n";
-static char rcsid [] = "$Id: test_ar_intrin.c,v 1.3 2003-12-09 19:14:36 eraxxon Exp $";
+static char rcsid [] = "$Id: test_ar_intrin.c,v 1.4 2003-12-11 22:08:33 eraxxon Exp $";
