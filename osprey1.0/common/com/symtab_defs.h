@@ -611,6 +611,7 @@ public:
 						//  which disables tail call 
 						// optimization
 #define PU_IS_THUNK		0x0000000400000000LL // pu is a C++ thunk
+#define PU_DECL_VIEW		0x0000000800000000LL // pu is a multiply copy for declare "external" 
 
 enum PU_SRC_LANG_FLAGS
 {

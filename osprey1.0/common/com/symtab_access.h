@@ -649,6 +649,21 @@ inline void
 Clear_PU_no_side_effects (PU& pu)	{ pu.flags &= ~PU_NO_SIDE_EFFECTS; }
 
 inline BOOL
+PU_decl_view (const PU& pu)       { return pu.flags & PU_DECL_VIEW; }
+inline void
+Set_PU_decl_view (PU& pu)         { pu.flags |= PU_DECL_VIEW; }
+inline void
+Clear_PU_decl_view (PU& pu)       { pu.flags &= ~PU_DECL_VIEW; }
+
+inline BOOL
+PU_decl_view (const PU_IDX pui)       { return PU_decl_view(Pu_Table[pui]); }
+inline void
+Set_PU_decl_view (PU_IDX  pui)         { Set_PU_decl_view(Pu_Table[pui]); }
+inline void
+Clear_PU_decl_view (PU_IDX pui)       { Clear_PU_decl_view(Pu_Table[pui]); }
+
+
+inline BOOL
 PU_is_inline_function (const PU& pu)	{ return pu.flags & PU_IS_INLINE_FUNCTION; }
 inline void
 Set_PU_is_inline_function (PU& pu)	{ pu.flags |= PU_IS_INLINE_FUNCTION; }
