@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:30 $
+ * $Revision: 1.2 $
+ * $Date: 2003-11-04 16:07:52 $
  *
  * Revision history:
  *  11-Nov-94 - Original Version
@@ -2088,14 +2088,17 @@ INT64 Finalize_Stack_Frame (void)
   if (Current_PU_Stack_Model == SMODEL_LARGE && Frame_Size < Max_Small_Frame_Offset)
 	if (Trace_Frame) fprintf(TFile, "<lay> stack-model underflowed\n");
 
-  {	/* check that stacksize does not exceed system max */
-#if defined(linux)
-        struct rlimit rlp;
-        getrlimit(RLIMIT_STACK, &rlp);
-#else
+  {	
+        /* check that stacksize does not exceed system max */
+#if (defined(__sgi) || defined(__sun) \
+     || (defined(__linux__) && defined(__ia64__)))
 	struct rlimit64 rlp;
 	getrlimit64 (RLIMIT_STACK, &rlp);
+#else
+        struct rlimit rlp;
+        getrlimit(RLIMIT_STACK, &rlp);
 #endif
+	
 	if (Frame_Size > rlp.rlim_cur)
 		ErrMsg (EC_LAY_stack_limit, Frame_Size, (INT64) rlp.rlim_cur);
   }
