@@ -179,7 +179,7 @@ class WN_TREE_ITER_base
 public:
 
   typedef WN_TREE_ITER_base<WHIRL>  self;
-  typedef typename std::forward_iterator_tag iterator_category;
+  typedef std::forward_iterator_tag iterator_category;
   typedef WHIRL                     value_type;
   typedef ptrdiff_t                 difference_type;
   typedef value_type*               pointer;
@@ -270,14 +270,15 @@ public:
   WN_TREE_ITER_base (WHIRL wn2) : _wn(wn2) {}
 
   // operators to fulfill forward Iterator requirements
-
-#ifndef __GNUC__
-  friend bool operator==(const self &x, const self & y); // defined below
-#else
-  friend bool operator==<>(const self &x, const self & y); // defined below
-#endif
   reference   operator*()     { return *_wn; }
-
+  
+  // eraxxon 2004.11.30: GCC 3.4.3 is complaining that it cannot find
+  // the corresonding declaration... am I missing something? However,
+  // this doesn't need to be a friend anyway.
+#if 0  
+  friend bool operator==<WHIRL>(const self &x, const self & y); // def'd below
+#endif
+  
   // replace the current node by another
   void Replace (WHIRL new_wn) {
     WHIRL parent = Get_parent_wn ();
@@ -321,14 +322,14 @@ public:
 // equality is only defined on two tree-iterators which have SAME TRAV ORDER
 // equality satisfies (it1 == it2) <==> (&*it1 == &*it2)
 template <class WHIRL>
-inline bool operator==(const WN_TREE_ITER_base<WHIRL> &x,
-                       const WN_TREE_ITER_base<WHIRL> &y) {
+bool operator==(const WN_TREE_ITER_base<WHIRL> &x,
+		const WN_TREE_ITER_base<WHIRL> &y) {
   return (x.Wn() == y.Wn());
 }
 
 template <class WHIRL>
-inline bool operator!=(const WN_TREE_ITER_base<WHIRL> &x,
-                       const WN_TREE_ITER_base<WHIRL> &y) {
+bool operator!=(const WN_TREE_ITER_base<WHIRL> &x,
+		const WN_TREE_ITER_base<WHIRL> &y) {
   return (x.Wn() != y.Wn());
 }
 
@@ -375,8 +376,8 @@ public:
   // i.e., when depth == 1, skip to the next sibling of the parent
   // when depth == 2, skip to the next sibling of the grandparent, etc.
   void Skip (UINT depth = 0) {
-    while (depth > 0 && !_parent.empty ()) {
-      Pop ();
+    while (depth > 0 && !this->_parent.empty ()) {
+      this->Pop ();
       --depth;
     }
     WN_TREE_next_skip ();
@@ -384,19 +385,19 @@ public:
 
   // delete the current node
   void Delete () {
-    WHIRL parent = Get_parent_wn ();
+    WHIRL parent = this->Get_parent_wn ();
     Is_True (parent, ("cannot delete nodes without a parent"));
     Is_True (WN_operator (parent) == OPR_BLOCK,
 	     ("can only delete nodes under a OPR_BLOCK"));
-    WHIRL _next = WN_next (_wn);
-    WHIRL _prev = WN_prev (_wn);
-    if (WN_first (parent) == _wn) {
+    WHIRL _next = WN_next (this->_wn);
+    WHIRL _prev = WN_prev (this->_wn);
+    if (WN_first (parent) == this->_wn) {
       WN_first (parent) = _next;
       if (_next == NULL)
 	WN_last (parent) = NULL;
       else
 	WN_prev (_next) = _prev;
-    } else if (WN_last (parent) == _wn) {
+    } else if (WN_last (parent) == this->_wn) {
       WN_last (parent) = _prev;
       if (_prev == NULL)
 	WN_first (parent) = NULL;
@@ -406,9 +407,9 @@ public:
       WN_prev (_next) = _prev;
       WN_next (_prev) = _next;
     }
-    _wn = _next;
-    if (_wn == NULL) {
-      Pop ();
+    this->_wn = _next;
+    if (this->_wn == NULL) {
+      this->Pop ();
       Skip (0);
     }
   }
@@ -416,19 +417,19 @@ public:
   // Insert a node before the current node, after insertion, current node
   // points to the new node
   void Insert (WHIRL node) {
-    WHIRL parent = Get_parent_wn ();
+    WHIRL parent = this->Get_parent_wn ();
     Is_True (parent, ("cannot insert to nodes without a parent"));
     Is_True (WN_operator (parent) == OPR_BLOCK,
 	     ("can only insert before nodes under a OPR_BLOCK"));
-    WHIRL _prev = WN_prev (_wn);
+    WHIRL _prev = WN_prev (this->_wn);
     WN_prev (node) = _prev;
     if (_prev == NULL)
       WN_first (parent) = node;
     else
       WN_next (_prev) = node;
-    WN_next (node) = _wn;
-    WN_prev (_wn) = node;
-    _wn = node;
+    WN_next (node) = this->_wn;
+    WN_prev (this->_wn) = node;
+    this->_wn = node;
   }
 
   // tree related "iterators"
@@ -457,13 +458,13 @@ WN_TREE_ITER<PRE_ORDER, WHIRL>::Unwind() {
   // unwind "unwinds the stack"
   BOOL done = FALSE;
   while (!done) {
-    WHIRL wn = Wn();
+    WHIRL wn = this->Wn();
     Is_True(wn != 0,("Bad tree node"));
 
-    WHIRL parent_wn = Get_parent_wn();
+    WHIRL parent_wn = this->Get_parent_wn();
     if (parent_wn == NULL) {
       // reached end of unwind
-      Set_wn(NULL);
+      this->Set_wn(NULL);
       return;
     }
     
@@ -473,7 +474,7 @@ WN_TREE_ITER<PRE_ORDER, WHIRL>::Unwind() {
         done = TRUE;
       }
       else // all stmts in a block processed ==> go back up
-        Pop(); // Pop(parent_wn) + MORE WORK NEEDED
+        this->Pop(); // Pop(parent_wn) + MORE WORK NEEDED
     } 
     else { // parent is NON_BLOCK ie increment kid_count to get next sibling
       // eraxxon, 2004.07.12: In special circumstances, some nodes may
@@ -481,19 +482,19 @@ WN_TREE_ITER<PRE_ORDER, WHIRL>::Unwind() {
       // optional Fortran parameters is currently represented as a
       // CALL node with NULL PARM nodes.
       BOOL usedNextChild = FALSE;
-      INT indx = Get_kid_index();
+      INT indx = this->Get_kid_index();
       while ((0 <= indx) && (indx < WN_kid_count(parent_wn) - 1)) {
-	indx = Inc_kid_index();
+	indx = this->Inc_kid_index();
 	WN* kid = WN_kid(parent_wn, indx);
 	if (kid) {
-	  Set_wn(kid);
+	  this->Set_wn(kid);
 	  usedNextChild = TRUE;
 	  done = TRUE;
 	  break;
 	}
       }
       if (!usedNextChild) {
-        Pop(); // Pop(parent_wn) + MORE WORK NEEDED
+        this->Pop(); // Pop(parent_wn) + MORE WORK NEEDED
       }
     } // else parent is NON_BLOCK
   } // while (!done)
@@ -507,16 +508,16 @@ void
 WN_TREE_ITER<PRE_ORDER, WHIRL>::WN_TREE_next ()
 {
   Is_True(_wn != 0, ("Bad tree node"));
-  if (WN_operator(_wn) == OPR_BLOCK) {
-    if (WN_first(_wn)) // go down
-      Push();  
+  if (WN_operator(this->_wn) == OPR_BLOCK) {
+    if (WN_first(this->_wn)) // go down
+      this->Push();  
     else              // go back up
       Unwind(); // Pop(parent_wn) + MORE WORK NEEDED
 
   } // if (OPCODE_OPERATOR(WN_opcode(wn)) == OPR_BLOCK)
   else { // not a block ==> look at kid_count to determine where to go
-    if ((WN_kid_count(_wn) != 0) && (WN_kid0(_wn)))
-      Push(); // go down
+    if ((WN_kid_count(this->_wn) != 0) && (WN_kid0(this->_wn)))
+      this->Push(); // go down
     else  // go sideways (if parent is BLOCK) or UP otherwise
       Unwind(); // Pop(parent_wn) + MORE WORK NEEDED
   }
@@ -579,17 +580,17 @@ WN_TREE_ITER<POST_ORDER, WHIRL>::Wind ()
   BOOL done = FALSE;
   while (!done) {
 
-    if (WN_operator(_wn) == OPR_BLOCK) {
-      if (WN_first(_wn)) 
-	Push();
+    if (WN_operator(this->_wn) == OPR_BLOCK) {
+      if (WN_first(this->_wn)) 
+	this->Push();
       else // leaf block 
 	done = TRUE;
     } else { // parent is NON_BLOCK ie increment kid_count to get next sibling
-      if ((WN_kid_count(_wn) == 0) || (!WN_kid0(_wn)))
+      if ((WN_kid_count(this->_wn) == 0) || (!WN_kid0(this->_wn)))
 	// leaf node
 	done = TRUE;
       else 
-	Push();
+	this->Push();
     }
   } // while (!done)
 } // Wind
@@ -604,20 +605,20 @@ WN_TREE_ITER<POST_ORDER, WHIRL>::WN_TREE_next ()
 {
   Is_True(_wn != 0, ("Bad tree node"));
   
-  WHIRL parent_wn = Get_parent_wn();
+  WHIRL parent_wn = this->Get_parent_wn();
   if (parent_wn == NULL) {
     // reached end of recursion
-    Set_wn(NULL);
+    this->Set_wn(NULL);
     return;
   }
     
   if (WN_operator(parent_wn) == OPR_BLOCK) {
-    if (WN_next(_wn)) { // go sideways
-      Set_wn(WN_next(_wn));
+    if (WN_next(this->_wn)) { // go sideways
+      Set_wn(WN_next(this->_wn));
       Wind();
     }
     else              // go back up
-      Pop(); // Pop(parent_wn) 
+      this->Pop(); // Pop(parent_wn) 
   } // if (OPCODE_OPERATOR(WN_opcode(wn)) == OPR_BLOCK)
   else { // not a block ==> look at kid_count to determine where to go
     // eraxxon, 2004.07.12: In special circumstances, some nodes may
@@ -625,19 +626,19 @@ WN_TREE_ITER<POST_ORDER, WHIRL>::WN_TREE_next ()
     // optional Fortran parameters is currently represented as a
     // CALL node with NULL PARM nodes.
     BOOL usedNextChild = FALSE;
-    INT indx = Get_kid_index();
+    INT indx = this->Get_kid_index();
     while ((0 <= indx) && (indx < WN_kid_count(parent_wn) - 1)) {
-      indx = Inc_kid_index();
+      indx = this->Inc_kid_index();
       WN* kid = WN_kid(parent_wn, indx);
       if (kid) {
-	Set_wn(kid);
+	this->Set_wn(kid);
 	Wind();
 	usedNextChild = TRUE;
 	break;
       }
     }
     if (!usedNextChild) {
-      Pop(); // Pop(parent_wn) 
+      this->Pop(); // Pop(parent_wn) 
     }
   } // else 
 }
@@ -761,7 +762,7 @@ operator== (const WN_TREE_CONTAINER<trav_order> &x,
 
 
 template <class OPERATION, class WHIRL, TRAV_ORDER trav_order>
-inline OPERATION&
+OPERATION&
 WN_TREE_walk (WHIRL wn, OPERATION& op,
 	      const WN_TREE_ITER<trav_order, WHIRL>& last_iter)
 {
