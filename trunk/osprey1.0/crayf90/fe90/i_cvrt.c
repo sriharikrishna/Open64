@@ -1300,7 +1300,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
    		int			last_task_idx		= NULL_IDX;
 		int			line;
    		int			list_array[OPEN_MP_LIST_CNT];
-   		int			list_cnt;
+   		int			list_cnt		= 0;
    		int			list_idx1;
    		int			list_idx2;
    		int			list_idx3;
