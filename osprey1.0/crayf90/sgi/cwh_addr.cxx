@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:07 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:28 $
+ * $Author: open64 $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -1697,7 +1697,12 @@ cwh_addr_istore(WN * lhs, OFFSET_64 off, TY_IDX ty, WN * rhs)
      lhs = cwh_expr_bincalc(OPR_ADD,lhs,WN_Intconst(Pointer_Mtype,off));
      off = 0;
   }
-  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
+/* July  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
+ * for SOURCE_TO_SOURCE level WHIRL we can keep
+ * the different types in an expression without
+ *explictly add OPR_CVT 
+ *---fzhao
+ */
   op  = Store_Opcode [TY_mtype(ty)];
   wn  = WN_CreateIstore(op,off,tp,rhs,lhs);
 

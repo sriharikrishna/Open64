@@ -286,7 +286,10 @@ boolean create_constructor_constant(opnd_type	   *top_opnd,
             IR_OPR(ir_idx) = Array_Construct_Opr;
             exp_desc->constructor_size_level = Simple_Expr_Size;
 
-            ok = create_runtime_array_constructor(top_opnd, exp_desc);
+/*            ok = create_runtime_array_constructor(top_opnd, exp_desc);*/
+/* keep source level array constructor----fzhao*/
+
+           ok =TRUE; 
 
             goto EXIT;
          }
@@ -1664,7 +1667,7 @@ static boolean interpret_constructor(opnd_type		*top_opnd,
                }
 # endif
 
-# if 0 /* March */
+# if 0  
                switch (ATP_INTRIN_ENUM(IR_IDX_L(ir_idx))) {
                case Trim_Intrinsic:
 
@@ -1747,7 +1750,7 @@ static boolean interpret_constructor(opnd_type		*top_opnd,
                   break;
 
                }
-# endif /* March */
+# endif 
                break;
 
             /*************************\

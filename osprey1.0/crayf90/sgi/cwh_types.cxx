@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:10 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:28 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -1143,13 +1143,16 @@ cwh_types_mk_procedure_TY (TY_IDX ret_typ_idx, INT32 nparms, BOOL global, BOOL h
    * TYs yet. (special case is void types, changed to structs).
    */
 
-  if (nparms == 0) {
+/*  if (nparms == 0) {
+ * When nparms>0 we have to set ret_typ_idx too,since this maybe happend 
+ * When the PU is appear in interface blk 
+ */
     (void) New_TYLIST (tylist_idx);
     Set_TY_tylist(ty, tylist_idx);
     Tylist_Table [tylist_idx] = ret_typ_idx;
     (void) New_TYLIST (tylist_idx);
     Tylist_Table [tylist_idx] = 0;
-  }
+/*  } */
 
   if (nparms == 0)
     if (MTYPE_is_void(TY_mtype(ret_typ)))

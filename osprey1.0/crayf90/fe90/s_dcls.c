@@ -6356,8 +6356,7 @@ static	void	attr_semantics(int	attr_idx,
          /* alternate entries are stored in the equivalence block.     */
 
         
-         if (FUNCTION_MUST_BE_SUBROUTINE(rslt_idx) && FALSE) {
-/* cannot keep this because no temp variables for return values */ 
+         if (FUNCTION_MUST_BE_SUBROUTINE(rslt_idx)) {
 
          ATP_EXTRA_DARG(attr_idx)      = TRUE;
 

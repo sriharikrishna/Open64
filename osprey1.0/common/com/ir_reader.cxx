@@ -878,7 +878,8 @@ static void ir_put_wn(WN * wn, INT indent)
 
     if (wn == NULL) {
     	/* null statement */
-    	fprintf(ir_ofile, "### error: null WN pointer\n");
+//    	fprintf(ir_ofile, "### error: null WN pointer\n");
+    	fprintf(ir_ofile, "### attention: null WN pointer\n");
    	return;
     } else {
 	if (IR_dump_wn_addr) {

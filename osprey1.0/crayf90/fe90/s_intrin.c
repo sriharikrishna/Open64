@@ -5149,7 +5149,7 @@ void    ichar_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-#if 0
+# if 0
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
 # endif
@@ -5160,7 +5160,7 @@ void    ichar_intrinsic(opnd_type     *result_opnd,
                IR_COL_NUM(ir_idx));
    }
 
-#if 0
+# if 0
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx && 
        folder_driver((char *)&CN_CONST(IL_IDX(list_idx1)),
@@ -6987,13 +6987,12 @@ void    adjustl_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
-# if 0 
 
    COPY_OPND(res_exp_desc->char_len, arg_info_list[info_idx1].ed.char_len);
    res_exp_desc->type_idx = type_idx;
+# if 0
    res_exp_desc->linear_type = TYP_LINEAR(res_exp_desc->type_idx);
    res_exp_desc->type = TYP_TYPE(res_exp_desc->type_idx);
-
    if (ATP_INTRIN_ENUM(*spec_idx) == Adjustl_Intrinsic) {
       opr = Adjustl_Opr;
    }
@@ -17141,9 +17140,14 @@ void    selected_real_kind_intrinsic(opnd_type     *result_opnd,
    int            list_idx2;
    long_type      folded_const[MAX_WORDS_FOR_NUMERIC];
    opnd_type	  opnd;
+   int i;
 
 
    TRACE (Func_Entry, "selected_real_kind_intrinsic", NULL);
+# if 0
+  for (i=0; i<=MAX_WORDS_FOR_NUMERIC-1;i++)
+      folded_const[i]=0;
+# endif
 
    ATP_EXTERNAL_INTRIN(*spec_idx) = TRUE;
    ir_idx = OPND_IDX((*result_opnd));

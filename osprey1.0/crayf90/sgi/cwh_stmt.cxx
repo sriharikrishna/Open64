@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.4 $
- * $Date: 2002-07-18 16:02:19 $
- * $Author: fzhao $
+ * $Revision: 1.5 $
+ * $Date: 2002-08-16 19:30:28 $
+ * $Author: open64 $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -556,7 +556,8 @@ fei_store ( TYPE result_type )
   WN * wd;
   TY_IDX ts1;
   TY_IDX ts2;
-  
+ enum item_class fm;
+ 
   FLD_det det ;
 
   if (cwh_stk_get_class() == STR_item) {
@@ -581,6 +582,8 @@ fei_store ( TYPE result_type )
       cwh_stk_pop_whatever() ;
       return ;
     }
+
+ fm = cwh_stk_get_class();
 
     switch(cwh_stk_get_class()) {
     case WN_item:
@@ -854,6 +857,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   TY_IDX  ta  ;
   TY_IDX  ts  ;
   TY_IDX  tr  ;
+  TY_IDX  keepty;
   INT32    nargs;  
   INT32    clen ;  
 
@@ -892,15 +896,22 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
 
     case ADDR_item:
       ta = cwh_stk_get_TY();
+      keepty = ta;
       wa = cwh_stk_pop_ADDR();
       args[k] = cwh_intrin_wrap_ref_parm(wa,ta);
+      if (keepty !=NULL ) {
+         WN_set_ty(args[k],keepty); //July
+      }
       break;
 
     case WN_item:
     case WN_item_whole_array:
+
+      keepty = cwh_stk_get_TY(); //July
       wa = cwh_stk_pop_WN();
       wa = cwh_intrin_wrap_value_parm(wa);
-
+      if (keepty !=NULL)
+         WN_set_ty(wa,keepty); //July
       args[k] = wa;
       break ;
 
@@ -1068,12 +1079,24 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   /* call is no good, because the f90 lowerer wants to see a store   */
   /* into an array-valued temp. So a COMMA node holds the pregs of   */
   /* the return and the call block                                   */
-  
+ 
+# if 0
+ 
   if ((ST_auxst_is_elemental(st)) && (TY_mtype(ts) != MTYPE_V)) {
 
      /* ELEMENTAL functions. Build a COMMA node */
 
+     block = cwh_block_new_and_current();
+     cwh_block_append(wn);
+     block = cwh_block_exchange_current(block);
+
+     wn  = cwh_stmt_return_scalar(rt,NULL,ts,FALSE);
+     opc = cwh_make_typed_opcode(OPR_COMMA,rbtype1,MTYPE_V);
+     wn  = WN_CreateComma(opc,block,wn);
+     cwh_stk_push_typed(wn,WN_item,ty);
+
   } else {
+# endif
     
     /* put ARRAYEXPs underneath the parm nodes of elementals */
     
@@ -1100,7 +1123,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
            cwh_stk_push_STR(len,wn,ts,WN_item);
        }
     }
-  }
+//   }
   
   if (backward_barrier) {
     barrier_wn=WN_CreateBarrier ( FALSE, 0 );
@@ -1298,9 +1321,13 @@ fei_addr_con(TYPE type)
 
     } else 
       st = WN_st(wn);
-    
+
     wt = cwh_addr_address_ST(st,0);
+
+  if (ty ==0)
     cwh_stk_push(wt,ADDR_item);
+  else
+    cwh_stk_push_typed(wt,ADDR_item,ty);
   }
 }
 
@@ -4609,3 +4636,177 @@ fei_use(INT32 rename_only_num,INT32 bonly)
    cwh_block_append(wn);
    return;
   }
+//***********************************************************//
+
+extern void
+fei_nullify(INT32 listnum)
+ {
+   OPCODE    opc;
+   ST     * st  ;
+   WN     * wn  ;
+   int    i ;
+
+
+   opc = OPCODE_make_op(OPR_NULLIFY,MTYPE_V,MTYPE_V);
+
+   wn  =  WN_Create(opc,listnum);
+
+   for (i=listnum-1; i>=0; i--)
+    {
+     st = cwh_stk_pop_ST();
+     WN_kid(wn,i) = WN_CreateIdname ( 0, st);
+    }
+   cwh_block_append(wn);
+   return;
+  }
+
+//****************************************************************//
+extern void
+fei_gen_func_entry(INTPTR sym_idx)
+{
+  INT16 nkids,i ;
+  ST   **ap     ;
+  WN *wn;
+
+ STB_pkt *p ;
+
+ if(sym_idx != NULL) {
+
+  p = cast_to_STB(sym_idx);
+  DevAssert((p->form == is_ST),("Odd object ref"));
+
+  ST * st = cast_to_ST(p->item);
+  DevAssert((st),("null st"));
+
+
+  (void) cwh_block_toggle_debug(FALSE);
+
+  nkids = cwh_auxst_num_dummies(st);
+   ap    = cwh_auxst_arglist(st);
+
+//     nkids = 0;
+
+   wn = WN_Create (OPC_FUNC_ENTRY, nkids);
+   WN_entry_name(wn) = ST_st_idx (st);
+
+  for (i = 0 ; i < nkids ; i ++)
+    WN_kid(wn,i) = WN_CreateIdname ( 0, *ap++);
+
+  cwh_stk_push(wn,WN_item);
+
+   }
+}
+
+
+extern void
+fei_array_construct(INT32 nlist,TYPE ty)
+{
+   OPCODE opc;
+   WN *wn;
+   WN *par;
+   WN ** lists;
+   TY_IDX ty_idx;
+   enum item_class fm;
+   int i;
+
+   lists = (WN **) malloc(nlist*sizeof(WN *));
+   ty_idx = cast_to_TY(t_TY(ty));
+
+  for (i=nlist-1;i>=0;i--) {
+    switch(cwh_stk_get_class()) {
+    case STR_item:
+      cwh_stk_pop_STR();
+      lists[i] =cwh_stk_pop_WN(); 
+      break ;
+
+    case ADDR_item:
+      lists[i] = cwh_stk_pop_ADDR();
+      break;
+
+    case WN_item:
+    case WN_item_whole_array:
+
+      lists[i]= cwh_stk_pop_WN();
+      break ;
+    default:
+      DevAssert((0),("Odd call actual")) ;
+    }
+  }
+
+   fm = cwh_stk_get_class();
+
+   opc = OPCODE_make_op(OPR_ARRAY_CONSTRUCT,TY_mtype(ty_idx),MTYPE_V);
+   par  =  WN_Create(opc,nlist); 
+   for (i=0;  i < nlist; i++) 
+      WN_kid(par,i) = lists[i];
+
+   cwh_stk_push(par,WN_item) ;
+
+   fm = cwh_stk_get_class();
+
+}
+
+extern void
+fei_noio_implied_do()
+{
+    OPCODE opc;
+    WN *wn;
+    WN *wa;
+    WN ** kids;
+    INT32 numkids = 5;
+    INT32 i;
+    enum item_class fm;
+
+    kids = (WN **)malloc(numkids*sizeof(WN *));
+
+    for (i=numkids-1;i>=0;i--) {
+    switch(cwh_stk_get_class()) {
+    case STR_item:
+      cwh_stk_pop_STR();
+      fm = cwh_stk_get_class();
+
+      wa =cwh_stk_pop_WN();
+
+      fm = cwh_stk_get_class();
+     if (cwh_stk_get_class()==ST_item) {
+        wa = cwh_expr_operand(NULL);
+        kids[i] = wa;
+      }else 
+       if (cwh_stk_get_class()==WN_item)
+            kids[i] =cwh_stk_pop_WN();
+      
+      break ;
+
+    case ADDR_item:
+      kids[i] = cwh_stk_pop_ADDR();
+      break;
+
+    case FLD_item:
+    case ST_item:
+    case ST_item_whole_array:
+      wa = cwh_expr_operand(NULL);
+      kids[i] = wa;
+      break ;
+
+    case WN_item:
+    case WN_item_whole_array:
+
+      kids[i]= cwh_stk_pop_WN();
+      break ;
+    default:
+      DevAssert((0),("Odd call actual")) ;
+    }
+  }
+
+
+  opc = OPCODE_make_op(OPR_IMPLIED_DO,MTYPE_V,MTYPE_V);
+
+  wn = WN_Create(opc,5);
+
+  for (i=0; i<=numkids-1; i++)
+      WN_kid(wn,i) = kids[i];
+
+
+  cwh_stk_push(wn,WN_item) ;
+
+}

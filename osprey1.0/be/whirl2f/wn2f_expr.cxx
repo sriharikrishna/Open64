@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:34 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:46 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.3 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -621,14 +621,20 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
    /* First operand */
    if (binary_op)
+     {
+      set_WN2F_CONTEXT_no_parenthesis(context);
       WN2F_Translate_Arithmetic_Operand(tokens, wn0, wn0_ty, 
 					TRUE/*call-by-value*/,
 					context);
-   
+      reset_WN2F_CONTEXT_no_parenthesis(context);
+      } 
+
    /* Operation */
    Append_Token_String(tokens, Opc_Fname[opcode]);
 
    /* Second operand, or only operand for unary operation */
+
+   reset_WN2F_CONTEXT_no_parenthesis(context);
    WN2F_Translate_Arithmetic_Operand(tokens, wn1, wn1_ty, 
 				     TRUE/*call-by-value*/,
 				     context);
@@ -896,6 +902,8 @@ void WN2F_Expr_finalize(void)
 WN2F_STATUS
 WN2F_binaryop(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
+   const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+
    ASSERT_DBG_FATAL(WN_kid_count(wn) == 2, 
 		    (DIAG_W2F_UNEXPECTED_NUM_KIDS, 
 		     WN_kid_count(wn), 2, WN_opc_name(wn)));
@@ -1615,13 +1623,51 @@ WN2F_nmsub(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 WN2F_STATUS 
 WN2F_const(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
+  const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_CONST, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_const"));
 
-   TCON2F_translate(tokens,
-		    STC_val(WN_st(wn)),
-		    (TY_is_logical(ST_type(WN_st(wn))) ||
-		     WN2F_CONTEXT_is_logical_arg(context)));
+
+   if (parenthesize && !WN2F_CONTEXT_is_logical_arg(context))
+      {
+        switch (TCON_ty(STC_val(WN_st(wn))))
+          {
+            case MTYPE_F4:
+            case MTYPE_F8:
+            case MTYPE_FQ:
+              if (TCON_ival(STC_val(WN_st(wn)))<0)  {
+                  Append_Token_Special(tokens, '(');
+                  TCON2F_translate(tokens,
+		                   STC_val(WN_st(wn)),
+		                   (TY_is_logical(ST_type(WN_st(wn))) ||
+		                     WN2F_CONTEXT_is_logical_arg(context)));
+                   Append_Token_Special(tokens, ')');
+                 }
+               else 
+                   TCON2F_translate(tokens,
+                                   STC_val(WN_st(wn)),
+                                   (TY_is_logical(ST_type(WN_st(wn))) ||
+                                     WN2F_CONTEXT_is_logical_arg(context)));
+
+               break;
+             default:
+                  TCON2F_translate(tokens,
+                                   STC_val(WN_st(wn)),
+                                   (TY_is_logical(ST_type(WN_st(wn))) ||
+                                     WN2F_CONTEXT_is_logical_arg(context)));
+                   break;
+             } /*switch*/
+        } 
+      else
+        TCON2F_translate(tokens,
+                          STC_val(WN_st(wn)),
+                          (TY_is_logical(ST_type(WN_st(wn))) ||
+                           WN2F_CONTEXT_is_logical_arg(context)));
+
+
+   if (parenthesize)
+       reset_WN2F_CONTEXT_no_parenthesis(context);
 
    return EMPTY_WN2F_STATUS;
 } /* WN2F_const */
@@ -1630,12 +1676,48 @@ WN2F_const(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 WN2F_STATUS 
 WN2F_intconst(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
+  const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_INTCONST, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_intconst"));
 
-   TCON2F_translate(tokens,
-		    Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn)),
-		    WN2F_CONTEXT_is_logical_arg(context));
+   if (parenthesize && !WN2F_CONTEXT_is_logical_arg(context))
+      {
+        switch (TCON_ty(Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn))))
+          {
+            case MTYPE_I1:
+            case MTYPE_I2:
+            case MTYPE_I4:
+            case MTYPE_I8:
+              if (TCON_ival(Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn)))<0)  {
+                  Append_Token_Special(tokens, '(');
+                  TCON2F_translate(tokens,
+                                   Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn)),
+                                   WN2F_CONTEXT_is_logical_arg(context));
+
+                   Append_Token_Special(tokens, ')');
+                 }
+               else
+                  TCON2F_translate(tokens,
+                                   Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn)),
+                                   WN2F_CONTEXT_is_logical_arg(context));
+
+               break;
+             default:
+                  TCON2F_translate(tokens,
+                                   STC_val(WN_st(wn)),
+                                   (TY_is_logical(ST_type(WN_st(wn))) ||
+                                     WN2F_CONTEXT_is_logical_arg(context)));
+                   break;
+             } /*switch*/
+        }
+      else
+
+           TCON2F_translate(tokens,
+		            Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn)),
+		            WN2F_CONTEXT_is_logical_arg(context));
+   if (parenthesize)
+       reset_WN2F_CONTEXT_no_parenthesis(context);
 
    return EMPTY_WN2F_STATUS;
 } /* WN2F_intconst */
@@ -1723,8 +1805,16 @@ WN2F_parm(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     */
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_PARM, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_parm"));
+   if ( TY_is_logical(Ty_Table[WN_ty(wn)]))
+      {
+        set_WN2F_CONTEXT_has_logical_arg(context);
+        WN2F_translate(tokens, WN_kid0(wn), context);
+         reset_WN2F_CONTEXT_has_logical_arg(context);
+       }
+    else
+         WN2F_translate(tokens, WN_kid0(wn), context);
+   return EMPTY_WN2F_STATUS;
 
-   return WN2F_translate(tokens, WN_kid0(wn), context);
 } /* WN2F_parm */
 
 

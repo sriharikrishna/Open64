@@ -1418,7 +1418,7 @@ HERE:
                   }
                }
 
-/*                 flatten_function_call(result_opnd); */
+                flatten_function_call(result_opnd);
 
                if (ATP_ELEMENTAL(spec_idx) &&
                    ATP_PROC(spec_idx) != Intrin_Proc) {
@@ -1551,8 +1551,7 @@ HERE:
             if (! is_function) {
                /* this was done for functions under flatten_func_call */
                COPY_OPND(opnd, IR_OPND_R(ir_idx));
-/*           ok = final_arg_work(&opnd, spec_idx, num_args, NULL) && ok; */
-               ok = TRUE; 
+           ok = final_arg_work(&opnd, spec_idx, num_args, NULL) && ok; 
                COPY_OPND(IR_OPND_R(ir_idx), opnd);
             }
 
@@ -2297,7 +2296,11 @@ boolean final_arg_work(opnd_type	*list_opnd,
    }
 
 # ifdef _DEBUG
-   if (explicit) {
+   if (explicit && FALSE) { /*need change here
+                    *since we put result in darg_list
+                    *will think about it later
+                    * fzhao July 
+                    */
       /* check that number of args matches number of dargs */
 
       debug_count = 0;
@@ -2381,6 +2384,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
       }
 
       if (IL_FLD(list_idx) == NO_Tbl_Idx) {
+# if 0 
 
          /* replace with zero */
        
@@ -2461,19 +2465,22 @@ boolean final_arg_work(opnd_type	*list_opnd,
 #endif
          }
 
+# endif 
          dummy_idx++;
          goto EXIT;
       }
 
-      info_idx = IL_ARG_DESC_IDX(list_idx);
-
+/*      info_idx = IL_ARG_DESC_IDX(list_idx); */
+      info_idx = ir_list_tbl[list_idx].il.link.prev_idx;
+                                                   
+#if 0
 # ifdef _DEBUG
       if (info_idx == NULL_IDX) {
          PRINTMSG(stmt_start_line, 626, Internal, stmt_start_col,
                   "valid info_idx", "final_arg_work");
       }
 # endif
-
+#endif
       COPY_OPND(opnd, IL_OPND(list_idx));
       check_for_constructors(&opnd, 
                   (info_idx != NULL_IDX ? &(arg_info_list[info_idx].ed):
@@ -3166,6 +3173,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
          case PASS_ADDRESS         :
 
+# if 0 
 # if defined(GENERATE_WHIRL)
             ATD_NOT_PT_UNIQUE_MEM(
                    (find_left_attr(&IL_OPND(list_idx)))) = TRUE;
@@ -3269,6 +3277,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
                }
 # endif
             }
+# endif
 
             break;
 
@@ -3369,7 +3378,8 @@ boolean final_arg_work(opnd_type	*list_opnd,
             break;
 
          case PASS_DV              :
-
+ 
+# if 0
 # if defined(GENERATE_WHIRL)
             ATD_NOT_PT_UNIQUE_MEM(
                    (find_left_attr(&IL_OPND(list_idx)))) = TRUE;
@@ -3405,6 +3415,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
             IL_FLD(list_idx) = IR_Tbl_Idx;
             IL_IDX(list_idx) = ir_idx;
+# endif
 
             break;
 
@@ -3536,11 +3547,19 @@ boolean final_arg_work(opnd_type	*list_opnd,
                 TYP_LINEAR(CN_TYPE_IDX(IL_IDX(list_idx))) != Complex_4 &&
                 
 # endif
-                (TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Integer ||
-                 TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Logical ||
-                 TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Real    ||
+/*I don't think we need Const_Tmp_Loc_Opr for Integer,Real and Logical
+ * type,and if use this operator,it's difficult to declare "LOGICAL" 
+ * arguments
+ * fzhao
+ * 
+ *              TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Integer ||
+ *                 TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Logical ||
+ *                TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Real    ||
+*/
+
 # if defined(GENERATE_WHIRL)
-                 (TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Character &&
+             
+                 ((TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Character &&
                   ! on_off_flags.pad_char_literals)                 ||
 # endif
                  TYP_TYPE(CN_TYPE_IDX(IL_IDX(list_idx))) == Complex)) {
@@ -3675,6 +3694,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
                IR_IDX_L(ir_idx) = unused1;
             }
             else {
+# if 0
 
                if (! io_call &&
                    arg_info_list[info_idx].ed.rank != 0) {
@@ -3767,6 +3787,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
                   }
 # endif
                }
+# endif
             }
             break;
 
@@ -3875,6 +3896,8 @@ boolean final_arg_work(opnd_type	*list_opnd,
             break;
 
          case MAKE_DV              :
+
+#if 0 
 
             if (AT_OPTIONAL(dummy) &&
                 arg_info_list[info_idx].ed.optional_darg) {
@@ -4029,6 +4052,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
             }
 
             arg_info_list[info_idx].ed.dope_vector = TRUE;
+# endif
 
             break;
 
@@ -6428,8 +6452,11 @@ void flatten_function_call(opnd_type     *result)
       orig_sh_idx = curr_stmt_sh_idx;
    }
 
+# if 0
+
    gen_sh(Before, Call_Stmt, stmt_start_line, stmt_start_col,
           FALSE, FALSE, TRUE);
+# endif
 
    curr_stmt_sh_idx = SH_PREV_IDX(curr_stmt_sh_idx);
    new_stmt_idx = curr_stmt_sh_idx;
@@ -6451,8 +6478,7 @@ void flatten_function_call(opnd_type     *result)
    elemental_exp_desc.linear_type = TYP_LINEAR(type_idx);
 
    COPY_OPND(opnd, IR_OPND_R(ir_idx));
-/*    ok = final_arg_work(&opnd, IR_IDX_L(ir_idx), num_args, &elemental_exp_desc); */
-    ok = TRUE;
+  ok = final_arg_work(&opnd, IR_IDX_L(ir_idx), num_args, &elemental_exp_desc); 
    COPY_OPND(IR_OPND_R(ir_idx), opnd);
 
    curr_stmt_sh_idx = new_stmt_idx;
@@ -6525,7 +6551,7 @@ void flatten_function_call(opnd_type     *result)
 
       /* need to make it a subroutine */
 
-# if 0 /* April */
+# if 0 /*August */
 
       tmp_idx = get_stmt_tmp(type_idx,
                              ATD_IM_A_DOPE(attr_idx),
@@ -6551,13 +6577,12 @@ void flatten_function_call(opnd_type     *result)
          ATD_POINTER(tmp_idx)      = FALSE;
          AT_SEMANTICS_DONE(tmp_idx)= TRUE;
       }
-# endif /* April */
 
 # if defined(GENERATE_WHIRL)
       ATD_NOT_PT_UNIQUE_MEM(tmp_idx) = TRUE;
 # endif
 
-      ATD_CHAR_LEN_IN_DV(tmp_idx) = ATD_CHAR_LEN_IN_DV(attr_idx);
+/*      ATD_CHAR_LEN_IN_DV(tmp_idx) = ATD_CHAR_LEN_IN_DV(attr_idx); */
 
       if (variable_size && FALSE) {  /* March */
 
@@ -6959,8 +6984,6 @@ void flatten_function_call(opnd_type     *result)
       }
       else {
 
-# if 0 /* March */
-
          /* this is for ELEMENTAL calls only */
          /* leave as temp = call             */
 
@@ -6997,11 +7020,9 @@ void flatten_function_call(opnd_type     *result)
          }
 
          COPY_OPND((*result), opnd);
-# endif
 
       }
 /*   } */
-# if 0 
    else {
       tmp_idx = get_stmt_tmp(ATD_TYPE_IDX(attr_idx),
                              FALSE,
@@ -7050,7 +7071,7 @@ void flatten_function_call(opnd_type     *result)
       /* no extra ir generation is needed.                     */
    }
 
-# endif
+# endif /*August*/
 
    orig_sh_idx = save_orig_sh_idx;
 
@@ -11685,14 +11706,14 @@ static void check_for_constructors(opnd_type		*top_opnd,
          break;
 
       case Array_Construct_Opr :
-
+# if 0 
          loc_exp_desc = arg_info_list[IR_IDX_L(ir_idx)].ed;
          create_runtime_array_constructor(top_opnd, &loc_exp_desc);
          if (exp_desc != NULL) {
             COPY_SHAPE((exp_desc->shape),
                        loc_exp_desc.shape, loc_exp_desc.rank);
          }
-
+# endif
          break;
 
       default:

@@ -8728,7 +8728,7 @@ static boolean struct_construct_opr_handler(opnd_type		*result_opnd,
          }
          else {
 
-            ok = create_runtime_struct_constructor(result_opnd);
+          ok = create_runtime_struct_constructor(result_opnd);
 
             exp_desc->tmp_reference = TRUE;
          }
@@ -8958,7 +8958,10 @@ static boolean array_construct_opr_handler(opnd_type		*result_opnd,
          }
       }
       else {
-         ok = create_runtime_array_constructor(result_opnd, exp_desc);
+/*         ok = create_runtime_array_constructor(result_opnd, exp_desc);*/
+/* keep source-level array constructor??fzhao                           */
+     ok =TRUE;
+
       }
    }
 

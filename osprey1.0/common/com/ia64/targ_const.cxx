@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: targ_const.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:03 $
+ * $Revision: 1.2 $
+ * $Date: 2002-08-16 19:31:08 $
  *
  * Revision history:
  *  12-Jun-91 - Original Version
@@ -3007,6 +3007,8 @@ Targ_Print ( char *fmt, TCON c )
       break;
 
     case MTYPE_F8:
+    case MTYPE_FQ:
+
       if (fmt == NULL) fmt = "%#21.16g";
         sprintf(r, fmt, TCON_R8(c));
 #if !(defined(FRONT_END_C) || defined(FRONT_END_CPLUSPLUS))
@@ -3015,6 +3017,7 @@ Targ_Print ( char *fmt, TCON c )
 #endif /* !(defined(FRONT_END_C) || defined(FRONT_END_CPLUSPLUS)) */
       break;
 
+# if 0 //August
 #ifdef TARG_NEEDS_QUAD_OPS
     case MTYPE_FQ:
       {
@@ -3035,6 +3038,8 @@ Targ_Print ( char *fmt, TCON c )
       }
       break;
 #endif
+# endif
+
 
     case MTYPE_C4:
       if (fmt == NULL) fmt = "%#12.7g, %#12.7g";

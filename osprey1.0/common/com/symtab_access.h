@@ -247,8 +247,10 @@ Clear_ST_is_weak_symbol (ST& s)		{ s.flags &= ~ST_IS_WEAK_SYMBOL; }
 
 inline BOOL
 ST_is_split_common (const ST& s)	{ return s.flags & ST_IS_SPLIT_COMMON;}
+
 inline void
 Set_ST_is_split_common (ST& s)		{ s.flags |= ST_IS_SPLIT_COMMON; }
+
 inline void
 Clear_ST_is_split_common (ST& s)	{ s.flags &= ~ST_IS_SPLIT_COMMON; }
 
@@ -468,6 +470,22 @@ inline void
 Set_ST_is_optional_argument (ST& s)	{ s.flags |= ST_IS_OPTIONAL_ARGUMENT; }
 inline void
 Clear_ST_is_optional_argument (ST& s)	{ s.flags &= ~ST_IS_OPTIONAL_ARGUMENT; }
+
+# if 0
+inline BOOL
+ST_is_intent_in_argument (const ST& s)   { return s.flags_ext & ST_IS_INTENT_IN_ARGUMENT;}
+inline void
+Set_ST_is_intent_in_argument (ST& s)     { s.flags_ext |= ST_IS_INTENT_IN_ARGUMENT; }
+inline void
+Clear_ST_is_intent_in_argument (ST& s)   { s.flags_ext &= ~ST_IS_INTENT_IN_ARGUMENT; }
+
+inline BOOL
+ST_is_intent_out_argument (const ST& s)   { return s.flags_ext & ST_IS_INTENT_OUT_ARGUMENT;}
+inline void
+Set_ST_is_intent_out_argument (ST& s)     { s.flags_ext |= ST_IS_INTENT_OUT_ARGUMENT; }
+inline void
+Clear_ST_is_intent_out_argument (ST& s)   { s.flags_ext &= ~ST_IS_INTENT_OUT_ARGUMENT; }
+# endif
 
 inline BOOL
 ST_is_temp_var (const ST& s)		{ return s.flags & ST_IS_TEMP_VAR;}

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: tcon2f.c
- * $Revision: 1.3 $
- * $Date: 2002-07-18 22:32:46 $
+ * $Revision: 1.4 $
+ * $Date: 2002-08-16 19:30:46 $
  *
  * Revision history:
  *  27-Apr-95 - Original Version
@@ -216,6 +216,7 @@ TCON2F_hollerith(TOKEN_BUFFER tokens, TCON tvalue)
 void 
 TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
 {
+
    /* Translates the given TCON to a Fortran representation.  Since
     * the tcon itself does not tell us, we must rely on the context
     * to inform us whether or not a integer constant is a logical
@@ -271,26 +272,11 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
       case MTYPE_I2:
       case MTYPE_I4:
 
-         if (TCON_ival(tvalue)<0) {
-          Append_Token_Special(tokens, '(');
-          
-
-         Append_Token_String(tokens, Targ_Print("%1d", tvalue));
-         Append_Token_Special(tokens, ')');
-         } else 
-
         Append_Token_String(tokens, Targ_Print("%1d", tvalue)) ;
          break;
 
 
       case MTYPE_I8:
-        
-        if (TCON_ival(tvalue)<0) {
-          Append_Token_Special(tokens, '(');
-
-	 Append_Token_String(tokens, Targ_Print("%1lld_8", tvalue));
-         Append_Token_Special(tokens, ')');
-         } else
          Append_Token_String(tokens, Targ_Print("%1lld_8", tvalue));
 	 break;
       
@@ -305,40 +291,14 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
 	 break;
 
       case MTYPE_F4:
-         if (TCON_ival(tvalue)<0) {
-           Append_Token_Special(tokens, '(');
-	   str = Targ_Print("%.10e", tvalue);
-	   strbase = Remove_Trailing_Zero_Fraction(str);
-	   if (str = (char *) strchr(strbase, 'd'))
-	      *str = 'E';
-	   Append_Token_String(tokens, strbase);
-           Append_Token_Special(tokens, ')');
-          }
-         else {
            str = Targ_Print("%.10e", tvalue);
            strbase = Remove_Trailing_Zero_Fraction(str);
            if (str = (char *) strchr(strbase, 'd'))
               *str = 'E';
            Append_Token_String(tokens, strbase);
-          }
-
 	 break;
 
       case MTYPE_F8:
-        if (TCON_ival(tvalue)<0) {
-            Append_Token_Special(tokens, '(');
-	    str = Targ_Print("%.20e", tvalue);
-	    strbase = Remove_Trailing_Zero_Fraction(str);
-	     if (str = (char *)strchr(strbase, 'E')) /* due to bug in targ_const.h */
-	          *str = 'D';
-	     else if (str = (char *)strchr(strbase, 'd'))
-	        *str = 'D';
-	      else
-	         strbase = Concat2_Strings(strbase, "D00");
-	     Append_Token_String(tokens, strbase);
-             Append_Token_Special(tokens, ')');
-          }
-         else {
             str = Targ_Print("%.20e", tvalue);
             strbase = Remove_Trailing_Zero_Fraction(str);
              if (str = (char *)strchr(strbase, 'E')) /* due to bug in targ_const.h */
@@ -348,25 +308,10 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
               else
                  strbase = Concat2_Strings(strbase, "D00");
              Append_Token_String(tokens, strbase);
-          }
 
 	 break;
 
       case MTYPE_FQ:
-        if (TCON_ival(tvalue)<0) {
-            Append_Token_Special(tokens, '(');
-	    str = Targ_Print(NULL, tvalue);
-	    strbase = Remove_Trailing_Zero_Fraction(str);
-	    if (str = (char *)strchr(strbase, 'E')) /* due to bug in targ_const.h */
-	       *str = 'Q';
-	    else if (str = (char *)strchr(strbase, 'd'))
-	       *str = 'Q';
-	    else
-	       strbase = Concat2_Strings(strbase, "Q00");
-   	    Append_Token_String(tokens, strbase);
-            Append_Token_Special(tokens, ')');
-           }
-        else {
             str = Targ_Print(NULL, tvalue);
             strbase = Remove_Trailing_Zero_Fraction(str);
             if (str = (char *)strchr(strbase, 'E')) /* due to bug in targ_const.h */
@@ -376,7 +321,6 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
             else
                strbase = Concat2_Strings(strbase, "Q00");
             Append_Token_String(tokens, strbase);
-           }          
 
 	 break;
 	 
@@ -399,4 +343,6 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
 	 break;
       } /* switch */
    } /* if */
+  
+
 } /* TCON2F_translate */

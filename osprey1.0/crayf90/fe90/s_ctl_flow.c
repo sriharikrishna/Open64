@@ -4637,7 +4637,7 @@ void nullify_stmt_semantics (void)
          COPY_OPND(opnd, IL_OPND(list_idx));
          xref_state = CIF_Symbol_Modification;
          semantically_correct = expr_semantics(&opnd, &exp_desc);
-         COPY_OPND(IL_OPND(list_idx), opnd);
+        COPY_OPND(IL_OPND(list_idx), opnd);
 
          if (!exp_desc.pointer) {
             find_opnd_line_and_column(&opnd, &line, &column);
@@ -4668,6 +4668,8 @@ void nullify_stmt_semantics (void)
 
             find_opnd_line_and_column(&opnd, &line, &column);
 
+# if 0 /* we don't have Dv_Deref_Opr in this version */
+
             if (OPND_FLD(opnd)         == IR_Tbl_Idx &&
                 IR_OPR(OPND_IDX(opnd)) == Dv_Deref_Opr) {
  
@@ -4694,6 +4696,9 @@ void nullify_stmt_semantics (void)
                PRINTMSG(line, 626, Internal, column,
                         "Dv_Deref_Opr", "nullify_stmt_semantics");
             }
+
+# endif
+
          }
       }
 
@@ -4702,8 +4707,11 @@ void nullify_stmt_semantics (void)
 
    if (semantically_correct) {
       /* remove nullify stmt */
+# if 0 /* in our version,don't remove nullify stmt-fzhao */
+
       remove_sh(curr_stmt_sh_idx);
       curr_stmt_sh_idx = SH_PREV_IDX(curr_stmt_sh_idx);
+# endif
    }
 
    TRACE (Func_Exit, "nullify_stmt_semantics", NULL);

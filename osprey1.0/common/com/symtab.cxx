@@ -1822,7 +1822,6 @@ void
 FLD::Print (FILE *f) const
 {
     fprintf (f, "\t%6lld  %-8s\t", ofst, &Str_Table[name_idx]);
-    fprintf (f,"I AM HERE \n"); //June
     Print_TY_IDX_verbose (f, type);
     fprintf (f, "\n\t\tfl:0x%04x", flags);
     if (flags) {

@@ -156,15 +156,27 @@ enum ST_FLAGS
     // new flags must go into flags_ext field.
 }; // ST_FLAGS
 
+# if 0
 enum ST_EXT_FLAGS
  {
-    ST_IS_POINTER       = 0x01,  
+    ST_IS_POINTER       = 0x00000001,  
+    ST_IS_ALLOCATABLE   = 0x00000002,
+    ST_IS_IN_MODULE     = 0x00000004,
+    ST_IS_EXTERNAL      = 0x00000008,
+    ST_IS_BLOCK_DATA    = 0x00000010, 
+    ST_IS_INTENT_IN_ARGUMENT = 0x00000020,
+    ST_IS_INTENT_OUT_ARGUMENT = 0x00000040 
+ }; // ST_EXT_FLAGS
+# endif
+
+enum ST_EXT_FLAGS
+ {
+    ST_IS_POINTER       = 0x01,
     ST_IS_ALLOCATABLE   = 0x02,
     ST_IS_IN_MODULE     = 0x04,
     ST_IS_EXTERNAL      = 0x08,
-    ST_IS_BLOCK_DATA    = 0x10 
+    ST_IS_BLOCK_DATA    = 0x10
  }; // ST_EXT_FLAGS
-
 
 // symbol table element
 class ST
@@ -176,6 +188,9 @@ public:
     } u1;
 
     mUINT32 flags;			// misc. attributes
+
+//    mUINT32 flags_ext;			// more attributes
+
 
     mUINT8 flags_ext;			// more attributes
 
@@ -194,6 +209,9 @@ public:
     ST_IDX base_idx;			// base of the allocated block
 
     ST_IDX st_idx;			// my own st_idx
+
+//    mUINT32 flags_ext;			// more attributes
+//    mUINT32 more_flags_ext;			//need 64bits for one word? 
 
     // operations
     

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:33 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:46 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.3 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -625,6 +625,8 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    TY_IDX       return_ty;
    WN *wn;   
    WN *stmt;
+   ST *rslt = NULL;
+   BOOL needcom=1;
 
    ASSERT_DBG_FATAL(TY_kind(funtype) == KIND_FUNCTION,
 		    (DIAG_W2F_UNEXPECTED_SYMBOL, "ST2F_func_header"));
@@ -648,10 +650,14 @@ ST2F_func_header(TOKEN_BUFFER tokens,
 	   param < num_params - implicit_parms; 
 	   param++)
       {
-	 
-	 Append_Token_String(header_tokens, 
-			     W2CF_Symtab_Nameof_St(params[param]));
-
+	 if (!ST_is_return_var(params[param]))  
+	         Append_Token_String(header_tokens, 
+			      W2CF_Symtab_Nameof_St(params[param]));
+         else {
+              rslt = params[param];
+              needcom = 0;
+              }
+ 
 	 if (STAB_PARAM_HAS_IMPLICIT_LENGTH(params[param])) 
 	 {
 	    implicit_parms++;
@@ -663,7 +669,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
 	    {
 	      if (ST_is_value_parm(params[param]) && ST_is_value_parm(params[param+1])) 
 	      {
-		if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) == KIND_VOID) 
+		if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) == KIND_VOID ||TRUE) 
 		{
 		  param ++ ;
 		  params[param] = NULL; 
@@ -673,9 +679,10 @@ ST2F_func_header(TOKEN_BUFFER tokens,
             }
 	 }
 
-	 if (param+implicit_parms+1 < num_params)
-	    Append_Token_Special(header_tokens, ',');
-      }
+	 if (param+implicit_parms+1 < num_params && needcom)
+	           Append_Token_Special(header_tokens, ',');
+         needcom = 1;
+    }
       Append_Token_Special(header_tokens, ')');
    }
    else if (!PU_is_mainpu(Get_Current_PU()) &&
@@ -689,6 +696,13 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       Append_Token_Special(header_tokens, '(');
       Append_Token_Special(header_tokens, ')');
    }
+
+    if (rslt !=NULL) {
+        Append_Token_String(header_tokens,"result(");
+        Append_Token_String(header_tokens,
+                             W2CF_Symtab_Nameof_St(rslt));
+        Append_Token_Special(header_tokens, ')');
+     }
    
    /* Prepend one of the keywords ENTRY, PROGRAM, FUNCTION, or
     * SUBROUTINE to the function name, as is appropriate.
@@ -706,7 +720,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
      {
        Prepend_Token_String(header_tokens, "FUNCTION");
 
-     if (PU_recursive(Get_Current_PU())) //July
+     if (PU_recursive(Get_Current_PU())) 
        Prepend_Token_String(header_tokens, "RECURSIVE");
        
        /* Note that we cannot have functions returning pointer types
@@ -726,7 +740,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       if (is_altentry)
 	 Prepend_Token_String(header_tokens, "ENTRY");
       else
-      if (ST_is_in_module(st))
+      if (ST_is_in_module(st) && !PU_is_nested_func(Pu_Table[ST_pu(st)]))
          Prepend_Token_String(header_tokens, "MODULE");  
       else
       if (ST_is_block_data(st))
@@ -788,8 +802,30 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       for (param = first_param; param < num_params -implicit_parms; param++)
       {
 	 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-	 if (params[param] != NULL)
+	 if (params[param] != NULL) {
 	   ST2F_decl_translate(header_tokens, params[param]);
+           if (ST_is_optional_argument( params[param])) {
+              Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+              Append_Token_String(header_tokens,"OPTIONAL ");
+              Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+           }
+# if 0
+        if (ST_is_intent_in_argument( params[param])) {
+              Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+              Append_Token_String(header_tokens,"INTENT(in) ");
+              Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+           }
+       if (ST_is_intent_out_argument( params[param])) {
+              Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+              Append_Token_String(header_tokens,"INTENT(out) ");
+              Append_Token_String(header_tokens,
+                              W2CF_Symtab_Nameof_St(params[param]));
+           }
+# endif
+
+        } 
       }
    }
 

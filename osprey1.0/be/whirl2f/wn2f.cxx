@@ -37,10 +37,11 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:34 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:46 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
+
  *
  * Revision history:
  *  12-Apr-95 - Original Version
@@ -66,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.3 $";
 #endif
 
 #include <alloca.h>
@@ -261,8 +262,12 @@ static const WN2F_OPR_HANDLER WN2F_Opr_Handler_List[] =
    {OPR_USE, &WN2F_use_stmt},
    {OPR_IMPLICIT_BND, &WN2F_implicit_bnd},  
    {OPR_NAMELIST, &WN2F_namelist_stmt},
+   {OPR_INTERFACE, &WN2F_interface_blk},
    {OPR_SWITCH,&WN2F_switch},
-   {OPR_CASEGOTO,&WN2F_casegoto}
+   {OPR_CASEGOTO,&WN2F_casegoto},
+   {OPR_NULLIFY,&WN2F_nullify_stmt},
+   {OPR_ARRAY_CONSTRUCT,&WN2F_ar_construct},
+   {OPR_IMPLIED_DO,&WN2F_noio_implied_do}
    
 }; /* WN2F_Opr_Handler_List */
 
@@ -521,6 +526,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
    }
 #endif 
 
+
    /* Select variable-reference translation function */
    if (deref_val                      && 
        ST_sclass(st) != SCLASS_FORMAL && 
@@ -538,7 +544,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
    if (WN2F_Can_Assign_Types(base_ty, object_ty) || 
        (TY_kind(base_ty) == KIND_FUNCTION &&
 	TY_kind(base_ty) == TY_kind(object_ty) &&
-        TY_kind(object_ty) != KIND_STRUCT))
+        TY_kind(object_ty) != KIND_STRUCT ))
    {
       /* Since the types are compatible, we cannot have an offset
        * into one of the objects.  Simply generate a reference to
@@ -546,6 +552,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
        */
       ASSERT_WARN(offset==0, (DIAG_W2F_UNEXPEXTED_OFFSET,
 			      offset, "WN2F_Offset_Symref"));
+
       translate_var_ref(tokens, st);
    }
    else if (TY_Is_Array(base_ty))
@@ -570,6 +577,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
    else /* incompatible base and object types */
    {
       FLD_PATH_INFO *fld_path;
+
       
       /* Get the path to the (undereferenced) object type.
        *
@@ -1051,6 +1059,7 @@ WN2F_dump_context( WN2F_CONTEXT c)
 WN2F_STATUS 
 WN2F_translate(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {   OPERATOR op ;  
+const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
 
    /* Determine whether we are in a context where we expect this
     * expression to have logically valued arguments, or whether
@@ -1058,8 +1067,6 @@ WN2F_translate(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     * to be a logically valued argument.
     */
 
-if (wn==NULL)
-     return EMPTY_WN2F_STATUS; 
 
    if (OPCODE_is_boolean(WN_opcode(wn)) && 
        WN2F_expr_has_boolean_arg(WN_opcode(wn)))  /* expect logical args */
@@ -1082,7 +1089,15 @@ if (wn==NULL)
    }
    else
    {
+
       reset_WN2F_CONTEXT_has_logical_arg(context);
+
+/* WN2F_CONTEXT_IS_LOGICAL_ARG and WN2F_CONTEXT_NO_PARENTHESIS use
+ * same flag,cause we cannot set no parenthesis for assignment stmts
+ * most outside parenthesis flag,temparary comment out next stmt---fzhao
+ * it did cause problem,so redefine the flag in wn2f.h--fzhao
+ */
+
       reset_WN2F_CONTEXT_is_logical_arg(context);
    }
   op=WN_opc_operator(wn);  
@@ -1297,7 +1312,7 @@ WN2F_End_Routine_Strings(TOKEN_BUFFER tokens, INT32 func_id)
 	TY_IDX rt = PUINFO_RETURN_TY;
 
 	if (TY_kind(rt) == KIND_VOID) {
-          if (ST_is_in_module(PUINFO_FUNC_ST))  
+          if (ST_is_in_module(PUINFO_FUNC_ST) && !PU_is_nested_func(pu))  
             p = "END MODULE";
           else
           if (ST_is_block_data(PUINFO_FUNC_ST))

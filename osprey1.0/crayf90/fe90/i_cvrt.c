@@ -78,6 +78,7 @@ static	void	send_label(int);
 static	void	send_label_def(int);
 static	void	send_mod_file_name(void);
 static	void	send_namelist_group(int,int);
+static  void    send_interface_list(int);
 static	TYPE	send_non_standard_aligned_type(int, int);
 static	void	send_procedure(int, int, int);
 static	void	send_stor_blk(int, int *);
@@ -1352,6 +1353,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
                 int                     bonly        = 0;
                 INTPTR      oldpdgatidx;
 		int bootry;
+                int                      listnum = 0;
 
    TRACE (Func_Entry, "cvrt_exp_to_pdg", NULL);
 
@@ -2038,6 +2040,20 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
 #endif 
 
 
+     case Array_Construct_Opr:
+        cvrt_exp_to_pdg(IR_IDX_R(ir_idx),
+                         IR_FLD_R(ir_idx));
+
+        basic = get_basic_type(IR_TYPE_IDX(ir_idx),0,NULL_IDX);
+
+        PDG_DBG_PRINT_START
+	PDG_DBG_PRINT_C("fei_array_construct");
+        PDG_DBG_PRINT_END
+
+# ifdef _ENABLE_FEI
+        fei_array_construct(IR_LIST_CNT_R(ir_idx),basic);
+#endif
+          break;
 
 
       case Length_Opr :
@@ -4179,7 +4195,6 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
    case Read_Namelist_Opr :
         io_type = READ_NML_STMT;
-
 # if !(defined(_TARGET_OS_IRIX) || defined(_TARGET_OS_LINUX))
         /* remove the namelist group attr from the format item */
         list_idx1 = IR_IDX_L(ir_idx);
@@ -5808,6 +5823,8 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
 
    case Implied_Do_Opr :
+      if (processing_io_stmt)
+        {
         if (static_initialization) {
            /* skip over DO control variable before starting loop */
            search_idx = IL_NEXT_LIST_IDX(IR_IDX_R(ir_idx));
@@ -5962,6 +5979,24 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
 # ifdef _ENABLE_FEI
            fei_implied_do();
+# endif
+
+        }
+   }
+   else  /*not in IO stmt,therefore don't generate IO_ITEM */
+     
+     {
+       cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
+                           IR_FLD_L(ir_idx));
+       cvrt_exp_to_pdg(IR_IDX_R(ir_idx),
+                           IR_FLD_R(ir_idx));
+
+           PDG_DBG_PRINT_START
+           PDG_DBG_PRINT_C("fei_noio_implied_do");
+           PDG_DBG_PRINT_END
+
+# ifdef _ENABLE_FEI 
+       fei_noio_implied_do(); 
 # endif
 
         }
@@ -6957,8 +6992,8 @@ CONTINUE:
         bootry = ATP_PGM_UNIT(IR_IDX_L(ir_idx)) == Subroutine;
         bootry = ATP_EXTRA_DARG(IR_IDX_L(ir_idx));
 
-        if (ATP_PGM_UNIT(IR_IDX_L(ir_idx)) == Subroutine ||
-            ATP_EXTRA_DARG(IR_IDX_L(ir_idx))) {
+        if (ATP_PGM_UNIT(IR_IDX_L(ir_idx)) == Subroutine ) {  /*  || */
+/*            ATP_EXTRA_DARG(IR_IDX_L(ir_idx))) */
            type_desc = pdg_type_void;
 
            if (ATP_HAS_ALT_RETURN(IR_IDX_L(ir_idx))) {
@@ -10368,6 +10403,22 @@ CONTINUE:
         fei_endcritical_open_mp(criticalname);
 # endif
         break;
+    
+      case Nullify_Opr:
+         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
+                          IR_FLD_L(ir_idx));
+
+         ir_idx = IR_IDX_L(ir_idx);
+
+         while (ir_idx !=NULL_IDX) {
+                ir_idx = IL_NEXT_LIST_IDX(ir_idx);
+                ++listnum;
+         }
+             
+
+         fei_nullify(listnum);
+      break;
+
 
      }
   }
@@ -12038,6 +12089,7 @@ static void  send_procedure(int			attr_idx,
    ((long64) ATP_OPTIONAL_DIR(attr_idx)        	<< FEI_PROC_OPTIONAL_DIR)|
    ((long64) (call_type == Definition)         	<< FEI_PROC_DEFINITION)|
    ((long64) (call_type == Imported)          	<< FEI_PROC_IMPORTED)|
+   ((long64) AT_MODULE_OBJECT(attr_idx)          << FEI_PROC_MODULE)|
    ((long64) (call_type == Parent)          	<< FEI_PROC_PARENT)|
    ((long64) (ATP_NOSIDE_EFFECTS(attr_idx) | ATP_PURE(attr_idx))
 						<< FEI_PROC_NOSIDE_EFFECTS)|
@@ -12075,7 +12127,7 @@ static void  send_procedure(int			attr_idx,
       }
 
       if (ATP_PROC(attr_idx) == Intrin_Proc)
-         proc = Intrin_src_Proc;  /*fzhao add June*/
+         proc = Intrin_src_Proc;  
 
       if (alt_entry_idx != NULL_IDX) {
          if (ATP_ALT_ENTRY(attr_idx)) {
@@ -12108,7 +12160,7 @@ static void  send_procedure(int			attr_idx,
                      proc = Imported_Proc; /*June*/
            else proc = Intrin_src_Proc;
            }
-              /* fzhao add June  */
+              
      else
       {
       proc = (ATP_PROC(attr_idx) == Intern_Proc) ? Intern_Proc_Refd :
@@ -12133,7 +12185,7 @@ static void  send_procedure(int			attr_idx,
 
 
    case Subroutine:
-      num_dargs = (call_type == Imported) ? 0 : ATP_NUM_DARGS(attr_idx);
+    num_dargs = (call_type == Imported) ? 0 : ATP_NUM_DARGS(attr_idx); 
 
       if (ATP_HAS_ALT_RETURN(attr_idx)) {
          pgm_unit = Function;
@@ -12148,13 +12200,15 @@ static void  send_procedure(int			attr_idx,
 
 
    case Function:
-      num_dargs = (call_type == Imported) ? 0 : ATP_NUM_DARGS(attr_idx);
+      num_dargs = (call_type == Imported) ? 0 : ATP_NUM_DARGS(attr_idx); 
 
+# if 0
       if (ATP_EXTRA_DARG(attr_idx)) {
          pgm_unit = Subroutine;
          type_desc = pdg_type_void;
       }
-      else {
+      else 
+# endif
          /*
          Need to send the attr_idx to
          get_type_desc, because we need
@@ -12177,9 +12231,10 @@ static void  send_procedure(int			attr_idx,
             both things are happening.
             */
 
-            send_attr_ntry(ATP_RSLT_IDX(attr_idx));
+          if (!ATP_EXTRA_DARG(attr_idx))
+            send_attr_ntry(ATP_RSLT_IDX(attr_idx)); 
+
          }
-      }
       break;
    }
 
@@ -12921,6 +12976,87 @@ static void  send_namelist_group(int	ng_attr_idx,int in_model)
 
 }   /* send_namelist_group */
 
+
+
+/*****************************************************************************\
+ * Description:
+ *  Send interface block's name plus a list of program unit(including dummy  
+ *  argumants 
+ * Input parameters :
+ *     attr_idx of the interface block
+ * Ouput parameters :
+ *     NONE
+ * Return:
+ *     Nothing
+ *
+ ******************************************************************************/
+static void send_interface_list(int ng_attr_idx)
+
+{
+   int          attr_idx;
+   int          sn_idx;
+   int          pu_in_interface=curr_scp_idx+1;
+   int i;
+
+
+   TRACE (Func_Entry, "send_interface_list", NULL);
+
+
+
+/*      if (ATP_PGM_UNIT(SCP_ATTR_IDX(curr_scp_idx)) != Module  ) { */
+
+         /* This is an interface block that has the same name as one of */
+         /* its program units.  The program unit has to go through the  */
+         /* interface.                                                  */
+
+         if (ATI_PROC_IDX(ng_attr_idx) != NULL_IDX &&
+             PDG_AT_IDX(ATI_PROC_IDX(ng_attr_idx)) == NULL_IDX) {
+            send_procedure(ATI_PROC_IDX(ng_attr_idx),
+                           NULL_IDX,
+                           Imported);
+         }
+
+         /* Need to send generic - explicit names if generating debug tbls */
+
+
+       sn_idx = ATI_FIRST_SPECIFIC_IDX(ng_attr_idx);
+            for (i = 0; i < ATI_NUM_SPECIFICS(ng_attr_idx); i++) {
+
+/*                 if (PDG_AT_IDX(SN_ATTR_IDX(sn_idx)) == NULL)  */
+
+                     send_procedure(SN_ATTR_IDX(sn_idx),
+                                    NULL_IDX,
+                                    Definition);
+               
+                   fei_gen_func_entry(PDG_AT_IDX(SN_ATTR_IDX(sn_idx)));
+                    
+
+                    sn_idx = SN_SIBLING_LINK(sn_idx);
+            }
+/*      } */
+
+
+
+# ifdef _ENABLE_FEI
+# if defined(GENERATE_WHIRL)
+   PDG_AT_IDX(ng_attr_idx) = fei_interface(AT_OBJ_NAME_PTR(ng_attr_idx),
+                                          ATI_NUM_SPECIFICS(ng_attr_idx));
+   PDG_AT_IDX(ng_attr_idx) = NULL;
+# endif
+# endif
+
+
+   TRACE (Func_Exit, "send_interface_list", NULL);
+
+   return;
+
+}   /* send_interface_list */
+
+
+
+
+ 
+
 
 /******************************************************************************\
 |*									      *|
@@ -13114,7 +13250,7 @@ static void send_attr_ntry(int		attr_idx)
          break;
 
       case Function_Result:
-         if (SB_BLK_TYPE(ATD_STOR_BLK_IDX(attr_idx)) == Formal) {
+         if (SB_BLK_TYPE(ATD_STOR_BLK_IDX(attr_idx)) == Formal ) { 
 
             /* The Function_Result has become the first dummy argument */
 
@@ -13130,6 +13266,7 @@ static void send_attr_ntry(int		attr_idx)
          break;
 
       case Dummy_Argument:
+
 # ifdef _NAME_SUBSTITUTION_INLINING
          if (!AT_IS_DARG(attr_idx)) {
             goto EXIT;
@@ -13185,7 +13322,6 @@ static void send_attr_ntry(int		attr_idx)
             send_attr_ntry(ATD_AUTO_BASE_IDX(attr_idx));
             offset = (long64) PDG_AT_IDX(ATD_AUTO_BASE_IDX(attr_idx));
          }
-
 # if ! (defined(_TARGET_OS_IRIX) || defined(_TARGET_OS_LINUX)) && ! defined(_TARGET_OS_MAX)
          if (ATD_DEFINING_ATTR_IDX(attr_idx) != NULL_IDX) {
             send_attr_ntry(ATD_DEFINING_ATTR_IDX(attr_idx));
@@ -13202,7 +13338,6 @@ static void send_attr_ntry(int		attr_idx)
             ATD_CLASS(ATD_CONST_IDX(attr_idx)) = Variable;
 
             AT_MODULE_OBJECT(ATD_CONST_IDX(attr_idx)) = AT_MODULE_OBJECT(attr_idx);
-/* fzhao add June */
             send_attr_ntry(ATD_CONST_IDX(attr_idx));
             ATD_CLASS(ATD_CONST_IDX(attr_idx)) = Compiler_Tmp;
             goto EXIT;
@@ -13600,7 +13735,6 @@ static void send_attr_ntry(int		attr_idx)
                      "send_attr_ntry");
          }
 # endif
-
 # if ! (defined(_TARGET_OS_IRIX) || defined(_TARGET_OS_LINUX)) && ! defined(_TARGET_OS_MAX)
          if (dv_alias == NULL_IDX) {
             dv_alias = defining_attr;  /* These two are overlayed */
@@ -13692,6 +13826,7 @@ static void send_attr_ntry(int		attr_idx)
       break;
 
    case Interface:
+# if 0 
       if (ATP_PGM_UNIT(SCP_ATTR_IDX(curr_scp_idx)) != Module  ) {
 
          /* This is an interface block that has the same name as one of */
@@ -13735,6 +13870,17 @@ static void send_attr_ntry(int		attr_idx)
             }
          }
       }
+
+# endif  
+/***************************************************************
+ * We need keep interface information in Whirl so we can output 
+ * "interface" block in w2f.f file,we need add OPR_INTERFACE in
+ * Whirl,here we have to generate a bounch of OPR_FUNC_ENTRY and
+ * send all dummy arguments for "OPR_INTERFACE"
+ ****************************************************************/
+    if (!AT_IS_INTRIN(attr_idx))
+        send_interface_list(attr_idx);
+
       break;
 
    case Derived_Type:
@@ -13743,7 +13889,9 @@ static void send_attr_ntry(int		attr_idx)
                
    case Namelist_Grp:
      if (ATP_PGM_UNIT(SCP_ATTR_IDX(curr_scp_idx)) != Module ) { 
+
 /*         send_namelist_group(attr_idx,0); add a argument for external??? */
+
        if (AT_MODULE_IDX(attr_idx)!=NULL_IDX ||
           AT_ORIG_MODULE_IDX(attr_idx)!=NULL_IDX) {  /*  input from a module */
                send_namelist_group(attr_idx,3);
@@ -14022,6 +14170,9 @@ static void  send_darg_list(int		pgm_attr_idx,
    prev_idx = NULL_IDX;
    darg_idx = darg_pdg_sn_fw_idx;
    end_idx = ATP_NUM_DARGS(pgm_attr_idx) + ATP_FIRST_IDX(pgm_attr_idx);
+
+
+
    sn_idx = ATP_FIRST_IDX(pgm_attr_idx);
 
    do {
@@ -14054,6 +14205,7 @@ static void  send_darg_list(int		pgm_attr_idx,
                           prev_idx,
                           darg_idx);
 # endif
+
 
       if (++sn_idx < end_idx)  {
          PDG_DBG_PRINT_START    

@@ -3882,6 +3882,7 @@ void	use_stmt_semantics(void)
    attr_list_free_list		= AL_NEXT_IDX(NULL_IDX);
    interface_list		= NULL_IDX;
 
+
    keep_module_procs = (opt_flags.inline_lvl > Inline_Lvl_0) ||
                         ATP_MAY_INLINE(SCP_ATTR_IDX(MAIN_SCP_IDX));
 

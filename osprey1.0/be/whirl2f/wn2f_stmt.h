@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:35 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:47 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.h,v $
  *
  * Revision history:
@@ -137,6 +137,9 @@ extern WN2F_STATUS
    WN2F_namelist_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);  
 
 extern WN2F_STATUS
+   WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
+
+extern WN2F_STATUS
    WN2F_switch(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);  
 
 extern WN2F_STATUS
@@ -150,6 +153,15 @@ extern WN2F_STATUS
 
 extern void
    WN2F_Append_Block_Data(TOKEN_BUFFER t);
+
+extern WN2F_STATUS
+   WN2F_nullify_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
+
+extern WN2F_STATUS
+   WN2F_ar_construct(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
+
+extern WN2F_STATUS
+   WN2F_noio_implied_do(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
 
 #endif /* wn2f_stmt_INCLUDED */
 
