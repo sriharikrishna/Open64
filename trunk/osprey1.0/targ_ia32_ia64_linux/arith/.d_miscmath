@@ -1,5 +1,0 @@
-# dependences for compilation
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/arith/../../arith/arith.h
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/arith/../../arith/arith.internal.h
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/arith/../../arith/int64.h
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/arith/../../arith/miscmath.c
