@@ -11390,7 +11390,11 @@ static TYPE get_type_desc(int	input_idx)
          }
 	 else {
          if (BD_XT_FLD(bd_idx, i) == CN_Tbl_Idx) {
-            extent = CN_INT_TO_C(BD_XT_IDX(bd_idx, i));
+           if (BD_XT_IDX(bd_idx,i))
+                 extent = CN_INT_TO_C(BD_XT_IDX(bd_idx, i));
+           else
+                 extent = BD_XT_IDX(bd_idx,i); 
+
             xt_vble = FALSE;
             span = extent * span;
          }
