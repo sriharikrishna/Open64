@@ -205,17 +205,15 @@ ir_b_grow_map (Elf64_Word min_size, Output_File *fl)
     fl->map_addr = (char *) mmap (0, fl->mapped_size, PROT_READ|PROT_WRITE,
 				  MAP_SHARED|MAP_AUTOGROW, fl->output_fd, 0); 
 #else
+    // mmap() normally cannot automatically increase file size, so we
+    // allocate some space using ftruncate().  SGI's mmap() can avoid
+    // this. cf. use of ftruncate() in ir_bwrite.cxx.
+    if (ftruncate(fl->output_fd, fl->mapped_size)) {
+	ErrMsg (EC_IR_Write, fl->file_name, strerror(errno));
+    }
     fl->map_addr = (char *) mmap (0, fl->mapped_size, PROT_READ|PROT_WRITE,
 				  MAP_SHARED, fl->output_fd, 0); 
 #endif    
-
-    // Hack: Because mmaps typically cannot automatically increase the file
-    // size, we allocate some space (4MB) in the output file (.B) now.
-    // cf. ir_b_create_map(); also cf. use of ftruncate() in ir_bwrite.cxx
-#if (defined(__linux__) || defined(__CYGWIN__))
-    if (ftruncate(fl->output_fd, fl->mapped_size))
-	ErrMsg (EC_IR_Write, fl->file_name, strerror(errno));
-#endif
     
     if (fl->map_addr == (char *) (-1))
 	ErrMsg (EC_IR_Write, fl->file_name, strerror(errno));
@@ -228,13 +226,6 @@ ir_b_create_map (Output_File *fl)
 {
     int fd = fl->output_fd;
     fl->mapped_size = INIT_TMP_MAPPED_SIZE;
-
-    // Hack: Because mmaps typically cannot automatically increase the file
-    // size, we allocate some space (4MB) in the output file (.B) now.
-    // cf. ir_b_grow_map(); also cf. use of ftruncate() in ir_bwrite.cxx
-#ifdef _SOLARIS_SOLARIS
-    ftruncate(fd, 1024 * 4096);
-#endif
 
 #if defined(__sgi)
     // Only SGI supports 'MAP_AUTOGROW' for mmap()

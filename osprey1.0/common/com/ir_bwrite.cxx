@@ -131,13 +131,8 @@ extern void Depgraph_Write (void *depgraph, Output_File *fl, WN_MAP off_map);
     mmap((void *)(addr), (size_t)(len), (int)(prot), (int)(flags),	\
 	 (int)(fd), (off_t)(off))
 
-//#ifndef linux
-//#define MUNMAP(addr, len)						\
-    munmap((void *)(addr), (size_t)(len))
-//#else
 #define MUNMAP(addr, len)						\
     munmap((char *)(addr), (size_t)(len))
-//#endif
 
 #define OPEN(path, flag, mode)						\
     open((const char *)(path), (int)(flag), (mode_t)(mode))
@@ -147,7 +142,7 @@ static void (*old_sigbus) (int);   /* the previous signal handler */
 
 Output_File *Current_Output = 0;
 
-#if (defined(linux) || defined(__CYGWIN__))
+#if !defined(__sgi)
 # define MAPPED_SIZE 0x400000
 #endif
 
@@ -160,9 +155,9 @@ cleanup (Output_File *fl)
     fl->num_of_section = 0;
     fl->section_list = NULL;
 
-    MUNMAP((char *)(fl->map_addr), (size_t)(fl->mapped_size));
-
-
+    // eraxxon: must have already called munmap() to support cygwin.
+    // (See comments below.)
+    //MUNMAP((char *)(fl->map_addr), (size_t)(fl->mapped_size));
     fl->map_addr = NULL;
     fl->file_size = 0;
 } /* cleanup */
@@ -619,11 +614,10 @@ WN_open_output (char *file_name)
     if (fl->output_fd < 0)
 	return NULL;
 
-
-    // mmap() normally doesn't append to a file, so a new empty file needs
-    // to be ftruncate()'d or writing to it will cause a "Bus error".  SGI
-    // has a trick to avoid this this hack of allocating 4MB.
-#if (defined(__linux__) || defined(__CYGWIN__))
+    // mmap() normally cannot automatically increase file size, so we
+    // allocate some space using ftruncate().  SGI's mmap() can avoid
+    // this. cf. use of ftruncate() in ir_bcom.cxx.
+#if !defined(__sgi)
     ftruncate(fl->output_fd, MAPPED_SIZE);
 #endif
 
@@ -1528,26 +1522,27 @@ WN_close_output (Output_File *fl)
 	Elf32_Shdr strtab_sec;	    /* for section string table */
 	UINT64 offset = layout_sections (strtab_sec, fl);
 
-// Solaris CC workaround
-// write_output() was defined as a template function, now it is not.
-
+	// Solaris CC workaround
+	// write_output() was defined as a template function, now it is not.
 	write_output (offset, strtab_sec, fl, ELF32());
-
     } else 
 #endif
     {
 	Elf64_Shdr strtab_sec;
 	UINT64 e_shoff = layout_sections (strtab_sec, fl);
-
 	write_output (e_shoff, strtab_sec, fl, ELF64());
-
     }
-
-    if (ftruncate(fl->output_fd, fl->file_size) != 0)
-	ErrMsg (EC_IR_Close, fl->file_name, errno);
-
+    
+    // eraxxon: unmap output file now for cygwin.  cygwin is
+    // necessarily built upon Win32 which requires all other accesses
+    // to the file to be closed before it can be changed.
+    MUNMAP(fl->map_addr, fl->mapped_size);
+    if (ftruncate(fl->output_fd, fl->file_size) != 0) {
+         ErrMsg (EC_IR_Close, fl->file_name, errno);
+    }
+    
     close (fl->output_fd);
-    cleanup (fl);		    /* unmaps output file */
+    cleanup (fl);
 
 } /* WN_close_output */
 
@@ -1558,12 +1553,16 @@ WN_close_file (void *this_fl)
     if (fl->output_fd < 0)
 	ErrMsg (EC_IR_Close, fl->file_name, EBADF);
     
-    if (ftruncate(fl->output_fd, fl->file_size) != 0)
+    // eraxxon: unmap output file now for cygwin.  cygwin is
+    // necessarily built upon Win32 which requires all other accesses
+    // to the file to be closed before it can be changed.
+    MUNMAP(fl->map_addr, fl->mapped_size);
+    if (ftruncate(fl->output_fd, fl->file_size) != 0) {
 	ErrMsg (EC_IR_Close, fl->file_name, errno);
+    }
 
     close (fl->output_fd);
-    cleanup (fl);		    /* unmaps output file */
-
+    cleanup (fl);
 }
 
 
