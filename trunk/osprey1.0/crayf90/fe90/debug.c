@@ -5558,7 +5558,7 @@ static void dump_at_ntry (FILE		*out_file,
                   dump_ro_ntry(out_file, ro_idx);
                   ro_idx = RO_NEXT_IDX(ro_idx);
                }
-            }  /* ftry 2002 */
+            }  
          }
 
          fprintf(out_file, "\n");

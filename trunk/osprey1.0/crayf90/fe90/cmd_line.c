@@ -3913,7 +3913,7 @@ static void process_u_option (char *optargs)
 	 dump_flags.fort_out		= TRUE;
 	 dump_flags.fp_tbl		= TRUE;
          dump_flags.ftrace_info		= FALSE;
-	 dump_flags.gl_tbl		= TRUE;
+	 dump_flags.gl_tbl		= TRUE;  
          dump_flags.intrin_tbl		= FALSE;	/* TOO much output    */
 	 dump_flags.ir1_tbl		= TRUE;
 	 dump_flags.ir2_tbl		= TRUE;
@@ -3921,7 +3921,8 @@ static void process_u_option (char *optargs)
 	 dump_flags.ir4_tbl		= FALSE;
 	 dump_flags.mem_report		= FALSE;
          dump_flags.mtrace_info		= TRUE;
-	 dump_flags.name_tbls		= TRUE;
+/*	 dump_flags.name_tbls		= TRUE; has bug -------fzhao */
+	 dump_flags.name_tbls		= FALSE;
          dump_flags.pdgcs		= TRUE;
 	 dump_flags.sb_tbl		= TRUE;
 	 dump_flags.scp_tbl		= TRUE;

@@ -591,6 +591,7 @@ typedef enum {
         PDGCS_Proc_Intern,
         PDGCS_Proc_Imported,
         PDGCS_Proc_Module,
+        PDGCS_Proc_SrcIntrin,
         PDGCS_Proc_Host_Ref } PROC_CLASS;
 
 typedef enum {
@@ -763,7 +764,7 @@ extern void  PDGCS_new_proc         	  ( INT32 ir_count,
                                     	    INT32 user_sades,
                                      	    INT32 pipeline_opt_level,   
                                      	    INT32 stream_opt_level,
-                                            INT32  ismodule);
+                                            INT32  ismodule); 
 extern void  PDGCS_do_proc          	  ( void );
 extern void  PDGCS_end_procs        	  ( INT32 *code_size,
                                     	    INT32 *data_size );
@@ -817,7 +818,7 @@ extern void  fei_deref                    ( TYPE  type );
 extern void  fei_paren                    ( TYPE  type );
 extern void  fei_cvtop                    ( TYPE  type );
 extern void  fei_substr                   ( INT32 bound_chk );
-extern void  fei_seq_subscr               ( TYPE  type );
+extern void  fei_seq_subscr               ( TYPE  type,INT32 kidsnum );
 extern void  fei_nseq_subscr              ( TYPE  type );
 extern void  fei_subscr_size              ( TYPE  type, INT32 bounds_check );
 extern void  fei_subscr_triplet           ( TYPE  type );

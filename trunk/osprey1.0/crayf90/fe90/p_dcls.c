@@ -5998,6 +5998,7 @@ static	void	merge_parameter(boolean		 chk_semantics,
             goto EXIT;
          }
 
+
          if (const_exp_desc->rank == BD_RANK(ATD_ARRAY_IDX(attr_idx))) {
 
             for (i = 1; i <= const_exp_desc->rank; i++) {

@@ -842,7 +842,7 @@ EXIT:
             break;
       }
    }
-   else if (issue_msg) {
+   else if (issue_msg ) { 
 
       if (gen_idx != NULL_IDX)  {
          PRINTMSG(IR_LINE_NUM(ir_idx), 380, Error, 

@@ -197,6 +197,7 @@ static boolean init_whole_array(int		 whole_sub_ir_idx,
          ATD_EQUIV(overlay_attr_idx)     	= TRUE;
          AT_REFERENCED(overlay_attr_idx) 	= Referenced;
          AT_SEMANTICS_DONE(overlay_attr_idx) 	= TRUE;
+/*         AT_MODULE_OBJECT(overlay_attr_idx)     = AT_MODULE_OBJECT(attr_idx);June*/
          
          if (ATD_CLASS(attr_idx) != Struct_Component) {
 
@@ -257,9 +258,13 @@ static boolean init_whole_array(int		 whole_sub_ir_idx,
 # if defined(_SEPARATE_NONCOMMON_EQUIV_GROUPS)
 
             sb_idx	= ATD_STOR_BLK_IDX(attr_idx);
-
             if (sb_idx == NULL_IDX ||
-                (!SB_MODULE(sb_idx) && !SB_IS_COMMON(sb_idx))) {
+/*                (!SB_MODULE(sb_idx) && !SB_IS_COMMON(sb_idx))) {    */
+
+/*  try to keep SB_MODULE variable keep similiar form with subroutine */
+/* fzhao June  */
+
+                 !SB_IS_COMMON(sb_idx)) {    
 
                if (SB_HOSTED_STATIC(sb_idx)) {
                   sb_idx = create_equiv_stor_blk(attr_idx, SB_BLK_TYPE(sb_idx));

@@ -5612,7 +5612,8 @@ void	global_name_semantics(int	def_ga_idx,
          /* Skip past the extra argument if necessary. */
 
          if (next_il_idx != NULL_IDX &&
-             FUNCTION_MUST_BE_SUBROUTINE(ref_rslt_idx)) {
+             FUNCTION_MUST_BE_SUBROUTINE(ref_rslt_idx) && FALSE) {
+/* keep source level don't need this */
             next_il_idx	= IL_NEXT_LIST_IDX(next_il_idx);
          }
       }

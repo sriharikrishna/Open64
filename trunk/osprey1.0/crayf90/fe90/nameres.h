@@ -263,7 +263,7 @@ long	obj_to_attr[Obj_Done]	=	{
 	/*  Obj_Defrd_Shp_Arr		ie: DIMENSION A(:)	*/
 
 	((0 << Attr_Assumed_Type_Ch) |	(1 << Attr_Parameter) |
-/* ftry	 (1 << Attr_Explicit_Shp_Arr) |	(0 << Attr_Dimension) |	*/
+/* 	 (1 << Attr_Explicit_Shp_Arr) |	(0 << Attr_Dimension) |	*/
 /* for module temporary use */
          (0 << Attr_Explicit_Shp_Arr) | (0 << Attr_Dimension) |
 	 (1 << Attr_Assumed_Size_Arr) |	(0 << Attr_Deferred_Shp_Arr) |

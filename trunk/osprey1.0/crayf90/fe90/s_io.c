@@ -2874,7 +2874,7 @@ static boolean io_ctl_list_semantics(opnd_type     *list_opnd,
    int		 pp_tmp = NULL_IDX;
    boolean	 semantically_correct = TRUE;
    int		 tmp_idx;
-int fm; /* ftry */
+int fm; 
 
 # if ! (defined(_TARGET_OS_IRIX) || defined(_TARGET_OS_LINUX))
    int		 ir_idx;
@@ -3352,7 +3352,7 @@ int fm; /* ftry */
 
             find_opnd_line_and_column(&opnd, &line, &col);
 
-        fm = OPND_IDX(opnd); /* ftry */
+        fm = OPND_IDX(opnd); 
 
             if (!format_expected                              &&
                 OPND_FLD(opnd)               == AT_Tbl_Idx    &&
@@ -3368,7 +3368,7 @@ int fm; /* ftry */
                }
 
                if (ATN_NAMELIST_DESC(OPND_IDX(opnd)) == NULL_IDX) {
-/* Feb                  create_namelist_descriptor(OPND_IDX(opnd)); */
+/*               create_namelist_descriptor(OPND_IDX(opnd)); */
                }
 
                namelist_descriptor_attr = ATN_NAMELIST_DESC(OPND_IDX(opnd));

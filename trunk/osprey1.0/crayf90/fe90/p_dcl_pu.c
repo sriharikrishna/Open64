@@ -1071,6 +1071,7 @@ void parse_module_stmt (void)
                                                           stmt_start_line,
                                                           stmt_start_col,
                                                           Static);
+
       SCP_SB_STATIC_INIT_IDX(curr_scp_idx)	= new_idx;
       SB_PAD_BLK(new_idx)			= cmd_line_flags.pad;
       SB_MODULE(new_idx)			= TRUE;

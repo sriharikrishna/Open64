@@ -185,14 +185,19 @@ void allocate_stmt_semantics (void)
    list_idx = IR_IDX_L(ir_idx);
 
 
-   while (list_idx != NULL_IDX && FALSE) { 
+/*    while (list_idx != NULL_IDX && FALSE) {           June */
+/* still need go through semantics for allocate stmts        */
+/* at least need keep "expr_semantics"                       */
+/* will think about keep other semantics later  --fzhao      */
+   while (list_idx != NULL_IDX ) { 
 
       COPY_OPND(opnd, IL_OPND(list_idx));
       exp_desc.rank = 0;
       xref_state    = CIF_Symbol_Modification;
       semantically_correct = expr_semantics(&opnd, &exp_desc)
                              && semantically_correct;
-      COPY_OPND(IL_OPND(list_idx), opnd);
+# if 0
+     COPY_OPND(IL_OPND(list_idx), opnd);
 
       if (exp_desc.rank != 0) {
          find_opnd_line_and_column((opnd_type *) &IL_OPND(list_idx),
@@ -262,7 +267,7 @@ void allocate_stmt_semantics (void)
 
          bd_list_idx = IR_IDX_R(OPND_IDX(opnd));
 
-/*          if (OPND_FLD(dope_opnd) == IR_Tbl_Idx &&
+          if (OPND_FLD(dope_opnd) == IR_Tbl_Idx &&
              IR_OPR(OPND_IDX(dope_opnd)) == Dv_Deref_Opr) {
     
             COPY_OPND(dope_opnd, IR_OPND_L(OPND_IDX(dope_opnd)));
@@ -271,7 +276,7 @@ void allocate_stmt_semantics (void)
             find_opnd_line_and_column(&opnd, &line, &col);
             PRINTMSG(line, 626, Internal, col,
                      "Dv_Deref_Opr", "allocate_stmt_semantics");
-         }   */
+         }  
            COPY_OPND(dope_opnd, IR_OPND_L(OPND_IDX(dope_opnd))); 
       }
       else {
@@ -279,6 +284,7 @@ void allocate_stmt_semantics (void)
          PRINTMSG(line, 626, Internal, col,
                   "Alloc_Obj_Opr", "allocate_stmt_semantics");
       }
+
 
       find_opnd_line_and_column(&dope_opnd, &line, &col);
 
@@ -614,6 +620,11 @@ void allocate_stmt_semantics (void)
 
       list_idx = IL_NEXT_LIST_IDX(list_idx);
 */
+
+# endif /* June */
+
+      list_idx = IL_NEXT_LIST_IDX(list_idx); 
+
    }
 
    if (glb_tbl_idx[Allocate_Attr_Idx] == NULL_IDX) {
@@ -5672,21 +5683,18 @@ void where_stmt_semantics (void)
 
       save_where_ir_idx = where_ir_idx;
 
-#if 0
-//      mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd,
-// ftry                                     Intent_In, FALSE, TRUE);
-//
-//      if (where_ir_idx > 0) {
-//         and_idx = gen_ir(IR_Tbl_Idx, where_ir_idx,
-//                     And_Opr, exp_desc.type_idx, line, col,
-//                          OPND_FLD(mask_expr_opnd), OPND_IDX(mask_expr_opnd));
-//
-//         gen_opnd(&opnd, and_idx, IR_Tbl_Idx, line, col);
-//      }
-//      else {
-// ftry         COPY_OPND(opnd, mask_expr_opnd);
-//      }
-#endif
+      mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd,
+                                 Intent_In, FALSE, TRUE);
+      if (where_ir_idx > 0) {
+         and_idx = gen_ir(IR_Tbl_Idx, where_ir_idx,
+                     And_Opr, exp_desc.type_idx, line, col,
+                          OPND_FLD(mask_expr_opnd), OPND_IDX(mask_expr_opnd));
+
+         gen_opnd(&opnd, and_idx, IR_Tbl_Idx, line, col);
+      }
+      else {
+         COPY_OPND(opnd, mask_expr_opnd);
+      }
 
       /* Check the next statement.  If it is a statement number statement */
       /* use it to set statement_number so that assignment statement gens */
@@ -5733,21 +5741,19 @@ void where_stmt_semantics (void)
 
       /* set up control mask */
 
-#if 0
-// ftry      mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd, 
-//                                     Intent_In, FALSE, TRUE);
+      mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd, 
+                                     Intent_In, FALSE, TRUE);
 
-//      if (where_ir_idx > 0) {
-//         and_idx = gen_ir(IR_Tbl_Idx, where_ir_idx,
-//                      And_Opr, exp_desc.type_idx, line, col,
-//                          OPND_FLD(mask_expr_opnd), OPND_IDX(mask_expr_opnd));
+      if (where_ir_idx > 0) {
+         and_idx = gen_ir(IR_Tbl_Idx, where_ir_idx,
+                      And_Opr, exp_desc.type_idx, line, col,
+                          OPND_FLD(mask_expr_opnd), OPND_IDX(mask_expr_opnd));
 
-//         gen_opnd(&opnd, and_idx, IR_Tbl_Idx, line, col);
-//      }
-//      else {
-// ftry         COPY_OPND(opnd, mask_expr_opnd);
-//      }
-#endif
+         gen_opnd(&opnd, and_idx, IR_Tbl_Idx, line, col);
+      }
+      else {
+         COPY_OPND(opnd, mask_expr_opnd);
+      }
 
       NTR_IR_LIST_TBL(list_idx);
       IR_FLD_L(ir_idx) = IL_Tbl_Idx;

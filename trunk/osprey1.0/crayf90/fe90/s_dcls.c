@@ -1911,7 +1911,7 @@ void	array_dim_resolution(int 	attr_idx,
          extent_idx = BD_UB_IDX(bd_idx, dim);
       }
       else {
-# if 0
+/* # if 0  cannot get ride of it.Because array initialize need BD_XT valuses to be correct!!!*/
          NTR_IR_TBL(ir_idx);			/* Create 1 - lower */
          IR_OPR(ir_idx)				= Minus_Opr;
          IR_TYPE_IDX(ir_idx)			= SA_INTEGER_DEFAULT_TYPE;
@@ -2026,9 +2026,11 @@ void	array_dim_resolution(int 	attr_idx,
                                 is_interface);
          extent_fld		= OPND_FLD(opnd);
          extent_idx		= OPND_IDX(opnd);
-# endif 
+/* # endif */
+# if 0
          extent_fld		= BD_UB_FLD(bd_idx,dim); /* April */
          extent_idx		= BD_UB_IDX(bd_idx,dim);
+# endif
       }
       BD_XT_FLD(bd_idx, dim)	= extent_fld;
       BD_XT_IDX(bd_idx, dim)	= extent_idx;
@@ -6354,9 +6356,10 @@ static	void	attr_semantics(int	attr_idx,
          /* alternate entries are stored in the equivalence block.     */
 
         
-         if (FUNCTION_MUST_BE_SUBROUTINE(rslt_idx)) {
+         if (FUNCTION_MUST_BE_SUBROUTINE(rslt_idx) && FALSE) {
+/* cannot keep this because no temp variables for return values */ 
 
-            ATP_EXTRA_DARG(attr_idx)      = TRUE;
+         ATP_EXTRA_DARG(attr_idx)      = TRUE;
 
             if (ATP_EXPL_ITRFC(attr_idx)) {
                ATD_STOR_BLK_IDX(rslt_idx) = SCP_SB_DARG_IDX(curr_scp_idx);
@@ -8586,6 +8589,8 @@ int	create_equiv_stor_blk(int		attr_idx,
                              sb_type);
 
    SB_EQUIVALENCED(sb_idx) = TRUE;
+   SB_MODULE(sb_idx) = SB_MODULE(SCP_SB_STATIC_IDX(curr_scp_idx));
+/* fzhao add  June */
 
    TRACE (Func_Exit, "create_equiv_stor_blk", NULL);
 
