@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:35 $
+ * $Revision: 1.3 $
+ * $Date: 2004-02-09 16:55:45 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.h,v $
  *
@@ -116,6 +116,7 @@ extern void
 
 
 extern BOOL WN2F_Is_Address_Preg(WN * wn ,TY_IDX ptr_ty) ;
+extern TY_IDX fld_type_z;
 
 #endif /* wn2f_load_store_INCLUDED */
 

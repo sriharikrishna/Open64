@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.22 $
- * $Date: 2003-12-09 19:20:24 $
- * $Author: eraxxon $
+ * $Revision: 1.23 $
+ * $Date: 2004-02-09 16:55:45 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.22 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.23 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -79,6 +79,7 @@ static void WN2F_Block(TOKEN_BUFFER tokens, ST * st, STAB_OFFSET off,WN2F_CONTEX
 
 static WN *WN2F_ZeroInt_Ptr = NULL;
 static WN *WN2F_OneInt_Ptr = NULL;
+TY_IDX fld_type_z = 0;
 
 #define WN2F_INTCONST_ZERO\
    (WN2F_ZeroInt_Ptr == NULL? WN2F_ZeroInt_Ptr = WN2F_Initiate_ZeroInt() \
@@ -885,19 +886,22 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* Get the lhs of the assignment (dereference address) */
    lhs_tokens = New_Token_Buffer();
-   if (WN_opc_operator(WN_kid1(wn)) == OPR_LDA ||
-       WN_opc_operator(WN_kid1(wn)) == OPR_LDID )
-          set_WN2F_CONTEXT_has_no_arr_elmt(context);
+   if (WN_operator(WN_kid1(wn)) == OPR_LDA ||
+       WN_operator(WN_kid1(wn)) == OPR_LDID )
+            set_WN2F_CONTEXT_has_no_arr_elmt(context);
+
    WN2F_Offset_Memref(lhs_tokens, 
 		      WN_kid1(wn),           /* base-symbol */
 		      base_ty,               /* base-type */
 		      TY_pointed(WN_ty(wn)), /* object-type */
 		      WN_store_offset(wn),   /* object-ofst */
 		      context);
-     reset_WN2F_CONTEXT_has_no_arr_elmt(context); 
+
+    reset_WN2F_CONTEXT_has_no_arr_elmt(context); 
 
    /* The rhs */
    rhs_tokens = New_Token_Buffer();
+
    if (TY_is_logical(Ty_Table[TY_pointed(WN_ty(wn))]))
    {
       set_WN2F_CONTEXT_has_logical_arg(context);
@@ -945,6 +949,8 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       Append_Token_Special(tokens, '=');
       Append_And_Reclaim_Token_List(tokens, &rhs_tokens);
    }
+
+   fld_type_z = 0;
 
    return EMPTY_WN2F_STATUS;
 } /* WN2F_istore */
@@ -1845,7 +1851,6 @@ WN  *kid;
 }
 
 
-
 WN2F_STATUS
 WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
@@ -1933,7 +1938,44 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	   /* Get the base of the object to be indexed into, still using
 	    * WN2F_CONTEXT_deref_addr(context).
 	    */
-       WN2F_translate(tokens, kid, context);
+     if (WN_operator(kid) == OPR_ADD || WN_operator(kid)==OPR_ARRAY)
+      {
+
+     STAB_OFFSET offset =(WN_operator(kid) == OPR_ADD)?WN_const_val(WN_kid1(kid)):0; 
+
+       WN2F_translate(tokens,WN_kid0(kid),context);
+
+       FLD_PATH_INFO *fld_path;
+
+       if (!fld_type_z)
+            fld_type_z = array_ty; 
+       fld_path = TY2F_Get_Fld_Path(fld_type_z,fld_type_z, offset);
+
+       if (fld_path){
+           TY2F_Fld_Separator(tokens);
+           FLD_HANDLE f (fld_path->fld);
+            fld_type_z = FLD_type(f); 
+
+            while (TY_Is_Pointer(fld_type_z))
+               fld_type_z = TY_pointed(fld_type_z);
+       
+            if (TY_kind(fld_type_z) == KIND_ARRAY)
+                 fld_type_z = TY_etype(fld_type_z);
+
+            Append_Token_String(tokens,
+                           TY2F_Fld_Name(f,FALSE,FALSE));
+           
+         } else
+          Append_Token_String(tokens,
+                               Number_as_String(offset,
+                                                "<field-at-offset=%lld>"));
+
+        }
+     else {
+           WN2F_translate(tokens, kid, context);
+           fld_type_z = TY_etype(array_ty);
+          }
+
        reset_WN2F_CONTEXT_deref_addr(context);
        WN2F_array_bounds(tokens,wn,array_ty,context);
      }
@@ -2225,7 +2267,7 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
    if (TY_is_f90_pointer(array_ty))
         array_ty = TY_pointed(array_ty); //Sept
 
-  if (TY_Is_Array(array_ty) && TY_AR_ndims(array_ty) >= WN_num_dim(wn))
+  if (TY_Is_Array(array_ty) && TY_AR_ndims(array_ty) >= WN_num_dim(wn) || TRUE) 
     {
       /* Cannot currently handle differing element sizes at place of
        * array declaration versus place of array access (TODO?).

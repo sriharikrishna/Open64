@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: ty2f.h
- * $Revision: 1.6 $
- * $Date: 2003-12-09 19:25:35 $
- * $Author: eraxxon $
+ * $Revision: 1.7 $
+ * $Date: 2004-02-09 16:55:45 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.h,v $
  *
  * Revision history:
@@ -142,6 +142,9 @@ extern void TY2F_Translate_Equivalence(TOKEN_BUFFER tokens,
 				       BOOL          alt_return);
 
 extern void TY2F_Prepend_Structures(TOKEN_BUFFER tokens);
+
+extern const char *TY2F_Fld_Name(FLD_HANDLE,BOOL,BOOL);
+
 
 static BOOL GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
                         ST_IDX         arbnd,
