@@ -6179,7 +6179,6 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
         whole_subscript = FALSE;
 
 
-
         if (IR_OPR(ir_idx) == Whole_Subscript_Opr &&
             !processing_io_stmt &&
              IR_CONTIG_ARRAY(ir_idx) != 0 ) {
@@ -6195,6 +6194,12 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
            fei_as_ref(null_type);
 # endif
            break;
+        }
+
+
+       if (IR_OPR(ir_idx) == Whole_Subscript_Opr) {
+             is_subscript = FALSE; 
+             break;  /* fzhao Oct*/
         }
 
      
@@ -13947,7 +13952,6 @@ static void send_attr_ntry(int		attr_idx)
          PDG_DBG_PRINT_END    
 
 # ifdef _ENABLE_FEI
-
          PDG_AT_IDX(attr_idx) = fei_object(class == Name ? 
                                            str : AT_OBJ_NAME_PTR(attr_idx),
                                            type_idx,
