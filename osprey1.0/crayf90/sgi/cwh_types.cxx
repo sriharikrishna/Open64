@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.10 $
- * $Date: 2002-09-25 21:53:58 $
- * $Author: open64 $
+ * $Revision: 1.11 $
+ * $Date: 2003-04-01 17:00:34 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.10 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.11 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -149,6 +149,22 @@ fei_descriptor (INT32        flag_matrix,
                                    top_of_decl_bounds + 1,
                                    ty_dim1,
                                    bit_to_byte(last_bitsize));
+
+     if (test_flag(flag_matrix,FEI_ASSUMD_SHAPE_ARRAY))
+	    Set_TY_is_f90_assumed_shape(ty_idx);
+
+     if (test_flag(flag_matrix,FEI_DEFERRED_SHAPE_ARRAY))
+            Set_TY_is_f90_deferred_shape(ty_idx);
+
+     if (test_flag(flag_matrix,FEI_ASSUMED_SIZE_ARRAY))
+	    Set_TY_is_f90_assumed_size(ty_idx);
+
+
+   /*
+    * move unique from "cwh_types_mk_array_TY" to here,
+    * since we need the flags----fzhao
+    */ 
+      ty_idx = cwh_types_unique_TY(ty_idx);
 
   
     
@@ -1277,7 +1293,16 @@ if (co_top_decl_bounds != ANULL) {
 
   }
 
-  ty_idx = cwh_types_unique_TY(ty_idx);
+/*
+ * move the function call "cwh_types_unique_TY" to fei_descriptor
+ * Since here we don't get all the flags of type
+ * may mix different kind of arrays such as a(1:*) a(1:1)
+ * are same type arrays
+ * ----fzhao
+ */
+//  ty_idx = cwh_types_unique_TY(ty_idx);
+
+
 
   return (ty_idx);
 }
