@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.8 $
- * $Date: 2002-10-11 21:39:11 $
+ * $Revision: 1.9 $
+ * $Date: 2002-10-21 19:30:57 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.9 $";
 #endif
 
 #include <ctype.h>
@@ -671,7 +671,6 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    ST *rslt = NULL;
    BOOL needcom=1;
    const char * func_name= W2CF_Symtab_Nameof_St(st);
-   char * cptl_func_name = ST_name(st);
 
 
    ASSERT_DBG_FATAL(TY_kind(funtype) == KIND_FUNCTION,
@@ -742,15 +741,12 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       Append_Token_Special(header_tokens, '(');
       Append_Token_Special(header_tokens, ')');
    }
+
 /* need to see if the result variable has same name with the function's 
  * name,if it does,don't declare the result variable
  */
-    if (rslt !=NULL) {
-      for (int i=0;i<strlen(func_name);i++) 
-         cptl_func_name[i] = toupper(func_name[i]);
-     }
   
-    if (rslt !=NULL && strcmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st))) { 
+    if (rslt !=NULL && strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st))) { 
         Append_Token_String(header_tokens,"result(");
         Append_Token_String(header_tokens,
                              W2CF_Symtab_Nameof_St(rslt));
@@ -859,8 +855,9 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       for (param = first_param; param < num_params -implicit_parms; param++)
       {
 	 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-//	 if (params[param] != NULL && !ST_is_return_var(params[param])) {
-	 if (params[param] != NULL ) {
+	 if (params[param] != NULL && 
+                 strcasecmp(W2CF_Symtab_Nameof_St(params[param]),func_name)) {
+//	 if (params[param] != NULL ) {
 
 	     ST2F_decl_translate(header_tokens, params[param]);
              if (ST_is_optional_argument( params[param])) {
