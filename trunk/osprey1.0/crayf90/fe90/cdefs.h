@@ -51,6 +51,10 @@
 
 #define _ANSI_PROTO
 
+#ifdef __
+# undef __
+#endif
+
 #if defined(__STDC__) || defined(__cplusplus)
 #define __(_A)	_A
 #else
