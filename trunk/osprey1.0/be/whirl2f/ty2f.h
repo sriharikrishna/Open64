@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: ty2f.h
- * $Revision: 1.5 $
- * $Date: 2003-12-09 16:17:53 $
- * $Author: fzhao $
+ * $Revision: 1.6 $
+ * $Date: 2003-12-09 19:25:35 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.h,v $
  *
  * Revision history:
@@ -166,9 +166,10 @@ struct Fld_Path_Info
 extern FLD_PATH_INFO * TY2F_Free_Fld_Path(FLD_PATH_INFO *fld_path);
 
 
-extern FLD_PATH_INFO * TY2F_Get_Fld_Path(TY_IDX    struct_ty, 
-					 TY_IDX    object_ty,
+extern FLD_PATH_INFO * TY2F_Get_Fld_Path(const TY_IDX struct_ty, 
+					 const TY_IDX object_ty,
 					 STAB_OFFSET offset);
+
 
 extern void TY2F_Translate_Fld_Path(TOKEN_BUFFER   tokens, 
 				    FLD_PATH_INFO *fld_path,

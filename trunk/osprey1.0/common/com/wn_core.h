@@ -508,13 +508,9 @@ public:
 #ifndef WN_NO_ACCESSOR_FUNCTIONS
 
   WN () {}
-#pragma set woff 3201
   WN (const WN& wn) { }
   WN (const WN* wn) { }
-#pragma set woff 1116
   WN& operator= (const WN& wn) { return *this;}
-#pragma reset woff 1116
-#pragma reset woff 3201
   ~WN () {}
 
 public:
@@ -759,18 +755,17 @@ inline void       WN_set_desc (WN* wn, TYPE_ID ty) { wn->common.desc = ty; }
 inline INT32      WN_map_id (const WN* wn) { return wn->common.map_id; }
 inline INT32&     WN_map_id (WN* wn) { return wn->common.map_id; }
 
-inline WN* WN_kid (const WN* wn, int i) { return wn->u3.kids [i]; }
-inline WN*& WN_kid (WN* wn, int i) { return wn->u3.kids [i]; }
+inline WN* WN_kid (const WN* wn, const int i) { return wn->u3.kids [i]; }
+inline WN*& WN_kid (WN* wn, const int i) { return wn->u3.kids [i]; }
 inline WN* WN_kid0 (const WN* wn) { return wn->u3.kids [0]; }
 inline WN*& WN_kid0 (WN* wn) { return wn->u3.kids [0]; }
 inline WN* WN_kid1 (const WN* wn) { return wn->u3.kids [1]; }
 inline WN*& WN_kid1 (WN* wn) { return wn->u3.kids [1]; }
-#pragma set woff 1172
 inline WN* WN_kid2 (const WN* wn) { return wn->u3.kids [2]; }
 inline WN*& WN_kid2 (WN* wn) { return wn->u3.kids [2]; }
 inline WN* WN_kid3 (const WN* wn) { return wn->u3.kids [3]; }
 inline WN*& WN_kid3 (WN* wn) { return wn->u3.kids [3]; }
-#pragma reset woff 1172
+
 inline INT64 WN_const_val (const WN* wn) { return wn->u3.const_val; }
 inline INT64& WN_const_val (WN* wn) { return wn->u3.const_val; }
 inline UINT32 WN_label_flag (const WN* wn) { return wn->u3.label_flag_fields.label_flag; }
