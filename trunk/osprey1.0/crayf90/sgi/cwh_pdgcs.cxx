@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_pdgcs
- * $Revision: 1.3 $
- * $Date: 2003-12-09 19:15:50 $
+ * $Revision: 1.4 $
+ * $Date: 2003-12-10 16:04:15 $
  * $Author: eraxxon $
  * $Source: 
  *
@@ -59,7 +59,7 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -79,6 +79,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "ir_bwrite.h"
 #include "file_util.h"
 #include "tracing.h"
+#include "x_libgen.h"           /* for dirname() */
 
 /* FE includes */
 
@@ -571,86 +572,6 @@ cwh_pdgcs_pu_mem(void)
  *
  *===============================================
  */ 
-static char *
-o64_basename ( char * const s )
-{
-  char * p;
-  char * last;
-  char * name;
-  int    size;
-
-  if ( s == NULL || *s == '\0' )
-    return ".";
-
-  else {
-
-    p = s + strlen ( s );
-
-    /* skip trailing '/' */
-
-    while ( p != s && *p == '/' )
-      --p;
-
-    last = p;
-
-    while ( p != s ) {
-
-      if ( *--p == '/' ) {
-
-        ++p;
-        break;
-      }
-    }
-
-    size = last - p;
-    name = (char *) malloc ( size + 1);
-    strncpy ( name, p, size );
-    name [size] = '\0';
-
-    return name;
-  }
-} /* o64_basename */
-
-static char *
-o64_dirname ( char * const s )
-{
-  char * p;
-  char * name;
-  int    size;
-
-  if ( s == NULL || *s == '\0' )
-    return ".";
-
-  else {
-
-    p = s + strlen ( s );
-
-    /* skip trailing '/' */
-
-    while ( p != s && *p == '/' )
-      --p;
-
-    while ( p != s ) {
-
-      if ( *--p == '/' ) {
-
-        if ( p == s )
-          return "/";
-
-        while ( *p == '/' )
-          --p;
-
-        size = p - s + 1;
-        name = (char *) malloc ( size + 1 );
-        strncpy ( name, s, size );
-	name [size] = '\0';
-        return name;
-      }
-    }
-
-    return ".";
-  }
-} /* o64_dirname */
 
 /*
  * Skip over leading lines upto and including the terminator (a line that
@@ -712,7 +633,7 @@ update_rii_file ( void )
   char * new_rii_file_name;
   int    ch;
 
-  rii_dir_name = o64_dirname ( rii_file_name );
+  rii_dir_name = ux_dirname ( rii_file_name );
   f_old_rii_file = fopen ( rii_file_name, "r" );
 
   if ( f_old_rii_file == NULL ) {
