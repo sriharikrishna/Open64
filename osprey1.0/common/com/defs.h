@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: defs.h
- * $Revision: 1.3 $
- * $Date: 2003-05-01 18:28:30 $
+ * $Revision: 1.4 $
+ * $Date: 2003-06-03 21:10:08 $
  *
  * Revision history:
  *  21-Aug-89 - Original Version
@@ -76,7 +76,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#define xDEBUG(flag, code) { if(flag) {code; fflush(stdout);} }
 
 /* Solaris workaround
  */
