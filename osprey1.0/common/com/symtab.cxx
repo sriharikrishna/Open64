@@ -92,6 +92,7 @@ ST_size (const ST *st)
     return STB_size(st);
   case CLASS_VAR:
   case CLASS_PREG:
+  case CLASS_PARAMETER:
     return TY_size(ST_type(st));
   case CLASS_CONST:
     if (TCON_ty(STC_val(st)) == MTYPE_STR)
@@ -1515,6 +1516,8 @@ Class_Name (INT cl)
 	return "CLASS_BLOCK";
     case CLASS_NAME:
 	return "CLASS_NAME";
+    case CLASS_PARAMETER:
+        return "CLASS_PARAMETER";
     default:
 	{
 	  static char buf[32];
@@ -1696,6 +1699,10 @@ ST::Print (FILE *f, BOOL verbose) const
 	fputs ("Variable", f);
 	ty_idx = u2.type;
 	break;
+
+    case CLASS_PARAMETER:
+        fputs ("Parameter", f);
+        break;
 
     case CLASS_FUNC:
 	fputs ("Subprogram", f);

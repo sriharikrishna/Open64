@@ -904,7 +904,7 @@ static void init_cmd_line (void)
                                            cft90_dash_G_debug_option;
 
    cmd_line_flags.mod_out_path		= FALSE;		/* -J         */
-   cmd_line_flags.dwarf_debug		= FALSE;		/* -Gd        */
+   cmd_line_flags.dwarf_debug		= TRUE;		/* -Gd        */
    cmd_line_flags.num_msgs_suppressed	= 0;			/* num -M msgs*/
    cmd_line_flags.line_size_80		= (cft90_dash_N_option == 80);
    cmd_line_flags.line_size_132         = (cft90_dash_N_option == 132);

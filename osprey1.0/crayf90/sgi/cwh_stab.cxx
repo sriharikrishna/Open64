@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.21 $
- * $Date: 2003-09-18 20:38:49 $
+ * $Revision: 1.22 $
+ * $Date: 2003-09-22 19:41:06 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.21 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.22 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -3514,6 +3514,17 @@ fei_smt_parameter(char * name_string,
       free(name);
       cwh_auxst_stem_name(st, name1);
    }
+//made a local symtab entry for parameter ---fzhao
+   ST * parast = New_ST(CURRENT_SYMTAB);
+   ST_Init(parast,
+	      Save_Str(name_string), 
+        	CLASS_PARAMETER,
+        	SCLASS_UNKNOWN,
+        	EXPORT_LOCAL,
+        	ty);
+   Set_ST_base(parast,st);
+   Set_ST_sclass(parast,ST_sclass(st));
+ 
    cwh_stab_set_linenum(st,lineno);
 
    return(cast_to_int(st));

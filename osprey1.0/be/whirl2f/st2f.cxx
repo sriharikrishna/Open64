@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.21 $
- * $Date: 2003-09-18 20:34:20 $
+ * $Revision: 1.22 $
+ * $Date: 2003-09-22 19:41:03 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.21 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.22 $";
 #endif
 
 #include <ctype.h>
@@ -123,6 +123,7 @@ static void ST2F_decl_var(TOKEN_BUFFER tokens, ST *st);
 static void ST2F_decl_func(TOKEN_BUFFER tokens, ST *st);
 static void ST2F_decl_const(TOKEN_BUFFER tokens, ST *st);
 static void ST2F_decl_type (TOKEN_BUFFER tokens, ST *st);
+static void ST2F_decl_parameter (TOKEN_BUFFER tokens, ST *st);
 
 static void ST2F_use_error(TOKEN_BUFFER tokens, ST *st);
 static void ST2F_use_var(TOKEN_BUFFER tokens, ST *st);
@@ -148,6 +149,7 @@ static const ST2F_HANDLER_FUNC ST2F_Decl_Handler[CLASS_COUNT] =
   &ST2F_decl_error,  /* CLASS_NAME  == 0x06 */
   &ST2F_decl_error,  /* CLASS_MODULE == 0x07*/
   &ST2F_decl_type,   /* CLASS_TYPE   ==0x08 */
+  &ST2F_decl_parameter, /*CLASS_PARAMETER == 0x08 */
 }; /* ST2F_Decl_Handler */
 
 static const ST2F_HANDLER_FUNC ST2F_Use_Handler[CLASS_COUNT] =
@@ -395,7 +397,6 @@ INITPRO:
    }
 } /* ST2F_decl_var */
 
-
 static void 
 ST2F_decl_type(TOKEN_BUFFER tokens, ST *st)
 {
@@ -420,6 +421,52 @@ ST2F_decl_type(TOKEN_BUFFER tokens, ST *st)
    Append_And_Reclaim_Token_List(tokens, &decl_tokens);
 
 } /* ST2F_decl_type */
+
+static void
+ST2F_decl_parameter(TOKEN_BUFFER tokens, ST *st)
+{
+  const char	*st_name = W2CF_Symtab_Nameof_St(st);
+  TOKEN_BUFFER	decl_tokens = New_Token_Buffer();
+  TY_IDX	ty_rt = ST_type(st);
+  ST 		*base = ST_base(st);
+  
+  
+  Append_Token_String(decl_tokens,st_name);
+  if (Use_Purple_Array_Bnds_Placeholder && TY_Is_Array(ST_type(st)))
+     TY2F_Translate_Purple_Array(decl_tokens, st, ST_type(st));
+  else
+     TY2F_translate(decl_tokens, ST_type(st));
+  TY2F_Prepend_Structures(decl_tokens);
+  Append_And_Reclaim_Token_List(tokens, &decl_tokens);
+/*other attributes that are allowed with the PARAMETER attribute are:
+ *	DIMENSION
+ *	PRIVATE
+ *	PUBLIC
+ *	SAVE
+ */
+
+  if (ST_is_private(st)) {
+       decl_tokens=New_Token_Buffer();
+       Append_Token_String(decl_tokens,"PRIVATE");
+       Append_Token_String(decl_tokens,ST_name(st));
+       Append_Token_Special(tokens, '\n');
+       Append_F77_Indented_Newline(tokens, 0, NULL);
+       Append_And_Reclaim_Token_List(tokens,&decl_tokens); }
+
+/* print out para_name = (value) */
+
+    decl_tokens=New_Token_Buffer();
+    Append_Token_String(decl_tokens,"PARAMETER (");
+    Append_Token_String(decl_tokens,st_name);
+    Append_Token_Special(decl_tokens, '=' );
+    Append_Token_String(decl_tokens,Targ_Print(NULL,Tcon_Table[base->u1.tcon]));
+    Append_Token_Special(decl_tokens, ')'); 
+    
+    Append_Token_Special(tokens, '\n');
+    Append_F77_Indented_Newline(tokens, 0, NULL);
+    Append_And_Reclaim_Token_List(tokens,&decl_tokens); 
+
+} /* ST_decl_parameter */
 
 static void 
 ST2F_decl_func(TOKEN_BUFFER tokens, ST *st)
