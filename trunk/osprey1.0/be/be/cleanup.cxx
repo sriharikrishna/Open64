@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cleanup.c
- * $Revision: 1.2 $
- * $Date: 2003-11-04 16:07:34 $
+ * $Revision: 1.3 $
+ * $Date: 2003-12-09 19:14:50 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/cleanup.cxx,v $
  *
@@ -155,7 +155,7 @@ Cleanup_Files (BOOL report,         /* Report errors during cleanup? */
        W2C_Cleanup();
     if (Whirl2f_loaded)
        W2F_Cleanup();
-#if !(defined(__linux__) || defined(__CYGWIN__))
+#if !(defined(__linux__) || defined(__alpha) || defined(__CYGWIN__))
     if (Prompf_anl_loaded)
        Anl_Cleanup();
 #endif
