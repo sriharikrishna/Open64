@@ -267,6 +267,7 @@ PU_Init (PU& pu, TY_IDX prototype, SYMTAB_IDX level)
     pu.src_lang = PU_UNKNOWN_LANG;
     pu.unused = 0;
     pu.flags = 0;
+    Set_PU_need_unparsed(pu);
 }
 
 inline UINT
