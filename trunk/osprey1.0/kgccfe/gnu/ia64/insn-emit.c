@@ -22,7 +22,6 @@ from the machine description file `md'.  */
 #define FAIL return (end_sequence (), _val)
 #define DONE return (_val = get_insns (), end_sequence (), _val)
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:241 */
 rtx
 gen_movbi (operand0, operand1)
      rtx operand0;
@@ -33,7 +32,6 @@ gen_movbi (operand0, operand1)
 	operand1);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:350 */
 rtx
 gen_movsi_symbolic (operand0, operand1)
      rtx operand0;
@@ -50,7 +48,6 @@ gen_movsi_symbolic (operand0, operand1)
 	1))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:402 */
 rtx
 gen_movdi_symbolic (operand0, operand1)
      rtx operand0;
@@ -67,7 +64,6 @@ gen_movdi_symbolic (operand0, operand1)
 	1))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:483 */
 rtx
 gen_load_gprel (operand0, operand1)
      rtx operand0;
@@ -81,7 +77,6 @@ gen_load_gprel (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:490 */
 rtx
 gen_gprel64_offset (operand0, operand1)
      rtx operand0;
@@ -95,7 +90,6 @@ gen_gprel64_offset (operand0, operand1)
 	1)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:545 */
 rtx
 gen_load_ltoff_dtpmod (operand0, operand1)
      rtx operand0;
@@ -112,7 +106,6 @@ gen_load_ltoff_dtpmod (operand0, operand1)
 	0)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:554 */
 rtx
 gen_load_ltoff_dtprel (operand0, operand1)
      rtx operand0;
@@ -129,7 +122,6 @@ gen_load_ltoff_dtprel (operand0, operand1)
 	1)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:612 */
 rtx
 gen_load_ltoff_tprel (operand0, operand1)
      rtx operand0;
@@ -146,7 +138,6 @@ gen_load_ltoff_tprel (operand0, operand1)
 	3)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:931 */
 rtx
 gen_extendqidi2 (operand0, operand1)
      rtx operand0;
@@ -158,7 +149,6 @@ gen_extendqidi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:938 */
 rtx
 gen_extendhidi2 (operand0, operand1)
      rtx operand0;
@@ -170,7 +160,6 @@ gen_extendhidi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:945 */
 rtx
 gen_extendsidi2 (operand0, operand1)
      rtx operand0;
@@ -182,7 +171,6 @@ gen_extendsidi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:956 */
 rtx
 gen_zero_extendqidi2 (operand0, operand1)
      rtx operand0;
@@ -194,7 +182,6 @@ gen_zero_extendqidi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:965 */
 rtx
 gen_zero_extendhidi2 (operand0, operand1)
      rtx operand0;
@@ -206,7 +193,6 @@ gen_zero_extendhidi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:974 */
 rtx
 gen_zero_extendsidi2 (operand0, operand1)
      rtx operand0;
@@ -218,7 +204,6 @@ gen_zero_extendsidi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1001 */
 rtx
 gen_extendsfdf2 (operand0, operand1)
      rtx operand0;
@@ -230,7 +215,6 @@ gen_extendsfdf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1008 */
 rtx
 gen_extendsftf2 (operand0, operand1)
      rtx operand0;
@@ -242,7 +226,6 @@ gen_extendsftf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1015 */
 rtx
 gen_extenddftf2 (operand0, operand1)
      rtx operand0;
@@ -254,7 +237,6 @@ gen_extenddftf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1022 */
 rtx
 gen_truncdfsf2 (operand0, operand1)
      rtx operand0;
@@ -266,7 +248,6 @@ gen_truncdfsf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1029 */
 rtx
 gen_trunctfsf2 (operand0, operand1)
      rtx operand0;
@@ -278,7 +259,6 @@ gen_trunctfsf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1036 */
 rtx
 gen_trunctfdf2 (operand0, operand1)
      rtx operand0;
@@ -290,7 +270,6 @@ gen_trunctfdf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1045 */
 rtx
 gen_floatditf2 (operand0, operand1)
      rtx operand0;
@@ -302,7 +281,6 @@ gen_floatditf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1068 */
 rtx
 gen_fix_truncsfdi2 (operand0, operand1)
      rtx operand0;
@@ -314,7 +292,6 @@ gen_fix_truncsfdi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1075 */
 rtx
 gen_fix_truncdfdi2 (operand0, operand1)
      rtx operand0;
@@ -326,7 +303,6 @@ gen_fix_truncdfdi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1082 */
 rtx
 gen_fix_trunctfdi2 (operand0, operand1)
      rtx operand0;
@@ -338,7 +314,6 @@ gen_fix_trunctfdi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1089 */
 rtx
 gen_fix_trunctfdi2_alts (operand0, operand1, operand2)
      rtx operand0;
@@ -354,7 +329,6 @@ gen_fix_trunctfdi2_alts (operand0, operand1, operand2)
 	operand2)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1099 */
 rtx
 gen_floatunsdisf2 (operand0, operand1)
      rtx operand0;
@@ -366,7 +340,6 @@ gen_floatunsdisf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1106 */
 rtx
 gen_floatunsdidf2 (operand0, operand1)
      rtx operand0;
@@ -378,7 +351,6 @@ gen_floatunsdidf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1113 */
 rtx
 gen_floatunsditf2 (operand0, operand1)
      rtx operand0;
@@ -390,7 +362,6 @@ gen_floatunsditf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1120 */
 rtx
 gen_fixuns_truncsfdi2 (operand0, operand1)
      rtx operand0;
@@ -402,7 +373,6 @@ gen_fixuns_truncsfdi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1127 */
 rtx
 gen_fixuns_truncdfdi2 (operand0, operand1)
      rtx operand0;
@@ -414,7 +384,6 @@ gen_fixuns_truncdfdi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1134 */
 rtx
 gen_fixuns_trunctfdi2 (operand0, operand1)
      rtx operand0;
@@ -426,7 +395,6 @@ gen_fixuns_trunctfdi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1141 */
 rtx
 gen_fixuns_trunctfdi2_alts (operand0, operand1, operand2)
      rtx operand0;
@@ -442,7 +410,6 @@ gen_fixuns_trunctfdi2_alts (operand0, operand1, operand2)
 	operand2)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1155 */
 rtx
 gen_extv (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -458,7 +425,6 @@ gen_extv (operand0, operand1, operand2, operand3)
 	operand3));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1164 */
 rtx
 gen_extzv (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -474,7 +440,6 @@ gen_extzv (operand0, operand1, operand2, operand3)
 	operand3));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1281 */
 rtx
 gen_shift_mix4left (operand0, operand1, operand2)
      rtx operand0;
@@ -492,7 +457,6 @@ gen_shift_mix4left (operand0, operand1, operand2)
 	operand2)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1321 */
 rtx
 gen_mix4right (operand0, operand1)
      rtx operand0;
@@ -506,7 +470,6 @@ gen_mix4right (operand0, operand1)
 	operand1);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1348 */
 rtx
 gen_andbi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -520,7 +483,6 @@ gen_andbi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1384 */
 rtx
 gen_iorbi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -534,7 +496,6 @@ gen_iorbi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1419 */
 rtx
 gen_one_cmplbi2 (operand0, operand1)
      rtx operand0;
@@ -549,7 +510,6 @@ gen_one_cmplbi2 (operand0, operand1)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1861 */
 rtx
 gen_mulhi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -563,7 +523,6 @@ gen_mulhi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1876 */
 rtx
 gen_addsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -577,7 +536,6 @@ gen_addsi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1914 */
 rtx
 gen_subsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -591,7 +549,6 @@ gen_subsi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1932 */
 rtx
 gen_mulsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -605,7 +562,6 @@ gen_mulsi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1940 */
 rtx
 gen_maddsi4 (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -622,7 +578,6 @@ gen_maddsi4 (operand0, operand1, operand2, operand3)
 	operand3));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1949 */
 rtx
 gen_negsi2 (operand0, operand1)
      rtx operand0;
@@ -634,7 +589,6 @@ gen_negsi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2120 */
 rtx
 gen_divsi3_internal (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -659,7 +613,6 @@ gen_divsi3_internal (operand0, operand1, operand2, operand3)
 	operand3)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2168 */
 rtx
 gen_adddi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -673,7 +626,6 @@ gen_adddi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2200 */
 rtx
 gen_subdi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -687,7 +639,6 @@ gen_subdi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2218 */
 rtx
 gen_muldi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -701,7 +652,6 @@ gen_muldi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2237 */
 rtx
 gen_madddi4 (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -721,7 +671,6 @@ gen_madddi4 (operand0, operand1, operand2, operand3)
 	gen_rtx_SCRATCH (DImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2284 */
 rtx
 gen_smuldi3_highpart (operand0, operand1, operand2)
      rtx operand0;
@@ -740,7 +689,6 @@ gen_smuldi3_highpart (operand0, operand1, operand2)
 	GEN_INT (64L))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2297 */
 rtx
 gen_umuldi3_highpart (operand0, operand1, operand2)
      rtx operand0;
@@ -759,7 +707,6 @@ gen_umuldi3_highpart (operand0, operand1, operand2)
 	GEN_INT (64L))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2310 */
 rtx
 gen_negdi2 (operand0, operand1)
      rtx operand0;
@@ -771,7 +718,6 @@ gen_negdi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2486 */
 rtx
 gen_divdi3_internal_lat (operand0, operand1, operand2)
      rtx operand0;
@@ -795,7 +741,6 @@ gen_divdi3_internal_lat (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2546 */
 rtx
 gen_divdi3_internal_thr (operand0, operand1, operand2)
      rtx operand0;
@@ -817,7 +762,6 @@ gen_divdi3_internal_thr (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2601 */
 rtx
 gen_addsf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -831,7 +775,6 @@ gen_addsf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2609 */
 rtx
 gen_subsf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -845,7 +788,6 @@ gen_subsf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2617 */
 rtx
 gen_mulsf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -859,7 +801,6 @@ gen_mulsf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2625 */
 rtx
 gen_abssf2 (operand0, operand1)
      rtx operand0;
@@ -871,7 +812,6 @@ gen_abssf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2632 */
 rtx
 gen_negsf2 (operand0, operand1)
      rtx operand0;
@@ -883,7 +823,6 @@ gen_negsf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2646 */
 rtx
 gen_minsf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -897,7 +836,6 @@ gen_minsf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2654 */
 rtx
 gen_maxsf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -911,7 +849,6 @@ gen_maxsf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2715 */
 rtx
 gen_divsf3_internal_lat (operand0, operand1, operand2)
      rtx operand0;
@@ -932,7 +869,6 @@ gen_divsf3_internal_lat (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2772 */
 rtx
 gen_divsf3_internal_thr (operand0, operand1, operand2)
      rtx operand0;
@@ -953,7 +889,6 @@ gen_divsf3_internal_thr (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2832 */
 rtx
 gen_adddf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -967,7 +902,6 @@ gen_adddf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2849 */
 rtx
 gen_subdf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -981,7 +915,6 @@ gen_subdf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2866 */
 rtx
 gen_muldf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -995,7 +928,6 @@ gen_muldf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2883 */
 rtx
 gen_absdf2 (operand0, operand1)
      rtx operand0;
@@ -1007,7 +939,6 @@ gen_absdf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2890 */
 rtx
 gen_negdf2 (operand0, operand1)
      rtx operand0;
@@ -1019,7 +950,6 @@ gen_negdf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2904 */
 rtx
 gen_mindf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1033,7 +963,6 @@ gen_mindf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2912 */
 rtx
 gen_maxdf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1047,7 +976,6 @@ gen_maxdf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3024 */
 rtx
 gen_divdf3_internal_lat (operand0, operand1, operand2)
      rtx operand0;
@@ -1070,7 +998,6 @@ gen_divdf3_internal_lat (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3105 */
 rtx
 gen_divdf3_internal_thr (operand0, operand1, operand2)
      rtx operand0;
@@ -1091,7 +1018,6 @@ gen_divdf3_internal_thr (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3177 */
 rtx
 gen_addtf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1105,7 +1031,6 @@ gen_addtf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3203 */
 rtx
 gen_subtf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1119,7 +1044,6 @@ gen_subtf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3229 */
 rtx
 gen_multf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1133,7 +1057,6 @@ gen_multf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3284 */
 rtx
 gen_abstf2 (operand0, operand1)
      rtx operand0;
@@ -1145,7 +1068,6 @@ gen_abstf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3291 */
 rtx
 gen_negtf2 (operand0, operand1)
      rtx operand0;
@@ -1157,7 +1079,6 @@ gen_negtf2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3305 */
 rtx
 gen_mintf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1171,7 +1092,6 @@ gen_mintf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3313 */
 rtx
 gen_maxtf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1185,7 +1105,6 @@ gen_maxtf3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3501 */
 rtx
 gen_divtf3_internal_lat (operand0, operand1, operand2)
      rtx operand0;
@@ -1210,7 +1129,6 @@ gen_divtf3_internal_lat (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3581 */
 rtx
 gen_divtf3_internal_thr (operand0, operand1, operand2)
      rtx operand0;
@@ -1231,7 +1149,6 @@ gen_divtf3_internal_thr (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (BImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3819 */
 rtx
 gen_ashldi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1245,7 +1162,6 @@ gen_ashldi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3864 */
 rtx
 gen_ashrdi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1259,7 +1175,6 @@ gen_ashrdi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3874 */
 rtx
 gen_lshrdi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1273,7 +1188,6 @@ gen_lshrdi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3945 */
 rtx
 gen_one_cmplsi2 (operand0, operand1)
      rtx operand0;
@@ -1285,7 +1199,6 @@ gen_one_cmplsi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3958 */
 rtx
 gen_anddi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1299,7 +1212,6 @@ gen_anddi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3978 */
 rtx
 gen_iordi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1313,7 +1225,6 @@ gen_iordi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3988 */
 rtx
 gen_xordi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -1327,7 +1238,6 @@ gen_xordi3 (operand0, operand1, operand2)
 	operand2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3998 */
 rtx
 gen_one_cmpldi2 (operand0, operand1)
      rtx operand0;
@@ -1339,7 +1249,6 @@ gen_one_cmpldi2 (operand0, operand1)
 	operand1));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4316 */
 rtx
 gen_doloop_end_internal (operand0, operand1)
      rtx operand0;
@@ -1367,7 +1276,6 @@ gen_doloop_end_internal (operand0, operand1)
 	operand0))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4760 */
 rtx
 gen_call_nogp (operand0, operand1)
      rtx operand0;
@@ -1382,7 +1290,6 @@ gen_call_nogp (operand0, operand1)
 	operand1)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4768 */
 rtx
 gen_call_value_nogp (operand0, operand1, operand2)
      rtx operand0;
@@ -1400,7 +1307,6 @@ gen_call_value_nogp (operand0, operand1, operand2)
 	operand2)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4777 */
 rtx
 gen_sibcall_nogp (operand0)
      rtx operand0;
@@ -1411,7 +1317,6 @@ gen_sibcall_nogp (operand0)
 	const0_rtx);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4784 */
 rtx
 gen_call_gp (operand0, operand1)
      rtx operand0;
@@ -1430,7 +1335,6 @@ gen_call_gp (operand0, operand1)
 	gen_rtx_SCRATCH (DImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4824 */
 rtx
 gen_call_value_gp (operand0, operand1, operand2)
      rtx operand0;
@@ -1452,7 +1356,6 @@ gen_call_value_gp (operand0, operand1, operand2)
 	gen_rtx_SCRATCH (DImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4865 */
 rtx
 gen_sibcall_gp (operand0)
      rtx operand0;
@@ -1468,7 +1371,6 @@ gen_sibcall_gp (operand0)
 	gen_rtx_SCRATCH (DImode))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4881 */
 rtx
 gen_return_internal (operand0)
      rtx operand0;
@@ -1479,14 +1381,12 @@ gen_return_internal (operand0)
 	operand0)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4888 */
 rtx
 gen_return ()
 {
   return gen_rtx_RETURN (VOIDmode);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4918 */
 rtx
 gen_jump (operand0)
      rtx operand0;
@@ -1497,7 +1397,6 @@ gen_jump (operand0)
 	operand0));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4924 */
 rtx
 gen_indirect_jump (operand0)
      rtx operand0;
@@ -1507,7 +1406,6 @@ gen_indirect_jump (operand0)
 	operand0);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5013 */
 rtx
 gen_prologue_allocate_stack (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -1526,7 +1424,6 @@ gen_prologue_allocate_stack (operand0, operand1, operand2, operand3)
 	operand3)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5029 */
 rtx
 gen_epilogue_deallocate_stack (operand0, operand1)
      rtx operand0;
@@ -1541,7 +1438,6 @@ gen_epilogue_deallocate_stack (operand0, operand1)
 	operand1)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5039 */
 rtx
 gen_prologue_use (operand0)
      rtx operand0;
@@ -1552,7 +1448,6 @@ gen_prologue_use (operand0)
 	25);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5049 */
 rtx
 gen_alloc (operand0, operand1, operand2, operand3, operand4)
      rtx operand0;
@@ -1578,7 +1473,6 @@ gen_alloc (operand0, operand1, operand2, operand3, operand4)
 	operand4)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5071 */
 rtx
 gen_gr_spill_internal (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -1598,7 +1492,6 @@ gen_gr_spill_internal (operand0, operand1, operand2, operand3)
 	operand3)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5095 */
 rtx
 gen_gr_restore_internal (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -1618,7 +1511,6 @@ gen_gr_restore_internal (operand0, operand1, operand2, operand3)
 	operand3)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5105 */
 rtx
 gen_fr_spill (operand0, operand1)
      rtx operand0;
@@ -1632,7 +1524,6 @@ gen_fr_spill (operand0, operand1)
 	12));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5113 */
 rtx
 gen_fr_restore (operand0, operand1)
      rtx operand0;
@@ -1646,7 +1537,6 @@ gen_fr_restore (operand0, operand1)
 	13));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5125 */
 rtx
 gen_bsp_value (operand0)
      rtx operand0;
@@ -1659,7 +1549,6 @@ gen_bsp_value (operand0)
 	21));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5135 */
 rtx
 gen_set_bsp (operand0)
      rtx operand0;
@@ -1670,7 +1559,6 @@ gen_set_bsp (operand0)
 	4);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5161 */
 rtx
 gen_flushrs ()
 {
@@ -1680,49 +1568,42 @@ gen_flushrs ()
 	22);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5178 */
 rtx
 gen_nop ()
 {
   return const0_rtx;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5184 */
 rtx
 gen_nop_m ()
 {
   return const1_rtx;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5190 */
 rtx
 gen_nop_i ()
 {
   return GEN_INT (2L);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5196 */
 rtx
 gen_nop_f ()
 {
   return GEN_INT (3L);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5202 */
 rtx
 gen_nop_b ()
 {
   return GEN_INT (4L);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5208 */
 rtx
 gen_nop_x ()
 {
   return GEN_INT (5L);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5214 */
 rtx
 gen_bundle_selector (operand0)
      rtx operand0;
@@ -1733,7 +1614,6 @@ gen_bundle_selector (operand0)
 	23);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5223 */
 rtx
 gen_blockage ()
 {
@@ -1743,7 +1623,6 @@ gen_blockage ()
 	1);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5230 */
 rtx
 gen_insn_group_barrier (operand0)
      rtx operand0;
@@ -1754,7 +1633,6 @@ gen_insn_group_barrier (operand0)
 	2);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5269 */
 rtx
 gen_break_f ()
 {
@@ -1764,7 +1642,6 @@ gen_break_f ()
 	3);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5275 */
 rtx
 gen_prefetch (operand0, operand1, operand2)
      rtx operand0;
@@ -1777,7 +1654,6 @@ gen_prefetch (operand0, operand1, operand2)
 	operand2);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5336 */
 rtx
 gen_builtin_setjmp_receiver (operand0)
      rtx operand0;
@@ -1788,7 +1664,6 @@ gen_builtin_setjmp_receiver (operand0)
 	7);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5406 */
 rtx
 gen_fetchadd_acq_si (operand0, operand1, operand2)
      rtx operand0;
@@ -1808,7 +1683,6 @@ gen_fetchadd_acq_si (operand0, operand1, operand2)
 	20))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5417 */
 rtx
 gen_fetchadd_acq_di (operand0, operand1, operand2)
      rtx operand0;
@@ -1828,7 +1702,6 @@ gen_fetchadd_acq_di (operand0, operand1, operand2)
 	20))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5428 */
 rtx
 gen_cmpxchg_acq_si (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -1850,7 +1723,6 @@ gen_cmpxchg_acq_si (operand0, operand1, operand2, operand3)
 	19))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5440 */
 rtx
 gen_cmpxchg_acq_di (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -1872,7 +1744,6 @@ gen_cmpxchg_acq_di (operand0, operand1, operand2, operand3)
 	19))));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5452 */
 rtx
 gen_xchgsi (operand0, operand1, operand2)
      rtx operand0;
@@ -1888,7 +1759,6 @@ gen_xchgsi (operand0, operand1, operand2)
 	operand2)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5461 */
 rtx
 gen_xchgdi (operand0, operand1, operand2)
      rtx operand0;
@@ -1904,7 +1774,6 @@ gen_xchgdi (operand0, operand1, operand2)
 	operand2)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5479 */
 rtx
 gen_pred_rel_mutex (operand0)
      rtx operand0;
@@ -1917,7 +1786,6 @@ gen_pred_rel_mutex (operand0)
 	15));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5487 */
 rtx
 gen_safe_across_calls_all ()
 {
@@ -1927,7 +1795,6 @@ gen_safe_across_calls_all ()
 	5);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5494 */
 rtx
 gen_safe_across_calls_normal ()
 {
@@ -1937,7 +1804,6 @@ gen_safe_across_calls_normal ()
 	6);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5507 */
 rtx
 gen_ptr_extend (operand0, operand1)
      rtx operand0;
@@ -1951,7 +1817,6 @@ gen_ptr_extend (operand0, operand1)
 	24));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:257 */
 extern rtx gen_split_274 PARAMS ((rtx *));
 rtx
 gen_split_274 (operands)
@@ -1983,7 +1848,6 @@ gen_split_274 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:269 */
 extern rtx gen_split_275 PARAMS ((rtx *));
 rtx
 gen_split_275 (operands)
@@ -2024,7 +1888,6 @@ operands[2] = gen_rtx_REG (CCImode, REGNO (operands[0]));
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:283 */
 rtx
 gen_movqi (operand0, operand1)
      rtx operand0;
@@ -2053,7 +1916,6 @@ gen_movqi (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:308 */
 rtx
 gen_movhi (operand0, operand1)
      rtx operand0;
@@ -2082,7 +1944,6 @@ gen_movhi (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:333 */
 rtx
 gen_movsi (operand0, operand1)
      rtx operand0;
@@ -2111,7 +1972,6 @@ gen_movsi (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:350 */
 extern rtx gen_split_279 PARAMS ((rtx *));
 rtx
 gen_split_279 (operands)
@@ -2132,7 +1992,6 @@ gen_split_279 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:385 */
 rtx
 gen_movdi (operand0, operand1)
      rtx operand0;
@@ -2161,7 +2020,6 @@ gen_movdi (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:402 */
 extern rtx gen_split_281 PARAMS ((rtx *));
 rtx
 gen_split_281 (operands)
@@ -2182,7 +2040,6 @@ gen_split_281 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:455 */
 extern rtx gen_split_282 PARAMS ((rtx *));
 rtx
 gen_split_282 (operands)
@@ -2200,7 +2057,6 @@ gen_split_282 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:465 */
 rtx
 gen_load_fptr (operand0, operand1)
      rtx operand0;
@@ -2238,7 +2094,6 @@ gen_load_fptr (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:497 */
 rtx
 gen_load_gprel64 (operand0, operand1)
      rtx operand0;
@@ -2276,7 +2131,6 @@ gen_load_gprel64 (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:508 */
 rtx
 gen_load_symptr (operand0, operand1, operand2)
      rtx operand0;
@@ -2315,7 +2169,6 @@ gen_load_symptr (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:563 */
 rtx
 gen_load_dtprel (operand0, operand1)
      rtx operand0;
@@ -2329,7 +2182,6 @@ gen_load_dtprel (operand0, operand1)
 	2));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:586 */
 rtx
 gen_add_dtprel (operand0, operand1, operand2)
      rtx operand0;
@@ -2346,7 +2198,6 @@ gen_add_dtprel (operand0, operand1, operand2)
 	2)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:621 */
 rtx
 gen_load_tprel (operand0, operand1)
      rtx operand0;
@@ -2360,7 +2211,6 @@ gen_load_tprel (operand0, operand1)
 	4));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:644 */
 rtx
 gen_add_tprel (operand0, operand1, operand2)
      rtx operand0;
@@ -2377,7 +2227,6 @@ gen_add_tprel (operand0, operand1, operand2)
 	4)));
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:672 */
 rtx
 gen_movti (operand0, operand1)
      rtx operand0;
@@ -2412,7 +2261,6 @@ gen_movti (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:684 */
 extern rtx gen_split_291 PARAMS ((rtx *));
 rtx
 gen_split_291 (operands)
@@ -2461,7 +2309,6 @@ gen_split_291 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:733 */
 extern rtx gen_split_292 PARAMS ((rtx *));
 rtx
 gen_split_292 (operands)
@@ -2494,7 +2341,6 @@ gen_split_292 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:762 */
 rtx
 gen_reload_inti (operand0, operand1, operand2)
      rtx operand0;
@@ -2530,7 +2376,6 @@ gen_reload_inti (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:774 */
 rtx
 gen_reload_outti (operand0, operand1, operand2)
      rtx operand0;
@@ -2566,7 +2411,6 @@ gen_reload_outti (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:791 */
 rtx
 gen_movsf (operand0, operand1)
      rtx operand0;
@@ -2595,7 +2439,6 @@ gen_movsf (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:817 */
 rtx
 gen_movdf (operand0, operand1)
      rtx operand0;
@@ -2624,7 +2467,6 @@ gen_movdf (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:845 */
 rtx
 gen_movtf (operand0, operand1)
      rtx operand0;
@@ -2708,7 +2550,6 @@ gen_movtf (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1182 */
 rtx
 gen_insv (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -2808,7 +2649,6 @@ gen_insv (operand0, operand1, operand2, operand3)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1290 */
 extern rtx gen_split_299 PARAMS ((rtx *));
 rtx
 gen_split_299 (operands)
@@ -2843,7 +2683,6 @@ operands[3] = operands[2];
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1301 */
 extern rtx gen_split_300 PARAMS ((rtx *));
 rtx
 gen_split_300 (operands)
@@ -2878,7 +2717,6 @@ operands[3] = operands[2];
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1348 */
 extern rtx gen_split_301 PARAMS ((rtx *));
 rtx
 gen_split_301 (operands)
@@ -2909,7 +2747,6 @@ gen_split_301 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1366 */
 extern rtx gen_split_302 PARAMS ((rtx *));
 rtx
 gen_split_302 (operands)
@@ -2938,7 +2775,6 @@ gen_split_302 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1384 */
 extern rtx gen_split_303 PARAMS ((rtx *));
 rtx
 gen_split_303 (operands)
@@ -2969,7 +2805,6 @@ gen_split_303 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1402 */
 extern rtx gen_split_304 PARAMS ((rtx *));
 rtx
 gen_split_304 (operands)
@@ -2998,7 +2833,6 @@ gen_split_304 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1431 */
 extern rtx gen_split_305 PARAMS ((rtx *));
 rtx
 gen_split_305 (operands)
@@ -3042,7 +2876,6 @@ operands[3] = gen_rtx_REG (CCImode, REGNO (operands[1]));
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1446 */
 extern rtx gen_split_306 PARAMS ((rtx *));
 rtx
 gen_split_306 (operands)
@@ -3080,7 +2913,6 @@ gen_split_306 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1711 */
 extern rtx gen_split_307 PARAMS ((rtx *));
 rtx
 gen_split_307 (operands)
@@ -3111,7 +2943,6 @@ gen_split_307 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1723 */
 extern rtx gen_split_308 PARAMS ((rtx *));
 rtx
 gen_split_308 (operands)
@@ -3150,7 +2981,6 @@ gen_split_308 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1737 */
 extern rtx gen_split_309 PARAMS ((rtx *));
 rtx
 gen_split_309 (operands)
@@ -3179,7 +3009,6 @@ gen_split_309 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1749 */
 extern rtx gen_split_310 PARAMS ((rtx *));
 rtx
 gen_split_310 (operands)
@@ -3216,7 +3045,6 @@ gen_split_310 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1838 */
 extern rtx gen_peephole2_311 PARAMS ((rtx, rtx *));
 rtx
 gen_peephole2_311 (curr_insn, operands)
@@ -3255,7 +3083,6 @@ operands[7] = copy_rtx (operands[1]);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1956 */
 rtx
 gen_abssi2 (operand0, operand1)
      rtx operand0;
@@ -3292,7 +3119,6 @@ gen_abssi2 (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1966 */
 rtx
 gen_sminsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3331,7 +3157,6 @@ gen_sminsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1976 */
 rtx
 gen_smaxsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3370,7 +3195,6 @@ gen_smaxsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1986 */
 rtx
 gen_uminsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3409,7 +3233,6 @@ gen_uminsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:1996 */
 rtx
 gen_umaxsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3448,7 +3271,6 @@ gen_umaxsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2006 */
 rtx
 gen_divsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3504,7 +3326,6 @@ gen_divsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2040 */
 rtx
 gen_modsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3549,7 +3370,6 @@ gen_modsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2063 */
 rtx
 gen_udivsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3605,7 +3425,6 @@ gen_udivsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2097 */
 rtx
 gen_umodsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3650,7 +3469,6 @@ gen_umodsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2120 */
 extern rtx gen_split_321 PARAMS ((rtx *));
 rtx
 gen_split_321 (operands)
@@ -3770,7 +3588,6 @@ operands[7] = CONST1_RTX (TFmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2266 */
 extern rtx gen_split_322 PARAMS ((rtx *));
 rtx
 gen_split_322 (operands)
@@ -3815,7 +3632,6 @@ gen_split_322 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2317 */
 rtx
 gen_absdi2 (operand0, operand1)
      rtx operand0;
@@ -3852,7 +3668,6 @@ gen_absdi2 (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2327 */
 rtx
 gen_smindi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3891,7 +3706,6 @@ gen_smindi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2337 */
 rtx
 gen_smaxdi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3930,7 +3744,6 @@ gen_smaxdi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2347 */
 rtx
 gen_umindi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -3969,7 +3782,6 @@ gen_umindi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2357 */
 rtx
 gen_umaxdi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -4008,7 +3820,6 @@ gen_umaxdi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2367 */
 rtx
 gen_ffsdi2 (operand0, operand1)
      rtx operand0;
@@ -4077,7 +3888,6 @@ gen_ffsdi2 (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2394 */
 rtx
 gen_divdi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -4128,7 +3938,6 @@ gen_divdi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2423 */
 rtx
 gen_moddi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -4167,7 +3976,6 @@ gen_moddi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2440 */
 rtx
 gen_udivdi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -4218,7 +4026,6 @@ gen_udivdi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2469 */
 rtx
 gen_umoddi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -4257,7 +4064,6 @@ gen_umoddi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2486 */
 extern rtx gen_split_333 PARAMS ((rtx *));
 rtx
 gen_split_333 (operands)
@@ -4436,7 +4242,6 @@ operands[7] = CONST1_RTX (TFmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2546 */
 extern rtx gen_split_334 PARAMS ((rtx *));
 rtx
 gen_split_334 (operands)
@@ -4583,7 +4388,6 @@ operands[6] = CONST1_RTX (TFmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2700 */
 rtx
 gen_divsf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -4620,7 +4424,6 @@ gen_divsf3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2715 */
 extern rtx gen_split_336 PARAMS ((rtx *));
 rtx
 gen_split_336 (operands)
@@ -4787,7 +4590,6 @@ gen_split_336 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:2772 */
 extern rtx gen_split_337 PARAMS ((rtx *));
 rtx
 gen_split_337 (operands)
@@ -4933,7 +4735,6 @@ gen_split_337 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3009 */
 rtx
 gen_divdf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -4970,7 +4771,6 @@ gen_divdf3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3024 */
 extern rtx gen_split_339 PARAMS ((rtx *));
 rtx
 gen_split_339 (operands)
@@ -5208,7 +5008,6 @@ gen_split_339 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3105 */
 extern rtx gen_split_340 PARAMS ((rtx *));
 rtx
 gen_split_340 (operands)
@@ -5394,7 +5193,6 @@ gen_split_340 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3486 */
 rtx
 gen_divtf3 (operand0, operand1, operand2)
      rtx operand0;
@@ -5431,7 +5229,6 @@ gen_divtf3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3501 */
 extern rtx gen_split_342 PARAMS ((rtx *));
 rtx
 gen_split_342 (operands)
@@ -5670,7 +5467,6 @@ operands[8] = CONST1_RTX (TFmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3581 */
 extern rtx gen_split_343 PARAMS ((rtx *));
 rtx
 gen_split_343 (operands)
@@ -5906,7 +5702,6 @@ operands[6] = CONST1_RTX (TFmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3680 */
 rtx
 gen_ashlsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -5944,7 +5739,6 @@ gen_ashlsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3707 */
 rtx
 gen_ashrsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -5991,7 +5785,6 @@ gen_ashrsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3728 */
 rtx
 gen_lshrsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -6038,7 +5831,6 @@ gen_lshrsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3753 */
 rtx
 gen_rotrsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -6074,7 +5866,6 @@ gen_rotrsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3767 */
 extern rtx gen_split_348 PARAMS ((rtx *));
 rtx
 gen_split_348 (operands)
@@ -6110,7 +5901,6 @@ operands[3] = gen_rtx_REG (DImode, REGNO (operands[0]));
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3781 */
 rtx
 gen_rotlsi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -6147,7 +5937,6 @@ gen_rotlsi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3796 */
 extern rtx gen_split_350 PARAMS ((rtx *));
 rtx
 gen_split_350 (operands)
@@ -6186,7 +5975,6 @@ gen_split_350 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3849 */
 extern rtx gen_split_351 PARAMS ((rtx *));
 rtx
 gen_split_351 (operands)
@@ -6222,7 +6010,6 @@ gen_split_351 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3889 */
 rtx
 gen_rotrdi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -6254,7 +6041,6 @@ gen_rotrdi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:3907 */
 rtx
 gen_rotldi3 (operand0, operand1, operand2)
      rtx operand0;
@@ -6286,7 +6072,6 @@ gen_rotldi3 (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4011 */
 rtx
 gen_cmpbi (operand0, operand1)
      rtx operand0;
@@ -6316,7 +6101,6 @@ gen_cmpbi (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4022 */
 rtx
 gen_cmpsi (operand0, operand1)
      rtx operand0;
@@ -6346,7 +6130,6 @@ gen_cmpsi (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4033 */
 rtx
 gen_cmpdi (operand0, operand1)
      rtx operand0;
@@ -6376,7 +6159,6 @@ gen_cmpdi (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4044 */
 rtx
 gen_cmpsf (operand0, operand1)
      rtx operand0;
@@ -6406,7 +6188,6 @@ gen_cmpsf (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4055 */
 rtx
 gen_cmpdf (operand0, operand1)
      rtx operand0;
@@ -6436,7 +6217,6 @@ gen_cmpdf (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4066 */
 rtx
 gen_cmptf (operand0, operand1)
      rtx operand0;
@@ -6466,7 +6246,6 @@ gen_cmptf (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4174 */
 rtx
 gen_beq (operand0)
      rtx operand0;
@@ -6493,7 +6272,6 @@ operands[1] = ia64_expand_compare (EQ, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4182 */
 rtx
 gen_bne (operand0)
      rtx operand0;
@@ -6520,7 +6298,6 @@ operands[1] = ia64_expand_compare (NE, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4190 */
 rtx
 gen_blt (operand0)
      rtx operand0;
@@ -6547,7 +6324,6 @@ operands[1] = ia64_expand_compare (LT, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4198 */
 rtx
 gen_ble (operand0)
      rtx operand0;
@@ -6574,7 +6350,6 @@ operands[1] = ia64_expand_compare (LE, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4206 */
 rtx
 gen_bgt (operand0)
      rtx operand0;
@@ -6601,7 +6376,6 @@ operands[1] = ia64_expand_compare (GT, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4214 */
 rtx
 gen_bge (operand0)
      rtx operand0;
@@ -6628,7 +6402,6 @@ operands[1] = ia64_expand_compare (GE, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4222 */
 rtx
 gen_bltu (operand0)
      rtx operand0;
@@ -6655,7 +6428,6 @@ operands[1] = ia64_expand_compare (LTU, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4230 */
 rtx
 gen_bleu (operand0)
      rtx operand0;
@@ -6682,7 +6454,6 @@ operands[1] = ia64_expand_compare (LEU, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4238 */
 rtx
 gen_bgtu (operand0)
      rtx operand0;
@@ -6709,7 +6480,6 @@ operands[1] = ia64_expand_compare (GTU, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4246 */
 rtx
 gen_bgeu (operand0)
      rtx operand0;
@@ -6736,7 +6506,6 @@ operands[1] = ia64_expand_compare (GEU, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4254 */
 rtx
 gen_bunordered (operand0)
      rtx operand0;
@@ -6763,7 +6532,6 @@ operands[1] = ia64_expand_compare (UNORDERED, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4262 */
 rtx
 gen_bordered (operand0)
      rtx operand0;
@@ -6790,7 +6558,6 @@ operands[1] = ia64_expand_compare (ORDERED, VOIDmode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4300 */
 rtx
 gen_doloop_end (operand0, operand1, operand2, operand3, operand4)
      rtx operand0;
@@ -6837,7 +6604,6 @@ gen_doloop_end (operand0, operand1, operand2, operand3, operand4)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4335 */
 rtx
 gen_seq (operand0)
      rtx operand0;
@@ -6860,7 +6626,6 @@ operands[1] = ia64_expand_compare (EQ, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4340 */
 rtx
 gen_sne (operand0)
      rtx operand0;
@@ -6883,7 +6648,6 @@ operands[1] = ia64_expand_compare (NE, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4345 */
 rtx
 gen_slt (operand0)
      rtx operand0;
@@ -6906,7 +6670,6 @@ operands[1] = ia64_expand_compare (LT, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4350 */
 rtx
 gen_sle (operand0)
      rtx operand0;
@@ -6929,7 +6692,6 @@ operands[1] = ia64_expand_compare (LE, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4355 */
 rtx
 gen_sgt (operand0)
      rtx operand0;
@@ -6952,7 +6714,6 @@ operands[1] = ia64_expand_compare (GT, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4360 */
 rtx
 gen_sge (operand0)
      rtx operand0;
@@ -6975,7 +6736,6 @@ operands[1] = ia64_expand_compare (GE, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4365 */
 rtx
 gen_sltu (operand0)
      rtx operand0;
@@ -6998,7 +6758,6 @@ operands[1] = ia64_expand_compare (LTU, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4370 */
 rtx
 gen_sleu (operand0)
      rtx operand0;
@@ -7021,7 +6780,6 @@ operands[1] = ia64_expand_compare (LEU, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4375 */
 rtx
 gen_sgtu (operand0)
      rtx operand0;
@@ -7044,7 +6802,6 @@ operands[1] = ia64_expand_compare (GTU, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4380 */
 rtx
 gen_sgeu (operand0)
      rtx operand0;
@@ -7067,7 +6824,6 @@ operands[1] = ia64_expand_compare (GEU, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4385 */
 rtx
 gen_sunordered (operand0)
      rtx operand0;
@@ -7090,7 +6846,6 @@ operands[1] = ia64_expand_compare (UNORDERED, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4390 */
 rtx
 gen_sordered (operand0)
      rtx operand0;
@@ -7113,7 +6868,6 @@ operands[1] = ia64_expand_compare (ORDERED, DImode);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4398 */
 extern rtx gen_split_385 PARAMS ((rtx *));
 rtx
 gen_split_385 (operands)
@@ -7145,7 +6899,6 @@ gen_split_385 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4412 */
 extern rtx gen_split_386 PARAMS ((rtx *));
 rtx
 gen_split_386 (operands)
@@ -7177,7 +6930,6 @@ gen_split_386 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4455 */
 extern rtx gen_split_387 PARAMS ((rtx *));
 rtx
 gen_split_387 (operands)
@@ -7217,7 +6969,6 @@ gen_split_387 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4507 */
 extern rtx gen_split_388 PARAMS ((rtx *));
 rtx
 gen_split_388 (operands)
@@ -7247,7 +6998,6 @@ gen_split_388 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4522 */
 extern rtx gen_split_389 PARAMS ((rtx *));
 rtx
 gen_split_389 (operands)
@@ -7287,7 +7037,6 @@ gen_split_389 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4574 */
 extern rtx gen_split_390 PARAMS ((rtx *));
 rtx
 gen_split_390 (operands)
@@ -7317,7 +7066,6 @@ gen_split_390 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4589 */
 extern rtx gen_split_391 PARAMS ((rtx *));
 rtx
 gen_split_391 (operands)
@@ -7357,7 +7105,6 @@ gen_split_391 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4609 */
 extern rtx gen_split_392 PARAMS ((rtx *));
 rtx
 gen_split_392 (operands)
@@ -7404,7 +7151,6 @@ gen_split_392 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4636 */
 extern rtx gen_split_393 PARAMS ((rtx *));
 rtx
 gen_split_393 (operands)
@@ -7451,7 +7197,6 @@ gen_split_393 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4679 */
 rtx
 gen_call (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -7489,7 +7234,6 @@ gen_call (operand0, operand1, operand2, operand3)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4690 */
 rtx
 gen_sibcall (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -7527,7 +7271,6 @@ gen_sibcall (operand0, operand1, operand2, operand3)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4708 */
 rtx
 gen_call_value (operand0, operand1, operand2, operand3, operand4)
      rtx operand0;
@@ -7570,7 +7313,6 @@ gen_call_value (operand0, operand1, operand2, operand3, operand4)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4720 */
 rtx
 gen_sibcall_value (operand0, operand1, operand2, operand3, operand4)
      rtx operand0;
@@ -7613,7 +7355,6 @@ gen_sibcall_value (operand0, operand1, operand2, operand3, operand4)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4734 */
 rtx
 gen_untyped_call (operand0, operand1, operand2)
      rtx operand0;
@@ -7662,7 +7403,6 @@ gen_untyped_call (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4796 */
 extern rtx gen_split_399 PARAMS ((rtx *));
 rtx
 gen_split_399 (operands)
@@ -7681,7 +7421,6 @@ gen_split_399 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4810 */
 extern rtx gen_split_400 PARAMS ((rtx *));
 rtx
 gen_split_400 (operands)
@@ -7700,7 +7439,6 @@ gen_split_400 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4835 */
 extern rtx gen_split_401 PARAMS ((rtx *));
 rtx
 gen_split_401 (operands)
@@ -7719,7 +7457,6 @@ gen_split_401 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4850 */
 extern rtx gen_split_402 PARAMS ((rtx *));
 rtx
 gen_split_402 (operands)
@@ -7738,7 +7475,6 @@ gen_split_402 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4865 */
 extern rtx gen_split_403 PARAMS ((rtx *));
 rtx
 gen_split_403 (operands)
@@ -7757,7 +7493,6 @@ gen_split_403 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4930 */
 rtx
 gen_tablejump (operand0, operand1)
      rtx operand0;
@@ -7822,7 +7557,6 @@ gen_tablejump (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4986 */
 rtx
 gen_prologue ()
 {
@@ -7840,7 +7574,6 @@ gen_prologue ()
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:4994 */
 rtx
 gen_epilogue ()
 {
@@ -7858,7 +7591,6 @@ gen_epilogue ()
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5002 */
 rtx
 gen_sibcall_epilogue ()
 {
@@ -7876,7 +7608,6 @@ gen_sibcall_epilogue ()
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5062 */
 rtx
 gen_gr_spill (operand0, operand1, operand2)
      rtx operand0;
@@ -7913,7 +7644,6 @@ operands[3] = gen_rtx_REG (DImode, AR_UNAT_REGNUM);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5086 */
 rtx
 gen_gr_restore (operand0, operand1, operand2)
      rtx operand0;
@@ -7950,7 +7680,6 @@ operands[3] = gen_rtx_REG (DImode, AR_UNAT_REGNUM);
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5238 */
 rtx
 gen_trap ()
 {
@@ -7959,7 +7688,6 @@ gen_trap ()
 	const0_rtx);
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5252 */
 rtx
 gen_conditional_trap (operand0, operand1)
      rtx operand0;
@@ -7985,7 +7713,6 @@ gen_conditional_trap (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5308 */
 rtx
 gen_save_stack_nonlocal (operand0, operand1)
      rtx operand0;
@@ -8016,7 +7743,6 @@ gen_save_stack_nonlocal (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5320 */
 rtx
 gen_nonlocal_goto (operand0, operand1, operand2, operand3)
      rtx operand0;
@@ -8059,7 +7785,6 @@ gen_nonlocal_goto (operand0, operand1, operand2, operand3)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5336 */
 extern rtx gen_split_414 PARAMS ((rtx *));
 rtx
 gen_split_414 (operands)
@@ -8077,7 +7802,6 @@ gen_split_414 (operands)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5347 */
 rtx
 gen_eh_epilogue (operand0, operand1, operand2)
      rtx operand0;
@@ -8126,7 +7850,6 @@ gen_eh_epilogue (operand0, operand1, operand2)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5375 */
 rtx
 gen_restore_stack_nonlocal (operand0, operand1)
      rtx operand0;
@@ -8157,7 +7880,6 @@ gen_restore_stack_nonlocal (operand0, operand1)
   return _val;
 }
 
-/* /users/fzhao/gcc-try/gcc-3.3.1/gcc/config/ia64/ia64.md:5390 */
 rtx
 gen_mf ()
 {

@@ -275,13 +275,12 @@ extern const char *ia64_tls_size_string;
 #define LIBGCC2_WORDS_BIG_ENDIAN 0
 #endif
 
-/*FMZH #define UNITS_PER_WORD 8 */
-
-/* #define POINTER_SIZE (TARGET_ILP32 ? 32 : 64) */
-
+#define UNITS_PER_WORD 8 
+#define POINTER_SIZE (TARGET_ILP32 ? 32 : 64) 
+/*FMZH
 #define UNITS_PER_WORD 4
 #define POINTER_SIZE 32
-
+*/
 
 /* A C expression whose value is zero if pointers that need to be extended
    from being `POINTER_SIZE' bits wide to `Pmode' are sign-extended and one if
@@ -392,8 +391,8 @@ while (0)
 
 #define SHORT_TYPE_SIZE 16
 
-/* FMZH #define LONG_TYPE_SIZE (TARGET_ILP32 ? 32 : 64) */
-#define LONG_TYPE_SIZE  32
+#define LONG_TYPE_SIZE (TARGET_ILP32 ? 32 : 64)
+/*FMZH #define LONG_TYPE_SIZE  32 */
 
 #define MAX_LONG_TYPE_SIZE 64
 
@@ -403,8 +402,8 @@ while (0)
 
 #define DOUBLE_TYPE_SIZE 64
 
-/*FMZH #define LONG_DOUBLE_TYPE_SIZE 128*/
-#define LONG_DOUBLE_TYPE_SIZE 96
+#define LONG_DOUBLE_TYPE_SIZE 128
+/*FMZH #define LONG_DOUBLE_TYPE_SIZE 96*/
 
 /* By default we use the 80-bit Intel extended float format packaged
    in a 128-bit entity.  */
