@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.c
- * $Revision: 1.6 $
- * $Date: 2003-06-19 19:43:30 $
- * $Author: broom $
+ * $Revision: 1.7 $
+ * $Date: 2004-07-26 19:06:31 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
  * Revision history:
@@ -76,7 +76,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
@@ -87,7 +87,6 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "mempool.h"
 #include "unparse_target.h"
 #include "w2cf_symtab.h"
-
 
 /*------------ Typedefs for the symtab datastructure ------------------*
  *---------------------------------------------------------------------*/
@@ -151,6 +150,8 @@ struct W2CF_Symhdr
 #define W2CF_SYMHDR_symbol(s) (s)->symbol
 #define W2CF_SYMHDR_next(s) (s)->next
 
+extern BOOL Run_w2f;     /* Defined in be.so */
+extern BOOL Run_w2c;     /* Defined in be.so */
 
 typedef enum W2CF_Symbol_Kind
 {
@@ -808,7 +809,7 @@ W2CF_Symtab_Nameof_St(const ST *st)
     * suffix (symid).  Create a name-buffer large enough to hold the
     * name appended to the suffix (hence the "+32").
     */
-   
+ 
    if (ST_sym_class(st) != CLASS_CONST) 
 	   valid_name = W2X_Unparse_Target->Make_Valid_Name(ST_name(st),!ST_is_temp_var(st));
 
@@ -837,9 +838,10 @@ W2CF_Symtab_Nameof_St(const ST *st)
    W2CF_Get_Symbol(&symtab, &symhdr, &symbol, &match_symbol, symname);
    
    /* Return the resultant disambiguated name */
-//   return W2CF_SYMBOL_name_string(symtab, symbol);
+if (Run_w2f)
    return valid_name; // fzhao change to keep original name
-
+else
+   return W2CF_SYMBOL_name_string(symtab, symbol);
    
 } /* W2CF_Symtab_Nameof_St */
 
@@ -916,8 +918,10 @@ W2CF_Symtab_Nameof_Ty(TY_IDX ty)
    }
    
    /* Return the resultant disambiguated name */
-//   return W2CF_SYMBOL_name_string(symtab, symbol);
+if (Run_w2f)
     return valid_name; 
+else
+    return W2CF_SYMBOL_name_string(symtab, symbol);
    
 } /* W2CF_Symtab_Nameof_Ty */
 
@@ -959,8 +963,10 @@ W2CF_Symtab_Nameof_Fld(FLD_HANDLE fld)
    W2CF_Get_Symbol(&symtab, &symhdr, &symbol, &match_symbol, symname);
    
    /* Return the resultant disambiguated name */
-//   return W2CF_SYMBOL_name_string(symtab, symbol);
+if (Run_w2f)
    return valid_name;
+else
+   return W2CF_SYMBOL_name_string(symtab, symbol);
    
 } /* W2CF_Symtab_Nameof_Fld */
 
