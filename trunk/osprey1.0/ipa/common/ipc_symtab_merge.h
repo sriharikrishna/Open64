@@ -287,8 +287,12 @@ struct IPC_GLOBAL_IDX_MAP
 
     IPC_GLOBAL_IDX_MAP (UINT32 st_size, UINT32 ty_size, UINT32 tcon_size,
 			UINT32 initv_size, MEM_POOL *pool) :
+#if 0
 	sym_str (0, hash<STR_IDX>(), equal_to<STR_IDX> (),
 		 SYMSTR_IDX_MAP::allocator_type (pool)),
+#else
+	sym_str (),
+#endif
 	st (st_size, ST_IDX_MAP::allocator_type (pool)),
 	ty (ty_size, TY_IDX_MAP::allocator_type (pool)),
 	tcon (tcon_size, TCON_IDX_MAP::allocator_type (pool)),
