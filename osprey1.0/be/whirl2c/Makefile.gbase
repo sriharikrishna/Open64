@@ -264,7 +264,7 @@ first:
 	cd $(TARGDIR)/be && $(MAKE)
 ifeq ($(BUILD_OS), LINUX)
 	cd $(BUILD_AREA)/include && $(MAKE)
-	if ! test -a $(TARGET_SO); then ln -sf $(TARG_TARG_INFO_DIR)/$(TARGET_SO) .; fi
+	if ! test -f $(TARGET_SO); then ln -sf $(TARG_TARG_INFO_DIR)/$(TARGET_SO) .; fi
 endif
 
 include $(BUILD_TOT)/Makeinclude 
