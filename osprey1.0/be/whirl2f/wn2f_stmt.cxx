@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.6 $
- * $Date: 2002-08-22 20:41:25 $
+ * $Revision: 1.7 $
+ * $Date: 2002-08-22 21:44:33 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.7 $";
 #endif
 
 #include <alloca.h>
@@ -2592,6 +2592,19 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
           else if (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE")== 0)
             Append_Token_String(call_tokens,"DEALLOCATE");
          }
+
+        if (strcmp(ST_name(WN_st(wn)),"ALLOCATED")== 0)
+         {
+          Append_Token_Special(call_tokens,'(');
+          Append_Token_String(call_tokens,ST_name(WN_st(WN_kid0(WN_kid0(WN_kid0(wn))))));
+/* Get the array name,it shoud be CALL->PARM->ARRSECTION->LDA->st_name
+ * Is there any other possible?
+ */
+          Append_Token_Special(call_tokens,')');
+          Append_And_Reclaim_Token_List(tokens, &call_tokens);
+          return EMPTY_WN2F_STATUS;
+         }    
+
 	 func_ty = ST_pu_type(WN_st(wn));
 	 last_arg_idx = WN_kid_count(wn) - 1;
       }
