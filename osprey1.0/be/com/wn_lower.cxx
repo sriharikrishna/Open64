@@ -11746,7 +11746,11 @@ static WN *lower_do_while(WN *block, WN *tree, LOWER_ACTIONS actions)
 
 //map the old label name to the new one
 static map<int, int> label_map;
+#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
+static set<int> labels;
+#else
 static hash_set<int> labels;
+#endif
 
 static WN *lower_while_do(WN *block, WN *tree, LOWER_ACTIONS actions);
 
