@@ -853,7 +853,6 @@ $(BE_EXE):  $(BE_DSO) $(BE_DRIVER_OBJS) $(LINK_DSO) $(EXPORT_FILE_BE)
 #	  ln -f -s $(TARGDIR)/whirl2f/$(WHIRL2F_DSO) $(WHIRL2F_DSO); \
 #	fi
 	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) $(BE_SPECIAL_OPT) \
-###FMZH	  $(BE_DSO) $(WHIRL2F_DSO) $(LDFLAGS) $(LINK_DSO_OPTS) \
 	  $(BE_DSO)  $(LDFLAGS) $(LINK_DSO_OPTS) \
 	  $(LINK_DSO) $(BE_SYS_LIBS)
 	-rm -f bedriver
