@@ -42,9 +42,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: w2f_driver.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:34 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2004-11-29 16:14:13 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.h,v $
  *
  * Description:
@@ -226,6 +226,8 @@ extern BOOL W2F_Emit_Frequency;  /* Emit feedback frequency information */
 extern BOOL W2F_Purple_Emission; /* Emitting purple extracted sources */
 extern BOOL W2F_Emit_Pcf;        /* Emitting PCF spellings of pragmas */
 extern BOOL W2F_Emit_Omp;        /* Emitting OMP spellings of pragmas */
+
+extern BOOL W2F_OpenAD;          /* Special OpenAD mode */
 
 
                      /* Files */
