@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.16 $
- * $Date: 2003-12-09 19:22:28 $
- * $Author: eraxxon $
+ * $Revision: 1.17 $
+ * $Date: 2004-06-01 22:03:18 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.17 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -528,6 +528,7 @@ static const OPC2CNAME_MAP WN2C_Opc2cname_Map[] =
   {OPC_U8F4FLOOR, "_U8F4FLOOR"},
   {OPC_U8FQFLOOR, "_U8FQFLOOR"},
   {OPC_U8F8FLOOR, "_U8F8FLOOR"},
+  {OPC_F8F8FLOOR,"_F8F8FLOOR"}, 
   {OPC_I4BNOT, "~"},
   {OPC_U8BNOT, "~"},
   {OPC_I8BNOT, "~"},
