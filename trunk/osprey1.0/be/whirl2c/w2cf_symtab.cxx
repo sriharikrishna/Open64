@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.c
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:41 $
- * $Author: jle $
+ * $Revision: 1.4 $
+ * $Date: 2003-06-12 15:27:49 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
  * Revision history:
@@ -76,21 +76,21 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
 #include <string.h>
 
 #ifdef BUILD_WHIRL2C
-#include "whirl2c_common.h"
-#define W2FC_Valid_Name(x,b) WHIRL2C_make_valid_c_name(x)
-#else /* BUILD_WHIRL2F */
-#include "whirl2f_common.h"
-#define W2FC_Valid_Name(x,b) WHIRL2F_make_valid_name(x,b)
-#endif /* BUILD_WHIRL2C */
+#include "whirl2c_common.h" /* For defs.h, config.h, erglob.h, etc. */
+#endif
+#ifdef BUILD_WHIRL2F
+#include "whirl2f_common.h" /* For defs.h, config.h, erglob.h, etc. */
+#endif
 
 #include "mempool.h"
+#include "unparse_target.h"
 #include "w2cf_symtab.h"
 
 
@@ -306,7 +306,7 @@ W2CF_Get_Basename(const char *original_name, char *basename, INT32 *sym_id)
     */
 #define MAX_NUMERIC_SUFFIX_SIZE 8 /* fits into a UINT32 */
 
-   const char *valid_name = W2FC_Valid_Name(original_name,WN2F_F90_pu);
+   const char *valid_name = W2X_Unparse_Target->Make_Valid_Name(original_name,TRUE);
    INT32       name_size, suffix_size;
    UINT32      numeric_suffix = 0;
    UINT32      suffix_exponent;
@@ -340,60 +340,6 @@ W2CF_Get_Basename(const char *original_name, char *basename, INT32 *sym_id)
 } /* W2CF_Get_Basename */
 
 
-static const char *
-W2CF_Get_Ftn_St_Name(const ST *st, const char *original_name)
-{ 
-   const char *extern_name;
-
-#ifdef BUILD_WHIRL2F
-   char *name_ptr;
-
-   if (Stab_External_Linkage(st) && 
-       !Stab_Is_Based_At_Common_Or_Equivalence(st) &&
-       !(ST_sym_class(st) == CLASS_VAR && ST_is_namelist(st)))
-   {
-      /* Here we deal with a curiosity of the Fortran naming scheme for
-       * external names:
-       *
-       *    + If the name ends with a '_', the name was without the '_'
-       *      in the original Fortran source.
-       *
-       *    + If the name ends without a '_', the name was with a '$'
-       *      suffix in the original Fortran source.
-       *
-       *    + Unless the external name was a namelist variable, then even
-       *      though there isn't a trailing '_', don't emit a '$'.
-       */
-      extern_name = name_ptr =
-	 strcpy(Get_Name_Buf_Slot(strlen(original_name)+2), original_name);
-      
-      /* Get the last character */
-      while (name_ptr[1] != '\0')
-	 name_ptr++;
-       
-      /* Correct the name-suffix */
-      if (extern_name[0] != '_'  && name_ptr[0] == '_')
-      {
-	 if (name_ptr[-1] == '_')
-	    name_ptr[-1] = '\0';
-	 else
-	    name_ptr[0] = '\0';
-      }
-      else if (!WN2F_F90_pu)
-      {
-	 name_ptr[1] = '$';
-	 name_ptr[2] = '\0';
-      }
-   }
-   else /* Not an external variable */
-#endif /* BUILD_WHIRL2F */
-      extern_name = original_name;
-
-   return extern_name;
-   
-} /* W2CF_Get_Ftn_St_Name */
-
-
 /*-------------- Hidden functions for symtab manipulation -------------*
  *---------------------------------------------------------------------*/
 
@@ -401,21 +347,16 @@ W2CF_Get_Ftn_St_Name(const ST *st, const char *original_name)
 static BOOL
 W2CF_Avoid_Suffix(W2CF_SYMBOL *symbol )
 {
-  /* some globals eg: COMMONs, functions,  should get the same name */
-  /* if they appear in the global symbol table more than once. They */
-  /* may have been created by different PUs                         */
 
   BOOL avoid = FALSE;
 
-#ifdef BUILD_WHIRL2F
-  if (W2CF_SYMBOL_kind(symbol) == SYMKIND_ST) 
-    {
+  if (W2X_Unparse_Target->Avoid_Common_Suffix ()) {
+    if (W2CF_SYMBOL_kind(symbol) == SYMKIND_ST) {
       const ST * st = W2CF_SYMBOL_st(symbol);
-
       if (Stab_Is_Common_Block(st))
-	avoid = TRUE;
+      avoid = TRUE;
     }
-#endif
+  }
 
   //WEI: shouldn't suffixs  be avoided for TY entries???
   if (Compile_Upc) {
@@ -874,7 +815,7 @@ W2CF_Symtab_Nameof_St(const ST *st)
     */
    
    if (ST_sym_class(st) != CLASS_CONST) 
-	   valid_name = W2FC_Valid_Name(ST_name(st),WN2F_F90_pu && !ST_is_temp_var(st));
+	   valid_name = W2X_Unparse_Target->Make_Valid_Name(ST_name(st),!ST_is_temp_var(st));
 
    if (valid_name == NULL || valid_name[0] == '\0')
    {
@@ -882,7 +823,7 @@ W2CF_Symtab_Nameof_St(const ST *st)
    }
    else
    {
-      valid_name = W2CF_Get_Ftn_St_Name(st, valid_name);
+      valid_name = W2X_Unparse_Target->Get_St_Name(st, valid_name);
    }
 
    //WEI: again, don't think there's any reason to rename function names
@@ -902,7 +843,7 @@ W2CF_Symtab_Nameof_St(const ST *st)
    
    /* Return the resultant disambiguated name */
 //   return W2CF_SYMBOL_name_string(symtab, symbol);
-    return valid_name; // fzhao change to keep original name
+   return valid_name; // fzhao change to keep original name
 
    
 } /* W2CF_Symtab_Nameof_St */
@@ -955,7 +896,7 @@ W2CF_Symtab_Nameof_Ty(TY_IDX ty)
     * suffix (symid).  Create a name-buffer large enough to hold the
     * name appended to the suffix (hence the "+32").
     */
-   valid_name = W2FC_Valid_Name(TY_name(ty),FALSE);
+   valid_name = W2X_Unparse_Target->Make_Valid_Name(TY_name(ty),FALSE);
    if (valid_name == NULL || valid_name[0] == '\0')
    {
       valid_name = W2CF_Anonymous_Ty;
@@ -1001,7 +942,7 @@ W2CF_Symtab_Nameof_Fld(FLD_HANDLE fld)
     * suffix (symid).  Create a name-buffer large enough to hold the
     * name appended to the suffix (hence the "+32").
     */
-   valid_name = W2FC_Valid_Name(FLD_name(fld),FALSE);
+   valid_name = W2X_Unparse_Target->Make_Valid_Name(FLD_name(fld),FALSE);
    if (valid_name == NULL || valid_name[0] == '\0')
    {
       valid_name = W2CF_Anonymous_Fld;
@@ -1116,7 +1057,7 @@ W2CF_Symtab_Nameof_Preg(const TY_IDX preg_ty, PREG_NUM preg_num)
      sprintf(buffer, "reg%d", preg_num);
      valid_name = buffer;
    }
-   valid_name = W2FC_Valid_Name(valid_name,FALSE);
+   valid_name = W2X_Unparse_Target->Make_Valid_Name(valid_name,FALSE);
    if (valid_name == NULL || valid_name[0] == '\0')
    {
       symname = Get_Name_Buf_Slot(strlen(W2CF_Anonymous_Preg) + 32);
@@ -1155,7 +1096,7 @@ W2CF_Symtab_Unique_Name(const char *name)
     * suffix (symid).  Create a name-buffer large enough to hold the
     * name appended to the suffix (hence the "+32").
     */
-   valid_name = W2FC_Valid_Name(name,WN2F_F90_pu);
+   valid_name = W2X_Unparse_Target->Make_Valid_Name(name,TRUE);
    if (valid_name == NULL || valid_name[0] == '\0')
       valid_name = W2CF_Anonymous_St;
    unique_name = Get_Name_Buf_Slot(strlen(valid_name) + 32);

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.4 $
- * $Date: 2003-03-26 21:38:27 $
- * $Author: dotsenko $
+ * $Revision: 1.5 $
+ * $Date: 2003-06-12 15:27:50 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.5 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -81,6 +81,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "st2f.h"
 #include "wn2f.h"
 #include "wn2f_stmt.h"
+#include "unparse_target_ftn.h"
 
 #define DEB_Whirl2f_IR_TY_W2F_Outfile_Translate_Pu 0
 
@@ -168,6 +169,7 @@ BOOL    W2F_Purple_Emission = FALSE; /* Emitting purple extracted sources */
 BOOL    W2F_Prompf_Emission = FALSE; /* Emitting prompf transformed sources */
 WN_MAP *W2F_Construct_Map = NULL;    /* Construct id mapping for prompf */
 WN_MAP  W2F_Frequency_Map = WN_MAP_UNDEFINED; /* Frequency mapping */
+Unparse_Target *W2X_Unparse_Target = NULL;
 
 
 /* ====================================================================
@@ -724,6 +726,8 @@ W2F_Init(void)
    Initialize_Token_Buffer(W2F_Format_Kind, W2F_Prompf_Emission);
    if (W2F_Line_Length > 0)
       Set_Maximum_Linelength(W2F_Line_Length);
+
+   W2X_Unparse_Target = new Unparse_Target_FTN;
 
    /* Enter the global symbols into the symbol table, since that
     * ensures these get the first priority at keeping their names 
