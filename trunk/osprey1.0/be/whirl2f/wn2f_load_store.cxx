@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.19 $
- * $Date: 2003-03-13 21:16:58 $
+ * $Revision: 1.20 $
+ * $Date: 2003-05-13 20:52:47 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.20 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -2075,32 +2075,32 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,TY_IDX array_ty,WN2F_CONTEXT contex
 
   kid = WN_kid0(wn);
 
-if (WN_operator(kid)==OPR_LDA)
- {
-  ttyy = array_ty;
+  if (WN_operator(kid)==OPR_LDA)
+    {
+      ttyy = array_ty;
 
-  if (TY_Is_Pointer(ttyy))
-     ttyy =TY_pointed(ttyy);
-  if (TY_is_f90_pointer(ttyy))
-     ttyy = TY_pointed(ttyy);
+      if (TY_Is_Pointer(ttyy))
+          ttyy =TY_pointed(ttyy);
+      if (TY_is_f90_pointer(ttyy))
+          ttyy = TY_pointed(ttyy);
 
-  arb_base = TY_arb(ttyy);
+      arb_base = TY_arb(ttyy);
 
-  dim =  ARB_dimension(arb_base);
-  co_dim = ARB_co_dimension(arb_base);
- } else {
-   co_dim =0;
-   dim = WN_num_dim(wn);
- }
+     dim =  ARB_dimension(arb_base);
+     co_dim = ARB_co_dimension(arb_base);
+    } else {
+     co_dim =0;
+     dim = WN_num_dim(wn);
+    }
 
 
-  if (dim >  WN_num_dim(wn) ) {
-     array_dim = dim-co_dim;
-     co_dim = 0;
-   }
-   else {
+   if (dim >  WN_num_dim(wn) ) {
+      array_dim = dim-co_dim;
+      co_dim = 0;
+     }
+    else {
          dim =  WN_num_dim(wn);
-         array_dim = dim;
+         array_dim = dim-co_dim;
        }
 
 
@@ -2132,25 +2132,25 @@ if (WN_operator(kid)==OPR_LDA)
 
     Append_Token_Special(tokens, ')');
   } 
+
   /* for co_rank */
 
-if (co_dim > 0) {
-
-  Append_Token_Special(tokens, '[');
-  for (dim =  co_dim-1; dim >= 0; dim--)
-  {
-    (void)WN2F_Denormalize_Array_Idx(tokens,
-                                     WN_array_index(wn, dim),
-                                     context);
+  if (co_dim > 0) {
+     Append_Token_Special(tokens, '[');
+     for (dim =  co_dim-1; dim >= 0; dim--)
+     {
+       (void)WN2F_Denormalize_Array_Idx(tokens,
+                                        WN_array_index(wn, dim),
+                                        context);
        
-    if (dim > 0)
-      Append_Token_Special(tokens, ',');
-  }
+       if (dim > 0)
+       Append_Token_Special(tokens, ',');
+    }
 
     Append_Token_Special(tokens, ']');
  
+    }
  }
-}
 
 void
 WN2F_arrsection_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT context)
