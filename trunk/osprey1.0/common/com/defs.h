@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: defs.h
- * $Revision: 1.8 $
- * $Date: 2003-12-09 19:27:39 $
+ * $Revision: 1.9 $
+ * $Date: 2004-01-13 20:36:53 $
  *
  * Revision history:
  *  21-Aug-89 - Original Version
@@ -248,6 +248,12 @@ typedef unsigned long	UINTPS;	/* Pointer-sized integer */
 /* Provide some limits that match the above types */
 
 /* The following are defined in <inttypes.h> but may not be visible in C++ */
+
+#if defined(__CYGWIN__) /* FIXME: remove eventually */
+# undef INT64_MAX /* force redefinition because system headers erroneously */
+# undef INT64_MIN /*   do not include appropriate 'll' suffix */
+#endif
+
 #ifndef INT8_MAX
 # define INT8_MAX	127		/* Max 8-bit int */
 #endif
