@@ -183,6 +183,11 @@ WHIRL2F_MAIN_SRCS = \
   whirl2f_main.cxx
 
 
+
+BE_EXE = $(addsuffix $(EXEext), be)
+BE_DSO = $(addsuffix $(DSOext), be)
+
+
 CFILES =
 CXXFILES = $(WHIRL2F_C_SRCS) $(WHIRL2F_DRIVER_SRCS) $(WHIRL2F_MAIN_SRCS)
 
@@ -190,11 +195,6 @@ WHIRL2F_C_OBJS = $(WHIRL2F_C_SRCS:.cxx=.o)
 WHIRL2F_DRIVER_OBJS = $(WHIRL2F_DRIVER_SRCS:.cxx=.o)
 WHIRL2F_MAIN_OBJS = $(WHIRL2F_MAIN_SRCS:.cxx=.o)
 
-ifeq ($(BUILD_OS), LINUX)
-WHIRL2F_DSOS = be.so
-else
-WHIRL2F_DSOS = $(TARGDIR)/be/be.so
-endif
 
 VPATH    =  $(SRC_DIRS)
 
@@ -254,7 +254,14 @@ endif
 #  Define target
 #----------------------------------------------------------------------
 
-TARGETS = whirl2f.so whirl2f_be whirl2f
+
+WHIRL2F_EXE = $(addsuffix $(EXEext), whirl2f)
+WHIRL2F_DSO = $(addsuffix $(DSOext), whirl2f)
+WHIRL2F_BE_EXE = $(addsuffix $(EXEext), whirl2f_be)
+WHIRL2F90_EXE = $(addsuffix $(EXEext), whirl2f90)
+
+
+TARGETS = $(WHIRL2F_EXE) $(WHIRL2F_BE_EXE) $(WHIRL2F_DSO) $(WHIRL2F90_EXE)
 
 ifdef LOCAL_TARG_INFO_DIR
 TARG_TARG_INFO_DIR = $(TARGDIR)/$(LOCAL_TARG_INFO_DIR)
@@ -263,17 +270,17 @@ TARG_TARG_INFO_DIR = $(TARGDIR)/targ_info
 endif
 
 ifeq ($(BUILD_TARGET), MIPS)
-TARGET_SO = r10000.so
+TARGET_SO = $(addsuffix $(DSOext), r10000)
 endif
 ifeq ($(BUILD_TARGET), IA64)
-TARGET_SO = itanium.so
+TARGET_SO = $(addsuffix $(DSOext), itanium)
 endif
 ifeq ($(BUILD_TARGET), IA32)
-TARGET_SO = pentium.so
+TARGET_SO = $(addsuffix $(DSOext), pentium)
 endif
 
 # extra files to be removed with make clobber
-LDIRT += be be.so $(TARGET_SO) whirl2c_be
+LDIRT += $(BE_EXE) $(BE_DSO) $(TARGET_SO) whirl2c_be
 
 
 #----------------------------------------------------------------------
@@ -325,7 +332,7 @@ first:
 	cd $(TARGDIR)/be && $(MAKE)
 ifeq ($(BUILD_OS), LINUX)
 	cd $(BUILD_AREA)/include && $(MAKE)
-	if ! test -a $(TARGET_SO); then ln -sf $(TARG_TARG_INFO_DIR)/$(TARGET_SO) .; fi
+	if ! test -f $(TARGET_SO); then ln -sf $(TARG_TARG_INFO_DIR)/$(TARGET_SO) .; fi
 endif
 
 include $(BUILD_TOT)/Makeinclude
@@ -339,12 +346,13 @@ DIRTS =
 #----------------------------------------------------------------------
 #  Build 'whirl2f.so', 'whirl2f_be' and 'whirl2f'
 #
-#  These rules build the 'whirl2f.so" by default, and can install
+#  These rules build the 'whirl2f.so' by default, and can install
 #  it in the $(STD_MONGOOSE_LOC) directory.
 #----------------------------------------------------------------------
 install:: default
-	$(STD_INSTALL) $(STD_INSTALL_EXEC_MASK) -F $(STD_MONGOOSE_LOC) whirl2f.so whirl2f
-	$(STD_INSTALL) -lns be -F $(STD_MONGOOSE_LOC) whirl2f_be
+	$(STD_INSTALL) $(STD_INSTALL_EXEC_MASK) -F $(STD_MONGOOSE_LOC) \
+	  $(WHIRL2F_DSO) $(WHIRL2F_EXE)
+	$(STD_INSTALL) -lns $(BE_EXE) -F $(STD_MONGOOSE_LOC) $(WHIRL2F_BE_EXE)
 
 
 #----------------------------------------------------------------------
@@ -353,50 +361,61 @@ install:: default
 # add -G for dynamic shared object, remove $(STD_DSO_LOADOPTS) $(EXPORT_LIST)
 # $(LDFLAGS) $(LLDLIBS), LLDLIBS = -none -lc  
 #----------------------------------------------------------------------
+ifeq ($(BUILD_OS), LINUX)
+WHIRL2F_LIBS = $(BE_DSO)
+endif
+
 ifeq ($(BUILD_OS), SOLARIS)
-whirl2f.so:  $(WHIRL2F_C_OBJS)  $(BE_WHIRL2F_DIR)/Exported $(WHIRL2F_DSOS) \
-	     $(WHIRL2F_DSOS) $(BE_BE_DIR)/so_locations
+$(WHIRL2F_DSO): $(WHIRL2F_C_OBJS) \
+                $(BE_WHIRL2F_DIR)/Exported $(BE_BE_DIR)/so_locations
 ifeq ($(BUILD_COMPILER), VENDOR)
 	$(CXX) -o $@ -G $(WHIRL2F_C_OBJS) -lc
 else
 	$(CXX) -o $@ -G $(WHIRL2F_C_OBJS)
 endif
 else # irix and linux
-whirl2f.so: $(WHIRL2F_C_OBJS)
-	$(CXX) -shared -o $@ $(WHIRL2F_C_OBJS) -lc
+$(WHIRL2F_DSO): $(WHIRL2F_C_OBJS) $(WHIRL2F_LIBS)
+	$(CXX) -shared -o $@ $(WHIRL2F_C_OBJS) $(WHIRL2F_LIBS) -lc
 endif
 
 
 #----------------------------------------------------------------------
 #  Rules for "whirl2f_be" changed by Solaris porting
 #----------------------------------------------------------------------
-whirl2f_be: whirl2f.so
+$(WHIRL2F_BE_EXE): $(WHIRL2F_DSO)
 	(cd $(TARGDIR)/be; \
 	$(MAKE) BE_OPT_DIR='$(BE_OPT_DIR)' \
-	                   LINK_DSO='$(LINK_DSO)' \
-	                   LINK_DSO_OPTS='$(LINK_DSO_OPTS) -L.' \
-	                   be)
-ifeq ($(BUILD_OS), SOLARIS)
-	if test ! -r whirl2f_be; then ln -f -s $(TARGDIR)/be/be whirl2f_be ; fi
-else
-	if test ! -r whirl2f_be; then ln -sf $(TARGDIR)/be/be whirl2f_be ; fi
-endif
+	        LINK_DSO='$(LINK_DSO)' \
+	        LINK_DSO_OPTS='$(LINK_DSO_OPTS) -L.' \
+	        $(BE_EXE))
+	if test ! -r $(WHIRL2F_BE_EXE); then \
+	  ln -f -s $(TARGDIR)/be/$(BE_EXE) $(WHIRL2F_BE_EXE) ; \
+	fi
 
 #---------------------------------------------------------------------
 #  Rules for "whirl2f" changed by Solaris porting
 #
 #  $(LDFLAGS) is removed
 #---------------------------------------------------------------------
-whirl2f: whirl2f.so whirl2f_be $(WHIRL2F_MAIN_OBJS) be.so be
-	rm -f whirl2f90
-	$(C++F) -o whirl2f $(WHIRL2F_MAIN_OBJS)
-	if test ! -r whirl2f90; then ln -f $(TARGDIR)/be/be whirl2f90 ; fi
+$(WHIRL2F_EXE): $(WHIRL2F_DSO) $(WHIRL2F_BE_EXE) $(WHIRL2F_MAIN_OBJS) \
+                $(BE_DSO) $(BE_EXE)
+	rm -f $(WHIRL2F90_EXE)
+	$(C++F) -o $(WHIRL2F_EXE) $(WHIRL2F_MAIN_OBJS)
 
-be.so:
-	if test ! -r be.so; then ln -f -s $(TARGDIR)/be/be.so ./be.so; fi
+$(WHIRL2F90_EXE): $(WHIRL2F_EXE)
+	if test ! -r $(WHIRL2F90_EXE); then \
+	  ln -f $(TARGDIR)/be/$(BE_EXE) $(WHIRL2F90_EXE) ; \
+	fi
 
-be:
-	if test ! -r be; then ln -f -s $(TARGDIR)/be/be ./be; fi
+$(BE_DSO):
+	if test ! -r $(BE_DSO); then \
+	  ln -f -s $(TARGDIR)/be/$(BE_DSO) ./$(BE_DSO); \
+	fi
+
+$(BE_EXE):
+	if test ! -r $(BE_EXE); then \
+	  ln -f -s $(TARGDIR)/be/$(BE_EXE) ./$(BE_EXE); \
+	fi
 
 #----------------------------------------------------------------------
 #  Include the usual commonrules

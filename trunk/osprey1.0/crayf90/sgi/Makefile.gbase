@@ -222,7 +222,7 @@ CXXFILES = $(SGI_CXX_SRCS)
 #----------------------------------------------------------------------
 # extra files to be removed with make clobber
 #----------------------------------------------------------------------
-LDIRT = cf90.i cf90.cat cf90.exp cf90.cat.m cf90.exp.m ii_files mfef90
+LDIRT = cf90.i cf90.cat cf90.exp cf90.cat.m cf90.exp.m ii_files
 
 
 #----------------------------------------------------------------------
@@ -302,7 +302,10 @@ endif
 #  Define target
 #----------------------------------------------------------------------
 
-TARGETS = mfef90
+MFEF90_EXE = $(addsuffix $(EXEext), mfef90)
+
+
+TARGETS = $(MFEF90_EXE)
 
 LIBRARY = fe90_sgi.a
 
@@ -369,11 +372,14 @@ exports: cf90.cat cf90.exp
 
 ifeq ($(BUILD_OS), LINUX)
 install: default cf90.cat
-	$(STD_INSTALL) $(STD_INSTALL_EXEC_MASK) -D mfef90 $(STD_MONGOOSE_LINUX_LOC)/mfef90
-	$(STD_INSTALL) $(STD_INSTALL_EXEC_MASK) -D cf90.cat $(STD_MONGOOSE_LINUX_LOC)/cf90.cat
+	$(STD_INSTALL) $(STD_INSTALL_EXEC_MASK) -D $(MFEF90_EXE) \
+	  $(STD_MONGOOSE_LINUX_LOC)/$(MFEF90_EXE)
+	$(STD_INSTALL) $(STD_INSTALL_EXEC_MASK) -D cf90.cat \
+	  $(STD_MONGOOSE_LINUX_LOC)/cf90.cat
 else
 install: default cf90.cat cf90.exp
-	$(STD_INSTALL) $(STD_INSTALL_EXEC_MASK) -F $(STD_MONGOOSE_LOC) mfef90
+	$(STD_INSTALL) $(STD_INSTALL_EXEC_MASK) -F $(STD_MONGOOSE_LOC) \
+	  $(MFEF90_EXE)
 	$(STD_INSTALL) -m 444 -F $(LANG_C_MSG_DIR) -src cf90.cat cf90.cat
 	$(STD_INSTALL) -m 444 -F $(LANG_C_MSG_DIR) -src cf90.cat.m cf90.cat.m
 	$(STD_INSTALL) -m 444 -F $(LANG_C_MSG_DIR) -src cf90.exp cf90.exp
@@ -383,7 +389,7 @@ endif
 #-------------------------------------------------------------------------
 #  Rules for mfef90, and error message catelogue cf90.cat
 #-------------------------------------------------------------------------
-mfef90: $(OBJECTS) $(LIBRARIES) 
+$(MFEF90_EXE): $(OBJECTS) $(LIBRARIES) 
 	echo char \* mfef90_compiler_build_date = \" `date` \"\;> compiler_build_date.c
 	$(CC) -c  compiler_build_date.c
 	$(C++F) -o $@ $(OBJECTS) compiler_build_date.o $(TARG_COMUTIL_DIR)/libcomutil.a \

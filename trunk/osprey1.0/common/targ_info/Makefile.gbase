@@ -141,31 +141,58 @@ DSOSTARTOPT_32 = $(DSOSTARTOPT)
 DSOSTARTOPT_N32 = $(DSOSTARTOPT)
 
 
-LDIRT += *.[ch] *.Exported isa_gen isa_subset_gen isa_operands_gen \
-	 isa_properties_gen isa_hazards_gen isa_pack_gen isa_print_gen \
-	 isa_decode_gen isa_pseudo_gen isa_registers_gen isa_enums_gen \
-	 isa_lits_gen abi_properties_gen proc_gen proc_properties_gen \
-	 isa_bundle_gen si_gen.so ii_files so_locations
+ISA_GEN_EXE = $(addsuffix $(EXEext), isa_gen)
+ISA_SUBSET_GEN_EXE = $(addsuffix $(EXEext), isa_subset_gen)
+ISA_OPERANDS_GEN_EXE = $(addsuffix $(EXEext), isa_operands_gen)
+ISA_PROPERTIES_GEN_EXE = $(addsuffix $(EXEext), isa_properties_gen)
+ISA_HAZARDS_GEN_EXE = $(addsuffix $(EXEext), isa_hazards_gen)
+ISA_PACK_GEN_EXE = $(addsuffix $(EXEext), isa_pack_gen)
+ISA_PRINT_GEN_EXE = $(addsuffix $(EXEext), isa_print_gen)
+ISA_DECODE_GEN_EXE = $(addsuffix $(EXEext), isa_decode_gen)
+ISA_PSEUDO_GEN_EXE = $(addsuffix $(EXEext), isa_pseudo_gen)
+ISA_REGISTERS_GEN_EXE = $(addsuffix $(EXEext), isa_registers_gen)
+ISA_ENUMS_GEN_EXE = $(addsuffix $(EXEext), isa_enums_gen)
+ISA_LITS_GEN_EXE = $(addsuffix $(EXEext), isa_lits_gen)
+ABI_PROPERTIES_GEN_EXE = $(addsuffix $(EXEext), abi_properties_gen)
+PROC_GEN_EXE = $(addsuffix $(EXEext), proc_gen)
+PROC_PROPERTIES_GEN_EXE = $(addsuffix $(EXEext), proc_properties_gen)
+ISA_BUNDLE_GEN_EXE = $(addsuffix $(EXEext), isa_bundle_gen)
+
+SI_GEN_DSO = $(addsuffix $(DSOext), si_gen)
+
+LDIRT += *.[ch] *.Exported $(ISA_GEN_EXE) $(ISA_SUBSET_GEN_EXE) \
+	 $(ISA_OPERANDS_GEN_EXE) $(ISA_PROPERTIES_GEN_EXE) \
+	 $(ISA_HAZARDS_GEN_EXE) $(ISA_PACK_GEN_EXE) $(ISA_PRINT_GEN_EXE) \
+	 $(ISA_DECODE_GEN_EXE) $(ISA_PSEUDO_GEN_EXE) $(ISA_REGISTERS_GEN_EXE) \
+	 $(ISA_ENUMS_GEN_EXE) $(ISA_LITS_GEN_EXE) $(ABI_PROPERTIES_GEN_EXE) \
+	 $(PROC_GEN_EXE) $(PROC_PROPERTIES_GEN_EXE) \
+	 $(ISA_BUNDLE_GEN_EXE) $(SI_GEN_DSO) ii_files so_locations
 
 
 #------------------------------------------------------------------------
 # Solaris_revision: these extra .so files are not needed for s-to-s
 #------------------------------------------------------------------------
+
+ITANIUM_SI_GEN_EXE = $(addsuffix $(EXEext), itanium_si_gen)
+ITANIUM_DSO = $(addsuffix $(DSOext), itanium)
+
+PENTIUM_SI_GEN_EXE = $(addsuffix $(EXEext), pentium_si_gen)
+
 ifeq ($(BUILD_TARGET), MIPS)
 LDIRT += r10000_si_gen r8000_si_gen r5000_si_gen r4000_si_gen 
 SO_TARGETS = 
 endif
 ifeq ($(BUILD_TARGET), IA64)
-LDIRT += itanium_si_gen
+LDIRT += $(ITANIUM_SI_GEN_EXE)
 # We are now building the target so for linux (for LNO).
 ifeq ($(BUILD_OS), LINUX)
-SO_TARGETS = itanium.so
+SO_TARGETS = $(ITANIUM_DSO)
 else
 SO_TARGETS = 
 endif
 endif
 ifeq ($(BUILD_TARGET), IA32)
-LDIRT += pentium_si_gen
+LDIRT += $(PENTIUM_SI_GEN_EXE)
 SO_TARGETS = 
 endif
 
@@ -325,13 +352,13 @@ ti_errors.o: ti_errors.c ti_errors.h
 	$(CC) $(CFLAGS) -c $(TARGINFO_ACCESS_DIR)/ti_errors.c
 
 
-topcode.o: isa_gen topcode.c
+topcode.o: $(ISA_GEN_EXE) topcode.c
 	$(CC) $(CFLAGS) -c topcode.c
 
 gen_util.o: gen_util.cxx gen_util.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/gen_util.cxx
 
-targ_proc.o: proc_gen targ_proc.c
+targ_proc.o: $(PROC_GEN_EXE) targ_proc.c
 	$(CC) $(CFLAGS) -c targ_proc.c
 
 
@@ -357,11 +384,11 @@ endif
 ## topcode.[ch] ##
 
 topcode.c: topcode.h
-topcode.h: isa_gen
-	$(RUN) ./isa_gen
+topcode.h: $(ISA_GEN_EXE)
+	$(RUN) ./$(ISA_GEN_EXE)
 
-isa_gen: isa_gen.o gen_util.o isa.o
-	$(CXX) $(CXXLDFLAGS) isa_gen.o gen_util.o isa.o -o isa_gen
+$(ISA_GEN_EXE): isa_gen.o gen_util.o isa.o
+	$(CXX) $(CXXLDFLAGS) isa_gen.o gen_util.o isa.o -o $(ISA_GEN_EXE)
 
 isa_gen.o: isa_gen.cxx isa_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_gen.cxx
@@ -374,12 +401,12 @@ isa.o: isa.cxx isa_gen.h
 ## targ_isa_enums.[ch] ##
 
 targ_isa_enums.c: targ_isa_enums.h
-targ_isa_enums.h: isa_enums_gen
-	$(RUN) ./isa_enums_gen
+targ_isa_enums.h: $(ISA_ENUMS_GEN_EXE)
+	$(RUN) ./$(ISA_ENUMS_GEN_EXE)
 
-isa_enums_gen: isa_enums_gen.o gen_util.o isa_enums.o
+$(ISA_ENUMS_GEN_EXE): isa_enums_gen.o gen_util.o isa_enums.o
 	$(CXX) $(CXXLDFLAGS) isa_enums.o isa_enums_gen.o gen_util.o \
-	    -o isa_enums_gen
+	    -o $(ISA_ENUMS_GEN_EXE)
 
 isa_enums_gen.o: isa_enums_gen.cxx isa_enums_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_enums_gen.cxx
@@ -390,12 +417,12 @@ isa_enums.o: isa_enums.cxx isa_enums_gen.h
 ## targ_isa_lits.[ch] ##
 
 targ_isa_lits.c: targ_isa_lits.h
-targ_isa_lits.h: isa_lits_gen
-	$(RUN) ./isa_lits_gen
+targ_isa_lits.h: $(ISA_LITS_GEN_EXE)
+	$(RUN) ./$(ISA_LITS_GEN_EXE)
 
-isa_lits_gen: isa_lits_gen.o gen_util.o isa_lits.o
+$(ISA_LITS_GEN_EXE): isa_lits_gen.o gen_util.o isa_lits.o
 	$(CXX) $(CXXLDFLAGS) isa_lits.o isa_lits_gen.o gen_util.o \
-	    -o isa_lits_gen
+	    -o $(ISA_LITS_GEN_EXE)
 
 isa_lits_gen.o: isa_lits_gen.cxx isa_lits_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_lits_gen.cxx
@@ -406,13 +433,13 @@ isa_lits.o: isa_lits.cxx isa_lits_gen.h
 ## targ_isa_registers.[ch] ##
 
 targ_isa_registers.c: targ_isa_registers.h
-targ_isa_registers.h: isa_registers_gen
-	$(RUN) ./isa_registers_gen
+targ_isa_registers.h: $(ISA_REGISTERS_GEN_EXE)
+	$(RUN) ./$(ISA_REGISTERS_GEN_EXE)
 
-isa_registers_gen: isa_registers_gen.o gen_util.o isa_registers.o topcode.o \
+$(ISA_REGISTERS_GEN_EXE): isa_registers_gen.o gen_util.o isa_registers.o topcode.o \
 		targ_isa_subset.o
 	$(CXX) $(CXXLDFLAGS) isa_registers.o isa_registers_gen.o \
-	    gen_util.o targ_isa_subset.o topcode.o -o isa_registers_gen
+	    gen_util.o targ_isa_subset.o topcode.o -o $(ISA_REGISTERS_GEN_EXE)
 
 isa_registers_gen.o: isa_registers_gen.cxx isa_registers_gen.h targ_isa_subset.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_registers_gen.cxx
@@ -424,13 +451,13 @@ isa_registers.o: isa_registers.cxx isa_registers_gen.h targ_isa_subset.h
 ## targ_isa_hazards.[ch] ##
 
 targ_isa_hazards.c: targ_isa_hazards.h
-targ_isa_hazards.h: isa_hazards_gen
-	$(RUN) ./isa_hazards_gen
+targ_isa_hazards.h: $(ISA_HAZARDS_GEN_EXE)
+	$(RUN) ./$(ISA_HAZARDS_GEN_EXE)
 
-isa_hazards_gen: isa_hazards_gen.o gen_util.o isa_hazards.o topcode.o \
+$(ISA_HAZARDS_GEN_EXE): isa_hazards_gen.o gen_util.o isa_hazards.o topcode.o \
 		targ_isa_subset.o
 	$(CXX) $(CXXLDFLAGS) isa_hazards.o isa_hazards_gen.o \
-	    gen_util.o targ_isa_subset.o topcode.o -o isa_hazards_gen
+	    gen_util.o targ_isa_subset.o topcode.o -o $(ISA_HAZARDS_GEN_EXE)
 
 isa_hazards_gen.o: isa_hazards_gen.cxx isa_hazards_gen.h topcode.h targ_isa_subset.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_hazards_gen.cxx
@@ -442,12 +469,12 @@ isa_hazards.o: isa_hazards.cxx isa_hazards_gen.h topcode.h targ_isa_subset.h
 ## targ_isa_subset.[ch] ##
 
 targ_isa_subset.c: targ_isa_subset.h
-targ_isa_subset.h: isa_subset_gen
-	$(RUN) ./isa_subset_gen
+targ_isa_subset.h: $(ISA_SUBSET_GEN_EXE)
+	$(RUN) ./$(ISA_SUBSET_GEN_EXE)
 
-isa_subset_gen: isa_subset_gen.o gen_util.o isa_subset.o topcode.o
+$(ISA_SUBSET_GEN_EXE): isa_subset_gen.o gen_util.o isa_subset.o topcode.o
 	$(CXX) $(CXXLDFLAGS) isa_subset.o isa_subset_gen.o gen_util.o \
-	    topcode.o -o isa_subset_gen
+	    topcode.o -o $(ISA_SUBSET_GEN_EXE)
 
 isa_subset_gen.o: isa_subset_gen.cxx isa_subset_gen.h topcode.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_subset_gen.cxx
@@ -459,12 +486,12 @@ isa_subset.o: isa_subset.cxx isa_subset_gen.h topcode.h
 ## targ_isa_properties.[ch] ##
 
 targ_isa_properties.c: targ_isa_properties.h
-targ_isa_properties.h: isa_properties_gen
-	$(RUN) ./isa_properties_gen
+targ_isa_properties.h: $(ISA_PROPERTIES_GEN_EXE)
+	$(RUN) ./$(ISA_PROPERTIES_GEN_EXE)
 
-isa_properties_gen: isa_properties_gen.o gen_util.o isa_properties.o topcode.o
+$(ISA_PROPERTIES_GEN_EXE): isa_properties_gen.o gen_util.o isa_properties.o topcode.o
 	$(CXX) $(CXXLDFLAGS) isa_properties.o isa_properties_gen.o gen_util.o \
-	    topcode.o -o isa_properties_gen
+	    topcode.o -o $(ISA_PROPERTIES_GEN_EXE)
 
 isa_properties_gen.o: isa_properties_gen.cxx isa_properties_gen.h topcode.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_properties_gen.cxx
@@ -476,18 +503,18 @@ isa_properties.o: isa_properties.cxx isa_properties_gen.h topcode.h
 ## targ_isa_operands.[ch] ##
 
 targ_isa_operands.c: targ_isa_operands.h
-targ_isa_operands.h: isa_operands_gen
-	$(RUN) ./isa_operands_gen
+targ_isa_operands.h: $(ISA_OPERANDS_GEN_EXE)
+	$(RUN) ./$(ISA_OPERANDS_GEN_EXE)
 
 targ_isa_operands.o: targ_isa_operands.c targ_isa_operands.h targ_isa_properties.h
 	$(CC) $(CFLAGS) -c targ_isa_operands.c
 
-isa_operands_gen: isa_operands_gen.o gen_util.o isa_operands.o topcode.o \
+$(ISA_OPERANDS_GEN_EXE): isa_operands_gen.o gen_util.o isa_operands.o topcode.o \
 		  targ_isa_registers.o targ_isa_enums.o targ_isa_lits.o \
 		  targ_isa_subset.o
 	$(CXX) $(CXXLDFLAGS) isa_operands.o isa_operands_gen.o gen_util.o \
 	    topcode.o targ_isa_registers.o targ_isa_enums.o targ_isa_lits.o \
-	    targ_isa_subset.o -o isa_operands_gen
+	    targ_isa_subset.o -o $(ISA_OPERANDS_GEN_EXE)
 
 isa_operands_gen.o: isa_operands_gen.cxx isa_operands_gen.h \
 	targ_isa_registers.h targ_isa_enums.h targ_isa_lits.h topcode.h
@@ -502,13 +529,13 @@ isa_operands.o: isa_operands.cxx isa_operands_gen.h targ_isa_registers.h \
 ## targ_isa_pack.[ch] ##
 
 targ_isa_pack.c: targ_isa_pack.h
-targ_isa_pack.h: isa_pack_gen
-	$(RUN) ./isa_pack_gen
+targ_isa_pack.h: $(ISA_PACK_GEN_EXE)
+	$(RUN) ./$(ISA_PACK_GEN_EXE)
 
-isa_pack_gen: gen_util.o isa_pack_gen.o gen_util.o isa_pack.o \
+$(ISA_PACK_GEN_EXE): gen_util.o isa_pack_gen.o gen_util.o isa_pack.o \
 	      topcode.o targ_isa_properties.o
 	$(CXX) $(CXXLDFLAGS) isa_pack.o isa_pack_gen.o gen_util.o \
-	    topcode.o targ_isa_properties.o -o isa_pack_gen
+	    topcode.o targ_isa_properties.o -o $(ISA_PACK_GEN_EXE)
 
 isa_pack_gen.o: isa_pack_gen.cxx isa_pack_gen.h topcode.h targ_isa_properties.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_pack_gen.cxx
@@ -520,12 +547,12 @@ isa_pack.o: isa_pack.cxx isa_pack_gen.h topcode.h
 ## targ_isa_decode.[ch] ##
 
 targ_isa_decode.c: targ_isa_decode.h
-targ_isa_decode.h: isa_decode_gen
-	$(RUN) ./isa_decode_gen
+targ_isa_decode.h: $(ISA_DECODE_GEN_EXE)
+	$(RUN) ./$(ISA_DECODE_GEN_EXE)
 
-isa_decode_gen: gen_util.o isa_decode_gen.o gen_util.o isa_decode.o topcode.o targ_isa_bundle.o 
+$(ISA_DECODE_GEN_EXE): gen_util.o isa_decode_gen.o gen_util.o isa_decode.o topcode.o targ_isa_bundle.o 
 	$(CXX) $(CXXLDFLAGS) isa_decode.o isa_decode_gen.o gen_util.o \
-	    topcode.o targ_isa_bundle.o -o isa_decode_gen
+	    topcode.o targ_isa_bundle.o -o $(ISA_DECODE_GEN_EXE)
 
 isa_decode_gen.o: isa_decode_gen.cxx isa_decode_gen.h topcode.h 
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_decode_gen.cxx
@@ -538,16 +565,16 @@ isa_decode.o: isa_decode.cxx isa_decode_gen.h topcode.h targ_isa_bundle.h \
 ## targ_isa_pseudo.[ch] ##
 
 targ_isa_pseudo.c: targ_isa_pseudo.h
-targ_isa_pseudo.h: isa_pseudo_gen
-	$(RUN) ./isa_pseudo_gen
+targ_isa_pseudo.h: $(ISA_PSEUDO_GEN_EXE)
+	$(RUN) ./$(ISA_PSEUDO_GEN_EXE)
 
-isa_pseudo_gen: gen_util.o isa_pseudo_gen.o gen_util.o isa_pseudo.o topcode.o \
+$(ISA_PSEUDO_GEN_EXE): gen_util.o isa_pseudo_gen.o gen_util.o isa_pseudo.o topcode.o \
 		targ_isa_operands.o targ_isa_operands.o targ_isa_registers.o \
 		targ_isa_lits.o targ_isa_enums.o targ_isa_subset.o
 	$(CXX) $(CXXLDFLAGS) isa_pseudo.o isa_pseudo_gen.o gen_util.o \
 	    topcode.o targ_isa_operands.o targ_isa_registers.o \
 	    targ_isa_lits.o targ_isa_enums.o targ_isa_subset.o \
-	    -o isa_pseudo_gen
+	    -o $(ISA_PSEUDO_GEN_EXE)
 
 isa_pseudo_gen.o: isa_pseudo_gen.cxx isa_pseudo_gen.h topcode.h targ_isa_operands.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_pseudo_gen.cxx
@@ -559,13 +586,13 @@ isa_pseudo.o: isa_pseudo.cxx isa_pseudo_gen.h topcode.h
 ## targ_isa_print.[ch] ##
 
 targ_isa_print.c: targ_isa_print.h
-targ_isa_print.h: isa_print_gen
-	$(RUN) ./isa_print_gen
+targ_isa_print.h: $(ISA_PRINT_GEN_EXE)
+	$(RUN) ./$(ISA_PRINT_GEN_EXE)
 
-isa_print_gen: gen_util.o isa_print_gen.o isa_print.o \
+$(ISA_PRINT_GEN_EXE): gen_util.o isa_print_gen.o isa_print.o \
 	       topcode.o targ_isa_properties.o
 	$(CXX) $(CXXLDFLAGS) isa_print.o isa_print_gen.o gen_util.o \
-	    topcode.o targ_isa_properties.o -o isa_print_gen
+	    topcode.o targ_isa_properties.o -o $(ISA_PRINT_GEN_EXE)
 
 isa_print_gen.o: isa_print_gen.cxx isa_print_gen.h topcode.h targ_isa_properties.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/isa_print_gen.cxx
@@ -577,13 +604,13 @@ isa_print.o: isa_print.cxx isa_print_gen.h topcode.h
 ## targ_abi_properties.[ch] ##
 
 targ_abi_properties.c: targ_abi_properties.h
-targ_abi_properties.h: abi_properties_gen
-	$(RUN) ./abi_properties_gen
+targ_abi_properties.h: $(ABI_PROPERTIES_GEN_EXE)
+	$(RUN) ./$(ABI_PROPERTIES_GEN_EXE)
 
-abi_properties_gen: abi_properties_gen.o gen_util.o abi_properties.o \
+$(ABI_PROPERTIES_GEN_EXE): abi_properties_gen.o gen_util.o abi_properties.o \
 		targ_isa_subset.o targ_isa_registers.o
 	$(CXX) $(CXXLDFLAGS) abi_properties.o abi_properties_gen.o gen_util.o \
-	    targ_isa_subset.o targ_isa_registers.o -o abi_properties_gen
+	    targ_isa_subset.o targ_isa_registers.o -o $(ABI_PROPERTIES_GEN_EXE)
 
 abi_properties_gen.o: abi_properties_gen.cxx abi_properties_gen.h \
 		targ_isa_registers.h
@@ -595,13 +622,13 @@ abi_properties.o: abi_properties.cxx abi_properties_gen.h targ_isa_registers.h
 ## targ_isa_bundle.[ch] ##
 
 targ_isa_bundle.c: targ_isa_bundle.h
-targ_isa_bundle.h: isa_bundle_gen
-	$(RUN) ./isa_bundle_gen
+targ_isa_bundle.h: $(ISA_BUNDLE_GEN_EXE)
+	$(RUN) ./$(ISA_BUNDLE_GEN_EXE)
 
-isa_bundle_gen: gen_util.o isa_bundle_gen.o gen_util.o isa_bundle.o \
+$(ISA_BUNDLE_GEN_EXE): gen_util.o isa_bundle_gen.o gen_util.o isa_bundle.o \
 	topcode.o targ_isa_properties.o
 	$(CXX) $(CXXLDFLAGS) isa_bundle.o isa_bundle_gen.o gen_util.o \
-	topcode.o targ_isa_properties.o -o isa_bundle_gen
+	topcode.o targ_isa_properties.o -o $(ISA_BUNDLE_GEN_EXE)
 
 isa_bundle_gen.o: isa_bundle_gen.cxx isa_bundle_gen.h topcode.h \
                   targ_isa_properties.h
@@ -613,11 +640,11 @@ isa_bundle.o: isa_bundle.cxx isa_bundle_gen.h topcode.h
 ## targ_proc.[ch] ##
 
 targ_proc.c: targ_proc.h
-targ_proc.h: proc_gen
-	$(RUN) ./proc_gen
+targ_proc.h: $(PROC_GEN_EXE)
+	$(RUN) ./$(PROC_GEN_EXE)
 
-proc_gen: proc_gen.o gen_util.o proc.o
-	$(CXX) $(CXXLDFLAGS) proc_gen.o gen_util.o proc.o -o proc_gen
+$(PROC_GEN_EXE): proc_gen.o gen_util.o proc.o
+	$(CXX) $(CXXLDFLAGS) proc_gen.o gen_util.o proc.o -o $(PROC_GEN_EXE)
 
 proc_gen.o: proc_gen.cxx proc_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/proc_gen.cxx
@@ -628,11 +655,11 @@ proc.o: proc.cxx proc_gen.h
 ## targ_proc_properties.[ch] ##
 
 targ_proc_properties.c: targ_proc_properties.h
-targ_proc_properties.h: proc_properties_gen
-	$(RUN) ./proc_properties_gen
+targ_proc_properties.h: $(PROC_PROPERTIES_GEN_EXE)
+	$(RUN) ./$(PROC_PROPERTIES_GEN_EXE)
 
-proc_properties_gen: proc_properties_gen.o gen_util.o proc_properties.o targ_proc.o
-	$(CXX) $(CXXLDFLAGS) proc_properties_gen.o gen_util.o proc_properties.o targ_proc.o -o proc_properties_gen
+$(PROC_PROPERTIES_GEN_EXE): proc_properties_gen.o gen_util.o proc_properties.o targ_proc.o
+	$(CXX) $(CXXLDFLAGS) proc_properties_gen.o gen_util.o proc_properties.o targ_proc.o -o $(PROC_PROPERTIES_GEN_EXE)
 
 proc_properties_gen.o: proc_properties_gen.cxx proc_properties_gen.h targ_proc.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_GENERATE_DIR)/proc_properties_gen.cxx
@@ -753,22 +780,22 @@ endif
 ifeq ($(BUILD_TARGET), IA64)
 
  ifeq ($(BUILD_COMPILER), VENDOR)
-itanium.so: itanium.o $(SI_EXPORT_LIST)
+$(ITANIUM_DSO): itanium.o $(SI_EXPORT_LIST)
 	$(CC) $(CFLAGS) $(STD_DSO_LOADOPTS) -exports_file $(SI_EXPORT_LIST) \
-               itanium.o -o itanium.so
+               itanium.o -o $(ITANIUM_DSO)
  else
-itanium.so: itanium.o
-	$(CC) $(CFLAGS) $(STD_DSO_LOADOPTS) itanium.o -shared -o itanium.so
+$(ITANIUM_DSO): itanium.o
+	$(CC) $(CFLAGS) $(STD_DSO_LOADOPTS) itanium.o -shared -o $(ITANIUM_DSO)
  endif
 
 itanium.o: itanium.c ti_si.h
 	$(CC) $(CFLAGS) -c itanium.c
 
-itanium.c: itanium_si_gen
-	$(SETPATH) $(RUN) ./itanium_si_gen
+itanium.c: $(ITANIUM_SI_GEN_EXE)
+	$(SETPATH) $(RUN) ./$(ITANIUM_SI_GEN_EXE)
 
-itanium_si_gen: si_gen.a itanium_si.o topcode.o
-	$(CXX) $(CXXLDFLAGS) itanium_si.o topcode.o si_gen.a -o itanium_si_gen
+$(ITANIUM_SI_GEN_EXE): si_gen.a itanium_si.o topcode.o
+	$(CXX) $(CXXLDFLAGS) itanium_si.o topcode.o si_gen.a -o $(ITANIUM_SI_GEN_EXE)
 
 itanium_si.o: itanium_si.cxx targ_isa_subset.h topcode.h si_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_PROC_DIR)/itanium_si.cxx
@@ -789,11 +816,11 @@ pentium.so: pentium.o
 pentium.o: pentium.c ti_si.h
 	$(CC) $(CFLAGS) -c pentium.c
 
-pentium.c: pentium_si_gen
-	$(SETPATH) $(RUN) ./pentium_si_gen
+pentium.c: $(PENTIUM_SI_GEN_EXE)
+	$(SETPATH) $(RUN) ./$(PENTIUM_SI_GEN_EXE)
 
-pentium_si_gen: si_gen.a pentium_si.o topcode.o
-	$(CXX) $(CXXLDFLAGS) pentium_si.o topcode.o si_gen.a -o pentium_si_gen
+$(PENTIUM_SI_GEN_EXE): si_gen.a pentium_si.o topcode.o
+	$(CXX) $(CXXLDFLAGS) pentium_si.o topcode.o si_gen.a -o $(PENTIUM_SI_GEN_EXE)
 
 pentium_si.o: pentium_si.cxx targ_isa_subset.h topcode.h si_gen.h
 	$(CXX) $(CXXFLAGS) -c $(TARGINFO_PROC_DIR)/pentium_si.cxx
