@@ -66,7 +66,7 @@ static char USMID[] = "@(#) libcif/cifopen.c	30.6	05/22/97 11:49:31";
 #include "cif_int.h"
 
 /* fileno() and strdup() are in the Unix standard but not C */
-#if !(defined(__sgi) || defined(__sun))
+#if !(defined(__sgi) || defined(__sun) || defined(__alpha))
   extern int fileno(FILE *stream);
   /* On other systems this is a macro */
 #endif
