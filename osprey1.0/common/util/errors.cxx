@@ -280,7 +280,7 @@ Handle_Signals ( void )
     setup_signal_handler (SIGILL);
     setup_signal_handler (SIGTRAP);
     setup_signal_handler (SIGABRT); // SIGABRT replaces SIGIOT
-#ifndef linux
+#if !defined(__linux__)
     setup_signal_handler (SIGEMT);
 #endif
     setup_signal_handler (SIGFPE);
@@ -288,12 +288,7 @@ Handle_Signals ( void )
     setup_signal_handler (SIGSEGV);
     setup_signal_handler (SIGTERM);
 
-// Solaris workaround
-// Solaris doesn't have the following two IRIX specific functions
-// Linux CAN include <sgidef.h> which is in osprey1.0/linux
-// folder to get the definition of SGI_SET_FP_PRECISE, but
-// it didn't use the header
-#if !defined(_SOLARIS_SOLARIS) && !defined(_LINUX_LINUX)
+#if defined(__sgi)
     syssgi(SGI_SET_FP_PRECISE, 1);
     set_fpc_csr(get_fpc_csr() & ~FPCSR_FLUSH_ZERO);
     syssgi(SGI_SET_FP_PRESERVE, 1);
