@@ -35,9 +35,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.3 $
- * $Date: 2003-02-20 01:51:31 $
- * $Author: fzhao $
+ * $Revision: 1.4 $
+ * $Date: 2003-12-11 22:10:42 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $
  *
  * Description: This static data initialization
@@ -49,7 +49,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -258,9 +258,9 @@ fei_static_substr( INT32 start)
 extern 
 void fei_static_member (INT32 st_idx )
 {
-   FLD_IDX  fld ;
+   FLD_IDX  fld;
 
-   fld = (FLD_IDX ) cast_to_void(st_idx);
+   fld = (FLD_IDX)st_idx;
 
    FLD_HANDLE f (fld);
    DevAssert((FLD_bofst(f) == 0),("Can't handle non 0 bofst"));
