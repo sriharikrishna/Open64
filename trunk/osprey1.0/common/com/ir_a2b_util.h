@@ -1,5 +1,5 @@
 /* -*-Mode: C++;-*- */
-/* $Id: ir_a2b_util.h,v 1.2 2005-01-18 21:42:33 eraxxon Exp $ */
+/* $Id: ir_a2b_util.h,v 1.3 2005-01-24 20:59:43 eraxxon Exp $ */
 /* * BeginRiceCopyright *****************************************************
  * 
  * ******************************************************* EndRiceCopyright */
@@ -8,8 +8,8 @@
  * ====================================================================
  *
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ir_a2b_util.h,v $
- * $Revision: 1.2 $
- * $Date: 2005-01-18 21:42:33 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-24 20:59:43 $
  *
  * Nathan Tallent.
  *
@@ -27,6 +27,7 @@
 #include "defs.h"
 #include "cxx_memory.h"			// for CXX_NEW
 #include "errors.h"			// for Fail_FmtAssertion
+#include "x_string.h"                   // for strcasecmp()
 
 /* ====================================================================
  *
@@ -41,7 +42,7 @@
  * Note 2: n will be a relatively small compile-time constant.
  * 
  * 1. Translate between an enumerated value (INT values between 0 and
- *    n) and a unique string.
+ *    n) and a unique string (case insensitive).
  *
  *    enum to string: O(1); no additional memory allocation. (*)
  *
@@ -50,7 +51,7 @@
  *      (O(n*log n)) to be later used with binary-search. (*)
  *
  * 2. Translate between a set of flags (a set is a UINT64) to a
- *    comma-separated list of strings and vice-versa.
+ *    comma-separated list of strings (case insensitive) and vice-versa.
  *
  *    flag to string: O(log n); no additional table memory allocation. (*)
  *
@@ -116,7 +117,7 @@ struct enum2str_tbl_entry_t {
   cmp(const void * entry1, const void * entry2) {
     enum2str_tbl_entry_t* e1 = (enum2str_tbl_entry_t*)entry1;
     enum2str_tbl_entry_t* e2 = (enum2str_tbl_entry_t*)entry2;
-    return /*std*/::strcmp(e1->getStr(), e2->getStr());
+    return ux_strcasecmp(e1->getStr(), e2->getStr());
   }
   
 };
@@ -159,7 +160,7 @@ struct flag2str_tbl_entry_t {
   strcmp(const void * entry1, const void * entry2) {
     flag2str_tbl_entry_t* e1 = (flag2str_tbl_entry_t*)entry1;
     flag2str_tbl_entry_t* e2 = (flag2str_tbl_entry_t*)entry2;
-    return /*std*/::strcmp(e1->getStr(), e2->getStr());
+    return ux_strcasecmp(e1->getStr(), e2->getStr());
   }
   
 };
@@ -400,7 +401,7 @@ MapStrToFlags(const char* tablenm, const char* str)
   
   // For each flag-string in the list, find the numerical flag
   // note: strtok() will destroy the string so we use strdup
-  char* flgstr = strdup(str);
+  char* flgstr = ux_strdup(str);
   for (char* tok = strtok(flgstr, ","); (tok != NULL);
        tok = strtok((char*)NULL, ",")) {
     // Use binary search to find the flag value
