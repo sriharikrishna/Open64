@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn_attr.c
- * $Revision: 1.6 $
- * $Date: 2003-06-13 23:05:29 $
+ * $Revision: 1.7 $
+ * $Date: 2003-09-10 19:13:56 $
  *
  * Revision history:
  *  07-Mar-95 - Original Version
@@ -350,9 +350,11 @@ WN_Tree_Type(const WN *wn)
     */
 
    TY_IDX ty = Stab_Mtype_To_Ty(MTYPE_V); /* return value, default = void */
-if (wn == NULL)
-     return ty;
+
+   if (wn == NULL)
+          return ty;
  
+
    if (OPCODE_is_expression(WN_opcode(wn)))
    {
       switch (WN_opc_operator(wn))
@@ -593,10 +595,16 @@ if (wn == NULL)
 
       default:
 	 /* Only the above forms of expression nodes are handled here */
-	 ErrMsg ( EC_Invalid_Case, "WN_Tree_Type", __LINE__ );
+/*	 ErrMsg ( EC_Invalid_Case, "WN_Tree_Type", __LINE__ );*/
+/* since the cases of OPR list do not cover all the operators,
+ * for some reason we need to keep the process going,
+ * change to return the default value (void) now,will adjust 
+ * it later based on case by case.
+ *   -----fzhao
+ */
+       break;
       } /* switch */
    } /* else */
-   
    return ty;
 } /* WN_Tree_Type */
 
