@@ -40,11 +40,11 @@
 #include <infoblk.h>
 #endif
 #include <liberrno.h>
+#include <stdlib.h> /* for exit() and abort() */
 #include <errno.h>
 #include <stdio.h>
 #include <stdarg.h>
   
-extern	int	abort();
 
 #ifdef	_CRAY2
 #pragma soft errfile
