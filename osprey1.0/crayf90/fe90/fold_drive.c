@@ -56,6 +56,14 @@ static char USMID[] = "\n@(#)5.0_pl/sources/fold_drive.c	5.19	10/14/99 14:09:57\
 # include "arith.h"
 # include "fold_drive.h"
 
+/* This function has Fortran linkage. */
+#if defined(__GNUC__) && defined(__alpha)
+  /* GCC alpha is different for some reason... */
+# define FOLD_OPERATION fold_operation__
+#else
+# define FOLD_OPERATION fold_operation_
+#endif
+
 
 /******************************************************************************\
 |*									      *|
@@ -718,7 +726,7 @@ CONTINUE:
 
  # if defined(_USE_FOLD_DOT_f)
                tmp_opr = Cvrt_Opr;
-               fold_operation_(
+               FOLD_OPERATION(
                               &tmp_opr, 
                               &loc_result.v,
                               &res_linear_type,
@@ -752,7 +760,7 @@ CONTINUE:
  * implemenation in arith.a instead!
  */ 
 # if 0 
-            fold_operation_(
+            FOLD_OPERATION(
                               &opr, 
                               &loc_result.v,
                               &res_linear_type,
@@ -783,7 +791,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
                tmp_opr = Cvrt_Opr;
-               fold_operation_(
+               FOLD_OPERATION(
                               &tmp_opr, 
                               &loc_result.v,
                               &res_linear_type,
@@ -817,7 +825,7 @@ CONTINUE:
  * implemenation in arith.a instead!
  */
 # if 0
-            fold_operation_(
+            FOLD_OPERATION(
                               &opr, 
                               &loc_result.v,
                               &res_linear_type,
@@ -847,7 +855,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
                tmp_opr = Cvrt_Opr;
-               fold_operation_(
+               FOLD_OPERATION(
                               &tmp_opr,  
                               &loc_result.v,
                               &res_linear_type,
@@ -883,7 +891,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
                tmp_opr = Cvrt_Opr;
-               fold_operation_(
+               FOLD_OPERATION(
                               &tmp_opr, 
                               &loc_result.v,
                               &res_linear_type,
@@ -915,7 +923,7 @@ CONTINUE:
  * implemenation in arith.a instead!
  */
 # if 0
-            fold_operation_(
+            FOLD_OPERATION(
                               &opr, 
                               &loc_result.v,
                               &res_linear_type,
@@ -978,7 +986,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)            
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -1006,7 +1014,7 @@ CONTINUE:
          SHIFT_ARITH_ARG(l_value.v, res_linear_type);
 
 # if defined(_USE_FOLD_DOT_f)
-         fold_operation_(
+         FOLD_OPERATION(
                         &opr,   
                         &loc_result.v,
                         &res_linear_type,
@@ -1112,7 +1120,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
          tmp_opr = Cvrt_Opr;
-         fold_operation_(
+         FOLD_OPERATION(
                         &tmp_opr,  
                         &loc_result.v,
                         &res_linear_type,
@@ -1199,7 +1207,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
          tmp_opr = Cvrt_Opr;
-         fold_operation_(
+         FOLD_OPERATION(
                         &tmp_opr,   
                         &loc_result.v,
                         &res_linear_type,
@@ -1233,7 +1241,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr, 
                            &loc_result.v,
                            &res_linear_type,
@@ -1265,7 +1273,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,   
                            &loc_result.v,
                            &res_linear_type,
@@ -1299,7 +1307,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -1330,7 +1338,7 @@ CONTINUE:
          SHIFT_ARITH_ARG(r_value.v, r_linear_type);
 
 # if defined(_USE_FOLD_DOT_f)
-         fold_operation_(
+         FOLD_OPERATION(
                         &opr,   
                         &loc_result.v,
                         &res_linear_type,
@@ -1372,7 +1380,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)            
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                    	   &tmp_opr,  
                            &loc_result.v,
              	           &res_linear_type,
@@ -1404,7 +1412,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)            
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                    	   &tmp_opr,  
                            &loc_result.v,
                		   &res_linear_type,
@@ -1433,7 +1441,7 @@ CONTINUE:
          SHIFT_ARITH_ARG(r_value.v, res_linear_type);
 
 # if defined(_USE_FOLD_DOT_f)            
-         fold_operation_(
+         FOLD_OPERATION(
                    	&opr,  
                         &loc_result.v,
                		&res_linear_type,
@@ -1558,7 +1566,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
                tmp_opr = Cvrt_Opr;
-               fold_operation_(
+               FOLD_OPERATION(
                               &tmp_opr,  
                               &loc_result.v,
                               &res_linear_type,
@@ -1590,7 +1598,7 @@ CONTINUE:
    
 # if defined(_USE_FOLD_DOT_f)
                tmp_opr = Cvrt_Opr;
-               fold_operation_(
+               FOLD_OPERATION(
                               &tmp_opr,  
                               &loc_result.v,
                               &res_linear_type,
@@ -1616,7 +1624,7 @@ CONTINUE:
             }
 
 # if defined(_USE_FOLD_DOT_f)
-            fold_operation_(
+            FOLD_OPERATION(
                            &opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -1815,7 +1823,7 @@ CONTINUE:
       case Sqrt_Opr :
          SHIFT_ARITH_ARG(l_value.v, res_linear_type);
 
-         fold_operation_(
+         FOLD_OPERATION(
                         &opr, 
                         &loc_result.v,
                         &res_linear_type,
@@ -1840,7 +1848,7 @@ CONTINUE:
          SHIFT_ARITH_ARG(l_value.v, res_linear_type);
 
 # if defined(_USE_FOLD_DOT_f)
-         fold_operation_(
+         FOLD_OPERATION(
                         &opr, 
                         &loc_result.v,
                         &res_linear_type,
@@ -1868,7 +1876,7 @@ CONTINUE:
 
       case Nint_Opr :
 # if defined(_USE_FOLD_DOT_f)
-         fold_operation_(
+         FOLD_OPERATION(
                         &opr, 
                         &loc_result.v,
                         &res_linear_type,
@@ -1949,7 +1957,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
          tmp_opr = Abs_Opr;
-         fold_operation_(
+         FOLD_OPERATION(
                         &tmp_opr,   
                         &a3_value.v,
                         &res_linear_type,
@@ -1988,7 +1996,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Uminus_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -2027,7 +2035,7 @@ CONTINUE:
          /* mod(r_value.v, TARGET_BITS_PER_WORD) to use as shift count */
 
 # if defined(_USE_FOLD_DOT_f)
-         fold_operation_(
+         FOLD_OPERATION(
                         &opr,  
                         &loc_result.v,
                         &res_linear_type,
@@ -2150,7 +2158,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -2182,7 +2190,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -2214,7 +2222,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -2244,7 +2252,7 @@ CONTINUE:
          SHIFT_ARITH_ARG(a3_value.v, res_linear_type);
 
 # if defined(_USE_FOLD_DOT_f)
-         fold_operation_(
+         FOLD_OPERATION(
                           &opr,  
                           &loc_result.v,
                           &res_linear_type,
@@ -2301,7 +2309,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -2333,7 +2341,7 @@ CONTINUE:
 
 # if defined(_USE_FOLD_DOT_f)
             tmp_opr = Cvrt_Opr;
-            fold_operation_(
+            FOLD_OPERATION(
                            &tmp_opr,  
                            &loc_result.v,
                            &res_linear_type,
@@ -2373,7 +2381,7 @@ CONTINUE:
          }
 
 # if defined(_USE_FOLD_DOT_f)
-         fold_operation_(
+         FOLD_OPERATION(
                         &opr,  
                         &loc_result.v,
                         &res_linear_type,
