@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: config.c
- * $Revision: 1.3 $
- * $Date: 2003-02-17 23:49:53 $
- * $Author: dotsenko $
+ * $Revision: 1.4 $
+ * $Date: 2003-11-04 16:12:49 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $
  *
  * Revision history:
@@ -61,23 +61,26 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
+
+#define USE_STANDARD_TYPES 1
+#include "defs.h"
+
 #ifdef FRONT_END	/* For setting fullwarn, woff in front end */
-#ifndef FRONT_F90
-#ifdef EDGSRC
-# include "basics.h"
-# include "cmd_line.h"
-# include "error.h"
-#endif /* EDGSRC */
-#endif /* ~FRONT_F90 */
+# ifndef FRONT_F90
+#  ifdef EDGSRC
+#   include "basics.h"
+#   include "cmd_line.h"
+#   include "error.h"
+#  endif /* EDGSRC */
+# endif /* ~FRONT_F90 */
 #endif /*  FRONT_END */
 #include <ctype.h>	/* For isdigit */
 #include <elf.h>
 
-#define USE_STANDARD_TYPES 1
-#include "defs.h"
+#include "x_string.h" // for strcasecmp()
 #include "em_elf.h"
 #include "config.h"
 #include "config_platform.h"
@@ -90,7 +93,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "wn.h"
 
 #ifndef BACK_END
-static INT32 Ignore_Int;
+  static INT32 Ignore_Int;
 #endif
 
 /* The following contains the phase-specific option groups and their
@@ -1049,17 +1052,17 @@ Configure_Source ( char	*filename )
 {
   /* Identify the source language: */
   if ( Language_Name != NULL ) {
-    if ( strcasecmp ( Language_Name, "KR_C" ) == 0 ) {
+    if ( ux_strcasecmp ( Language_Name, "KR_C" ) == 0 ) {
       Language = LANG_KR_C;
-    } else if ( strcasecmp ( Language_Name, "ANSI_C" ) == 0 ) {
+    } else if ( ux_strcasecmp ( Language_Name, "ANSI_C" ) == 0 ) {
       Language = LANG_ANSI_C;
-    } else if ( strcasecmp ( Language_Name, "CPLUS" ) == 0 ) {
+    } else if ( ux_strcasecmp ( Language_Name, "CPLUS" ) == 0 ) {
       Language = LANG_CPLUS;
-    } else if ( strcasecmp ( Language_Name, "DELTA" ) == 0 ) {
+    } else if ( ux_strcasecmp ( Language_Name, "DELTA" ) == 0 ) {
       Language = LANG_DELTA;
-    } else if ( strcasecmp ( Language_Name, "F77" ) == 0 ) {
+    } else if ( ux_strcasecmp ( Language_Name, "F77" ) == 0 ) {
       Language = LANG_F77;
-    } else if ( strcasecmp ( Language_Name, "F90" ) == 0 ) {
+    } else if ( ux_strcasecmp ( Language_Name, "F90" ) == 0 ) {
       Language = LANG_F90;
     }
   }
@@ -1070,9 +1073,9 @@ Configure_Source ( char	*filename )
 
   /* Determine whether to use the CRAY or MIPS IO library */
   if (Library_Name != NULL) {
-    if (strcasecmp ( Library_Name,"cray") == 0 ) {
+    if (ux_strcasecmp ( Library_Name,"cray") == 0 ) {
        target_io_library = IOLIB_CRAY;
-    } else if (strcasecmp ( Library_Name,"mips") == 0 ) {
+    } else if (ux_strcasecmp ( Library_Name,"mips") == 0 ) {
        target_io_library = IOLIB_MIPS;
     }
   } else {
@@ -1328,7 +1331,7 @@ Configure_Alias_Options( OPTION_LIST *olist )
   for (ol = olist; ol != NULL; ol = OLIST_next(ol)) {
     char *val = OLIST_val(ol);
     INT len = strlen (val);
-    if (strncasecmp( val, "any", len) == 0) {
+    if (ux_strncasecmp( val, "any", len) == 0) {
       Alias_Pointer_Parms = TRUE;	/* observed by Fortran programs */
       Alias_Pointer_Cray = FALSE;	/* observed by Fortran programs */
       Alias_Pointer_Types = TRUE;	/* observed by C and C++ programs */
@@ -1339,53 +1342,53 @@ Configure_Alias_Options( OPTION_LIST *olist )
       Alias_Pointer_Named_Data = FALSE;	/* observed by C and C++ programs */
       Alias_Pointer_Restricted = FALSE;	/* observed by C and C++ programs */
       Alias_Pointer_Disjoint   = FALSE;
-    } else if (strncasecmp( val, "parm", len) == 0) {
+    } else if (ux_strncasecmp( val, "parm", len) == 0) {
       Alias_Pointer_Parms = TRUE;
-    } else if (strncasecmp( val, "typed", len) == 0) {
+    } else if (ux_strncasecmp( val, "typed", len) == 0) {
       Alias_Pointer_Types = TRUE;
       Alias_Pointer_Types_Set = TRUE;
-    } else if (strncasecmp( val, "unnamed", len) == 0) {
+    } else if (ux_strncasecmp( val, "unnamed", len) == 0) {
       Alias_Pointer_Named_Data = TRUE;
-    } else if (strncasecmp( val, "nounion",len) == 0) {
+    } else if (ux_strncasecmp( val, "nounion",len) == 0) {
       Alias_Not_In_Union  = TRUE;	/* observed by C++ programs only */
       Alias_Not_In_Union_Set  = TRUE;	/* observed by C++ programs only */
-    } else if (strncasecmp( val, "restricted", len) == 0) {
+    } else if (ux_strncasecmp( val, "restricted", len) == 0) {
       Alias_Pointer_Restricted = TRUE;
       Alias_Pointer_Named_Data = TRUE;
-    } else if (strncasecmp( val, "disjoint", len) == 0) {
+    } else if (ux_strncasecmp( val, "disjoint", len) == 0) {
       Alias_Pointer_Disjoint = TRUE;
       Alias_Pointer_Restricted = TRUE;
       Alias_Pointer_Named_Data = TRUE;
-    } else if (strncasecmp( val, "cray_pointer", len) == 0) {
+    } else if (ux_strncasecmp( val, "cray_pointer", len) == 0) {
       Alias_Pointer_Cray = TRUE;
-    } else if (strncasecmp( val, "strongly_typed", len) == 0) {
+    } else if (ux_strncasecmp( val, "strongly_typed", len) == 0) {
       Alias_Pointer_Strongly_Typed = TRUE;
-    } else if (strncasecmp( val, "no_parm", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_parm", len) == 0) {
       Alias_Pointer_Parms = FALSE;
-    } else if (strncasecmp( val, "no_typed", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_typed", len) == 0) {
       Alias_Pointer_Types = FALSE;
       Alias_Pointer_Types_Set = TRUE;
-    } else if (strncasecmp( val, "no_unnamed", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_unnamed", len) == 0) {
       Alias_Pointer_Named_Data = FALSE;
-    } else if (strncasecmp( val, "no_restricted", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_restricted", len) == 0) {
       Alias_Pointer_Restricted = FALSE;
       Alias_Pointer_Named_Data = FALSE;
-    } else if (strncasecmp( val, "no_disjoint", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_disjoint", len) == 0) {
       Alias_Pointer_Disjoint = FALSE;
       Alias_Pointer_Named_Data = FALSE;
-    } else if (strncasecmp( val, "no_cray_pointer", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_cray_pointer", len) == 0) {
       Alias_Pointer_Cray = FALSE;
-    } else if (strncasecmp( val, "no_strongly_typed", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_strongly_typed", len) == 0) {
       Alias_Pointer_Strongly_Typed = FALSE;
-    } else if (strncasecmp( val, "cckr_default", len) == 0) {
+    } else if (ux_strncasecmp( val, "cckr_default", len) == 0) {
       Alias_Pointer_Cckr = TRUE;
-    } else if (strncasecmp( val, "common_scalar", len) == 0) {
+    } else if (ux_strncasecmp( val, "common_scalar", len) == 0) {
       Alias_Common_Scalar = TRUE;
-    } else if (strncasecmp( val, "no_common_scalar", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_common_scalar", len) == 0) {
       Alias_Common_Scalar = FALSE;
-    } else if (strncasecmp( val, "no_f90_pointer_alias", len) == 0) {
+    } else if (ux_strncasecmp( val, "no_f90_pointer_alias", len) == 0) {
       Alias_F90_Pointer_Unaliased = TRUE;
-    } else if (strncasecmp( val, "f90_pointer_alias", len) == 0) {
+    } else if (ux_strncasecmp( val, "f90_pointer_alias", len) == 0) {
       Alias_F90_Pointer_Unaliased = FALSE;
     } else {
       ErrMsg ( EC_Inv_OPT, "alias", val );

@@ -107,8 +107,10 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include "x_stdio.h" // for fdopen()
 #include <stdlib.h>
 #include <string.h>
+#include "x_string.h" // for memccpy(), strdup()
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -318,7 +320,7 @@ MDstrcpy(MDhandle h, char * src )
 	 *  Make a copy of the string into the string table
 	 */
 	dest		= h->stabcur;
-	h->stabcur	= (char *) memccpy(h->stabcur, src, '\0', freespace );
+	h->stabcur	= (char *)ux_memccpy(h->stabcur, src, '\0', freespace);
 	if ( h->stabcur == NULL ) { 
 		/* 
 		 *  We're screwed if the string length is 
@@ -694,7 +696,7 @@ MDclose(MDhandle h, char *target)
 	 *	Setup file handle information
 	 **********************************************************************
 	 */
-	MDfile_init ( &md ); md.filename  = strdup ( h->filename );
+	MDfile_init ( &md ); md.filename  = ux_strdup ( h->filename );
 
 	/*
 	 **********************************************************************
@@ -795,7 +797,7 @@ MDclose(MDhandle h, char *target)
 	 **********************************************************************
 	 */
 	LOG(("Write final record to %s\n",md.filename));
-	if ( 0 == (file = fdopen(md.f,"a"))) 
+	if ( 0 == (file = ux_fdopen(md.f,"a"))) 
 		ERR(("fdopen(%s): %s", md.filename, strerror(errno)));
 
 	fprintf ( file, "%s:", target );

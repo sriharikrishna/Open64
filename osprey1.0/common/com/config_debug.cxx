@@ -36,9 +36,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:27 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-11-04 16:12:49 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_debug.cxx,v $
  *
  * Revision history:
@@ -54,8 +54,9 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *config_debug_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_debug.cxx,v $ $Revision: 1.2 $";
+static char *config_debug_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_debug.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
+
 
 /* This file is included in config.c, so it doesn't need its own set of
  * standard includes -- only the following:
@@ -410,11 +411,11 @@ static void DEBUG_Configure_Alignment(char *val)
   {
     INT32  len = strlen(val);
 
-    if (strncasecmp(val, "normal", len)==0)
+    if (ux_strncasecmp(val, "normal", len)==0)
       DEBUG_Alignment = ALIGN_NORMAL;
-    else if (strncasecmp(val, "fixade", len)==0)
+    else if (ux_strncasecmp(val, "fixade", len)==0)
       DEBUG_Alignment = ALIGN_FIXADE;
-    else if (strncasecmp(val, "compose", len)==0)
+    else if (ux_strncasecmp(val, "compose", len)==0)
       DEBUG_Alignment= ALIGN_COMPOSE;
     else
     {
