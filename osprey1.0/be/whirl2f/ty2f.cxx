@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.12 $
- * $Date: 2002-10-09 18:40:02 $
- * $Author: open64 $
+ * $Revision: 1.13 $
+ * $Date: 2003-06-19 19:22:35 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -59,6 +59,7 @@
 #include "st2f.h"
 #include "tcon2f.h"
 #include "wn2f_load_store.h"
+#include "ty_ftn.h"
 
 extern WN* PU_Body;
 extern BOOL Array_Bnd_Temp_Var;

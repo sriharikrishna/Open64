@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.20 $
- * $Date: 2003-05-13 20:52:47 $
- * $Author: fzhao $
+ * $Revision: 1.21 $
+ * $Date: 2003-06-19 19:22:36 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.21 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -69,6 +69,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "ty2f.h"
 #include "tcon2f.h"
 #include "wn2f_load_store.h"
+#include "ty_ftn.h"
 
 #define DEB_Whirl2f_IR_TY_WN2F_Arrsection_Slots 0
 #define DEB_Whirl2f_IR_TY_WN2F_Arrsection_Slots_st1 0

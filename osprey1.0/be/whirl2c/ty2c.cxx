@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2c.c
- * $Revision: 1.4 $
- * $Date: 2003-04-22 19:15:16 $
- * $Author: jle $
+ * $Revision: 1.5 $
+ * $Date: 2003-06-19 19:22:34 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $
  *
  * Revision history:
@@ -54,13 +54,14 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
 #include "PUinfo.h"
 #include "ty2c.h"
 #include "tcon2c.h"
+#include "unparse_target.h"
 
 #if defined(__GNUC__) && (__GNUC__ == 3) 
 #include <ext/hash_set>
@@ -809,7 +810,7 @@ TY2C_function(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
    Append_Token_Special(decl_tokens, ')');
 
    /* Prepend the return type as the type of the decl_tokens */
-   TY2C_translate(decl_tokens, Func_Return_Type(ty), context);
+   TY2C_translate(decl_tokens, W2X_Unparse_Target->Func_Return_Type(ty), context);
 } /* TY2C_function */
 
 

@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: stab_attr.h
- * $Revision: 1.3 $
- * $Date: 2002-09-18 17:51:59 $
- * $Author: open64 $
+ * $Revision: 1.4 $
+ * $Date: 2003-06-19 19:22:34 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.h,v $
  *
  * Revision history:
@@ -344,39 +344,6 @@ inline BOOL TY_Is_Pointer_Or_Scalar(TY_IDX ty)
    return (TY_Is_Scalar(ty) || (TY_Is_Pointer(ty)&&!TY_is_f90_pointer(ty)));
 } /* TY_Is_Pointer_Or_Scalar */
 
-#if (defined(BUILD_WHIRL2F) || defined(BUILD_PURPLE))
-inline BOOL TY_Is_Character_Reference(TY_IDX ty)
-{
-   return TY_Is_Pointer(ty) &&
-          (TY_is_character(TY_pointed(ty)) ||
-           TY_mtype(TY_pointed(ty)) == MTYPE_STR);
-} /* TY_Is_Character_Reference */
-
-/* The front-end is not always reliable in where it sets the is_character
- * flag, so we look for it both on the array and on the element type.
- */
-inline BOOL TY_Is_Character_String(TY_IDX ty)
-{
-   return TY_is_character(ty) ||
-          TY_mtype(ty) == MTYPE_STR ||
-          (TY_Is_Array(ty)                 &&
-           TY_Is_Integral(TY_AR_etype(ty)) &&
-           TY_size(TY_AR_etype(ty)) == 1   &&
-           TY_is_character(TY_AR_etype(ty)));
-} /* TY_Is_Character_String */
-
-inline BOOL TY_Is_Chararray(TY_IDX ty)
-{
-   return TY_Is_Array(ty) && TY_Is_Character_String(TY_AR_etype(ty));
-} /* TY_Is_Chararray */
-
-inline BOOL TY_Is_Chararray_Reference(TY_IDX ty)
-{
-   return TY_Is_Pointer(ty) && TY_Is_Chararray(TY_pointed(ty));
-} /* TY_Is_Chararray_Reference */
-
-#endif /*BUILD_WHIRL2F || BUILD_PURPLE*/
-
 inline BOOL TY_Is_Array_Of_Chars(TY_IDX ty)
 {
    return TY_Is_Array(ty) &&
@@ -483,35 +450,6 @@ inline BOOL Stab_Assign_Compatible_Pointer_Quals(TY_IDX t1, TY_IDX t2)
            (TY_is_const(t2)?    TY_is_const(t1) : TRUE));
 } /* Stab_Assign_Compatible_Pointer_Quals */
 
-#if (defined(BUILD_WHIRL2F) || defined(BUILD_PURPLE))
-/* A macro to test if a parameter is a character string, in which case
- * it needs an implicit length parameter.  Note that in the test on the
- * argument (caller) side we only need to consider reference types, since
- * the call-by-reference always should be explicit on that side.  This
- * macro should only be used on the subprogram definition side!  This
- * only applies to Fortran code.
- */
-inline BOOL STAB_PARAM_HAS_IMPLICIT_LENGTH(const ST *st)
-{
-   return ((ST_sclass(st) == SCLASS_FORMAL_REF &&
-            TY_Is_Character_String(ST_type(st))) ||
-           (ST_sclass(st) == SCLASS_FORMAL &&
-            (TY_Is_Character_Reference(ST_type(st)) ||
-             TY_Is_Chararray_Reference(ST_type(st)))));
-}
-
-/* Identify cases when a reference parameter is explicitly represented
- * as a pointer (as opposed to an SCLASS_FORMAL_REF).  This only applies
- * to Fortran code.
-*/
-inline BOOL STAB_IS_POINTER_REF_PARAM(const ST *st)
-{
-   return (TY_Is_Pointer(ST_type(st))   &&
-           ST_sclass(st)==SCLASS_FORMAL &&
-           !ST_is_value_parm(st));
-}
-#endif /*BUILD_WHIRL2F || BUILD_PURPLE*/
-
 
                   /*----- Reserved Names Information -----*/
                   /*--------------------------------------*/
@@ -524,39 +462,6 @@ extern BOOL Stab_Reserved_St(const ST *st);
 
 extern void Stab_Reset_Referenced_Flag(SYMTAB_IDX symtab);
    
-
-               /*------ Function type attributes ------*/
-               /*--------------------------------------*/
-
-inline BOOL Func_Return_Character(TY_IDX func_ty)
-{
-#ifdef BUILD_WHIRL2F
-   return TY_is_character(Ty_Table[TY_ret_type(func_ty)]);
-#else /*BUILD_WHIRL2C*/
-   return FALSE;
-#endif /*BUILD_WHIRL2F*/
-} /* Func_Return_Character */
-
-inline TY_IDX Func_Return_Type(TY_IDX func_ty)
-{
-#ifdef BUILD_WHIRL2F
-   return TY_ret_type(func_ty);
-#else /*BUILD_WHIRL2C*/
-   return TY_is_character(Ty_Table[TY_ret_type(func_ty)]) ?
-                                             Void_Type : TY_ret_type(func_ty);
-#endif /*BUILD_WHIRL2F*/
-} /* Func_Return_Type */
-
-inline BOOL Func_Return_To_Param(TY_IDX func_ty)
-{
-#ifdef BUILD_WHIRL2F
-   return TY_return_to_param(Ty_Table[func_ty]);
-#else /*BUILD_WHIRL2C*/
-   return TY_return_to_param(Ty_Table[func_ty]) &&
-          !TY_is_character(Ty_Table[TY_ret_type(func_ty)]);
-#endif /*BUILD_WHIRL2F*/
-} /* Func_Return_To_Param */
-
 
 
                /*------ Obtaining pointer/array types ------*/

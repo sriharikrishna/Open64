@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: PUinfo.c
- * $Revision: 1.5 $
- * $Date: 2003-06-13 23:05:29 $
+ * $Revision: 1.6 $
+ * $Date: 2003-06-19 19:22:34 $
  * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
@@ -67,7 +67,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>
@@ -696,7 +696,7 @@ Append_CallSite(WN_ITER *stmt_iter, const WN *next_stmt)
 	      ("Missing WN_entry_name() for %s", 
 	       OPCODE_name(WN_opcode(call_wn))));
       return_ty =
-               Func_Return_Type(ST_pu_type(&St_Table[WN_entry_name(call_wn)]));
+               W2X_Unparse_Target->Func_Return_Type(ST_pu_type(&St_Table[WN_entry_name(call_wn)]));
    }
    else if (WN_opc_operator(call_wn) == OPR_ICALL)
    {
@@ -705,7 +705,7 @@ Append_CallSite(WN_ITER *stmt_iter, const WN *next_stmt)
        *    TY_pointed(
        *       WN_Tree_Type(WN_kid(call_wn, WN_kid_count(call_wn) - 1))));
        */
-      return_ty = Func_Return_Type(WN_ty(call_wn));
+      return_ty = W2X_Unparse_Target->Func_Return_Type(WN_ty(call_wn));
    }
    else
    {
