@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: whirl2f_common.c
- * $Revision: 1.3 $
- * $Date: 2003-12-09 16:17:53 $
- * $Author: fzhao $
+ * $Revision: 1.4 $
+ * $Date: 2003-12-29 23:30:32 $
+ * $Author: johnmc $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f_common.h,v $
  *
  * Revision history:
@@ -138,7 +138,7 @@
                      /* Identifier naming */
                      /*-------------------*/
 
-#define WHIRL2F_number_as_name(number) Number_as_String(number, "%ull")
+#define WHIRL2F_number_as_name(number) Number_as_String(number, "%llu")
    
 #define WHIRL2F_ptr_as_name(ptr) Ptr_as_String(ptr)
 
