@@ -12485,8 +12485,9 @@ static TYPE	send_derived_type(int	type_idx)
    PDG_DBG_PRINT_END    
 
 # ifdef _ENABLE_FEI
-  if (AT_ORIG_MODULE_IDX(dt_attr_idx)!=NULL_IDX)
-      fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
+  if (AT_ORIG_MODULE_IDX(dt_attr_idx)!=NULL_IDX ||
+       (curr_scp_idx!=1)&& (ATT_SCP_IDX(dt_attr_idx)==1))
+           fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
                     ATT_NUM_CPNTS(dt_attr_idx),
                     cpnt_idx,
                     size,
@@ -13008,6 +13009,7 @@ static void send_interface_list(int ng_attr_idx)
 {
    int          attr_idx;
    int          sn_idx;
+   int          kind_interface = 0;
    int          pu_in_interface=curr_scp_idx+1;
    int i;
 
@@ -13048,12 +13050,22 @@ static void send_interface_list(int ng_attr_idx)
             }
 /*      } */
 
-
+     if (ATI_INTERFACE_CLASS(ng_attr_idx) == Defined_Assign_Interface)
+          kind_interface = 1;
+     else
+        if (ATI_INTERFACE_CLASS(ng_attr_idx)>Defined_Interface)
+          {
+           if (ATI_DEFINED_OPR(ng_attr_idx)!=Null_Opr)
+                kind_interface = 2;
+           else
+                kind_interface = 3;
+           } 
 
 # ifdef _ENABLE_FEI
 # if defined(GENERATE_WHIRL)
    PDG_AT_IDX(ng_attr_idx) = fei_interface(AT_OBJ_NAME_PTR(ng_attr_idx),
-                                          ATI_NUM_SPECIFICS(ng_attr_idx));
+                                          ATI_NUM_SPECIFICS(ng_attr_idx),
+                                          kind_interface);
    PDG_AT_IDX(ng_attr_idx) = NULL;
 # endif
 # endif
@@ -13915,8 +13927,8 @@ static void send_attr_ntry(int		attr_idx)
 
 /*    send_derived_type(ATD_TYPE_IDX(attr_idx)); */
 
-//   PDG_AT_IDX(attr_idx) = fei_derived_type_name(AT_OBJ_NAME_PTR(attr_idx),
-//August                                                   TRUE);
+/*   PDG_AT_IDX(attr_idx) = fei_derived_type_name(AT_OBJ_NAME_PTR(attr_idx),*/
+/* August                                                   TRUE); */
       goto EXIT; 
                
    case Namelist_Grp:

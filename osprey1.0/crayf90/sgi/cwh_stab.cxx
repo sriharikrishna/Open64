@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.4 $
- * $Date: 2002-08-22 15:47:54 $
+ * $Revision: 1.5 $
+ * $Date: 2002-08-22 20:40:35 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -3358,7 +3358,8 @@ fei_smt_parameter(char * name_string,
 /*ARGSUSED*/
 INTPTR
 fei_interface(char  * name_string,
-             INT32   nitems)
+             INT32   nitems,
+             INT32   kind_interface)
 {
   ST * st;
   TY_IDX  ty;
@@ -3377,8 +3378,14 @@ fei_interface(char  * name_string,
   ST_Init(st, Save_Str(name_string), CLASS_VAR, SCLASS_AUTO, EXPORT_LOCAL, ty);
   Set_ST_ofst(st, 0);
 
-  p = cwh_stab_packet(cast_to_void(st),is_ST) ;
+  if (kind_interface == 1)
+    Set_ST_is_assign_interface(st);
+  else if (kind_interface == 2)
+         Set_ST_is_operator_interface(st);
+       else if (kind_interface == 3)
+             Set_ST_is_u_operator_interface(st);
 
+  p = cwh_stab_packet(cast_to_void(st),is_ST) ;
 
 
   opc = OPCODE_make_op(OPR_INTERFACE,MTYPE_V,MTYPE_V);

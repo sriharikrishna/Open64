@@ -486,6 +486,28 @@ inline void
 Clear_ST_is_intent_out_argument (ST& s)   { s.flags_ext &= ~ST_IS_INTENT_OUT_ARGUMENT; }
 
 inline BOOL
+ST_is_assign_interface (const ST& s)   { return s.flags_ext & ST_IS_ASSIGN_INTERFACE;}
+inline void
+Set_ST_is_assign_interface (ST& s)     { s.flags_ext |= ST_IS_ASSIGN_INTERFACE; }
+inline void
+Clear_ST_is_assign_interface (ST& s)   { s.flags_ext &= ~ST_IS_ASSIGN_INTERFACE; }
+
+inline BOOL
+ST_is_operator_interface (const ST& s)   { return s.flags_ext & ST_IS_OPERATOR_INTERFACE;}
+inline void
+Set_ST_is_operator_interface (ST& s)     { s.flags_ext |= ST_IS_OPERATOR_INTERFACE; }
+inline void
+Clear_ST_is_operator_interface (ST& s)   { s.flags_ext &= ~ST_IS_OPERATOR_INTERFACE; }
+
+inline BOOL
+ST_is_u_operator_interface (const ST& s) { return s.flags_ext & ST_IS_U_OPERATOR_INTERFACE;}
+inline void
+Set_ST_is_u_operator_interface (ST& s)   { s.flags_ext |= ST_IS_U_OPERATOR_INTERFACE; }
+inline void
+Clear_ST_is_u_operator_interface (ST& s) { s.flags_ext &= ~ST_IS_U_OPERATOR_INTERFACE; }
+
+
+inline BOOL
 ST_is_temp_var (const ST& s)		{ return s.flags & ST_IS_TEMP_VAR;}
 inline void
 Set_ST_is_temp_var (ST& s)		{ s.flags |= ST_IS_TEMP_VAR; }
