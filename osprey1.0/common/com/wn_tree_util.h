@@ -682,10 +682,12 @@ public:
   WN *           Root()  const    { return _root;}
 
   // operators to fulfill Fwd Container requirements defined below
-#ifndef __GNUC__
-  friend bool operator==(const self &x, const self & y);
-#else
-  friend bool operator==<>(const self &x, const self & y);
+
+  // eraxxon 2004.11.30: GCC 3.4.3 is complaining that it cannot find
+  // the corresonding declaration... am I missing something? However,
+  // this doesn't need to be a friend anyway.
+#if 0
+  friend bool operator==<TRAV_ORDER>(const self &x, const self & y);
 #endif
 
   // WARNING: size is linear time, don't use it unless you have to
