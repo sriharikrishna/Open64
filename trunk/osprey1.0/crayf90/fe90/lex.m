@@ -100,9 +100,6 @@
                 }                                                             \
                 (LEN)++
 
-# define NEXT_LA_CH_LITERAL						      \
-		(*get_char_literal) ()
-
 # ifdef _WARNING_FOR_NUMERIC_INPUT_ERROR
 #  define OVERFLOW_MESSAGE(RESULT)                                            \
                 PRINTMSG(TOKEN_LINE(token),1413,Warning,TOKEN_COLUMN(token));

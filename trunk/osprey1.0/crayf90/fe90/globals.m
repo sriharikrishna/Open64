@@ -679,6 +679,8 @@
 #define	NEXT_LA_CH							       \
 		(*get_char)()
 
+# define NEXT_LA_CH_LITERAL						       \
+		(*get_char_literal) ()
 
 /******************************************************************************\
 |* the TBL_ALLOC and TBL_REALLOC_CK macros assume the following declarations  *|
