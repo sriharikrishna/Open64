@@ -69,14 +69,8 @@ load_so (char *soname, char *path, BOOL verbose)
         full_path = soname;
     }
 
-/* Solaris workaround
- * This is a typical error occuring in the sgi source files. Searching for "def 
- * linux" in folders may help fixing those problems. The author assumes there 
- * were only two possible OS - linux and irix
- */
-/*  #ifndef linux */
-
-#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
+#if defined(__sgi)
+    /* use IRIX specific loader (does Ultix support this?) */
     if (sgidladd (full_path, RTLD_LAZY) == NULL)
 #else
     if (dlopen (full_path, RTLD_NOW | RTLD_GLOBAL) == NULL)
