@@ -36,9 +36,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:09 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:28 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
  * Revision history:
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -88,6 +88,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "wn_util.h"
 #include "dwarf_DST_producer.h"
 #include "cxx_memory.h"
+#include "cwh_stk.h"
 #include <stdio.h>
 
 /* FE includes */
@@ -238,6 +239,7 @@ fei_proc(char         *name_string,
                       Class_arg,
                       result_type,
                       flags);
+
   }
 
   return(p);
@@ -327,7 +329,8 @@ fei_proc_def(char         *name_string,
     Set_ST_ofst(st,0);
     cwh_auxst_add_to_list(&Top_Text,st,FALSE);
     
-  } else {
+   }
+ else {
     Set_ST_sclass(st, SCLASS_TEXT);
     Set_ST_export(st, eclass);
   }
@@ -335,6 +338,7 @@ fei_proc_def(char         *name_string,
   /* if fei_proc_imp made ST, then ST has a default void return */
   /* which should be replaced with the correct return type/args */
 
+  
   PU_IDX pu_idx = ST_pu(st);
   PU& pu = Pu_Table[pu_idx];
 
@@ -402,6 +406,9 @@ fei_proc_def(char         *name_string,
   if (test_flag(flags, FEI_PROC_ELEMENTAL))
     Set_ST_auxst_is_elemental(st,TRUE);
 
+  if (test_flag(flags, FEI_PROC_MODULE))
+    Set_ST_is_in_module(st);
+
   if (test_flag(flags, FEI_PROC_ENTRY)) {
 
     Set_ST_auxst_is_altentry(st,TRUE);
@@ -412,7 +419,15 @@ fei_proc_def(char         *name_string,
     Scope_tab [Current_scope].st = st;
     Procedure_ST = st  ;
     cwh_stab_pu_has_globals = FALSE;
+
+/* Since we need use this function to get interface block information   */
+/* we have to keep blocks un_initialize when we get PUs in interface,   */
+/* but don't know if there is problem if comment out this function call */
+/* completely,will think about it later ----fzhao                       */
+
+# if 0 
     cwh_block_init_pu();
+# endif
 
     if (test_flag(flags, FEI_PROC_HAS_ALT_ENTRY)) 
       Set_PU_has_altentry(pu);
@@ -789,6 +804,7 @@ fei_object(char * name_string,
   ty = cast_to_TY(t_TY(type));
   p  = cast_to_STB(storage_idx);
 
+# if 0 
   hosted = (sym_class == Hosted_Dummy_Procedure) ||
            (sym_class == Hosted_Dummy_Arg ) || 
            (sym_class == Hosted_Compiler_Temp) || 
@@ -796,7 +812,9 @@ fei_object(char * name_string,
            (sym_class == CRI_Pointee && 
 	    (test_flag(flag_bits,FEI_OBJECT_INNER_REF) ||
 	     test_flag(flag_bits,FEI_OBJECT_INNER_DEF))) ;
-
+# endif
+  
+  hosted = FALSE;
 
   /* ignore hosted args w/o inner ref/defs because don't    */
   /* want duplicates in symbol table for debug info (only   */
@@ -884,7 +902,6 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   in_common = ((p->form == is_ST) && (IS_COMMON(cast_to_ST(p->item)))) ||
                ((sym_class == CRI_Pointee) && IS_COMMON(cast_to_ST((cast_to_STB(ptr_st_idx))->item)));
  
-
   if (in_common) {
 
     /* if it's a pointee in COMMON, its base is on the l_COMLIST  */
@@ -947,7 +964,8 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
      Set_ST_is_not_used (st);
   }
 
- if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE)) //fzhao June
+ if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE) &&
+          !PU_is_nested_func(Pu_Table[ST_pu(Scope_tab[CURRENT_SYMTAB].st)])) //fzhao June
      st1 = Scope_tab[CURRENT_SYMTAB].st;
  else st1 = st;
     
@@ -1025,9 +1043,7 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
 
       if (STRUCT_BY_VALUE(ty)) {
 
-        Set_ST_sclass(st, SCLASS_AUTO);
-
-        /* correct argument list in AUXST */
+      Set_ST_sclass(st, SCLASS_AUTO);
 
         if (! hosted)
           cwh_auxst_patch_proc(ty);
@@ -1056,11 +1072,11 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
         /* may differ on result type. Alttemp_ST is for results of entry   */
 	/* points so applies only to host (level) procedure result varbls  */  
 
-	if (ST_level(st) == HOST_LEVEL) {
-	  if (Alttemp_ST != NULL) 
-	    st = Alttemp_ST ;
+	if (ST_level(st) == HOST_LEVEL) { 
+//	  if (Alttemp_ST != NULL) 
+//	    st = Alttemp_ST ;
 
-	  Alttemp_ST = st ;
+//	  Alttemp_ST = st ;
 	}
 
       } else if (TY_mtype(ty) == MTYPE_CQ) {
@@ -1097,17 +1113,29 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
 	  formal    = FALSE;
 	} 
       } 
-    }
+
+    } else {
+        if (test_flag(flag_bits,FEI_OBJECT_OPTIONAL)) 
+           Set_ST_is_optional_argument(st);
+
+        switch (arg_intent) {
+           case 1:
+//              Set_ST_is_intent_in_argument(st);
+               break;
+
+           case 2:
+//              Set_ST_is_intent_out_argument(st);
+              break;
+           default:
+              break;
+
+        } /*switch*/
+     } 
+
     if (formal)
       cwh_stab_formal_ref(st,hosted);
-  }  
 
-  /* Optional argument*/
-
-  if (test_flag(flag_bits,FEI_OBJECT_OPTIONAL)) {
-     Set_ST_is_optional_argument(st);
-  }
-
+ }
 
   /* allocatable & assumed shape cannot be aliases, unless a pointer TARGET */
   
@@ -1225,6 +1253,7 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   /* was a Host dummy used within internal routine           */
   
   if (IS_FORMAL(st)) {
+
     if (! hosted )
       cwh_auxst_add_dummy(st,test_flag(flag_bits,FEI_OBJECT_RESULT_TEMP));
   } 
@@ -1259,8 +1288,8 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
     Set_ST_auxst_is_allocatable(st, TRUE) ;
     Set_ST_is_allocatable(st) ; } 
 
-
-
+  if (test_flag(flag_bits,FEI_OBJECT_RESULT_TEMP))
+     Set_ST_is_return_var(st); 
 
   if (test_flag(flag_bits, FEI_OBJECT_ASSUMD_SHAPE)) {
     Set_ST_auxst_is_assumed_shape(st, TRUE) ;
@@ -1502,7 +1531,7 @@ fei_name (char *name_string,
 	if (p->form == is_ST) {
 	  st = cast_to_ST(p->item) ;
 
-	  if (IS_FORMAL(st)) {
+	  if (IS_FORMAL(st) ) {  
 	    if (!cwh_auxst_find_dummy(st)) 
 	      cwh_auxst_add_dummy(st,FALSE);
 	  } 
@@ -3301,3 +3330,57 @@ fei_smt_parameter(char * name_string,
 
    return(cast_to_int(st));
 }
+
+/*===================================================
+ *
+ * fei_interface
+ *
+ * Introduces an interface block, and the associated
+ * list of components (pu's). Put it in the
+ * First_Block.
+ *
+ ====================================================
+ */
+/*ARGSUSED*/
+INTPTR
+fei_interface(char  * name_string,
+             INT32   nitems)
+{
+  ST * st;
+  TY_IDX  ty;
+  STB_pkt *p;
+  WN * wn;
+  WN * wn1;
+  OPCODE  opc;
+  WN * block;
+  int i = 0;
+  int k;
+
+
+  st = New_ST(CURRENT_SYMTAB);
+                             
+  cwh_auxst_clear(st);
+  ST_Init(st, Save_Str(name_string), CLASS_VAR, SCLASS_AUTO, EXPORT_LOCAL, ty);
+  Set_ST_ofst(st, 0);
+
+  p = cwh_stab_packet(cast_to_void(st),is_ST) ;
+
+
+
+  opc = OPCODE_make_op(OPR_INTERFACE,MTYPE_V,MTYPE_V);
+  wn  =  WN_Create(opc,nitems);
+  WN_st_idx(wn) = ST_st_idx(st);
+
+
+  for (k = nitems -1 ; k >= 0  ; k --) {
+     wn1 = cwh_stk_pop_WN();
+     WN_kid(wn,k) = wn1;
+
+  }
+
+  cwh_block_append_given_id(wn,First_Block,FALSE);
+
+  return (cast_to_int(p));
+}
+
+

@@ -1038,6 +1038,33 @@ struct OPERATOR_info_struct OPERATOR_info[OPERATOR_LAST+1] = {
    OPERATOR_MAPCAT_OEXP /* mapcat */,
    OPERATOR_PROPERTY_expression},
 
+  {"OPR_NULLIFY",
+   -1 /* nkids */,
+   OPERATOR_MAPCAT_HDR /* mapcat */,
+   OPERATOR_PROPERTY_scf                  |
+   OPERATOR_PROPERTY_next_prev            |
+   OPERATOR_PROPERTY_sym  },
+
+
+  {"OPR_INTERFACE",
+   -1 /* nkids */,
+   OPERATOR_MAPCAT_HDR /* mapcat */,
+   OPERATOR_PROPERTY_scf                  |
+   OPERATOR_PROPERTY_next_prev            |
+   OPERATOR_PROPERTY_sym  },
+
+
+  {"OPR_ARRAY_CONSTRUCT",
+   -1 /* nkids */,
+   OPERATOR_MAPCAT_OEXP /* mapcat */,
+   OPERATOR_PROPERTY_expression},
+
+
+  {"OPR_IMPLIED_DO",
+   5 /* nkids */,
+   OPERATOR_MAPCAT_OEXP /* mapcat */,
+   OPERATOR_PROPERTY_expression},
+
 };
 
 static BOOL
@@ -2013,6 +2040,9 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       case OPR_GOTO_OUTER_BLOCK:
       case OPR_USE: 
       case OPR_NAMELIST:
+      case OPR_NULLIFY:
+      case OPR_INTERFACE:
+
         // [RTYPE] : V [DESC] : V
         valid = rtype == MTYPE_V && desc == MTYPE_V;
         break;
@@ -2028,6 +2058,7 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
         break;
 
       case OPR_ARRAYEXP:
+      case OPR_ARRAY_CONSTRUCT:
         // [RTYPE] : f,i,M,z [DESC] : V
         valid = Is_MTYPE_f_i_M_z [rtype] && desc == MTYPE_V;
         break;
@@ -2052,6 +2083,8 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       case OPR_TRIPLET:
       case OPR_SRCTRIPLET:
       case OPR_XMPY:
+      case OPR_IMPLIED_DO:
+
         // [RTYPE] : i [DESC] : V
         valid = Is_MTYPE_i [rtype] && desc == MTYPE_V;
         break;
@@ -2375,6 +2408,8 @@ OPCODE_name (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
     case OPR_USE:  
     case OPR_NAMELIST:
     case OPR_IMPLICIT_BND: 
+    case OPR_NULLIFY:
+    case OPR_INTERFACE:
 
       // [RTYPE] : V [DESC] : V
       sprintf (buffer, "OPC_%s", &OPERATOR_info [opr]._name [4]);
@@ -2391,6 +2426,7 @@ OPCODE_name (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       break;
 
     case OPR_ARRAYEXP:
+    case OPR_ARRAY_CONSTRUCT:
       // [RTYPE] : f,i,M,z [DESC] : V
       sprintf (buffer, "OPC_%s%s", MTYPE_name(rtype), &OPERATOR_info [opr]._name [4]);
       break;
@@ -2415,6 +2451,8 @@ OPCODE_name (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
     case OPR_TRIPLET:
     case OPR_SRCTRIPLET:
     case OPR_XMPY:
+    case OPR_IMPLIED_DO:
+
       // [RTYPE] : i [DESC] : V
       sprintf (buffer, "OPC_%s%s", MTYPE_name(rtype), &OPERATOR_info [opr]._name [4]);
       break;

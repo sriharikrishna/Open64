@@ -137,7 +137,9 @@ typedef unsigned long          INTPTR;
 #define FEI_PROC_DEFINITION       			26
 #define FEI_PROC_PARENT           			27
 #define FEI_PROC_IMPORTED         			28
-#define FEI_PROC_UNUSED_29        			29
+/* I need this bit -fzhao #define FEI_PROC_UNUSED_29        			29 */
+#define FEI_PROC_MODULE                                 29
+
 #define FEI_PROC_UNUSED_30        			30
 #define FEI_PROC_UNUSED_31        			31
 #define FEI_PROC_PASARG     				32
@@ -1219,6 +1221,7 @@ extern void  fei_namelist_write           ( void );
 extern void  fei_control_list             ( INT32 io_type );
 extern void  fei_IO_list                  ( INT32 n_opnds, INT32 io_type );
 extern void  fei_implied_do               ( void );
+extern void  fei_noio_implied_do               ( void );
 extern void  fei_iolength                 ( void );
 extern void  fei_bit_len                  ( void );
 extern void  fei_where                    ( INT32 defined_asg, 
@@ -1228,6 +1231,7 @@ extern void  fei_exponent                 ( TYPE type );
 extern void  fei_floor                    ( TYPE type );
 extern void  fei_getpos                   ( void );
 extern void  fei_length                   ( void );
+extern void  fei_array_construct         ( INT32 nlist,TYPE type);
 extern void  fei_nearest                  ( void );
 extern void  fei_near                     ( TYPE type);
 extern void  fei_present                  ( void );
@@ -1456,6 +1460,11 @@ extern INTPTR fei_namelist         	  ( char   *name_string,
                                  	    INT32  nitems,
                                  	    INTPTR idx ,
                                             INT32  in_model);
+
+extern INTPTR fei_interface               ( char   *name_string,
+                                            INT32   nitems);
+extern void  fei_gen_func_entry           (INTPTR   idx);
+
 extern void  fei_fcd             	  ( TYPE type );
 extern void  fei_rrspace         	  ( TYPE type );
 extern void  fei_modulo          	  ( TYPE type );
@@ -1621,6 +1630,7 @@ extern void PDGCS_mpp_init                ( char        *src_fname,
                                             INT32        num_barriers,
                                             INT32        num_eurekas,
                                             INT32        partition_type );
+extern void fei_nullify (INT32 listnum);
 
 
 typedef struct		type_descriptor	pdg_type_tbl_type;

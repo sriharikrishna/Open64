@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.4 $
- * $Date: 2002-07-18 20:15:19 $
- * $Author: fzhao $
+ * $Revision: 1.5 $
+ * $Date: 2002-08-16 19:30:47 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.5 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -842,6 +842,9 @@ WN2F_STATUS
 WN2F_stid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
    TOKEN_BUFFER lhs_tokens, rhs_tokens;
+   const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+    if (parenthesize)
+       set_WN2F_CONTEXT_no_parenthesis(context);
    
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_STID, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_stid"));
@@ -874,14 +877,21 @@ WN2F_stid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    
    /* The rhs */
    rhs_tokens = New_Token_Buffer();
+
+//   const BOOL p11arenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+
    if (TY_is_logical(Ty_Table[WN_ty(wn)]))
    {
       set_WN2F_CONTEXT_has_logical_arg(context);
       WN2F_translate(rhs_tokens, WN_kid0(wn), context);
       reset_WN2F_CONTEXT_has_logical_arg(context);
    }
-   else
+   else {
+    
+//      set_WN2F_CONTEXT_no_parenthesis(context);
       WN2F_translate(rhs_tokens, WN_kid0(wn), context);
+//      reset_WN2F_CONTEXT_no_parenthesis(context);
+     }
 
    /* See if we need to apply a "char" conversion to the rhs
     */
@@ -1858,15 +1868,17 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
 
   dim =  ARB_dimension(arb_base);
   co_dim = ARB_co_dimension(arb_base);
+
   if (co_dim <= 0)
       co_dim = 0;
  if (dim >  WN_num_dim(wn) ) {
 
      array_dim = dim-co_dim;
-     co_dim = 0;
  }
  else {
          dim =  WN_num_dim(wn);
+         array_dim = dim;
+         co_dim = 0; 
        }
 
 
@@ -1884,7 +1896,7 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
     Append_Token_Special(tokens, '(');
     set_WN2F_CONTEXT_no_parenthesis(context);
 
-# if 0 //this is original code without think about co_array
+#if 0 //this is original code without think about co_array
 
   for (dim = WN_num_dim(wn)-1; dim >= 0; dim--)
   {
@@ -1895,7 +1907,7 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
     if (dim > 0)
       Append_Token_Special(tokens, ',');
   }
-# endif
+#endif
 
   for (dim =  WN_num_dim(wn)-1; dim >= co_dim; dim--)
   {
@@ -1911,6 +1923,7 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
     Append_Token_Special(tokens, ')');
   } 
   /* for co_rank */
+
 if (co_dim > 0) {
 
   Append_Token_Special(tokens, '[');
@@ -2175,7 +2188,8 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 	reset_WN2F_CONTEXT_deref_addr(context);
       }
 
- if (WN_operator(base) != OPR_CALL)
+ if (WN_operator(base) != OPR_CALL &&
+     WN_operator(base) != OPR_LDA )
       WN2F_Substring(tokens, 
 		     str_length,
 		     lower_bnd,

@@ -628,7 +628,16 @@ CONTINUE:
 
       case SRK_Opr :
 
-    
+       for (i = 0; i < num_host_wds[l_linear_type]; i++) {
+               l_value.v[i] = ((long_type *)l_value_ptr)[i];
+            }
+
+       for (i = 0; i < num_host_wds[r_linear_type]; i++) {
+              r_value.v[i] = ((long_type *)r_value_ptr)[i];
+             ((long_type *)r_value_ptr)[i]=r_value.v[i]; /* fff */
+            }
+
+ 
        if (l_value_ptr!=NULL && r_value_ptr!=NULL) {
           cn_idx1 = ntr_const_tbl(l_type_idx, FALSE, &l_value.v[0]);
           cn_idx2 = ntr_const_tbl(r_type_idx, FALSE, &r_value.v[0]);
@@ -690,9 +699,10 @@ CONTINUE:
          i=-2; 
      }
 
+       C_TO_F_INT(result, i, res_linear_type);
 
 
-    if (FALSE) {   
+    if (FALSE) {    
 
 
 
@@ -930,8 +940,7 @@ CONTINUE:
          for (i = 0; i < num_host_wds[res_linear_type]; i++) {
             result[i] = loc_result.v[i];
          }
-  }
-        C_TO_F_INT(result, i, res_linear_type);
+   } 
 
          break; 
 

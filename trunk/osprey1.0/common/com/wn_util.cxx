@@ -39,8 +39,8 @@
 ***
 ***-------------------------------------------------------------------*/
 
-/** $Revision: 1.2 $
-*** $Date: 2002-07-12 16:48:34 $
+/** $Revision: 1.3 $
+*** $Date: 2002-08-16 19:31:08 $
 **/
 #ifdef USE_PCH
 #include "common_com_pch.h"
@@ -529,7 +529,9 @@ extern void WN_INSERT_BlockAfter(WN *blck, WN *wn, WN *in)
    WN_prev(in) = wn;
    WN_next(in) = WN_next(wn);
    WN_next(wn) = in;
-   if (WN_next(in)) WN_prev(WN_next(in)) = in;
+
+   if (WN_next(in))
+       WN_prev(WN_next(in)) = in;
    }
 
  else /* opcode is a block */
@@ -545,7 +547,8 @@ extern void WN_INSERT_BlockAfter(WN *blck, WN *wn, WN *in)
      WN_prev(first) = wn;
      WN_next(last) = WN_next(wn);
      WN_next(wn) = first;
-    if (WN_next(last)) WN_prev(WN_next(last)) = last;
+    if (WN_next(last)) 
+        WN_prev(WN_next(last)) = last;
     }
    WN_first(in) = WN_last(in) = NULL;
    WN_Delete(in);

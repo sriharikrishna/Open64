@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn_attr.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:18 $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:46 $
  *
  * Revision history:
  *  07-Mar-95 - Original Version
@@ -373,6 +373,9 @@ if (wn == NULL)
       case OPR_ARRSECTION:  
       case OPR_ARRAY:
       case OPR_ARRAYEXP:
+      case OPR_ARRAY_CONSTRUCT:
+      case OPR_IMPLIED_DO:
+
 	 /* Get the address type denoted by the base offset by the
 	  * given indexing expression. Note that we do handle
 	  * pointers as arrays when there is no ambiguity, and

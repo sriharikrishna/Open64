@@ -399,6 +399,8 @@ WN * F90_Wrap_ARREXP(WN * expr)
    is_array_valued = F90_Size_Walk(expr, &ndim, sizes);
    if (is_array_valued) {
      ty = WN_rtype(expr);
+
+# if 0 /*Keep ty as it was */
      switch (ty) {
       case MTYPE_I1:
       case MTYPE_I2:
@@ -412,6 +414,8 @@ WN * F90_Wrap_ARREXP(WN * expr)
       default:
 	break;
      }
+# endif
+
      r = WN_Create(OPCODE_make_op(OPR_ARRAYEXP,ty,MTYPE_V),
 		   ndim+1);
      WN_kid0(r) = expr;

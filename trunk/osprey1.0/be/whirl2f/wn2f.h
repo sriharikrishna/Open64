@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: wn2f.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:34 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-16 19:30:46 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.h,v $
  *
  * Revision history:
@@ -183,7 +183,9 @@ typedef struct WN2F_Context
 /* This flag indicates that we are in a context where we expect the
  * current expression to evaluate to a logically typed arg.
  */
-#define WN2F_CONTEXT_IS_LOGICAL_ARG 0x00000020
+//  #define WN2F_CONTEXT_IS_LOGICAL_ARG 0x00000020
+
+#define WN2F_CONTEXT_IS_LOGICAL_ARG 0x02000000
 #define WN2F_CONTEXT_is_logical_arg(c)\
    ((c).flags & WN2F_CONTEXT_IS_LOGICAL_ARG)
 #define set_WN2F_CONTEXT_is_logical_arg(c)\
@@ -202,6 +204,10 @@ typedef struct WN2F_Context
    ((c).flags = (c).flags | WN2F_CONTEXT_NO_PARENTHESIS)
 #define reset_WN2F_CONTEXT_no_parenthesis(c)\
    ((c).flags = (c).flags & ~WN2F_CONTEXT_NO_PARENTHESIS)
+/*****************************************
+ * WN2F_CONTEXT_NO_PARENTHESIS and WN2F_CONTEXT_IS_LOGICAL_ARG
+ * use same flag---changed!!
+ ****************************************/
 
 /* This flag indicates whether or not a Fortran IO control-list
  * should be emitted in keyword form.

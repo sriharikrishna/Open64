@@ -3641,7 +3641,9 @@ static void check_for_constructors(opnd_type 		*top_opnd,
       case Array_Construct_Opr :
 
          loc_exp_desc = arg_info_list[IR_IDX_L(ir_idx)].ed;
-         ok = create_runtime_array_constructor(top_opnd, &loc_exp_desc);
+/*         ok = create_runtime_array_constructor(top_opnd, &loc_exp_desc);*/
+/*keep source level array constructor ----fzhao */
+         ok = TRUE;
          if (exp_desc != NULL) {
             COPY_SHAPE((exp_desc->shape),
                        loc_exp_desc.shape, loc_exp_desc.rank);
