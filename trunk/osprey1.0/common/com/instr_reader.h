@@ -38,9 +38,9 @@
 // ====================================================================
 //
 // Module: instr_reader.h
-// $Revision: 1.2 $
-// $Date: 2002-07-12 16:48:31 $
-// $Author: fzhao $
+// $Revision: 1.3 $
+// $Date: 2003-12-11 22:13:04 $
+// $Author: eraxxon $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/instr_reader.h,v $
 //
 // Revision history:
@@ -78,10 +78,16 @@
 #endif /* _USE_PROFILE_ERROR_ROUTINES */
 
 
+#ifdef FSEEK
+# undef FSEEK
+#endif
 #define FSEEK(_fd, _position, whence, _error_message, _error_arg) \
      if (fseek(_fd, _position, whence) != 0) \
            profile_error(_error_message, _error_arg);
 
+#ifdef FREAD
+# undef FREAD
+#endif
 #define FREAD(_buffer, _size, _nitems, _fp, _error_message, _error_arg) \
         if (fread((void *)_buffer, _size, _nitems, _fp) != _nitems) \
            profile_error(_error_message, _error_arg);
