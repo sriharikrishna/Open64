@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
+ * $Revision: 1.3 $
+ * $Date: 2003-12-09 19:16:57 $
  *
  * Revision history:
  *  07-Oct-95 - Original Version
@@ -111,19 +111,7 @@ const char * W2CF_Symtab_Nameof_Ty(TY_IDX ty);
 const char * W2CF_Symtab_Nameof_Fld(FLD_HANDLE fld);
 const char * W2CF_Symtab_Nameof_Fld_Pointee(FLD_HANDLE fld);
 const char * W2CF_Symtab_Nameof_Tempvar(INT32 tempvar_id);
-
-/* Solaris CC workaround
- * See Forte C++ Documentation
- * This is a feature in Solaris CC compiler's name mangling,
- * "const" parameter and general parameter has different name mangling
- * on the function name
- */
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
 const char * W2CF_Symtab_Nameof_Preg(const TY_IDX preg_ty, PREG_NUM preg_num);
-#else
-const char * W2CF_Symtab_Nameof_Preg(TY_IDX preg_ty, PREG_NUM preg_num);
-#endif
-
 const char * W2CF_Symtab_Unique_Name(const char *name);
 UINT32 W2CF_Symtab_Unique_Label(void);
 

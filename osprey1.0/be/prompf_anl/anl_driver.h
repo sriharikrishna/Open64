@@ -35,6 +35,7 @@
 
 #ifndef anl_driver_INCLUDED
 #define anl_driver_INCLUDED
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,9 +43,9 @@ extern "C" {
  * ==============================================================
  *
  * Module: anl_driver.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:52 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-12-09 19:16:57 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/prompf_anl/anl_driver.h,v $
  *
  * Description:
@@ -73,4 +74,5 @@ void        Anl_Cleanup(void);
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* anl_driver_INCLUDED */

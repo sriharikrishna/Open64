@@ -519,17 +519,7 @@ Preg_Home(PREG_NUM preg)
 
 extern void BE_symtab_initialize_be_scopes(void);
 extern void BE_symtab_free_be_scopes(void);
-
-/* Solaris CC workaround
- * See Forte C++ Documentation
- * Some C++ compiler has strict name mangling that distinguish 
- * 'const' argument and normal argument
- *
- */
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
 extern void BE_symtab_alloc_scope_level(const SYMTAB_IDX);
-#else
-extern void BE_symtab_alloc_scope_level(SYMTAB_IDX);
-#endif
+
 
 #endif // be_symtab_INCLUDED

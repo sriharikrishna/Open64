@@ -144,46 +144,12 @@
 #ifndef id_map_INCLUDED
 #define id_map_INCLUDED "id_map.h"
 
+#include <math.h>
 #include "defs.h"
 #include "cxx_template.h"
 #include "tracing.h"
 #include "opt_defs.h"
 #include "erglob.h"      // For EC_xxx error codes
-
-// Bring in declaration of floor and ceil from /usr/include/math.h
-// Can't include math.h directly because of defs.h!
-
-/* eraxxon: we should figure out how to replace this junk with math.h FIXME */
-
-#if defined(__CYGWIN__) 
-# include <math.h>
-#elif defined(_LP64) && defined(_MATH_H)
-  /* nothing */
-#else
-  extern "C" {
-# if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-   extern double   floor(double);
-# elif defined(_SGI_SGI) && !defined(__GNUC__)
-   extern double   floor(double);
-# else
-   extern double   floor(double) __THROW;
-# endif
-# ifdef __MATH_HAS_NO_SIDE_EFFECTS
-#  pragma no side effects (floor)
-# endif /* __MATH_HAS_NO_SIDE_EFFECTS */
-
-# if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-   extern double   ceil(double);
-# elif defined(_SGI_SGI) && !defined(__GNUC__)
-   extern double   ceil(double);
-# else
-   extern double   ceil(double) __THROW;
-# endif
-# ifdef __MATH_HAS_NO_SIDE_EFFECTS
-#  pragma no side effects (ceil)
-# endif /* __MATH_HAS_NO_SIDE_EFFECTS */
-  }
-#endif /* defined(_LP64) && defined(_MATH_H) */
 
 #define MIN_TABLE_SIZE 16
 
