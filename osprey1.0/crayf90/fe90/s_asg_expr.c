@@ -9924,7 +9924,7 @@ static boolean subscript_opr_handler(opnd_type		*result_opnd,
 
                      (exp_desc->rank)++;
 
-# if 1
+# if 0
                      find_opnd_line_and_column((opnd_type *)
                                                 &IL_OPND(list_idx),
                                                &opnd_line,
