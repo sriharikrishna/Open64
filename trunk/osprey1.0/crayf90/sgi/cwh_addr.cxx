@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.8 $
- * $Date: 2002-10-31 22:52:22 $
- * $Author: open64 $
+ * $Revision: 1.9 $
+ * $Date: 2003-06-26 20:01:25 $
+ * $Author: fzhao $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -1620,7 +1620,7 @@ cwh_addr_stid(ST *st, OFFSET_64 off, TY_IDX ty , WN * rhs)
   TYPE_ID bt;
   OPCODE  op;
 
-//  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
+  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
 
   if (BIG_OFFSET(off)) {
     wn = cwh_addr_lda(st,off,ty);
