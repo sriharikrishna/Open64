@@ -11284,6 +11284,8 @@ static TYPE get_type_desc(int	input_idx)
 
    pe_bd_idx = ATD_PE_ARRAY_IDX(attr_idx);
 
+      fei_init_global_vars();
+
       for (i = 1; i <= BD_RANK(bd_idx); i++) {  
 
          if (BD_LB_FLD(bd_idx, i) == NO_Tbl_Idx)  
