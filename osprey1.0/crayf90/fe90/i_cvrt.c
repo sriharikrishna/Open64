@@ -3312,7 +3312,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
              PDG_DBG_PRINT_C("fei_paren");
              PDG_DBG_PRINT_END
 # ifdef _ENABLE_FEI
-             fei_paren(basic);
+             fei_paren(basic,processing_call);
 # endif
              break;
 
@@ -9240,7 +9240,10 @@ CONTINUE:
    case Use_Opr:
         if (ATP_USE_LIST(IR_IDX_L(ir_idx)) != NULL_IDX) {
              ro_idx = ATP_USE_LIST(IR_IDX_L(ir_idx));
-             while (ro_idx != NULL_IDX) {
+             while (ro_idx != NULL_IDX && 
+                              ATD_CLASS(RO_NAME_ATTR(ro_idx)) == Variable) {
+  /* Currently we only want to keep "Variable" in the rename list----fzhao */
+
 /*               PDG_AT_IDX(RO_NAME_ATTR(ro_idx)) = NULL_IDX; */ /* send anyway */
                cvrt_exp_to_pdg(RO_NAME_ATTR(ro_idx),
                                AT_Tbl_Idx);
@@ -9270,7 +9273,7 @@ CONTINUE:
        
        cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                         IR_FLD_L(ir_idx));
-       if (ATP_USE_TYPE(IR_IDX_L(ir_idx)) == Use_Only)
+       if (ATP_USE_TYPE(IR_IDX_L(ir_idx)) == Use_Only && rename_only_num)
            bonly = 1;
 
         fei_use(rename_only_num,bonly);
@@ -13213,6 +13216,7 @@ static void send_interface_list(int ng_attr_idx)
 
    TRACE (Func_Entry, "send_interface_list", NULL);
 
+   fei_set_in_interface_processing();
 
          /* This is an interface block that has the same name as one of */
          /* its program units.  The program unit has to go through the  */
@@ -13273,6 +13277,8 @@ static void send_interface_list(int ng_attr_idx)
 
 
    TRACE (Func_Exit, "send_interface_list", NULL);
+  
+   fei_reset_in_interface_processing();
 
    return;
 
@@ -14106,8 +14112,8 @@ static void send_attr_ntry(int		attr_idx)
 
 # endif  
 /***************************************************************
- * We need keep interface information in Whirl so we can output 
- * "interface" block in w2f.f file,we need add OPR_INTERFACE in
+ * We need to keep interface information in Whirl so we can output 
+ * "interface" block in w2f.f file,we need to add OPR_INTERFACE in
  * Whirl,here we have to generate a bounch of OPR_FUNC_ENTRY and
  * send all dummy arguments for "OPR_INTERFACE"
  ****************************************************************/
