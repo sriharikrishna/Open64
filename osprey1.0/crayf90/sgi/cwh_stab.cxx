@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.6 $
- * $Date: 2002-08-30 21:27:13 $
+ * $Revision: 1.7 $
+ * $Date: 2002-09-05 21:42:18 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -3383,6 +3383,9 @@ fei_interface(char  * name_string,
   st = New_ST(CURRENT_SYMTAB);
                              
   cwh_auxst_clear(st);
+
+  ty = NULL;
+
   ST_Init(st, Save_Str(name_string), CLASS_VAR, SCLASS_AUTO, EXPORT_LOCAL, ty);
   Set_ST_ofst(st, 0);
 

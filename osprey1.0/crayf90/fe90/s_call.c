@@ -2342,7 +2342,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
       /* Make sure this is not defined in this program unit and that */
       /* it is not an intrinsic.  Also get rid of stuff like _END    */
 
-      check_call_for_global_def(list_idx, spec_idx, num_args);
+      check_call_for_global_def(list_idx, spec_idx, num_args); 
    }
 
    if (ATP_EXTRA_DARG(spec_idx)) {
