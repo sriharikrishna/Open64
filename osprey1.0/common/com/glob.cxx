@@ -77,6 +77,8 @@ PU_KIND	Cur_PU_Kind = PU_UNKNOWN;
 BOOL Symbol_Table_Out = FALSE;	/* Symbol table output (list or trace) */
 BOOL Show_Progress = FALSE;     /* Report progress to stdout */
 
+BOOL Compile_Upc = FALSE;
+
 /* ====================================================================
  *
  * Front End process info: for consistency checking 

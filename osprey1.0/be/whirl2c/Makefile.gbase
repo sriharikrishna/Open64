@@ -86,7 +86,7 @@ HOSTDEFS += -Dlonglong
 # need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
 HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
 # need to define BUILD_WHIRL2C to get appropriate code from common sources
-HOSTDEFS += -DMONGOOSE_BE -DBUILD_WHIRL2C
+HOSTDEFS += -DMONGOOSE_BE -DBUILD_WHIRL2C -DCOMPILE_UPC
 
 ifeq ($(BUILD_OPTIMIZE), DEBUG)
 HOSTDEFS += -DIs_True_On
@@ -109,7 +109,7 @@ BE_WHIRL2C_DIR 		= $(BE_DIR)/whirl2c
 BE_WHIRL2F_DIR 		= $(BE_DIR)/whirl2f
 COMMON_DIR 		= $(BUILD_TOT)/common
 COMMON_COM_DIR 		= $(COMMON_DIR)/com
-COMMON_LIB_DIR 		= $(COMMON_DIR)/lib
+#COMMON_LIB_DIR 		= $(COMMON_DIR)/lib
 COMMON_UTIL_DIR 	= $(COMMON_DIR)/util
 INCLUDE_DIR 		= $(ROOT)/usr/include
 IPA_COM_DIR 		= $(BUILD_TOT)/ipa/common/
@@ -252,7 +252,7 @@ ifeq ($(BUILD_COMPILER), EDG)
 LLDLIBS	= -none -lc
 endif
 
-default: first $(TARGETS) last
+default: first depends $(TARGETS) last
 
 #----------------------------------------------------------------------
 #  The commands in this section are done BEFORE any other target is
@@ -264,6 +264,8 @@ ifeq ($(BUILD_OS), LINUX)
 	cd $(BUILD_AREA)/include && $(MAKE)
 	if ! test -a $(TARGET_SO); then ln -sf $(TARG_TARG_INFO_DIR)/$(TARGET_SO) .; fi
 endif
+
+include $(BUILD_TOT)/Makeinclude 
 
 #----------------------------------------------------------------------
 #  The commands in this section are done AFTER every other target is
@@ -291,10 +293,17 @@ endif
 # extra files to be removed with make clobber
 LDIRT += be be.so whirl2c_dbg $(TARGET_SO)
 
+ifeq ($(BUILD_OS), LINUX)
+whirl2c.so:  $(WHIRL2C_CXX_OBJS) $(BE_WHIRL2C_DIR)/Exported \
+		$(WHIRL2C_DSOS) $(BE_BE_DIR)/so_locations
+		$(CXX) -shared -o $@ $(EXPORT_LIST)  \
+		$(WHIRL2C_CXX_OBJS) $(WHIRL2C_DSOS) $(LLDLIBS)
+else
 whirl2c.so:  $(WHIRL2C_CXX_OBJS) $(BE_WHIRL2C_DIR)/Exported \
 		$(WHIRL2C_DSOS) $(BE_BE_DIR)/so_locations
 		$(CXX) -o $@ $(STD_DSO_LOADOPTS) $(EXPORT_LIST) $(LDFLAGS) \
 		$(WHIRL2C_CXX_OBJS) $(WHIRL2C_DSOS) $(LLDLIBS)
+endif
 
 # Make the back-end executable, then create a link to it named
 # "whirl2c_be".  Make a driver "whirl2c" which MUST reside in the 
@@ -324,9 +333,9 @@ be:
 # For debugging, set LD_LIBRARY_PATH manually and invoke whirl2c_dbg
 # directly.
 #
-#whirl2c_dbg: whirl2c.so $(WHIRL2C_DRIVER_OBJS) $(WHIRL2C_DSOS)
-#		$(LD) -o $@ $(WHIRL2C_DRIVER_OBJS) $(LDFLAGS) \
-#		whirl2c.so $(WHIRL2C_DSOS)
+whirl2c_dbg: whirl2c.so $(WHIRL2C_DRIVER_OBJS) $(WHIRL2C_DSOS)
+		$(LD) -o $@ $(WHIRL2C_DRIVER_OBJS) $(LDFLAGS) \
+		whirl2c.so $(WHIRL2C_DSOS)
 
 
 #----------------------------------------------------------------------

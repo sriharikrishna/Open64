@@ -115,6 +115,13 @@ struct lang_type
 #define C_TYPE_VARIABLE_SIZE(type) TYPE_LANG_FLAG_1 (type)
 #define C_DECL_VARIABLE_SIZE(type) DECL_LANG_FLAG_0 (type)
 
+/* Record that we are processing a UPC shared array declaration
+   or type definition that refers to THREADS in its array dimension.*/
+#define UPC_TYPE_USES_THREADS(type) TYPE_LANG_FLAG_2 (type)
+
+/* WEI: Record that the array dimension contains THREADS */
+#define UPC_TYPE_HAS_THREADS(type) TYPE_LANG_FLAG_3(type)
+
 /* Record in each node resulting from a binary operator
    what operator was specified for it.  */
 #define C_EXP_ORIGINAL_CODE(exp) ((enum tree_code) TREE_COMPLEXITY (exp))
@@ -163,6 +170,15 @@ extern tree maybe_building_objc_message_expr    PARAMS ((void));
 extern tree maybe_objc_method_name		PARAMS ((tree));
 extern int recognize_objc_keyword		PARAMS ((void));
 extern tree build_objc_string			PARAMS ((int, const char *));
+
+int count_upc_thread_refs			PARAMS((tree));
+int is_multiple_of_upc_threads			PARAMS((tree));
+void set_upc_thread_refs_to_one			PARAMS((tree *));
+tree set_upc_blocksize				PARAMS((tree, tree));
+tree upc_shared_pointer_int_sum			PARAMS((enum tree_code,
+						       tree, tree));
+tree upc_shared_pointer_diff			PARAMS((tree, tree));
+int upc_get_threads_val				PARAMS(());
 
 /* in c-parse.in */
 extern void c_parse_init			PARAMS ((void));
@@ -304,6 +320,31 @@ extern void iterator_for_loop_end		PARAMS ((tree));
 extern void iterator_for_loop_record		PARAMS ((tree));
 extern void push_iterator_stack			PARAMS ((void));
 extern void pop_iterator_stack			PARAMS ((void));
+
+/* in expr.c */
+struct consistency_value
+{
+  tree value;
+  struct consistency_value *next;
+};
+
+struct consistency_nesting_level
+{
+  int pragma;
+  struct consistency_nesting_level *next;
+};
+extern struct consistency_value *global_consistency_stack;
+extern struct consistency_value *stmt_consistency_stack;
+extern struct consistency_value *current_consistency_stack;
+extern struct consistency_nesting_level *stmt_consistency_nesting_level;
+extern int UPC_statement_pragma_ok;
+
+/* In c-pragma.c */
+extern void push_consistency_value		PARAMS((tree, int));
+extern void pop_consistency_value		PARAMS((int));
+extern void push_consistency_nesting_level	PARAMS((int));
+extern void pop_consistency_nesting_level	PARAMS((int));
+
 
 /* Set to 0 at beginning of a function definition, set to 1 if
    a return statement that specifies a return value is seen.  */
@@ -447,6 +488,10 @@ extern int system_header_p;
 /* Nonzero enables objc features.  */
 
 extern int doing_objc_thang;
+
+/* Nonzero enables upc features.  */
+
+extern int compiling_upc;
 
 /* In c-decl.c */
 extern void finish_incomplete_decl PARAMS ((tree));

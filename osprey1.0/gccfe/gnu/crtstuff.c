@@ -336,6 +336,11 @@ __frame_dummy (void)
 
 #endif /* defined(INIT_SECTION_ASM_OP) */
 
+#ifdef UPC_SHARED_SECTION_BEGIN_INIT
+/* Establish a symbol at the beginning of the shared data section */
+UPC_SHARED_SECTION_BEGIN_INIT
+#endif /* UPC_SHARED_SECTION_BEGIN_INIT */
+
 /* Force cc1 to switch to .data section.  */
 static func_ptr force_to_data[0] __attribute__ ((__unused__)) = { };
 
@@ -486,6 +491,11 @@ __do_global_ctors (void)
 #endif
 
 #endif /* defined(INIT_SECTION_ASM_OP) */
+
+#ifdef UPC_SHARED_SECTION_END_INIT
+/* Establish a symbol at the end of the shared data section */
+UPC_SHARED_SECTION_END_INIT
+#endif /* UPC_SHARED_SECTION_END_INIT */
 
 /* Force cc1 to switch to .data section.  */
 static func_ptr force_to_data[0] __attribute__ ((__unused__)) = { };

@@ -89,7 +89,7 @@ LDLIBS += -llmsgi
 endif
 
 # don't want to use common/com/defs.h
-LCINCS	= -I. -I$(BUILD_BASE)
+LCINCS	= -I. -I$(BUILD_BASE) -I$(BUILD_AREA)/include
 
 TARGETS	= driver
 
@@ -163,12 +163,14 @@ LDIRT = OPTIONS.P table generated $(GEN_HFILES) $(GEN_CFILES)
 
 LANGS = as cc c89 CC f77 fort77 f90
 
-default: first $(TARGETS) last
+default: first depends $(TARGETS) last
 
 first:
 ifeq ($(BUILD_OS), LINUX)
 	cd $(BUILD_AREA)/include && $(MAKE)
 endif
+
+include $(BUILD_TOT)/Makeinclude
 
 last: make_deps
 

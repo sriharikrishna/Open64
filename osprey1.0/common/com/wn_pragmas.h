@@ -43,9 +43,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: wn_pragmas.h
- * $Revision: 1.3 $
- * $Date: 2002-09-12 13:06:11 $
- * $Author: open64 $
+ * $Revision: 1.4 $
+ * $Date: 2003-02-21 21:13:43 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $
  *
  * Description:
@@ -115,7 +115,7 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *pragmas_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $ $Revision: 1.3 $";
+static char *pragmas_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Pragma IDs: */
@@ -364,6 +364,13 @@ typedef enum {
   WN_PRAGMA_ASM_CONSTRAINT,	/* constraint string for an ASM operand */
   WN_PRAGMA_ASM_CLOBBER,        /* clobber string for an ASM statement */
 
+  /* "upc" specific pragmas */
+  WN_PRAGMA_UPC_STRICT_CONSISTENCY_START,  /* strict consistency */
+  WN_PRAGMA_UPC_STRICT_CONSISTENCY_STOP,  
+  WN_PRAGMA_UPC_RELAXED_CONSISTENCY_START, /* relaxed */
+  WN_PRAGMA_UPC_RELAXED_CONSISTENCY_STOP,
+  WN_PRAGMA_UPC_FORALL,              /* forall loop - marks the whole loop body */
+  WN_PRAGMA_UPC_FORALL_AFFINITY,     /* marks the affinity test for a forall loop */
   MAX_WN_PRAGMA			/* last one in enum			*/
 } WN_PRAGMA_ID;
 

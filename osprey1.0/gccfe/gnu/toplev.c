@@ -149,6 +149,9 @@ You Lose!  You must define PREFERRED_DEBUGGING_TYPE!
 extern char **environ;
 #endif
 
+/* indicating we're in 32-bit mode */
+int is_ia32 = 0;
+
 /* Carry information from ASM_DECLARE_OBJECT_NAME
    to ASM_FINISH_DECLARE_OBJECT.  */
 
@@ -1261,6 +1264,13 @@ documented_lang_options[] =
   
 #define DEFINE_LANG_NAME(NAME) { NULL, NAME },
   
+  
+  /* These are for UPC. */
+  DEFINE_LANG_NAME ("UPC")
+
+  { "-lang-upc", "" },
+  { "-fupc-threads- ", "Specify the compile-time value of THREADS" },
+
   /* These are for Objective C.  */
   DEFINE_LANG_NAME ("Objective C")
   
@@ -3676,8 +3686,12 @@ rest_of_compilation (decl)
     TREE_NOTHROW (current_function_decl) = 1;
 
   /* Now turn the rtl into assembler code.  */
-
   timevar_push (TV_FINAL);
+/* JLE: I added this ifdef to be consistent with other parts of the
+   front-end that avoid assembly output when SGI_MONGOOSE is defined.
+   I'm not sure how this could have ever worked since asm_out_file is
+   NULL when SGI_MONGOOSE is defined.  */
+#ifndef SGI_MONGOOSE
   {
     rtx x;
     const char *fnname;
@@ -3707,6 +3721,7 @@ rest_of_compilation (decl)
     /* Release all memory held by regsets now */
     regset_release_memory ();
   }
+#endif /* SGI_MONGOOSE.  */
   timevar_pop (TV_FINAL);
 
   if (ggc_p)
@@ -4007,6 +4022,7 @@ decode_d_option (arg)
 #ifdef SGI_MONGOOSE
       case 'P':
 	parse_tree_dump = 1;
+	tree_dump_file = stdout;
 	break;
 #endif /* SGI_MONGOOSE */
       case 'v':

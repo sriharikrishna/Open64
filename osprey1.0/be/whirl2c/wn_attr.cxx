@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn_attr.c
- * $Revision: 1.4 $
- * $Date: 2002-08-23 21:59:12 $
+ * $Revision: 1.5 $
+ * $Date: 2003-02-21 21:13:42 $
  *
  * Revision history:
  *  07-Mar-95 - Original Version
@@ -110,10 +110,55 @@ WN_Cvtl_Ty(const WN *wn)
    return Stab_Mtype_To_Ty(cvtl_mtype);
 } /* WN_Cvtl_Ty */
 
+TY_IDX Get_Field_Type(TY_IDX base, int field_id) {
+
+  Is_True(TY_Is_Structured(base), ("CALLING GET_FIELD_TYPE with a non struct type"));
+
+  UINT cur_fld_id = 0;
+  FLD_HANDLE fh = FLD_get_to_field(base, field_id, cur_fld_id);
+  return FLD_type(fh);
+}
 
 /*------------------------ Exported functions -------------------------
  *---------------------------------------------------------------------*/
 
+
+static TY_IDX
+WN_get_tld_type(const WN* wn) {
+
+  //wn must be TLD_ADDR(...)
+  WN* kid = WN_kid0(WN_kid0(wn));
+  TY_IDX result_ty = WN_Tree_Type(kid);
+  switch (TY_kind(result_ty)) {
+  case KIND_ARRAY: {
+    TY_IDX new_ty;
+    int dim = 1;
+    for (new_ty = TY_etype(result_ty); TY_kind(new_ty) == KIND_ARRAY; new_ty = TY_etype(new_ty), dim++);
+    for (;dim > 0; new_ty = Make_Pointer_Type(new_ty), dim--);
+    return new_ty;
+  }
+  case KIND_STRUCT:
+    if (WN_field_id(kid) != 0) {
+      return Make_Pointer_Type(Get_Field_Type(result_ty, WN_field_id(kid)));
+    }
+    return Make_Pointer_Type(result_ty);
+  case KIND_POINTER: {
+    //need to handle ptr to shared data as a speical case
+    TY_IDX pointed = TY_pointed(result_ty);
+    if (TY_is_shared(pointed)) {
+      if (TY_kind(pointed) != KIND_VOID &&
+	  Get_Type_Block_Size(pointed) <= 1) {
+	return Make_Pointer_Type(Make_Pointer_Type(pshared_ptr_idx));
+      } else {
+	return Make_Pointer_Type(Make_Pointer_Type(shared_ptr_idx));
+      }
+    }
+    //fall thru to the default case if not shared
+  }
+  default:
+    return Make_Pointer_Type(result_ty);
+  }
+}
 
 UINT
 WN_num_var_refs(WN *wn, const ST *st, STAB_OFFSET st_ofst)
@@ -250,6 +295,9 @@ WN_intrinsic_return_ty(OPCODE wn_opc, INTRINSIC intr_opc, const WN *call)
    case IRETURN_DA1:
       ret_ty = WN_Tree_Type(WN_kid0(call));
       break;
+   case IRETURN_M:
+     ret_ty = Stab_Mtype_To_Ty(MTYPE_M);
+     break;
    default:
       Is_True(FALSE, 
 	      ("Unexpected INTRN_RETKIND in WN_intrinsic_return_ty()"));
@@ -351,6 +399,13 @@ if (wn == NULL)
       {
       case OPR_ILOAD:
       case OPR_ILOADX:
+	ty = WN_ty(wn);
+	if (TY_kind(ty) == KIND_STRUCT &&
+	    WN_field_id(wn) > 0) {
+	  //WEI: for field accesses we return the type of the field
+	  ty = TY_pointed(WN_load_addr_ty(wn));
+	}
+	break;
       case OPR_LDID:
       case OPR_LDA:
 	 ty = WN_ty(wn);
@@ -361,9 +416,15 @@ if (wn == NULL)
 	 if (WN_opc_operator(WN_kid1(wn)) == OPR_INTCONST &&
 	     TY_Is_Structured(TY_pointed(WN_ty(wn))))
 	 {
+
+	   /* WEI: for field accesses, get the type of the field */
+	   if (WN_field_id(wn) != 0) {
+	     ty = Get_Field_Type(TY_pointed(WN_ty(wn)), WN_field_id(wn));
+	   } else {
 	    ty = Stab_Get_Mload_Ty(TY_pointed(WN_ty(wn)), 
 				   WN_load_offset(wn), 
 				   WN_const_val(WN_kid1(wn)));
+	   }
 	 }
 	 else
 	 {
@@ -469,6 +530,13 @@ if (wn == NULL)
 	 break;
 
       case OPR_INTRINSIC_OP:
+
+	if (WN_intrinsic(wn) == INTRN_TLD_ADDR) {
+	  //in this case we get its actual type from its arguments
+	  ty = WN_get_tld_type(wn);
+	  break;
+	}
+	
 	 if (INTR_is_adrtmp(WN_intrinsic(wn)))
 	 {
 	    if (WN_opcode(WN_kid0(wn)) == OPC_VCALL ||

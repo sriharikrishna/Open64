@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: whirl2c_common.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/whirl2c_common.cxx,v $
  *
  * Revision history:
@@ -72,57 +72,57 @@ void WHIRL2C_parenthesize(TOKEN_BUFFER tokens)
 const char * 
 WHIRL2C_make_valid_c_name(const char *name)
 {
-   /* If name==NULL, then return NULL;  otherwise, if a valid name,
-    * then keep it unaltered; otherwise, construct a valid name
-    * in a new Name_Buf by removing invalid characters (never return
-    * NULL for this case)
-    */
-   const char *return_name = name;
-   char       *new_name;
-   INT         name_idx;
-   
-   if (name != NULL)
-   {
+  /* If name==NULL, then return NULL;  otherwise, if a valid name,
+   * then keep it unaltered; otherwise, construct a valid name
+   * in a new Name_Buf by removing invalid characters (never return
+   * NULL for this case)
+   */
+  const char *return_name = name;
+  char       *new_name;
+  INT         name_idx;
+  
+  if (name != NULL)
+    {
       /* See if we need to construct a new name. First skip valid
        * characters (alphanumeric or '_', and beginning with
        * an alphabetic or '_' character).
        */
       if (isalpha(name[0]) || name[0] == '_')
-      {
-	 for (name_idx = 1;
+	{
+	  for (name_idx = 1;
 	      (isalnum(name[name_idx]) || 
 	       name[name_idx] == '_');
-	      name_idx++);
-      }
+	       name_idx++);
+	}
       else /* Incorrect first character */
-      {
-	 /* Skip to a valid first character & construct a new name below */
-	 name_idx = 0;
-	 while (name[name_idx] != '\0'   &&
-		!isalpha(name[name_idx]) && 
-		name[name_idx] != '_')
+	{
+	  /* Skip to a valid first character & construct a new name below */
+	  name_idx = 0;
+	  while (name[name_idx] != '\0'   &&
+		 !isalpha(name[name_idx]) && 
+		 name[name_idx] != '_')
 	    name += 1;
-	 return_name = name; /* Just in case (name[name_idx] == '\0') */
-      }
+	  return_name = name; /* Just in case (name[name_idx] == '\0') */
+	}
       
       /* Did we find an invalid character? */
       if (name[name_idx] != '\0')
-      {
-	 /* Need to construct a new name.  This should be relatively rare */
-	 new_name = strcpy(Get_Name_Buf_Slot(strlen(name) + 1), name);
-	 return_name = new_name;
-	 while (*name != '\0')
-	 {
-	    if (isalnum(*name) || *name == '_' || *name == '$')
+	{
+	  /* Need to construct a new name.  This should be relatively rare */
+	  new_name = strcpy(Get_Name_Buf_Slot(strlen(name) + 1), name);
+	  return_name = new_name;
+	  while (*name != '\0')
 	    {
-	       *new_name++ = *name++;
+	      if (isalnum(*name) || *name == '_' || *name == '$')
+		{
+		  *new_name++ = *name++;
+		}
+	      else
+		name++; /* Skip invalid character */
 	    }
-	    else
-	       name++; /* Skip invalid character */
-	 }
-	 *new_name = '\0';
-      }
-   }
-   return return_name;
+	  *new_name = '\0';
+	}
+    }
+  return return_name;
 } /* WHIRL2C_make_valid_c_name */
 

@@ -63,6 +63,9 @@ extern cpp_options parse_options;
 FILE *finput;
 #endif
 
+int UPC_statement_pragma_ok = 0;
+void handle_upc_pragma			PARAMS((void));
+
 extern void yyprint			PARAMS ((FILE *, int, YYSTYPE));
 
 /* The elements of `ridpointers' are identifier nodes
@@ -138,6 +141,10 @@ tree lastiddecl;
 /* Nonzero enables objc features.  */
 
 int doing_objc_thang;
+
+/* Nonzero enables upc features.  */
+
+int compiling_upc;
 
 extern int yydebug;
 
@@ -317,6 +324,12 @@ init_lex ()
   ridpointers[(int) RID_REGISTER] = get_identifier ("register");
   ridpointers[(int) RID_ITERATOR] = get_identifier ("iterator");
   ridpointers[(int) RID_COMPLEX] = get_identifier ("complex");
+  
+  /* UPC type qualifiers */
+  ridpointers[(int) RID_SHARED] = get_identifier ("shared");
+  ridpointers[(int) RID_RELAXED] = get_identifier ("relaxed");
+  ridpointers[(int) RID_STRICT] = get_identifier ("strict");
+  
   ridpointers[(int) RID_ID] = get_identifier ("id");
   ridpointers[(int) RID_IN] = get_identifier ("in");
   ridpointers[(int) RID_OUT] = get_identifier ("out");
@@ -334,6 +347,21 @@ init_lex ()
 
   if (! doing_objc_thang)
     UNSET_RESERVED_WORD ("id");
+
+  if (! compiling_upc)
+    {
+      UNSET_RESERVED_WORD ("relaxed");
+      UNSET_RESERVED_WORD ("shared");
+      UNSET_RESERVED_WORD ("strict");
+      UNSET_RESERVED_WORD ("upc_barrier");
+      UNSET_RESERVED_WORD ("upc_blocksizeof");
+      UNSET_RESERVED_WORD ("upc_forall");
+      UNSET_RESERVED_WORD ("upc_localsizeof");
+      UNSET_RESERVED_WORD ("upc_notify");
+      UNSET_RESERVED_WORD ("upc_wait");
+      UNSET_RESERVED_WORD ("upc_fence");
+      UNSET_RESERVED_WORD ("upc_elemsizeof");
+    }
 
   if (flag_traditional)
     {
@@ -640,6 +668,9 @@ check_newline ()
 	  if (token != IDENTIFIER
 	      || TREE_CODE (yylval.ttype) != IDENTIFIER_NODE)
 	    goto skipline;
+
+	  if(!strcmp(IDENTIFIER_POINTER(yylval.ttype),"upc"))
+	    handle_upc_pragma(/*finput*/);
 
 #ifdef HANDLE_PRAGMA
 	  /* We invoke HANDLE_PRAGMA before HANDLE_GENERIC_PRAGMAS
@@ -2463,4 +2494,29 @@ set_yydebug (value)
 #else
   warning ("YYDEBUG not defined.");
 #endif
+}
+
+
+/* Called from check_newline after that function determines that a #pragma
+   directive has been found.  Check for the upc label; it it is there,
+   process the pragma. */
+void
+handle_upc_pragma ()
+{
+  register int c;
+  register int token  = yylex();
+  char *cons = IDENTIFIER_POINTER(yylval.ttype);
+  
+  if(strcmp(cons,"relaxed") && strcmp(cons,"strict"))
+    warning ("Unimplemented value for UPC pragma"); 
+  if (!current_function_decl)
+    push_consistency_value (yylval.ttype, 1);
+  else if (UPC_statement_pragma_ok)
+    {
+      push_consistency_value (yylval.ttype, 0);
+      stmt_consistency_nesting_level->pragma = 1;
+    }
+  else
+    warning ("UPC pragma ignored; must be global or just after '{'");
+  /* let caller purge rest of line */
 }

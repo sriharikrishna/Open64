@@ -42,7 +42,7 @@
 #include <alloca.h>
 
 #include <algorithm>
-
+#include <string>
 #include <map>
 #include "HashTable.h"
 using namespace stlCompatibility;
@@ -57,6 +57,7 @@ using namespace stlCompatibility;
 #include "const.h"                      // for MAX_SYMBOLIC_CONST_NAME_LEN
 #include "ttype.h"
 #include "targ_sim.h"
+#include "upc_symtab_utils.h"
 
 // global tables
 FILE_INFO	File_info;
@@ -277,7 +278,8 @@ FLD_get_to_field (TY_IDX struct_ty_idx, UINT field_id, UINT &cur_field_id)
 	cur_field_id++;
 	if (cur_field_id == field_id)
 	    return fld;
-	if (TY_kind(FLD_type(fld)) == KIND_STRUCT &&
+	//WEI: if the field is a {p}shared_ptr_t, make sure we don't try to traverse its fields
+	if (TY_kind(FLD_type(fld)) == KIND_STRUCT && !is_upcr_ptr(FLD_type(fld)) &&
             TY_fld(FLD_type(fld)) != FLD_HANDLE()) {
 	    fld = FLD_get_to_field(FLD_type(fld), field_id, cur_field_id);
 	    if (cur_field_id == field_id)
@@ -444,6 +446,125 @@ TY_pointer (TY_IDX pointee, BOOL f90_pointer)
     return result;
 } // TY_pointer
 
+static string utoa(UINT64 i) {
+  
+  string val = "";
+  
+  while (i >= 10) {
+    val = (char) ((i % 10) + '0') + val;  
+    i = i / 10;
+  }
+  return ((char) (i + '0')) + val;
+}
+
+string get_TY_string(TY_IDX idx) {
+
+  switch (TY_kind(idx)) {
+  case KIND_SCALAR:
+    return utoa(TY_mtype(idx));
+  case KIND_POINTER:
+    return "*" + utoa(TY_pointed(idx));
+  case KIND_ARRAY: {
+    TY_IDX base;
+    int dim;
+    for (base = TY_etype(idx), dim = 1; TY_kind(base) == KIND_ARRAY; base = TY_etype(base), dim++);
+    string res = utoa(base);
+    for (int i = 0; i < dim; i++, res += "[]");
+    res += utoa(TY_size(idx));
+    return res;
+  }
+  case KIND_STRUCT: 
+    return utoa(TY_name_idx(idx));
+  case KIND_VOID:
+    return "void";
+  }
+}
+
+class Idx_Pair {
+public:
+  TY_IDX idx;
+  int bsize;
+  Idx_Pair(TY_IDX i, int b) {idx = i; bsize = b;}
+}; 
+
+struct Pair_Cmp {
+  bool operator() (const Idx_Pair* t1, const Idx_Pair* t2) const {
+    return t1->idx < t2->idx || (t1->idx == t2->idx && t1->bsize < t2->bsize);
+  }
+};
+
+//map<Idx_Pair*, TY_IDX, Pair_Cmp> ty_map;
+map<string, TY_IDX> ty_map;
+
+
+/**
+ *
+ * Given a type(shared/non-shared), this function returns an equivalent shared type with the specified block size
+ */
+TY_IDX Make_Shared_Type (TY_IDX ty_idx, int bsize, CONSISTENCY_class consistency) {
+
+  string key = get_TY_string(ty_idx) + "_" + utoa(bsize) + (consistency == STRICT_CONSISTENCY ? "s" : "");
+  
+  if (TY_is_shared(ty_idx)) {
+    //if the type passed in is already shared, check if it has the same block size as the one given
+    //if yes, we can safely use the same TY entry
+    int ty_bsize;
+    switch (TY_kind(ty_idx)) {
+    case KIND_SCALAR:
+    case KIND_POINTER:
+    case KIND_STRUCT:
+      ty_bsize = TY_block_size(ty_idx);
+      break;
+    case KIND_ARRAY: {
+      TY_IDX base;
+      for (base = TY_etype(ty_idx); TY_kind(base) == KIND_ARRAY; base = TY_etype(base));
+      ty_bsize = TY_block_size(base);
+      break;
+    }
+    }
+    if (ty_bsize == bsize && TY_is_strict(ty_idx) &&  consistency == STRICT_CONSISTENCY) {
+      ty_map[key] = ty_idx;
+      return ty_idx;
+    }
+  }
+
+  //create a new shared type
+  TY_IDX res = ty_map[key];  
+  if (res == 0) {
+    TY& ty = New_TY(res);
+    TY_Init (ty, TY_size(ty_idx), TY_kind(ty_idx), TY_mtype(ty_idx),
+	     Save_Str (TY_name(ty_idx)));
+    Set_TY_flags(res, TY_flags(ty_idx));
+    Set_TY_align(res, TY_align(ty_idx));
+   
+    if(consistency == STRICT_CONSISTENCY)
+      Set_TY_is_strict(ty_idx);
+    
+    switch (TY_kind(ty_idx)) {
+    case KIND_SCALAR:
+      Set_TY_block_size(res, bsize);
+      Set_TY_is_shared(res);
+      break;
+    case KIND_POINTER:
+      Set_TY_block_size(res, bsize);
+      Set_TY_is_shared(res);
+      Set_TY_pointed(res, TY_pointed(ty_idx));      
+      break;
+    case KIND_STRUCT:
+      Set_TY_block_size(res, bsize);
+      Set_TY_is_shared(res);
+      Set_TY_fld(res, TY_fld(ty_idx));
+      break;
+    case KIND_ARRAY:
+      Set_TY_arb(res, TY_arb(ty_idx));
+      Set_TY_etype(res, Make_Shared_Type(TY_etype(ty_idx), bsize, consistency));
+      break;
+    }
+    ty_map[key] = res;
+  }
+  //cout << "MAKING SHARED: " << TY_name(res) << " " << key << " bsize: " << bsize << endl;
+  return res;
+}
 
 TY_IDX
 make_ptr_type (TY_IDX ty_idx, BOOL f90_pointer)
@@ -1863,6 +1984,7 @@ TY::Print (FILE *f) const
 	if (flags & TY_NOT_IN_UNION)	fprintf (f, " not_in_union");
 	if (flags & TY_NO_ANSI_ALIAS)	fprintf (f, " no_ansi_alias");
 	if (flags & TY_IS_NON_POD)	fprintf (f, " non_pod");
+	if (flags & TY_IS_SHARED)	fprintf (f, " shared");
     }
     fprintf (f, ")");
 
@@ -1943,6 +2065,9 @@ TY::Print (FILE *f) const
 	fputc ('\n', f);
 	break;
     }
+
+    if (flags & TY_IS_SHARED)
+	fprintf (f, "%s %d\n", "Block:", block_size);
 } // TY::Print
 
 

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2c_driver.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -82,10 +82,15 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "wn2c.h"
 #include "w2c_driver.h"
 
+#include <string>
+#include <stdio.h>
 
 /* Avoid errors due to uses of "int" in stdio.h macros.
  */
 #undef int
+
+//the maximum line length for the global_data.c file
+#define MAX_LINE_LEN 2000
 
 
 /* ====================================================================
@@ -101,7 +106,8 @@ static const char *W2C_File_Extension[W2C_NUM_FILES] =
    ".c",       /* original input file */
    ".w2c.h",   /* .h output file */
    ".w2c.c",   /* .c output file */
-   ".w2c.loc"  /* .loc output file */
+   ".w2c.loc",  /* .loc output file */
+   ".global_data.c", /* initialization input file */
 };
 
 /* CITE extensions for input/outfile files: */
@@ -110,7 +116,8 @@ static const char *W2C_Cite_Extension[W2C_NUM_FILES] =
    ".c",	        /* original input file */
    "-after-lno.h",	/* .c output file */
    "-after-lno.c",	/* .h output file */
-   ".loc"	        /* .loc output file */
+   ".loc",	        /* .loc output file */
+   ".global_data.c", /* initialization input file */
 };
 
 /* ProMPF extensions for input/outfile files: */
@@ -143,7 +150,7 @@ static const char *W2C_Progname = "";
 static const char *W2C_File_Name[W2C_NUM_FILES] = 
                                           {NULL, NULL, NULL, NULL};
 static BOOL        File_Is_Created[W2C_NUM_FILES] = 
-                                          {FALSE, FALSE, FALSE, FALSE};
+                                          {FALSE, FALSE, FALSE, FALSE, FALSE};
 static MEM_POOL     W2C_Parent_Pool;
 
 /* External data set through command-line options */
@@ -283,6 +290,11 @@ Process_Filename_Options(const char *src_filename, const char *irb_filename)
 	    New_Extension(fname, W2C_Extension(W2C_LOC_FILE));
       }
    }
+   if (W2C_File_Name[W2C_DATA_FILE] == NULL) {
+     W2C_File_Name[W2C_DATA_FILE] = 
+       New_Extension ( fname, W2C_Extension(W2C_DATA_FILE) );
+   }
+
 } /* Process_Filename_Options */
 
 
@@ -853,6 +865,14 @@ W2C_Translate_Global_Types(FILE *outfile)
    W2C_Undo_Whirl_Side_Effects();
 } /* W2C_Translate_Global_Types */
 
+void W2C_write_init(FILE *outfile) {
+
+  if (!Check_Initialized("W2C_write_init")) {
+    return;
+  }
+  
+
+}
 
 void
 W2C_Translate_Global_Defs(FILE *outfile)
@@ -864,6 +884,7 @@ W2C_Translate_Global_Defs(FILE *outfile)
 
    W2C_File[W2C_DOTH_FILE] = outfile;
    WN2C_translate_file_scope_defs(Global_Context);
+
    W2C_File[W2C_DOTH_FILE] = saved_hfile;
    W2C_Undo_Whirl_Side_Effects();
 } /* W2C_Translate_Global_Defs */
@@ -1155,11 +1176,18 @@ W2C_Outfile_Init(BOOL emit_global_decls)
    {
       Open_W2c_Output_File(W2C_DOTH_FILE);
 
-      /* Include <whirl2c.h> in the .h file */
-      Write_String(W2C_File[W2C_DOTH_FILE], NULL/* No srcpos map */,
-		   "/* Include builtin types and operators */\n"
-		   "#include <whirl2c.h>\n\n");
-
+      if(Compile_Upc) 
+	/* Include <whirl2c.h> in the .h file */
+	Write_String(W2C_File[W2C_DOTH_FILE], NULL/* No srcpos map */,
+		     "/* Include builtin types and operators */\n"
+		     //WEI: Took external_defs out, use upc_proxy instead
+		     "#include \"upcr_proxy.h\"\n#include<upcr.h>\n#include <whirl2c.h>\n\n");
+      else
+	/* Include <whirl2c.h> in the .h file */
+	Write_String(W2C_File[W2C_DOTH_FILE], NULL/* No srcpos map */,
+		     "/* Include builtin types and operators */\n"
+		     "#include \"whirl2c.h\"\n\n");
+      
       /* Include the .h file in the .c file */
       Write_String(W2C_File[W2C_DOTC_FILE], W2C_File[W2C_LOC_FILE],
 		   "/* Include file-level type and variable decls */\n"
@@ -1169,6 +1197,28 @@ W2C_Outfile_Init(BOOL emit_global_decls)
       Write_String(W2C_File[W2C_DOTC_FILE], W2C_File[W2C_LOC_FILE],
 		   "\"\n\n");
    }
+
+   // add the init file to output
+   Write_String(W2C_File[W2C_DOTC_FILE], W2C_File[W2C_LOC_FILE],
+		"/* Included code from the initialization script */\n");
+
+   char buf[MAX_LINE_LEN];
+   FILE* in = fopen(W2C_File_Name[W2C_DATA_FILE], "r");
+
+   while (fgets(buf, MAX_LINE_LEN, in) != NULL) {
+     Write_String(W2C_File[W2C_DOTC_FILE], W2C_File[W2C_LOC_FILE], buf);
+   }
+   /*
+     fstream fs;
+     string line;
+     fs.open(W2C_File_Name[W2C_DATA_FILE], ios::in);
+     
+     while (fs.good()) {
+     getline(fs, line);
+     Write_String(W2C_File[W2C_DOTC_FILE], W2C_File[W2C_LOC_FILE], (line + "\n").c_str());
+     }
+   */
+     
 
    if (emit_global_decls)
       WN2C_translate_structured_types();
@@ -1253,11 +1303,15 @@ W2C_Outfile_Fini(BOOL emit_global_decls)
       TOKEN_BUFFER tokens = New_Token_Buffer();
 
       WN2C_translate_file_scope_defs(Global_Context);
-
       ST2C_Define_Common_Blocks(tokens, Global_Context);
-      Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE], 
-			       W2C_File[W2C_LOC_FILE], 
-			       &tokens);
+
+      //WEI: Don't think we need this anymore, since Append_Symtab_Var now does this.
+      //Could be wrong, though...
+      if (!Compile_Upc) {
+	Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE], 
+	W2C_File[W2C_LOC_FILE], 
+	&tokens);
+      }
    }
 
    Close_W2c_Output_File(W2C_LOC_FILE);

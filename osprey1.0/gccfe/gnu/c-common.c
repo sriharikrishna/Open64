@@ -3279,10 +3279,19 @@ c_build_qualified_type (type, type_quals)
       type_quals &= ~TYPE_QUAL_RESTRICT;
     }
 
-  if (TREE_CODE (type) == ARRAY_TYPE)
-    return build_array_type (c_build_qualified_type (TREE_TYPE (type),
+  if (TREE_CODE (type) == ARRAY_TYPE) {
+    tree t = build_array_type (c_build_qualified_type (TREE_TYPE (type),
 						     type_quals),
-			     TYPE_DOMAIN (type));
+			       TYPE_DOMAIN (type));
+    //WEI: need to preserve the HAS_THREADS flag, if it's set
+    if (UPC_TYPE_HAS_THREADS(type) == 1) {
+      UPC_TYPE_HAS_THREADS(t) = 1;
+    }
+
+    if ((type_quals & TYPE_QUAL_SHARED))
+      TREE_SHARED (t) = 1;
+    return t;
+  }
   return build_qualified_type (type, type_quals);
 }
 
@@ -3331,6 +3340,21 @@ c_apply_type_quals_to_decl (type_quals, decl)
 				    DECL_POINTER_ALIAS_SET (decl));
 	    }
 	}
+    }
+
+  if (type_quals & TYPE_QUAL_STRICT)
+    TREE_STRICT(decl) = 1;
+  if (type_quals & TYPE_QUAL_RELAXED)
+    TREE_RELAXED(decl) = 1;
+  if (type_quals & TYPE_QUAL_SHARED)
+    {
+      tree type = TREE_TYPE (decl);
+      if (!TYPE_SHARED (type))
+	{
+	  int quals = TYPE_QUALS (type) | TYPE_QUAL_SHARED;
+	  TREE_TYPE (decl) = build_qualified_type (type, quals);
+	}
+      TREE_SHARED (decl) = 1;
     }
 }
 

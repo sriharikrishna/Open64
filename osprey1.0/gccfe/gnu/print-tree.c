@@ -305,6 +305,8 @@ print_node (file, prefix, node, indent)
     fputs (" side-effects", file);
   if (TREE_READONLY (node))
     fputs (" readonly", file);
+  if (TREE_SHARED (node))
+    fputs (" shared", file);
   if (TREE_CONSTANT (node))
     fputs (" constant", file);
   if (TREE_ADDRESSABLE (node))
@@ -527,8 +529,11 @@ print_node (file, prefix, node, indent)
 
       print_node (file, "size", TYPE_SIZE (node), indent + 4);
       print_node (file, "unit size", TYPE_SIZE_UNIT (node), indent + 4);
+      if (TYPE_BLOCK_SIZE (node))
+	print_node (file, "block_size", TYPE_BLOCK_SIZE (node), indent + 4);
       indent_to (file, indent + 3);
 
+      
       fprintf (file, " align %d", TYPE_ALIGN (node));
       fprintf (file, " symtab %d", TYPE_SYMTAB_ADDRESS (node));
       fprintf (file, " alias set %d", TYPE_ALIAS_SET (node));

@@ -42,6 +42,8 @@ Boston, MA 02111-1307, USA.  */
 #include "intl.h"
 #include "defaults.h"
 #include "ggc.h"
+#include "wfe_misc.h"
+
 
 /* Nonzero if we've already printed a "missing braces around initializer"
    message within this initializer.  */
@@ -79,6 +81,7 @@ static int pending_init_member		PARAMS ((tree));
 
 /* Do `exp = require_complete_type (exp);' to make sure exp
    does not have an incomplete type.  (That includes void types.)  */
+
 
 tree
 require_complete_type (value)
@@ -695,6 +698,7 @@ c_sizeof (type)
      tree type;
 {
   enum tree_code code = TREE_CODE (type);
+  tree t;
 
   if (code == FUNCTION_TYPE)
     {
@@ -719,9 +723,14 @@ c_sizeof (type)
     }
 
   /* Convert in case a char is more than one unit.  */
-  return size_binop (CEIL_DIV_EXPR, TYPE_SIZE_UNIT (type),
+  t = size_binop (CEIL_DIV_EXPR, TYPE_SIZE_UNIT (type),
 		     size_int (TYPE_PRECISION (char_type_node)
 			       / BITS_PER_UNIT));
+
+  if (UPC_TYPE_USES_THREADS (type))
+    t = size_binop (MULT_EXPR, t, lookup_name (get_identifier ("THREADS")));
+  return t;
+  
 }
 
 tree
@@ -758,6 +767,10 @@ c_size_in_bytes (type)
       error ("arithmetic on pointer to an incomplete type");
       return size_one_node;
     }
+  
+  if (code == POINTER_TYPE && is_ia32) {
+    return build_int_2(4, 0);
+  }
 
   /* Convert in case a char is more than one unit.  */
   return size_binop (CEIL_DIV_EXPR, TYPE_SIZE_UNIT (type),
@@ -949,20 +962,38 @@ default_conversion (exp)
       tree ptrtype;
       int constp = 0;
       int volatilep = 0;
-
+      
+      if (TREE_SHARED (exp) && !TYPE_SHARED (restype))
+	{
+	  restype = build_type_copy (restype);
+	  TYPE_SHARED (restype) = TREE_SHARED (exp);
+	  build_pointer_type (restype);
+	}
       if (TREE_CODE_CLASS (TREE_CODE (exp)) == 'r' || DECL_P (exp))
 	{
 	  constp = TREE_READONLY (exp);
 	  volatilep = TREE_THIS_VOLATILE (exp);
 	}
 
-      if (TYPE_QUALS (type) || constp || volatilep)
+      if (TYPE_QUALS (type) || constp || volatilep) {
+	/* see file bug1.c */
+	tree ptr_to;
+	ptr_to = TYPE_POINTER_TO(restype);
 	restype 
 	  = c_build_qualified_type (restype,
 				    TYPE_QUALS (type) 
 				    | (constp * TYPE_QUAL_CONST)
 				    | (volatilep * TYPE_QUAL_VOLATILE));
-
+	
+	if(!TYPE_POINTER_TO(restype) && ptr_to)
+	  TYPE_POINTER_TO(restype) = ptr_to;
+      }
+      if (TYPE_BLOCK_SIZE (type))
+        {
+          restype = build_type_copy (restype);
+          TYPE_BLOCK_SIZE (restype) = TYPE_BLOCK_SIZE (type);
+          build_pointer_type (restype);
+        }
       if (TREE_CODE (exp) == INDIRECT_REF)
 	return convert (TYPE_POINTER_TO (restype),
 			TREE_OPERAND (exp, 0));
@@ -1179,7 +1210,13 @@ build_component_ref (datum, component)
 	TREE_READONLY (ref) = 1;
       if (TREE_THIS_VOLATILE (datum) || TREE_THIS_VOLATILE (field))
 	TREE_THIS_VOLATILE (ref) = 1;
-
+      /* Turn this off for now.  Even though the component is actually
+	 shared (can be remote), we do not want to perform any special
+	 arithmetic on it.  If it is converted to a PLUS_EXPR, it should
+	 be just like any other PLUS_EXPR. */
+      if (TREE_SHARED (datum))
+	TREE_SHARED (ref) = 1;
+      
       return ref;
     }
   else if (code != ERROR_MARK)
@@ -1211,9 +1248,29 @@ build_indirect_ref (ptr, errorstring)
       else
 	{
 	  tree t = TREE_TYPE (type);
-	  register tree ref = build1 (INDIRECT_REF,
-				      TYPE_MAIN_VARIANT (t), pointer);
-
+	  int constp, volatilep, sharedp, strictp, relaxedp;
+	  register tree ref;
+	  
+	  constp = TYPE_READONLY (t);
+	  volatilep = TYPE_VOLATILE (t);
+	  
+	  if (TYPE_SHARED (t))
+	    ref = build1 (INDIRECT_REF,
+			  t,
+			  pointer);
+	  else
+	    ref = build1 (INDIRECT_REF,
+			  TYPE_MAIN_VARIANT (t),
+			  pointer);
+	  if (TYPE_BLOCK_SIZE (t) && ! TYPE_BLOCK_SIZE (TREE_TYPE (ref)))
+	    {
+	      tree newtype = build_type_copy (TREE_TYPE (ref));
+	      TYPE_BLOCK_SIZE (newtype) = TYPE_BLOCK_SIZE (t);
+	      TYPE_SHARED (newtype) = TYPE_SHARED (t);
+	      TREE_TYPE (ref) = newtype;
+	    }
+	  
+	  
 	  if (!COMPLETE_TYPE_P (t) && TREE_CODE (t) != ARRAY_TYPE)
 	    {
 	      error ("dereferencing pointer to incomplete type");
@@ -1233,6 +1290,7 @@ build_indirect_ref (ptr, errorstring)
 	  TREE_SIDE_EFFECTS (ref)
 	    = TYPE_VOLATILE (t) || TREE_SIDE_EFFECTS (pointer) || flag_volatile;
 	  TREE_THIS_VOLATILE (ref) = TYPE_VOLATILE (t);
+	  TREE_SHARED (ref) = TYPE_SHARED (t);  
 	  return ref;
 	}
     }
@@ -1254,6 +1312,7 @@ tree
 build_array_ref (array, index)
      tree array, index;
 {
+  /* sgi UPC diff - this if was taken out */ 
   if (index == 0)
     {
       error ("subscript missing in array reference");
@@ -1264,10 +1323,14 @@ build_array_ref (array, index)
       || TREE_TYPE (index) == error_mark_node)
     return error_mark_node;
 
+  /* For UPC shared arrays - attempt to build ARRAY_REF nodes
+     when compiling for a static environment */
+
   if (TREE_CODE (TREE_TYPE (array)) == ARRAY_TYPE
-      && TREE_CODE (array) != INDIRECT_REF)
+      && TREE_CODE (array) != INDIRECT_REF 
+      && !(TREE_SHARED(array) /* && !upc_get_threads_val() */))
     {
-      tree rval, type;
+      tree rval, type, strided_type;
 
       /* Subscripting with type char is likely to lose
 	 on a machine where chars are signed.
@@ -1372,18 +1435,46 @@ build_array_ref (array, index)
     if (ar == error_mark_node)
       return ar;
 
-    if (TREE_CODE (TREE_TYPE (ar)) != POINTER_TYPE
-	|| TREE_CODE (TREE_TYPE (TREE_TYPE (ar))) == FUNCTION_TYPE)
+
+    if ((TREE_CODE (TREE_TYPE (ar)) != POINTER_TYPE
+	 || TREE_CODE (TREE_TYPE (TREE_TYPE (ar))) == FUNCTION_TYPE)
+	&& ! (TREE_CODE (ar) == COMPONENT_REF
+	      && TREE_CODE (TREE_TYPE (ar)) == ARRAY_TYPE
+	      && TREE_SHARED (TREE_OPERAND (ar, 0))))
       {
 	error ("subscripted value is neither array nor pointer");
 	return error_mark_node;
       }
+    
+    
     if (TREE_CODE (TREE_TYPE (ind)) != INTEGER_TYPE)
       {
 	error ("array subscript is not an integer");
 	return error_mark_node;
       }
-
+    
+    {
+      tree newptr = ar;
+      STRIP_NOPS (newptr);
+      if (TREE_CODE (newptr) == PLUS_EXPR
+	  && TREE_CODE (TREE_OPERAND (newptr, 0)) == NOP_EXPR
+	  && TREE_CODE (TREE_OPERAND
+			(TREE_OPERAND (newptr, 0), 0)) == ADDR_EXPR
+	  && TREE_CODE (TREE_OPERAND (TREE_OPERAND
+				      (TREE_OPERAND (newptr, 0), 0), 0)) == COMPONENT_REF)
+	/* Then we have an array of shared structures.  We have to ensure
+	   that we do not perform shared arithmetic within the structure
+	   itself.  If we get here, we are dealing with a multidimensional
+	   array whose first dimension was handled in pointer_int_sum. */
+	{
+	  tree intop = TREE_OPERAND (newptr, 1);
+	  tree size = size_in_bytes (TREE_TYPE (TREE_TYPE (ar)));
+	  tree newint = build (MULT_EXPR, sizetype, ind, size);
+	  intop = fold (build (PLUS_EXPR, sizetype, intop, newint));
+	  TREE_OPERAND (newptr, 1) = intop;
+	  return build_indirect_ref (ar, "array indexing");
+	}
+    }
     return build_indirect_ref (build_binary_op (PLUS_EXPR, ar, ind, 0),
 			       "array indexing");
   }
@@ -1414,9 +1505,8 @@ build_function_call (function, params)
       /* Differs from default_conversion by not setting TREE_ADDRESSABLE
 	 (because calling an inline function does not mean the function
 	 needs to be separately compiled).  */
-      fntype = build_type_variant (TREE_TYPE (function),
-				   TREE_READONLY (function),
-				   TREE_THIS_VOLATILE (function));
+      fntype = build_qualified_type (TREE_TYPE (function),
+				     TREE_QUALS (function));
       fundecl = function;
       function = build1 (ADDR_EXPR, build_pointer_type (fntype), function);
     }
@@ -2515,6 +2605,7 @@ build_binary_op (code, orig_op0, orig_op1, convert_p)
     {
       if (TREE_TYPE (op0) != result_type)
 	op0 = convert (result_type, op0); 
+      
       if (TREE_TYPE (op1) != result_type)
 	op1 = convert (result_type, op1); 
     }
@@ -2538,6 +2629,9 @@ build_binary_op (code, orig_op0, orig_op1, convert_p)
 /* Return a tree for the sum or difference (RESULTCODE says which)
    of pointer PTROP and integer INTOP.  */
 
+static tree pshared_size = NULL;
+static tree shared_size = NULL;
+
 static tree
 pointer_int_sum (resultcode, ptrop, intop)
      enum tree_code resultcode;
@@ -2551,6 +2645,10 @@ pointer_int_sum (resultcode, ptrop, intop)
   /* The result is a pointer of the same type that is being added.  */
 
   register tree result_type = TREE_TYPE (ptrop);
+  register tree child_type = TREE_TYPE(result_type);
+  
+  if (TYPE_SHARED (TREE_TYPE (result_type)))
+    return upc_shared_pointer_int_sum (resultcode, ptrop, intop);
 
   if (TREE_CODE (TREE_TYPE (result_type)) == VOID_TYPE)
     {
@@ -2560,10 +2658,27 @@ pointer_int_sum (resultcode, ptrop, intop)
     }
   else if (TREE_CODE (TREE_TYPE (result_type)) == FUNCTION_TYPE)
     {
-      if (pedantic || warn_pointer_arith)
+      if (pedantic || warn_pointer_arith) 
 	pedwarn ("pointer to a function used in arithmetic");
       size_exp = integer_one_node;
     }
+  else if (TREE_CODE(child_type) == POINTER_TYPE && TYPE_SHARED(TREE_TYPE(child_type))) {
+      int bsize =  TREE_INT_CST_LOW(TYPE_BLOCK_SIZE(TREE_TYPE(child_type)));
+      if ((bsize == 1 || bsize == 0) && TREE_CODE(TREE_TYPE(child_type)) != VOID_TYPE) {
+	if (pshared_size == NULL) {
+	  pshared_size =  build_decl(VAR_DECL, get_identifier("UPCR_PSHARED_SIZE_"), integer_type_node);
+	}
+	size_exp = pshared_size;
+      } else {
+	if (shared_size == NULL) {
+	  shared_size =  build_decl(VAR_DECL, get_identifier("UPCR_SHARED_SIZE_"), integer_type_node);
+	}
+	size_exp = shared_size;
+      }
+      TREE_PUBLIC(size_exp) = 1;
+      finish_decl(size_exp, 0, 0);
+      make_decl_rtl(size_exp, NULL, 1); 
+  } 
   else
     size_exp = c_size_in_bytes (TREE_TYPE (result_type));
 
@@ -2579,6 +2694,7 @@ pointer_int_sum (resultcode, ptrop, intop)
       /* If the constant comes from pointer subtraction,
 	 skip this optimization--it would cause an error.  */
       && TREE_CODE (TREE_TYPE (TREE_OPERAND (intop, 0))) == INTEGER_TYPE
+      && ! TYPE_SHARED (result_type)
       /* If the constant is unsigned, and smaller than the pointer size,
 	 then we must skip this optimization.  This is because it could cause
 	 an overflow error if the constant is negative but INTOP is not.  */
@@ -2643,7 +2759,10 @@ pointer_diff (op0, op1)
       if (TREE_CODE (target_type) == FUNCTION_TYPE)
 	pedwarn ("pointer to a function used in subtraction");
     }
-
+  
+  if (TYPE_SHARED (target_type) || TYPE_SHARED (TREE_TYPE (op1)))
+    return upc_shared_pointer_diff (op0, op1);
+  
   /* First do the subtraction as integers;
      then drop through to build the divide operator.
      Do not do default conversions on the minus operator
@@ -2833,6 +2952,29 @@ build_unary_op (code, xarg, noconvert)
 	/* Compute the increment.  */
 
 	if (typecode == POINTER_TYPE)
+	  if (TYPE_SHARED (TREE_TYPE (argtype)))
+	    {
+	      if (TREE_TYPE (argtype) != get_inner_array_type (argtype))
+		/* then we have to find the number of elements by which
+		   to increment the pointer */
+		{
+		  int size, elt_size;
+		  if (TREE_CONSTANT (TYPE_SIZE (TREE_TYPE (argtype))))
+		    {
+		      size = TREE_INT_CST_LOW (TYPE_SIZE (TREE_TYPE (argtype)));
+		      elt_size = TREE_INT_CST_LOW ( TYPE_SIZE (get_inner_array_type
+							      (argtype)));
+		      inc = size_int (size / elt_size);
+		    }
+		  else
+		    inc = build (EXACT_DIV_EXPR, sizetype,
+				 TYPE_SIZE (TREE_TYPE (argtype)),
+				 TYPE_SIZE (TREE_TYPE (TREE_TYPE (argtype))));
+		}
+	      else
+		inc = integer_one_node;
+	    }
+	  else
 	  {
 	    /* If pointer target is an undefined struct,
 	       we just cannot know how to do the arithmetic.  */
@@ -2989,10 +3131,8 @@ build_unary_op (code, xarg, noconvert)
 	 restricted pointer by taking the address of something, so we
 	 only have to deal with `const' and `volatile' here.  */
       if ((DECL_P (arg) || TREE_CODE_CLASS (TREE_CODE (arg)) == 'r')
-	  && (TREE_READONLY (arg) || TREE_THIS_VOLATILE (arg)))
-	  argtype = c_build_type_variant (argtype,
-					  TREE_READONLY (arg),
-					  TREE_THIS_VOLATILE (arg));
+	  && TREE_QUALS(arg))
+	  argtype = c_build_qualified_type (argtype, TREE_QUALS (arg));
 
       argtype = build_pointer_type (argtype);
 
@@ -3006,6 +3146,10 @@ build_unary_op (code, xarg, noconvert)
 	  {
 	    tree field = TREE_OPERAND (arg, 1);
 
+	    if (TREE_SHARED (arg))
+	      /* let expand_expr use get_inner_reference to compute address */
+	      return build1 (ADDR_EXPR, argtype, arg);
+	    
 	    addr = build_unary_op (ADDR_EXPR, TREE_OPERAND (arg, 0), 0);
 
 	    if (DECL_C_BIT_FIELD (field))
@@ -3015,13 +3159,41 @@ build_unary_op (code, xarg, noconvert)
 		return error_mark_node;
 	      }
 
-	    addr = fold (build (PLUS_EXPR, argtype,
-				convert (argtype, addr),
-				convert (argtype, byte_position (field))));
+
+	    if (TREE_SHARED (arg))
+	      /* make sure that we don't get shared pointer -> pointer
+		 conversion by explicitly converting to integer before the
+		 arithmetic */
+	      addr = convert (sizetype, addr);
+	    /* else */
+/* 	      addr = convert (argtype, addr); */
+
+	   /*  if (! integer_zerop (DECL_FIELD_OFFSET (field))) */
+/* 	      { */
+/* 		tree offset */
+/* 		  = size_binop (EASY_DIV_EXPR, DECL_FIELD_OFFSET (field), */
+/* 				size_int (BITS_PER_UNIT)); */
+	{	int flag = TREE_CONSTANT (addr);
+		if (TREE_SHARED (arg))
+		  {
+		    addr = build (PLUS_EXPR, sizetype,
+				  addr, convert (sizetype, byte_position(field)));
+		    addr = convert (argtype, addr);
+		  }
+		else
+		  addr = fold (build (PLUS_EXPR, argtype,
+				      convert(argtype, addr), 
+				      convert (argtype,byte_position(field))));
+		TREE_CONSTANT (addr) = flag;
+	}
+	     /*  } */
+/* 	    else if (TREE_SHARED (arg)) */
+/* 	      convert to argtype so that the result is typed correctly  */
+/* 	      addr = convert (argtype, addr); */
 	  }
 	else
 	  addr = build1 (code, argtype, arg);
-
+	
 	/* Address of a static or external variable or
 	   file-scope function counts as a constant.  */
 	if (staticp (arg)
@@ -3468,9 +3640,7 @@ build_conditional_expr (ifexp, op1, op2)
 
   /* Merge const and volatile flags of the incoming types.  */
   result_type
-    = build_type_variant (result_type,
-			  TREE_READONLY (op1) || TREE_READONLY (op2),
-			  TREE_THIS_VOLATILE (op1) || TREE_THIS_VOLATILE (op2));
+    =  build_qualified_type (result_type, TREE_QUALS (op1) | TREE_QUALS (op2)); 
 
   if (result_type != TREE_TYPE (op1))
     op1 = convert_and_check (result_type, op1);
@@ -3583,6 +3753,17 @@ build_c_cast (type, expr)
       return error_mark_node;
     }
 
+  if (TREE_CODE (type) == POINTER_TYPE
+      && TYPE_SHARED (TREE_TYPE (type))
+      && (TREE_CODE (TREE_TYPE (expr)) == POINTER_TYPE || 
+	  TREE_CODE (TREE_TYPE (expr)) == ARRAY_TYPE)
+      && ! TYPE_SHARED (TREE_TYPE (TREE_TYPE (expr))) 
+      && /*allow for null*/ TREE_CODE(expr) != INTEGER_CST)
+    {
+      error ("UPC does not allow casts from local to shared pointers.");
+      return error_mark_node;
+    }
+  
   if (type == TREE_TYPE (value))
     {
       if (pedantic)
@@ -3804,7 +3985,9 @@ build_modify_expr (lhs, modifycode, rhs)
 
   if (modifycode != NOP_EXPR)
     {
+      int sharedflag = TREE_SHARED (lhs);
       lhs = stabilize_reference (lhs);
+      TREE_SHARED (lhs) = sharedflag;
       newrhs = build_binary_op (modifycode, lhs, rhs, 1);
     }
 
@@ -4005,7 +4188,7 @@ convert_for_assignment (type, rhs, errtype, fundecl, funname, parmnum)
 	    {
 	      register tree ttl = TREE_TYPE (memb_type);
 	      register tree ttr = TREE_TYPE (rhstype);
-
+	      
 	      /* Any non-function converts to a [const][volatile] void *
 		 and vice versa; otherwise, targets must be the same.
 		 Meanwhile, the lhs target must have all the qualifiers of
@@ -4082,6 +4265,48 @@ convert_for_assignment (type, rhs, errtype, fundecl, funname, parmnum)
     {
       register tree ttl = TREE_TYPE (type);
       register tree ttr = TREE_TYPE (rhstype);
+      
+      if (TYPE_SHARED (ttl) && !TYPE_SHARED (ttr))
+	//WEI: we allow NULL to be a valid value for shared pointers
+	if (TREE_CODE(rhs) != INTEGER_CST || TREE_INT_CST_LOW(rhs) != 0) {
+	  // For the case where we take the address of a field of a shared
+	  // struct and assign it to a shared pointer we get here with rhstype not
+	  // shared. For that case usually the rhs is a PLUS_EXPR.
+	  if(TREE_CODE(rhs) == PLUS_EXPR) 
+	    warn_for_assignment ("%s makes local pointer from shared pointer without a cast",
+				 errtype, funname, parmnum);
+	  else 
+	    error ("UPC does not allow assignments"
+		   " from local to shared pointers.");
+	}
+      if (!TYPE_SHARED (ttl) && TYPE_SHARED (ttr))
+	warn_for_assignment (
+			     "%s makes local pointer from shared pointer without a cast",
+			     errtype, funname, parmnum);
+      
+      if(TYPE_SHARED(ttl) && TYPE_SHARED(ttr)) {
+	tree bl = TYPE_BLOCK_SIZE(ttl);
+	tree br = TYPE_BLOCK_SIZE(ttr);
+	if(bl) {
+	  if(br) {
+	    if (TREE_INT_CST_LOW(br) != TREE_INT_CST_LOW(bl))
+	      warn_for_assignment ("%s between shared pointers with different block sizes without a cast",
+						      errtype, funname, parmnum);
+	  } else {
+	    if(TREE_CODE(ttr) != VOID_TYPE)
+	      warn_for_assignment(
+			  "%s between shared pointers with different block sizes without a cast",
+			  errtype, funname, parmnum);
+	  }
+	} else { /* bl = 0 */
+	  if(br) {
+	    if(TREE_CODE(ttl) != VOID_TYPE)
+	    warn_for_assignment ("%s between shared pointers with different block sizes without a cast",
+				  errtype, funname, parmnum);
+	  }
+	}
+
+      }
 
       /* Any non-function converts to a [const][volatile] void *
 	 and vice versa; otherwise, targets must be the same.
@@ -6384,7 +6609,9 @@ process_init_element (value)
 	      continue;
 	    }
 
+	  //WEI: if the dimension contains THREADS, we allow arbitrary number of elements in initializer
 	  if (constructor_max_index != 0
+	      && !UPC_TYPE_HAS_THREADS(constructor_type)
 	      && tree_int_cst_lt (constructor_max_index, constructor_index))
 	    {
 	      pedwarn_init ("excess elements in array initializer");

@@ -3946,6 +3946,9 @@ set_type_quals (type, type_quals)
   TYPE_READONLY (type) = (type_quals & TYPE_QUAL_CONST) != 0;
   TYPE_VOLATILE (type) = (type_quals & TYPE_QUAL_VOLATILE) != 0;
   TYPE_RESTRICT (type) = (type_quals & TYPE_QUAL_RESTRICT) != 0;
+  TYPE_SHARED (type) = (type_quals & TYPE_QUAL_SHARED) != 0;
+  TYPE_RELAXED (type) = (type_quals & TYPE_QUAL_RELAXED) != 0;
+  TYPE_STRICT (type) = (type_quals & TYPE_QUAL_STRICT) != 0;
 }
 
 /* Given a type node TYPE and a TYPE_QUALIFIER_SET, return a type for
@@ -3968,7 +3971,13 @@ build_qualified_type (type, type_quals)
 
   for (t = TYPE_MAIN_VARIANT (type); t; t = TYPE_NEXT_VARIANT (t))
     if (TYPE_QUALS (t) == type_quals && TYPE_NAME (t) == TYPE_NAME (type))
-      return t;
+      /* UPC - if the original type has the block_size set, the main_variant
+	 does not. Keep the oroginal type. */
+      if(!TYPE_BLOCK_SIZE(type))
+	if(!TYPE_BLOCK_SIZE(t))
+	  if(TYPE_STRICT(type) ==  TYPE_STRICT(t) && !TYPE_STRICT(t))
+	     if (TYPE_RELAXED(type) == TYPE_RELAXED(t))
+	     return t;
 
   /* We need a new one.  */
   t = build_type_copy (type);

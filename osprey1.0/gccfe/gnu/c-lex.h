@@ -49,6 +49,11 @@ enum rid
   RID_ITERATOR,
   RID_COMPLEX,
 
+  /* UPC type qualifiers */
+  RID_SHARED,
+  RID_RELAXED,
+  RID_STRICT,
+
   RID_IN,
   RID_OUT,
   RID_INOUT,

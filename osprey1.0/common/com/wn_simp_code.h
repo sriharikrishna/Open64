@@ -4668,9 +4668,31 @@ static simpnode SIMPNODE_SimplifyExp2_h(OPCODE opc, simpnode k0, simpnode k1)
 	 if (!k1const &&
 	     SIMPNODE_opcode(k0) == opc &&
 	     SIMP_Is_Constant(SIMPNODE_kid1(k0))) {
-	    SHOW_RULE("reassociate 2a");
-	    result = SIMPNODE_SimpCreateExp2(opc,SIMPNODE_SimpCreateExp2(opc, SIMPNODE_kid0(k0), k1), SIMPNODE_kid1(k0));
-	    SIMP_DELETE(k0);
+	   TY_IDX tas_idx = 0;
+	   simpnode t0;
+	   SHOW_RULE("reassociate 2a");
+	   
+	   // for expr x[a+ct][b] the optimizer
+	   // moves the ct to the rightmost leaf
+	   // need to create a TAS for the inner add node
+	   if(SIMPNODE_operator(k0) == OPR_LDA && 
+	      Type_Is_Shared_Ptr(ST_type(SIMPNODE_st((k0))))) {
+	      tas_idx = ST_type(SIMPNODE_st(k0));
+	   } else  if(SIMPNODE_operator(k1) == OPR_LDA && 
+		      Type_Is_Shared_Ptr(ST_type(SIMPNODE_st(k1))) ) {
+	     tas_idx = ST_type(SIMPNODE_st(k1));
+	   }
+	   
+	   k1 = SIMPNODE_SimpCreateExp2(opc, SIMPNODE_kid0(k0), k1); 
+	   if (tas_idx) {
+	     OPCODE opc = OPCODE_make_op(OPR_TAS, Pointer_Mtype, MTYPE_V);
+	     t0 = SIMPNODE_SimpCreateExp1(opc, k1);
+	     WN_set_ty((WN*)t0, tas_idx);
+	     k1  = t0;
+	     SHOW_RULE("tas after reassociate2a");
+	   }
+	   result = SIMPNODE_SimpCreateExp2(opc ,k1, SIMPNODE_kid1(k0));
+	   SIMP_DELETE(k0);     
 	    return (result);
 	 }
       

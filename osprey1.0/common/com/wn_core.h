@@ -1560,5 +1560,44 @@ inline mINT16 WN_num_actuals(const WN *wn)
 
 /* end prefetch macros */
 
+/*
+//Some helper functions for handling struct field accesses
+unsigned int Get_Num_Fields(TY_IDX base) {
+
+  if (!TY_Is_Structured(base)) {
+    return 0;
+  }
+  
+  int num = 0;
+  FLD_HANDLE fh = TY_fld(base); 
+  while (true) {
+    num++;
+    TY_IDX fld_ty = FLD_type(fh);
+    num += Get_Num_Fields(fld_ty);
+    if (FLD_last_field(fh)) {
+      break;
+    }
+    fh = FLD_next(fh);
+  } 
+  return num;
+}
+
+TY_IDX Get_Field_Type(TY_IDX base, int field_id) {
+
+  Is_True(TY_Is_Structured(base), ("CALLING GET_FIELD_TYPE with a non struct type"));
+
+  FLD_HANDLE fh = TY_fld(base);
+  for (int i = 1; i < field_id; i++, fh = FLD_next(fh)) {
+    TY_IDX fld_ty = FLD_type(fh);
+    int num_subfld = Get_Num_Fields(fld_ty);
+    if (i + num_subfld >= field_id) {
+      return Get_Field_Type(fld_ty, field_id - i);
+    } else {
+      i += num_subfld;
+    }
+  }
+  return FLD_type(fh);
+}
+*/
 
 #endif /* wn_core_INCLUDED */

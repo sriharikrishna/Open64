@@ -1,4 +1,3 @@
-
 /*
 
   Copyright (C) 2000, 2001 Silicon Graphics, Inc.  All Rights Reserved.
@@ -98,6 +97,26 @@ static void add_command_line_arg(string_list_t *args, char *sourcefile);
 
 static void do_f90_common_args(string_list_t *args) ;
 static void set_f90_source_form(string_list_t *args,boolean set_line_length) ;
+
+extern int upc_extensions;
+int upc_no_threads=-1;
+string string_upc_no_threads = "1";
+
+string config_file_name = "";
+#define MAX_FILE_NAME 1000
+
+//WEI:  function to handle the config file flag
+void set_config_file(char *filename) {
+  
+  config_file_name = filename;
+}
+
+
+void
+set_upc_no_threads(int tnum, char *stnum) {
+  upc_no_threads = tnum;
+  string_upc_no_threads = stnum;
+}
 
 static phases_t
 post_fe_phase (void);
@@ -304,6 +323,8 @@ add_file_args (string_list_t *args, phases_t index)
 			add_string(args, "-xassembler-with-cpp");
 		}
 		add_string(args, input_source);
+		if(upc_extensions && upc_no_threads != -1)
+		  add_string(args, "-D__UPC_THREADS__");
 		if (read_stdin && option_was_seen(O_E)) 
 			break;
 		if (option_was_seen(O_E) && outfile != NULL) {
@@ -531,6 +552,15 @@ add_file_args (string_list_t *args, phases_t index)
 	case P_c_gfe:
 	case P_cplus_gfe:
 		add_string(args, "-dx");
+		if (upc_extensions) {
+		  add_string(args, "-std=upc");
+		  if(upc_no_threads != -1) 
+ 		    add_string(args, concat_strings("-fupc-threads-",string_upc_no_threads));  
+		  if (abi == ABI_IA32) {
+		    //WEI: need to let the front end know we're on 32-bit platform
+		    add_string(args, "-ia32");
+		  }
+		}
 #if !(defined(TARG_IA64) || defined(TARG_IA32))
 		if (abi == ABI_64) add_string(args, "-mabi=64");
 		else if (abi == ABI_I64) add_string(args, "-mabi=i64");
@@ -613,7 +643,13 @@ add_file_args (string_list_t *args, phases_t index)
 		break; 
 	case P_be:
 		add_language_option ( args );
-
+		if (upc_extensions) {
+		  add_string(args, "-std=upc");
+		}
+		if (config_file_name != "") {
+		  char file_arg[MAX_FILE_NAME + 5] = "-fC,";
+		  add_string(args, strncat(file_arg, config_file_name, MAX_FILE_NAME));
+		}
 		if (invoked_lang == L_f77) {
 		  if (use_craylibs == TRUE) {
 		    add_string(args,"-TENV:io_library=cray");
@@ -948,7 +984,7 @@ determine_phase_order (void)
 		} else {
 			cpp_phase = P_cplus_cpp;
 		}
-	} else if (source_lang == L_cc) {
+	} else if ((source_lang == L_cc) || (source_lang == L_upc)) {
 		if (option_was_seen(O_mp)) {
 			/* power C */
                         cpp_phase = P_cpp;
@@ -1008,6 +1044,7 @@ determine_phase_order (void)
 	switch (source_kind) {
 	case S_c:
 	case S_C:
+	case S_u:
 		if (first_phase != P_any_cpp) {
 		    next_phase = (source_lang == L_CC ? 
 					P_cplus_gfe : P_c_gfe);
@@ -1030,7 +1067,7 @@ determine_phase_order (void)
 			next_phase = asm_phase;
 		else if (source_lang == L_CC)
 			next_phase = P_cplus_gfe;
-		else if (source_lang == L_cc)
+		else if ((source_lang == L_cc) || (source_lang == L_upc))
 			next_phase = P_c_gfe;
 		else if (source_kind == S_ii)
 			next_phase = P_cplus_gfe;
@@ -1767,7 +1804,8 @@ static void add_command_line_arg(string_list_t *args, char *source_file)
     if (source_lang == L_cc ||
 	source_lang == L_CC ||
 	source_lang == L_f77 ||
-	source_lang == L_f90) 
+	source_lang == L_f90 ||
+	source_lang == L_upc) 
     {
 	    add_string(args, concat_strings("-FE:cmdline=", cmd_file_name));
     }

@@ -1423,6 +1423,13 @@ handle_option (pfile, argc, argv)
 	  CPP_OPTION (pfile, dollars_in_ident) = 0;
 	  new_pending_directive (pend, "__ASSEMBLER__", cpp_define);
 	  break;
+	case OPT_lang_upc:
+	  CPP_OPTION (pfile, cplusplus) = 0;
+	  CPP_OPTION (pfile, cplusplus_comments) = 1;
+	  CPP_OPTION (pfile, c89) = 0;
+	  CPP_OPTION (pfile, c99) = 1;
+	  CPP_OPTION (pfile, objc) = 0;
+	  break;
 	case OPT_lang_fortran:
  	  CPP_OPTION (pfile, lang_fortran) = 1;
 	  CPP_OPTION (pfile, traditional) = 1;
@@ -1817,6 +1824,7 @@ Switches:\n\
   -lang-asm                 Assume that the input sources are in assembler\n\
   -lang-fortran		    Assume that the input sources are in Fortran\n\
   -lang-chill               Assume that the input sources are in Chill\n\
+  -lang-upc                 Assume that the input sources are in UPC\n\
   -std=<std name>           Specify the conformance standard; one of:\n\
                             gnu89, gnu99, c89, c99, iso9899:1990,\n\
                             iso9899:199409, iso9899:1999\n\

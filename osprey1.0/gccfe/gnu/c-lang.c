@@ -32,6 +32,10 @@ Boston, MA 02111-1307, USA.  */
 #include "flags.h"
 #include "ggc.h"
 
+extern void set_threads_value PARAMS((char *));
+extern void init_upc PARAMS((void));
+
+
 #if USE_CPPLIB
 #include "cpplib.h"
 extern char *yy_cur;
@@ -47,7 +51,19 @@ lang_decode_option (argc, argv)
      int argc;
      char **argv;
 {
-  return c_decode_option (argc, argv);
+   char *p = argv[0];
+  if (!strcmp (p, "-lang-upc"))
+    compiling_upc = 1;
+  else if (!strncmp (p, "-fupc-threads-", 14))
+    set_threads_value (p + 14);
+  else if (strcmp(p, "-ia32") == 0) {
+    /* WEI: the gnu front end should ignore this option; this is handled in WFE_Init */
+  } else if (strncmp(p, "-fconfig-", 9) == 0) {
+    /* ditto here */
+  } else
+    return c_decode_option (argc, argv);
+  return 1;
+
 }
 
 void
@@ -79,11 +95,15 @@ lang_init ()
   yy_cur--;
 #endif 
 
+  if (compiling_upc)
+      init_upc ();
+
+
   save_lang_status = &push_c_function_context;
   restore_lang_status = &pop_c_function_context;
   mark_lang_status = &mark_c_function_context;
 
-  c_parse_init ();
+  //c_parse_init ();
 }
 
 void
@@ -170,6 +190,11 @@ build_objc_string (len, str)
   abort ();
   return NULL_TREE;
 }
+
+
+
+
+
 
 /* Called at end of parsing, but before end-of-file processing.  */
 

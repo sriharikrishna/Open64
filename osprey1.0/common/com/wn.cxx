@@ -139,6 +139,7 @@ extern "C" { WN * WN_COPY_Tree ( WN * ); }
 static UINT64 masks [] = { 0, 0xff, 0xffff, 0, 0xffffffffULL,
                            0, 0, 0, 0xffffffffffffffffULL };
 
+
 static WN *
 fe_combine_address_offset ( WN_OFFSET * offset, WN * addr )
 {
@@ -1179,9 +1180,7 @@ WN_CreatePstore (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc,
   Is_True(opr == OPR_ISTORE ||opr == OPR_PSTORE|| opr == OPR_ISTBITS,
           ("Bad opcode in WN_CreatePstore"));
 
-#if (defined(FRONT_END_C)||defined(FRONT_END_CPLUSPLUS))
-                               &&!defined(FRONT_END_MFEF77)
-
+#if (defined(FRONT_END_C) || defined(FRONT_END_CPLUSPLUS)) && !defined(FRONT_END_MFEF77)
 
   addr = fe_combine_address_offset ( &offset, addr );
 
@@ -1433,8 +1432,7 @@ WN_CreatePStid (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc,
             ("Preg offset 0 in WN_CreatePStid"));
 #endif /* FRONT_END */
 
-#if (defined(FRONT_END_C) || defined(FRONT_END_CPLUSPLUS)) 
-                              && !defined(FRONT_END_MFEF77)
+#if (defined(FRONT_END_C) || defined(FRONT_END_CPLUSPLUS)) && !defined(FRONT_END_MFEF77)
 
     UINT64 ty_size;
     if (field_id == 0) {
@@ -1851,6 +1849,8 @@ WN *WN_CreateMload (WN_OFFSET offset, TY_IDX ty,WN *addr, WN *num_bytes)
 }
 
 
+
+
 WN *
 WN_CreateLdid (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc,
 	       WN_OFFSET offset, ST_IDX st, TY_IDX ty, UINT field_id)
@@ -1860,6 +1860,7 @@ WN_CreateLdid (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc,
 
     Is_True (opr == OPR_LDID || opr == OPR_LDBITS,
 	    ("Bad opcode in WN_CreateLdid"));
+
 #ifdef FRONT_END
     Is_True (!((offset == 0) && (&St_Table [st] == Int32_Preg ||
 				 &St_Table [st] == Int64_Preg ||
@@ -1867,12 +1868,14 @@ WN_CreateLdid (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc,
 				 &St_Table [st] == Float64_Preg)),
 	     ("Preg offset 0 in WN_CreateLdid"));
 #endif /* FRONT_END */
-    wn = WN_Create(opr,rtype,desc,0);
-    WN_load_offset(wn) = offset;
-    WN_st_idx(wn) = st;
-    WN_set_ty(wn,ty);
-    WN_set_field_id(wn, field_id);
 
+   
+      wn = WN_Create(opr,rtype,desc,0);
+      WN_load_offset(wn) = offset;
+      WN_st_idx(wn) = st;
+      WN_set_ty(wn,ty);
+      WN_set_field_id(wn, field_id);
+  
     return(wn);
 }
 

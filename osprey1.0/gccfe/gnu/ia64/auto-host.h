@@ -357,13 +357,13 @@
 #define HAVE_DECL_GETWD 1
 
 /* Define to 1 if we found this declaration otherwise define to 0. */
-#define HAVE_DECL_STRSIGNAL 0
+#define HAVE_DECL_STRSIGNAL 1
 
 /* Define to 1 if we found this declaration otherwise define to 0. */
 #define HAVE_DECL_PUTC_UNLOCKED 1
 
 /* Define to 1 if we found this declaration otherwise define to 0. */
-#define HAVE_DECL_FPUTS_UNLOCKED 0
+#define HAVE_DECL_FPUTS_UNLOCKED 1
 
 /* Define to 1 if we found this declaration otherwise define to 0. */
 #define HAVE_DECL_STRSTR 1

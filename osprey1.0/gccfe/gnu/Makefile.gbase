@@ -239,6 +239,7 @@ GNU_SRCS =		\
   toplev.c		\
   tree.c		\
   unroll.c		\
+  upc-share.c		\
   varasm.c		\
   varray.c		\
   version.c		\

@@ -54,6 +54,10 @@ endif
 WOFF     =
 LCINCS  += -I$(BUILD_TOT)/include/cmplrs
 
+ifeq ($(BUILD_OS), LINUX)
+LCINCS += -I$(BUILD_AREA)/include
+endif
+
 LIBRARY = libcmplrs.a
 LIBRARYG0 = libcmplrs_G0.a
 
@@ -69,10 +73,12 @@ CFILES += \
 	events.c
 endif
 
-default: first $(TARGETS) last
+default: first depends $(TARGETS) last
 
 first:
 	cd $(BUILD_AREA)/include && $(MAKE)
+
+include $(BUILD_TOT)/Makeinclude
 
 last: make_libdeps
 

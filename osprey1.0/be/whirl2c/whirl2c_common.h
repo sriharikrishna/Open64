@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: whirl2c_common.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/whirl2c_common.h,v $
  *
  * Revision history:
@@ -220,7 +220,7 @@ extern const char * WHIRL2C_make_valid_c_name(const char *name);
  */
 extern void WHIRL2C_parenthesize(TOKEN_BUFFER tokens);
 
-
+extern int compiling_upc_flag;
 #endif /* whirl2c_common_INCLUDED */
 
 

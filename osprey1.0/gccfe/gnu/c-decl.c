@@ -39,6 +39,8 @@ Boston, MA 02111-1307, USA.  */
 #include "defaults.h"
 #include "ggc.h"
 #include "tm_p.h"
+#include "upc-act.h"
+
 #ifdef SGI_MONGOOSE
 #include "wfe_decl.h"
 extern ST * Create_ST_For_Tree (tree);
@@ -57,6 +59,12 @@ enum decl_context
   FIELD,			/* Declaration inside struct or union */
   BITFIELD,			/* Likewise but with specified width */
   TYPENAME};			/* Typename (inside cast or sizeof)  */
+
+
+#ifndef UPC_SHARED_SECTION_NAME
+#define UPC_SHARED_SECTION_NAME ".shared"
+#endif
+
 
 /* We let tm.h override the types used here, to handle trivial differences
    such as the choice of unsigned int or long unsigned int for size_t.
@@ -86,6 +94,14 @@ tree pending_invalid_xref;
 /* File and line to appear in the eventual error message.  */
 const char *pending_invalid_xref_file;
 int pending_invalid_xref_line;
+
+
+/* Stack structures used to keep track of memory_consistency values. */
+struct consistency_value *global_consistency_stack;
+struct consistency_value *stmt_consistency_stack;
+struct consistency_value *current_consistency_stack;
+struct consistency_nesting_level *stmt_consistency_nesting_level;
+
 
 /* While defining an enum type, this is 1 plus the last enumerator
    constant value.  Note that will do not have to save this or `enum_overflow'
@@ -561,8 +577,12 @@ c_decode_option (argc, argv)
 	  flag_no_nonansi_builtin = 0;
 	  flag_isoc99 = 1;
 	}
-      else
-	error ("unknown C standard `%s'", argstart);
+      else /* add UPC dialect here because open64 does
+	      not use the preprocessor files */
+	if (!strcmp (argstart, "upc")) {
+	  compiling_upc = 1;
+	} else 
+	  error ("unknown C standard `%s'", argstart);
     }
   else if (!strcmp (p, "-fdollars-in-identifiers"))
     dollars_in_ident = 1;
@@ -1824,6 +1844,13 @@ duplicate_decls (newdecl, olddecl, different_binding_level)
 	  if (TREE_CODE (newdecl) == VAR_DECL)
 	    make_var_volatile (newdecl);
 	}
+      if (TREE_SHARED (newdecl))
+	{
+	  TREE_SHARED (write_olddecl) = 1;
+	  /* strict semantics are implied by shared, in this implementation */
+	  if (TREE_CODE (newdecl) == VAR_DECL)
+	    make_var_volatile (newdecl);
+	}
 
       /* Keep source location of definition rather than declaration.  */
       /* When called with different_binding_level set, keep the old
@@ -1884,6 +1911,7 @@ duplicate_decls (newdecl, olddecl, different_binding_level)
       TREE_READONLY (olddecl) = TREE_READONLY (newdecl);
       TREE_THIS_VOLATILE (olddecl) = TREE_THIS_VOLATILE (newdecl);
       TREE_SIDE_EFFECTS (olddecl) = TREE_SIDE_EFFECTS (newdecl);
+      TREE_SHARED (olddecl) = TREE_SHARED (newdecl);
     }
 
   /* Merge the storage class information.  */
@@ -3263,6 +3291,17 @@ init_decl_processing ()
 
   lang_get_alias_set = c_get_alias_set;
 
+
+
+  /* Initialize consistency value. */
+  global_consistency_stack = (struct consistency_value *) malloc (sizeof (struct consistency_value));
+  global_consistency_stack->value = get_identifier ("relaxed");
+  global_consistency_stack->next = (struct consistency_value *) NULL;
+  current_consistency_stack = global_consistency_stack;
+  stmt_consistency_stack = (struct consistency_value *) NULL;
+  stmt_consistency_nesting_level = (struct consistency_nesting_level *) NULL;
+
+
   /* Record our roots.  */
 
   ggc_add_tree_root (c_global_trees, CTI_MAX);
@@ -3649,7 +3688,13 @@ finish_decl (decl, init, asmspec_tree)
 
   if (init)
     {
-      if (TREE_CODE (decl) != TYPE_DECL)
+      if (TREE_CODE (TREE_TYPE (init)) == POINTER_TYPE
+	  && TYPE_SHARED (TREE_TYPE (TREE_TYPE (init)))
+	  && (TREE_CODE (init) == PLUS_EXPR
+	      ||TREE_CODE (init) == MINUS_EXPR))
+	error_with_decl (decl,
+			 "shared pointers can be initialized only with simple values");
+      else if (TREE_CODE (decl) != TYPE_DECL)
 	store_init_value (decl, init);
       else
 	{
@@ -3706,6 +3751,26 @@ finish_decl (decl, init, asmspec_tree)
 
   if (TREE_CODE (decl) == VAR_DECL)
     {
+
+      if (TREE_SHARED (decl))
+	{
+#ifdef ASM_OUTPUT_SECTION_NAME
+	  /* shared variables are placed in their own shared section */
+	  int slen = strlen (UPC_SHARED_SECTION_NAME);
+	  DECL_SECTION_NAME (decl) =
+	    build_string (slen, UPC_SHARED_SECTION_NAME);
+#else
+	  static int one_time = 0;
+	  if (!one_time)
+	    {
+	      one_time = 1;
+	      error ("UPC is not implemented on this target."
+		     " The target linker does not support separately"
+		     " linked sections.");
+	    }
+#endif
+	}
+
       if (DECL_SIZE (decl) == 0 && COMPLETE_TYPE_P (TREE_TYPE (decl)))
 	layout_decl (decl, 0);
 
@@ -3989,6 +4054,9 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
   int constp;
   int restrictp;
   int volatilep;
+  int sharedp;
+  int strictp;
+  int relaxedp;
   int type_quals = TYPE_UNQUALIFIED;
   int inlinep;
   int explicit_int = 0;
@@ -4002,6 +4070,9 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
   int bitfield = 0;
   int size_varies = 0;
   tree decl_machine_attr = NULL_TREE;
+  tree layout_specifier = 0;	/* points to blocking factor in shared decl. */
+  int threads_found = 0;	/* for static declarations of shared arrays */
+  int has_threads = 0;
 
   if (decl_context == BITFIELD)
     bitfield = 1, decl_context = FIELD;
@@ -4100,7 +4171,17 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 		goto found;
 	      }
 	  }
-      if (type)
+      if (TREE_CODE (id) == TREE_LIST) /* a blocking factor, keep it */
+	{
+	  if (layout_specifier)
+	    error ("two or more layout specifier in declaration of `%s'", name);
+	  layout_specifier = id;
+	  /* UPC - for gcc > 2.95 size_binop wants the type
+             of its operands to be a "size type".
+	  TREE_TYPE(TREE_VALUE(layout_specifier))->type.no_force_blk_flag = 1; */
+	     
+	}
+      else if (type)
 	error ("two or more data types in declaration of `%s'", name);
       /* Actual typedefs come to us as TYPE_DECL nodes.  */
       else if (TREE_CODE (id) == TYPE_DECL)
@@ -4301,6 +4382,9 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
   constp = !! (specbits & 1 << (int) RID_CONST) + TYPE_READONLY (type);
   restrictp = !! (specbits & 1 << (int) RID_RESTRICT) + TYPE_RESTRICT (type);
   volatilep = !! (specbits & 1 << (int) RID_VOLATILE) + TYPE_VOLATILE (type);
+  sharedp = !! (specbits & (1 << (int) RID_SHARED)) + TYPE_SHARED (type);
+  strictp = !! (specbits & (1 << (int) RID_STRICT)) + TYPE_STRICT (type);
+  relaxedp = !! (specbits & (1 << (int) RID_RELAXED)) + TYPE_RELAXED (type);
   inlinep = !! (specbits & (1 << (int) RID_INLINE));
   if (constp > 1)
     pedwarn ("duplicate `const'");
@@ -4308,11 +4392,27 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
     pedwarn ("duplicate `restrict'");
   if (volatilep > 1)
     pedwarn ("duplicate `volatile'");
+  if (sharedp > 1)
+    pedwarn ("duplicate `shared'");
+  if (strictp > 1)
+    pedwarn ("duplicate `strict'");
+  if (relaxedp > 1)
+    pedwarn ("duplicate `relaxed'");
+  if (strictp && relaxedp)
+    error ("`%s' is declared both strict and relaxed.", name);
+  if (strictp && !sharedp)
+    error ("`%s' is declared strict but not shared.", name);
+  if (relaxedp && !sharedp)
+    error ("`%s' is declared relaxed but not shared.", name);
   if (! flag_gen_aux_info && (TYPE_QUALS (type)))
     type = TYPE_MAIN_VARIANT (type);
   type_quals = ((constp ? TYPE_QUAL_CONST : 0)
 		| (restrictp ? TYPE_QUAL_RESTRICT : 0)
-		| (volatilep ? TYPE_QUAL_VOLATILE : 0));
+		| (volatilep ? TYPE_QUAL_VOLATILE : 0)
+		| (sharedp ? TYPE_QUAL_SHARED : 0)
+		| (strictp ? TYPE_QUAL_STRICT : 0)
+		| (relaxedp ? TYPE_QUAL_RELAXED : 0)
+		);
 
   /* Warn if two storage classes are given. Default to `auto'.  */
 
@@ -4398,6 +4498,20 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
       }
   }
 
+  if (declarator && TREE_CODE(declarator) == IDENTIFIER_NODE) {
+    /* WEI: for scalars we need to set its blocksize here, since 
+       the following loop won't get executed */
+    if (layout_specifier) {
+      if (sharedp) {
+	type = set_upc_blocksize (type, layout_specifier);
+      }
+      else
+	error ("UPC layout specifier requires `shared' type qualifier"
+	       " in the declaration of `%s'", name);
+      layout_specifier = 0;
+    }
+  }
+      
   /* Now figure out the structure of the declarator proper.
      Descend through it, creating more complex types, until we reach
      the declared identifier (or NULL_TREE, in an absolute declarator).  */
@@ -4409,6 +4523,19 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	  declarator = TREE_OPERAND (declarator, 0);
 	  continue;
 	}
+
+      /* Add UPC-defined block size, if supplied */
+      /* WEI: since pointers can also have blocksizes qualifiers,
+	 move the code here outside the  if (TREE_CODE (declarator) == ARRAY_REF) */
+      if (layout_specifier) {
+	if (sharedp) {
+	  type = set_upc_blocksize (type, layout_specifier);
+	}
+	else
+	  error ("UPC layout specifier requires `shared' type qualifier"
+		 " in the declaration of `%s'", name);
+	layout_specifier = 0;
+      }
 
       /* Each level of DECLARATOR is either an ARRAY_REF (for ...[..]),
 	 an INDIRECT_REF (for *...),
@@ -4426,11 +4553,34 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 
       if (TREE_CODE (declarator) == ARRAY_REF)
 	{
-	  register tree itype = NULL_TREE;
-	  register tree size = TREE_OPERAND (declarator, 1);
+	  tree itype = NULL_TREE;
+	  tree size = TREE_OPERAND (declarator, 1);
 	  /* The index is a signed object `sizetype' bits wide.  */
 	  tree index_type = signed_type (sizetype);
-
+	  
+	  /* if the UPC shared qualifier has been applied to an array,
+	     then process the dimensions according to UPC semantics */
+	  if (sharedp
+	      && TREE_CODE (TREE_OPERAND (declarator, 0)) != INDIRECT_REF)
+	    {
+	      int n_thread_refs = count_upc_thread_refs (size);
+	      has_threads = 0;
+	      if (n_thread_refs)
+		{
+		  has_threads = 1;
+		  if (threads_found || n_thread_refs > 1)
+		    error ("THREADS may not be referenced more than once"
+			   " in a shared array declaration.");
+		  else if (is_multiple_of_upc_threads (size)) 
+		    threads_found = 1;
+		  else
+		    error ("array dimension is not a simple multiple"
+			   " of THREADS");
+		  set_upc_thread_refs_to_one (&size);
+		  size = fold (size);
+	        } 
+	    }
+	  
 	  declarator = TREE_OPERAND (declarator, 0);
 
 	  /* Check for some types that there cannot be arrays of.  */
@@ -4452,6 +4602,15 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 
 	  if (type == error_mark_node)
 	    continue;
+
+	  /* UPC shared array types must have an explicit dimension */
+	  
+	  if (sharedp && !size && !in_parm_level_p())
+	    {
+	      error ("An explicit size must be supplied in the declaration"
+		     " of shared array `%s'", name);
+	      size = copy_node (size_one_node);
+	    }
 
 	  /* If size was specified, set ITYPE to a range-type for that size.
 	     Otherwise, ITYPE remains null.  finish_decl may figure it out
@@ -4517,6 +4676,7 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	      if (size_varies)
 		itype = variable_size (itype);
 	      itype = build_index_type (itype);
+
 	    }
 
 #if 0 /* This had bad results for pointers to arrays, as in
@@ -4546,6 +4706,17 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	  type = build_array_type (type, itype);
 	  if (type_quals)
 	    type = c_build_qualified_type (type, type_quals);
+	  
+	  if (compiling_upc && sharedp)
+	    {
+	      TYPE_SHARED(type) = 1;
+	      if (threads_found)
+		UPC_TYPE_USES_THREADS (type) = 1;
+	      if (has_threads) {
+		UPC_TYPE_HAS_THREADS (type) = 1;
+	      }
+	    }
+
 
 #if 0	/* don't clear these; leave them set so that the array type
 	   or the variable is itself const or volatile.  */
@@ -4629,12 +4800,12 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	    type = c_build_qualified_type (type, type_quals);
 	  type_quals = TYPE_UNQUALIFIED;
 	  size_varies = 0;
-
+	  
 	  type = build_pointer_type (type);
-
-	  /* Process a list of type modifier keywords
+	  
+	    /* Process a list of type modifier keywords
 	     (such as const or volatile) that were given inside the `*'.  */
-
+	  
 	  if (TREE_TYPE (declarator))
 	    {
 	      register tree typemodlist;
@@ -4643,6 +4814,10 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	      constp = 0;
 	      volatilep = 0;
 	      restrictp = 0;
+	      sharedp = 0;
+	      strictp = 0;
+	      relaxedp = 0;
+
 	      for (typemodlist = TREE_TYPE (declarator); typemodlist;
 		   typemodlist = TREE_CHAIN (typemodlist))
 		{
@@ -4654,6 +4829,24 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 		    volatilep++;
 		  else if (qualifier == ridpointers[(int) RID_RESTRICT])
 		    restrictp++;
+		  else if (qualifier == ridpointers[(int) RID_SHARED])
+		    sharedp++;
+		  else if (qualifier == ridpointers[(int) RID_STRICT])
+		    strictp++;
+		  else if (qualifier == ridpointers[(int) RID_RELAXED])
+		    relaxedp++;
+		  /* A TREE_LIST value is used to tag a UPC-defined
+		     layout specifier. */
+		  else if (TREE_CODE (typemodlist) == TREE_LIST)
+		    {
+		      tree blocksize;
+		      if (layout_specifier)
+			error ("two or more blocking factors in"
+			       " declaration of `%s'", name);
+		      layout_specifier = TREE_VALUE (typemodlist);
+		      type = set_upc_blocksize (type, layout_specifier);
+		      layout_specifier = 0;
+		    }
 		  else if (!erred)
 		    {
 		      erred = 1;
@@ -4666,10 +4859,31 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 		pedwarn ("duplicate `volatile'");
 	      if (restrictp > 1)
 		pedwarn ("duplicate `restrict'");
-
+	      if (sharedp > 1)
+		pedwarn ("duplicate `shared'");
+	      if (strictp > 1)
+		pedwarn ("duplicate `strict'");
+	      if (relaxedp > 1)
+		pedwarn ("duplicate `relaxed'");
+	      if (strictp && relaxedp)
+		error ("`%s' is declared both strict and relaxed.", name);
+	      if (strictp && !sharedp)
+		{
+		  error ("`%s' is declared strict but not shared.", name);
+		  sharedp = 1;
+		}
+	      if (relaxedp && !sharedp)
+		{
+		  error ("`%s' is declared relaxed but not shared.", name);
+		  sharedp = 1;
+		}
 	      type_quals = ((constp ? TYPE_QUAL_CONST : 0)
 			    | (restrictp ? TYPE_QUAL_RESTRICT : 0)
-			    | (volatilep ? TYPE_QUAL_VOLATILE : 0));
+			    | (volatilep ? TYPE_QUAL_VOLATILE : 0)
+			    | (sharedp ? TYPE_QUAL_SHARED : 0)
+			    | (strictp ? TYPE_QUAL_STRICT : 0)
+			    | (relaxedp ? TYPE_QUAL_RELAXED : 0)
+			    );
 	    }
 
 	  declarator = TREE_OPERAND (declarator, 0);
@@ -4787,7 +5001,14 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	    type = build_pointer_type (type);
 	    type_quals = TYPE_UNQUALIFIED;
 	  }
-
+	if (type_quals & TYPE_QUAL_SHARED)
+	  {
+	    error ("parameter `%s' declared with shared qualifier",
+		   name);
+	    type_quals &= ~(TYPE_QUAL_SHARED | TYPE_QUAL_STRICT
+			    | TYPE_QUAL_RELAXED);
+	  }
+	
 	decl = build_decl (PARM_DECL, declarator, type);
 	if (size_varies)
 	  C_DECL_VARIABLE_SIZE (decl) = 1;
@@ -4823,7 +5044,14 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	  {
 	    error ("field `%s' has incomplete type", name);
 	    type = error_mark_node;
-	  }
+	  } else if (type_quals & TYPE_QUAL_SHARED)
+	    {
+	      error ("field `%s' declared with shared qualifier",
+		     name);
+	      type_quals &= ~(TYPE_QUAL_SHARED | TYPE_QUAL_STRICT
+			      | TYPE_QUAL_RELAXED);
+	    }
+
 	/* Move type qualifiers down to element of an array.  */
 	if (TREE_CODE (type) == ARRAY_TYPE && type_quals)
 	  {
@@ -4903,13 +5131,30 @@ grokdeclarator (declarator, declspecs, decl_context, initialized)
 	/* It's a variable.  */
 	/* An uninitialized decl with `extern' is a reference.  */
 	int extern_ref = !initialized && (specbits & (1 << (int) RID_EXTERN));
-
+	
+	if (sharedp && !extern_ref
+	    && ((specbits & (1 << (int) RID_STATIC)) == 0)
+	    && (current_binding_level != global_binding_level)
+	    && (TREE_CODE (type) != POINTER_TYPE))
+          {
+	    error ("UPC does not support shared auto variables.");
+	    /* handle it as if it were declared `static' */
+	    specbits |= (1 << (int)RID_STATIC);
+	  }
+	
 	/* Move type qualifiers down to element of an array.  */
 	if (TREE_CODE (type) == ARRAY_TYPE && type_quals)
 	  {
+	    //WEI: again, need to preserve the has_thread flag here
+	    int thread_dim = UPC_TYPE_HAS_THREADS(type);
 	    type = build_array_type (c_build_qualified_type (TREE_TYPE (type),
 							     type_quals),
 				     TYPE_DOMAIN (type));
+	    if (thread_dim) {
+	      UPC_TYPE_HAS_THREADS(type) = 1;
+	    }
+	    if (threads_found)
+	      UPC_TYPE_USES_THREADS (type) = 1;
 #if 0 /* Leave the variable const or volatile as well.  */
 	    type_quals = TYPE_UNQUALIFIED;
 #endif
@@ -5789,10 +6034,20 @@ build_enumerator (name, value)
   /* It should no longer be possible to have NON_LVALUE_EXPR
      in the default.  */
   if (value == 0)
-    {
-      value = enum_next_value;
-      if (enum_overflow)
-	error ("overflow in enumeration values");
+    { 
+      if (compiling_upc
+	  && upc_get_threads_val ()
+	  && name == get_identifier ("THREADS"))
+	{
+	  /* Fake out the value of THREADS if -fupc-threads-N asserted */
+	  value = size_int (upc_get_threads_val ());
+	}
+      else
+	{
+	  value = enum_next_value;
+	  if (enum_overflow)
+	    error ("overflow in enumeration values");
+	}
     }
 
   if (pedantic && ! int_fits_type_p (value, integer_type_node))

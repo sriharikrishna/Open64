@@ -98,4 +98,6 @@ extern int handle_pragma_token PARAMS ((const char *, tree));
 
 extern void init_pragma PARAMS ((void));
 
+#define START_CONSISTENCY_SCOPE     0
+#define END_CONSISTENCY_SCOPE       1
 #endif /* _C_PRAGMA_H */

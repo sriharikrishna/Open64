@@ -38,6 +38,9 @@
 #ifndef symtab_utils_INCLUDED
 #define symtab_utils_INCLUDED
 
+#include <upc_symtab_utils.h>
+
+
 // This file should contains only function prototypes and inlined function
 // definitions for utility routines operating on the symbol table classes.
 
@@ -118,6 +121,14 @@ TY_log_base2 (UINT align);
 // return a type that points to ty.  return 0 if none can be found
 TY_IDX
 TY_pointer (TY_IDX ty, BOOL f90_pointer = FALSE);
+
+/**
+ *
+ * Given ty_idx of a type, create its shared equivalent (with the specified block size) if it doesn't already exist
+ * If the given type is already shared, nothing's done and the type is returned
+ */
+TY_IDX 
+Make_Shared_Type(TY_IDX ty_idx, int bsize, CONSISTENCY_class  consistency = NO_CONSISTENCY);
 
 // f90_pointer argument is ignored now, use Make_F90_Pointer_Type
 TY_IDX

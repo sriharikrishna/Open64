@@ -138,6 +138,9 @@ ST_name (ST_IDX idx)			{ return ST_name (St_Table[idx]); }
 inline ST_CLASS				// for compatibility
 ST_class (const ST_IDX s)		{ return ST_class (St_Table[s]); }
 
+inline ST_SCLASS
+ST_sclass (const ST_IDX s)	        { return ST_sclass(St_Table[s]); }
+
 inline TY_IDX
 // ST_type (const ST_IDX s)		{ return ST_type(St_Table[s]); }
 ST_type (const ST_IDX s)
@@ -231,6 +234,19 @@ INITO_Table_Size (SYMTAB_IDX level) {
 //----------------------------------------------------------------------
 inline UINT
 INITV_Table_Size () { return Initv_Table.Size();}
+
+inline INITV_IDX
+INITV_index (SYMTAB_IDX level, ST_IDX st) {
+ 
+  for (int i = 1; i < INITO_Table_Size(level); i++) {
+    INITO* init = &Inito_Table(level, i);
+    if (init->st_idx == st) {
+      return init->val;
+    } 
+  }
+  return INITV_Table_Size()+1;
+}
+  
 
 
 //----------------------------------------------------------------------

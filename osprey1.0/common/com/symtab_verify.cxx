@@ -396,6 +396,7 @@ ST_Verify_Flags (const ST &s)
 static void
 ST_Verify_Fields(const ST &s) 
 {
+
   static char msg[] = "Invalid entry for ST Field: (%s)"; 
   if ( ST_sym_class(s) == CLASS_CONST) {
     Is_True( 0 < ST_tcon(s) && ST_tcon(s) < TCON_Table_Size (),

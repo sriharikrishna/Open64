@@ -1115,6 +1115,63 @@ Set_TY_is_packed (TY_IDX tyi)       { Set_TY_is_packed(Ty_Table[tyi]); }
 inline void
 Clear_TY_is_packed (TY_IDX tyi)     { Clear_TY_is_packed(Ty_Table[tyi]); }
 
+
+
+
+#ifdef COMPILE_UPC
+inline UINT32
+TY_block_size (const TY& ty)	{ return ty.block_size;}
+inline void
+Set_TY_block_size (TY &ty, UINT32 size)	{ty.block_size = size;}
+
+inline UINT32 
+TY_block_size (TY_IDX tyi)	{ return TY_block_size(Ty_Table[tyi]); }
+inline void
+Set_TY_block_size (TY_IDX tyi, UINT32 size)	{ Set_TY_block_size(Ty_Table[tyi], size); }
+
+
+inline BOOL
+TY_is_shared (const TY& ty)		{ return ty.flags & TY_IS_SHARED; }
+inline void
+Set_TY_is_shared (TY& ty)		{ ty.flags |= TY_IS_SHARED; }
+inline void
+Clear_TY_is_shared (TY& ty)		{ ty.flags &= ~TY_IS_SHARED; }
+inline BOOL
+TY_is_shared (const TY_IDX tyi)     { return TY_is_shared(Ty_Table[tyi]); }
+inline void
+Set_TY_is_shared (TY_IDX tyi)       { Set_TY_is_shared(Ty_Table[tyi]); }
+inline void
+Clear_TY_is_shared (TY_IDX tyi)     { Clear_TY_is_shared(Ty_Table[tyi]); }
+
+inline BOOL
+TY_is_strict (const TY& ty)		{ return ty.flags & TY_IS_STRICT; }
+inline void
+Set_TY_is_strict (TY& ty)		{ ty.flags |= TY_IS_STRICT; }
+inline void
+Clear_TY_is_strict (TY& ty)		{ ty.flags &= ~TY_IS_STRICT; }
+inline BOOL
+TY_is_strict (const TY_IDX tyi)     { return TY_is_strict(Ty_Table[tyi]); }
+inline void
+Set_TY_is_strict (TY_IDX tyi)       { Set_TY_is_strict(Ty_Table[tyi]); }
+inline void
+Clear_TY_is_strict (TY_IDX tyi)     { Clear_TY_is_strict(Ty_Table[tyi]); }
+
+inline BOOL
+TY_is_relaxed (const TY& ty)		{ return ty.flags & TY_IS_RELAXED; }
+inline void
+Set_TY_is_relaxed (TY& ty)		{ ty.flags |= TY_IS_RELAXED; }
+inline void
+Clear_TY_is_relaxed (TY& ty)		{ ty.flags &= ~TY_IS_RELAXED; }
+inline BOOL
+TY_is_relaxed (const TY_IDX tyi)     { return TY_is_relaxed(Ty_Table[tyi]); }
+inline void
+Set_TY_is_relaxed (TY_IDX tyi)       { Set_TY_is_relaxed(Ty_Table[tyi]); }
+inline void
+Clear_TY_is_relaxed (TY_IDX tyi)     { Clear_TY_is_relaxed(Ty_Table[tyi]); }
+
+
+#endif
+
 inline BOOL
 TY_ptr_as_array (const TY& ty)		{ return ty.flags & TY_PTR_AS_ARRAY; }
 inline void

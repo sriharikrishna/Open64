@@ -53,6 +53,7 @@ endif
 
 HOSTDEFS += -DIR_TOOLS
 HOSTDEFS += -D_NEW_SYMTAB
+HOSTDEFS += -DCOMPILE_UPC
 
 ifeq ($(BUILD_COMPILER), GNU)
 HOSTDEFS += -D__GNU_BUG_WORKAROUND
@@ -151,6 +152,7 @@ COMMON_COM_CXX_SRC =	\
 	strtab.cxx	\
 	symtab.cxx	\
 	symtab_verify.cxx	\
+	upc_symtab_utils.cxx \
 	wn.cxx		\
 	wn_map.cxx	\
 	wn_pragmas.cxx	\

@@ -118,7 +118,7 @@ HOSTDEFS += -DBACK_END
 HOSTDEFS += -Dlonglong
 
 HOSTDEFS += -DSTD_MONGOOSE_LOC='"$(STD_MONGOOSE_LOC)"' 
-HOSTDEFS += -DMONGOOSE_BE
+HOSTDEFS += -DMONGOOSE_BE -DCOMPILE_UPC
 
 # need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
 HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
@@ -278,6 +278,8 @@ COMMON_COM_CXX_SRCS = \
   opcode_core.cxx	\
   wutil.cxx		\
   DaVinci.cxx           \
+  upc_wn_util.cxx	\
+  upc_symtab_utils.cxx
 
 COMMON_COM_PCH_CXX_SRCS = \
   const.cxx		\
@@ -658,7 +660,7 @@ endif
 ifeq ($(BUILD_OS), SOLARIS) 
 CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -D_LEGO_CLONER -DBACK_END -DMONGOOSE_BE \
 	-D_LONGLONG -Dlonglong -D_SVR4_SOURCE -D_NEW_SYMTAB -DTARG_SOLARIS \
-	$(LCINCS) $(OPTIMIZER)
+	-DCOMPILE_UPC $(LCINCS) $(OPTIMIZER)
  ifeq ($(BUILD_COMPILER), VENDOR)
  CFLAGS += -KPIC
  ifeq ($(BUILD_SB), YES)

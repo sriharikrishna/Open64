@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: driver_util.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:20 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/driver_util.h,v $
  *
  * Revision history:
@@ -57,18 +57,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+  
+  extern char* Config_File_Name;
 
-extern void Get_Phase_Args (BE_PHASES, INT*, char ***);
-
-extern void Process_Command_Line (INT, char **);
-
-extern void Prepare_Source (void);
-
-extern void Prepare_Listing_File (void);
-
-extern void Lowering_Initialize (void);
-
-extern void Lower_Init(void);
+  extern void Get_Phase_Args (BE_PHASES, INT*, char ***);
+  
+  extern void Process_Command_Line (INT, char **);
+  
+  extern void Prepare_Source (void);
+  
+  extern void Prepare_Listing_File (void);
+  
+  extern void Lowering_Initialize (void);
+  
+  extern void Lower_Init(void);
 
 #ifdef __cplusplus
 }

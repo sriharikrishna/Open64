@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: wn_attr.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:18 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-21 21:13:42 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn_attr.h,v $
  *
  * Revision history:
@@ -222,6 +222,7 @@ extern UINT WN_num_var_refs(WN *wn, const ST *st, STAB_OFFSET st_ofst);
 #define WN_Skip_Parm(arg) \
    ((arg)!=NULL && WN_opc_operator(arg) == OPR_PARM? WN_kid0(arg) : arg)
 
+extern TY_IDX Get_Field_Type(TY_IDX base, int field_id);
 
 extern const char * WN_intrinsic_name(INTRINSIC intr_opc);
 extern TY_IDX WN_intrinsic_return_ty(OPCODE    wn_opc,

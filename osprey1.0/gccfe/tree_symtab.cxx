@@ -44,6 +44,8 @@ extern "C" {
 #include "gnu/system.h"
 #include "gnu/tree.h"
 #include "gnu/toplev.h"
+#include "gnu/c-tree.h"
+#include "gnu/upc-act.h"
 }
 #ifdef TARG_IA32
 // the definition in gnu/config/i386/i386.h causes problem
@@ -61,9 +63,113 @@ extern "C" {
 #include "ir_reader.h"
 #include <cmplrs/rcodes.h>
 
+#include "glob.h"
+#include "cxx_memory.h"
+
+#include <math.h>
+
 extern FILE *tree_dump_file; // For debugging only
 
 extern INT pstatic_as_global;
+
+extern string utoa(UINT64 i);
+
+/* functions for the initialization of global data */
+extern void add_shared_symbol(ST_IDX st, TY_IDX ty, int thread_dim);
+extern void add_TLD_symbol(ST_IDX st, tld_pair_p info);
+
+TY_IDX char_ty = 0; /* see tree_symtab.h */
+
+/* UPC specific */
+
+tree shared_ptr_tree;
+extern int compiling_upc;
+
+//std::map<ST*,bs_pair_p> upc_st_orig_ty;
+std::map<ST_IDX,bs_pair_p> upc_st_orig_ty;
+
+//vector storing all tld variables
+//std::map<ST*, tld_pair_p> upc_tld;
+std::map<ST_IDX, tld_pair_p> upc_tld;
+
+/**
+ *  Return the hash value of a string. 
+ */
+unsigned int hash_val(string s) {
+
+  unsigned int length = s.size();
+  unsigned int res = 0;
+  for (int i = 0; i < length; i++) {
+    res = s[i] + 31 * res;
+  }
+  return res;
+}
+
+static bool is_star(tree block) {
+  return block != NULL && (TREE_INT_CST_LOW(block) ^ -1) == 0;
+}
+
+
+//For all that I can remember:
+// return 1 if block = NULL, 
+// otherwise return the value of the block tree 
+int Type_Tree_Block_Size(tree type_tree) {
+
+  tree block = 0;
+  switch (TREE_CODE (type_tree)) {
+  case VOID_TYPE:
+  case BOOLEAN_TYPE:
+  case INTEGER_TYPE:
+  case CHAR_TYPE:  
+  case ENUMERAL_TYPE:
+  case REAL_TYPE:
+  case RECORD_TYPE:
+  case UNION_TYPE:
+  case COMPLEX_TYPE:
+    block = TYPE_BLOCK_SIZE(type_tree); 
+    if (block && TYPE_SIZE(type_tree)) {
+      return Get_Integer_Value(block) / Get_Integer_Value(TYPE_SIZE(type_tree));
+    }
+    break;
+  case ARRAY_TYPE:
+    block = TYPE_BLOCK_SIZE(get_inner_array_type(type_tree));
+    if (block) {
+      int elt_size = Get_Integer_Value(TYPE_SIZE(get_inner_array_type(type_tree)));
+      if (is_star(block)) {
+	int ar_size = Get_Integer_Value(TYPE_SIZE(type_tree));
+	if (threads_int == 0) {
+	  //In dynamic env, block size is the same as the product of dimensions
+	  return ar_size / elt_size;
+	} else {
+	  //in static case, needs to use the formula
+	  return (ar_size / elt_size + threads_int - 1) / threads_int; 
+	}
+      } else {
+	//regular case 
+	return Get_Integer_Value(block) / elt_size;
+      }
+    }
+    break;
+  case POINTER_TYPE:
+  case REFERENCE_TYPE:
+    //blocksize for pointer is stored directly in the pointer type tree, fixed here 
+    //block = TYPE_BLOCK_SIZE(TREE_TYPE(type_tree));
+    block = TYPE_BLOCK_SIZE(type_tree);
+    if (block) {
+      int elt_size = Get_Integer_Value(TYPE_SIZE(type_tree));
+      if (is_star(block)) {
+	//can't have [*] in pointers
+	error ("The [*] qualifier can only be used for arrays");
+      }	
+      return Get_Integer_Value(block) / elt_size;
+    }
+    break;
+  default:
+    break;
+  }
+  //if we reach here, this means blocksize is not specified
+  return 1;
+}
 
 static char*
 Get_Name (tree node)
@@ -86,7 +192,10 @@ Get_Name (tree node)
 		return NULL;
 }
 
+static string getTypeStr(tree type);
+
 // idx is non-zero only for RECORD and UNION, when there is forward declaration
+
 extern TY_IDX
 Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 {
@@ -112,6 +221,13 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 		if (TYPE_VOLATILE(type_tree))
 			Set_TY_is_volatile (idx);
 		// restrict qualifier not supported by gcc
+	
+		if (TYPE_SHARED(type_tree)) {
+		  idx = Make_Shared_Type(idx, 
+				   TYPE_BLOCK_SIZE(type_tree) ? 
+				   Get_Integer_Value( TYPE_BLOCK_SIZE(type_tree)) : 1);
+		 
+		}
 		TYPE_TY_IDX(type_tree) = idx;
 		if(Debug_Level >= 2) {
 		  struct mongoose_gcc_DST_IDX dst = 
@@ -122,7 +238,7 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 	}
 
 	TYPE_ID mtype;
-	INT tsize;
+	UINT64 tsize;
 	BOOL variable_size = FALSE;
 	tree type_size = TYPE_SIZE(type_tree);
 
@@ -156,22 +272,36 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 		break;
 	case BOOLEAN_TYPE:
 	case INTEGER_TYPE:
-		switch (tsize) {
-		case 1:  mtype = MTYPE_I1; break;
-		case 2:  mtype = MTYPE_I2; break;
-		case 4:  mtype = MTYPE_I4; break;
-		case 8:  mtype = MTYPE_I8; break;
+	  switch (tsize) {
+	  case 1:  mtype = MTYPE_I1; break;
+	  case 2:  mtype = MTYPE_I2; break;
+	  case 4:  mtype = MTYPE_I4; break;
+	  case 8:  mtype = MTYPE_I8; break;
 #ifdef _LP64
-		case 16:  mtype = MTYPE_I8; break;
+	  case 16:  mtype = MTYPE_I8; break;
 #endif /* _LP64 */
-		default:  FmtAssert(FALSE, ("Get_TY unexpected size"));
-		}
-		if (TREE_UNSIGNED(type_tree)) {
-			mtype = MTYPE_complement(mtype);
-		}
-		idx = MTYPE_To_TY (mtype);	// use predefined type
-		Set_TY_align (idx, align);
-		break;
+	  default:  FmtAssert(FALSE, ("Get_TY unexpected size"));
+	  }
+	  
+	  if (TREE_UNSIGNED(type_tree)) {
+	    mtype = MTYPE_complement(mtype);
+	  }
+	  if (type_tree == char_type_node) {
+	    if (char_ty == 0) {
+	      TY& ty = New_TY (char_ty);
+	      TY_Init (ty, tsize, KIND_SCALAR, MTYPE_I1, /* does it matter what mtype to use? */ 
+		       Save_Str("char"));
+	      if (compiling_upc) {
+		/* borrow the ty_is_char flag since it's not being used */
+		Set_TY_is_character(char_ty);
+	      }
+	    }
+	    idx = char_ty;
+	  } else {
+	    idx = MTYPE_To_TY (mtype);	// use predefined type
+	  }
+	  Set_TY_align (idx, align);
+	  break;
 	case CHAR_TYPE:
 		mtype = (TREE_UNSIGNED(type_tree) ? MTYPE_U1 : MTYPE_I1);
 		idx = MTYPE_To_TY (mtype);	// use predefined type
@@ -216,14 +346,32 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 		break;
 	case REFERENCE_TYPE:
 	case POINTER_TYPE:
-		idx = Make_Pointer_Type (Get_TY (TREE_TYPE(type_tree)));
-		Set_TY_align (idx, align);
-		break;
+	  idx = Get_TY (TREE_TYPE(type_tree));
+	  // if (TREE_SHARED(TREE_TYPE(type_tree))  && TYPE_BLOCK_SIZE(TREE_TYPE(type_tree)) ) {
+// 	    idx = Copy_TY(Get_TY (TREE_TYPE(type_tree)));
+// 	    Set_TY_block_size(idx, Get_Integer_Value( TYPE_BLOCK_SIZE(TREE_TYPE(type_tree))));
+// 	  } 
+	    idx = Make_Pointer_Type (idx);
+		
+	  // if (compiling_upc && TREE_SHARED(TREE_TYPE(type_tree))) {
+// 	    TYPE_ORIG_TY_IDX(type_tree) = idx;
+// 	    Set_TY_align (idx, align);
+	    // idx = shared_ptr_idx;
+// 	  } else 
+	    Set_TY_align (idx, align);
+		
+	  break;
 	case ARRAY_TYPE:
 		{	// new scope for local vars
 		TY &ty = New_TY (idx);
 		TY_Init (ty, tsize, KIND_ARRAY, MTYPE_M, 
-			Save_Str(Get_Name(TYPE_NAME(type_tree))) );
+			 Save_Str(Get_Name(TYPE_NAME(type_tree))) );
+		//If block size is *, we need to fix the element type's block size first
+		if (is_star(TYPE_BLOCK_SIZE(get_inner_array_type(type_tree)))) {
+		  TYPE_BLOCK_SIZE(get_inner_array_type(type_tree)) = 
+		    build_int_2(Type_Tree_Block_Size(type_tree) * 32, 0);
+		}
+		
 		Set_TY_etype (ty, Get_TY (TREE_TYPE(type_tree)));
 		Set_TY_align (idx, TY_align(TY_etype(ty)));
 		// assumes 1 dimension
@@ -289,6 +437,7 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 			Clear_ARB_const_ubnd (arb);
 			Set_ARB_ubnd_val (arb, 0);
 		}
+
 		if (variable_size) {
 			WN *swn, *wn;
 			swn = WFE_Expand_Expr (type_size);
@@ -307,14 +456,14 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 				WFE_Stmt_Append (wn, Get_Srcpos());
 			}
 		}
-		} // end array scope
-		break;
+	} // end array scope
+	break;
 	case RECORD_TYPE:
-	case UNION_TYPE:
-		{	// new scope for local vars
+	case UNION_TYPE: {	// new scope for local vars
 		TY &ty = (idx == TY_IDX_ZERO) ? New_TY(idx) : Ty_Table[idx];
 		TY_Init (ty, tsize, KIND_STRUCT, MTYPE_M, 
 			Save_Str(Get_Name(TYPE_NAME(type_tree))) );
+		
 		if (TREE_CODE(type_tree) == UNION_TYPE) {
 			Set_TY_is_union(idx);
 		}
@@ -429,6 +578,13 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 			Set_FLD_type(fld, fty_idx);
 			fld = FLD_next(fld);
 		}
+		/* UPC specific */
+		if (compiling_upc) {
+		  if(strcmp(TY_name(ty), shared_ptr_name) == 0) {
+		    shared_ptr_idx = idx;
+		    shared_ptr_tree = type_tree;
+		  } 
+		}
 		} // end record scope
 		break;
 	case METHOD_TYPE:
@@ -498,18 +654,173 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 	default:
 		FmtAssert(FALSE, ("Get_TY unexpected tree_type"));
 	}
+
+	if (TYPE_SHARED(type_tree)) {
+	  idx = Make_Shared_Type(idx, Type_Tree_Block_Size(type_tree), 
+	    TYPE_STRICT(type_tree) ? STRICT_CONSISTENCY :
+	    TYPE_RELAXED(type_tree) ? RELAXED_CONSISTENCY : NO_CONSISTENCY);    
+	}
+
 	if (TYPE_READONLY(type_tree))
 		Set_TY_is_const (idx);
 	if (TYPE_VOLATILE(type_tree))
 		Set_TY_is_volatile (idx);
 	// restrict qualifier not supported by gcc
+	//UPC
+	if (TYPE_SHARED(type_tree) /*&& TREE_CODE(type_tree) != ARRAY_TYPE*/)
+		Set_TY_is_shared (idx);
 	TYPE_TY_IDX(type_tree) = idx;
+	
 	if(Debug_Level >= 2) {
 	  struct mongoose_gcc_DST_IDX dst = 
 	    Create_DST_type_For_Tree(type_tree,idx,orig_idx);
 	  TYPE_DST_IDX(type_tree) = dst;
 	}
+
 	return idx;
+}
+
+static string getTypeStr(tree decl_type) {
+
+  string type_str;
+
+  switch (TREE_CODE(decl_type)) {
+  case INTEGER_TYPE: {
+    if (decl_type == char_type_node) {
+      //FIXME: this comparison would not work if the type has qualifiers (const, etc.)  
+      //how do we get around this?
+      type_str = "char";
+    } else {
+      int size = Get_Integer_Value(TYPE_SIZE(decl_type)) / 8;
+      type_str = (TREE_UNSIGNED(decl_type) ? "u" : "");
+      switch (size) {
+      case 1: 
+	type_str = (TREE_UNSIGNED(decl_type) ? "unsigned char" : "char");
+	break;
+      case 2: 
+	type_str += "int16_t";
+	break;
+      case 4:
+	type_str += "int32_t";
+	break;
+      case 8: 
+	type_str == "int64_t";
+	break;
+      default:
+	Is_True(false, ("IN TREE_SYMTAB, getTypeStr:  UNKNOWN SIZE OF INTEGER TYPE: %d", size));
+      }
+    }
+    break;
+  }
+  case ENUMERAL_TYPE:
+    type_str = "int32_t";
+    break;
+  case REAL_TYPE: {
+    int size = Get_Integer_Value(TYPE_SIZE(decl_type)) / 8;
+    switch (size) {
+    case 4:  
+      type_str = "float"; 
+      break;
+    case 8:  
+      type_str = "double";
+      break;
+    case 12:
+      type_str = "long double";
+      break;
+    default:
+      Is_True(false, ("IN TREE_SYMTAB:  UNKNOWN SIZE OF FLOAT TYPE: %d", size));
+    }
+    break;
+  }
+  case REFERENCE_TYPE:
+  case POINTER_TYPE: {
+    tree subtype = TREE_TYPE(decl_type);
+    if (TREE_THIS_SHARED(subtype)) {
+      tree block = TYPE_BLOCK_SIZE(subtype);
+      if (block != NULL) {
+	int bsize = Get_Integer_Value(block);
+	if (bsize != 0) {
+	  type_str = "upcr_shared_ptr_t";
+	} else {
+	  type_str = "upcr_pshared_ptr_t";
+	}
+      } else {
+	type_str = "upcr_pshared_ptr_t";
+      }
+    } else if (TREE_CODE(subtype) == FUNCTION_TYPE) {
+      //function pointers requires some special care
+      type_str = getTypeStr(TREE_TYPE(subtype));
+      type_str += "(*)(";
+      bool first = true;
+      for (tree arg_list = TYPE_ARG_TYPES(subtype); arg_list != NULL; arg_list = TREE_CHAIN(arg_list)) {
+	if (TREE_CODE(TREE_VALUE(arg_list)) == VOID_TYPE) {
+	  break;
+	}
+	if (!first) {
+	  type_str += ",";
+	}
+	first = false;
+	type_str += getTypeStr(TREE_VALUE(arg_list));
+      }
+      type_str += ")";
+    } else {
+      type_str = getTypeStr(TREE_TYPE(decl_type)) + "*";
+      if (TREE_READONLY(decl_type)) {
+	type_str += " const ";
+      }
+    }
+    break;
+  }
+  case ARRAY_TYPE: 
+    if (TYPE_SIZE(decl_type) != NULL) {
+      UINT64 eltSize = Get_Integer_Value(TYPE_SIZE(TREE_TYPE(decl_type)));
+      UINT64 length = Get_Integer_Value(TYPE_SIZE(decl_type)) / eltSize;
+      type_str = "[" + utoa(length) + "]";
+    } else {
+      type_str = "[]";
+    }
+    type_str += getTypeStr(TREE_TYPE(decl_type));
+    break;
+  case UNION_TYPE:
+  case RECORD_TYPE: {
+    tree name = TYPE_NAME(decl_type);
+    if (name == NULL) {
+      /* we encounter an anonymous struct, this could happen because of typedef, e.g.
+       * typedef struct {int x; int y;} foo
+       * since we strip off the typedef, we're left with a nameless struct
+       */
+      TY_IDX ty_idx = TYPE_TY_IDX(decl_type);
+      type_str = (TY_is_union(ty_idx) ? "union " : "struct ") + (string) TY_name(ty_idx);
+      //we need to remove the "." from the TY_name.  This should match with whatever WHIRL2C_make_valid_c_name
+      //returns as long as anonymous structs have names like ".anonymous.i"
+      for (int i = type_str.find("."); i >= 0; i = type_str.find(".")) { 
+	type_str = type_str.replace(i, 1, "");
+      }
+      break;
+    }
+
+    if (TREE_CODE(name) == TYPE_DECL) {
+      //type is a typedef
+      type_str = getTypeStr(TYPE_MAIN_VARIANT(decl_type));
+    } else {
+      type_str = TREE_CODE(decl_type) == UNION_TYPE ? "union " : "struct ";
+      type_str += IDENTIFIER_POINTER(name); 
+    }
+    break;
+  }
+  case VOID_TYPE:
+    //this can occur for "void *"
+    type_str = "void ";
+    break;
+  default:
+    Is_True(false, ("IN TREE_SYMTAB, getTypeStr:  UNEXPECTED TYPE"));    
+  }
+
+  if (TYPE_READONLY(decl_type) && TREE_CODE(decl_type) !=POINTER_TYPE) {
+    type_str = "const " + type_str;
+  }
+
+  return type_str;
 }
 
 ST*
@@ -517,7 +828,7 @@ Create_ST_For_Tree (tree decl_node)
 {
   TY_IDX     ty_idx;
   ST*        st;
-  char      *name;
+  string name;
   ST_SCLASS  sclass;
   ST_EXPORT  eclass;
   SYMTAB_IDX level;
@@ -525,138 +836,226 @@ Create_ST_For_Tree (tree decl_node)
   if (TREE_CODE(decl_node) == ERROR_MARK)
     exit (RC_USER_ERROR);
 
-  if (DECL_NAME (decl_node))
+  if (DECL_NAME (decl_node)) {
+    tree enclosing_decl = DECL_CONTEXT(decl_node);
     name = IDENTIFIER_POINTER (DECL_NAME (decl_node));
-  else {
+    if (compiling_upc) {
+      string suffix = "";
+      bool pstatic = enclosing_decl != NULL && TREE_STATIC(decl_node) && TREE_CODE(enclosing_decl) == FUNCTION_DECL;
+      bool fstatic = enclosing_decl == NULL && !TREE_PUBLIC(decl_node);
+      //rename static local/global variables by adding the hash value of (fn name + file name) to the variable
+      if (pstatic) {
+	suffix += "_" + (string) IDENTIFIER_POINTER(DECL_NAME(enclosing_decl));
+      }
+      if (pstatic || fstatic) {
+	char buf[MAX_PATH];
+	realpath(Orig_Src_File_Name, buf);
+	suffix += (string) buf;
+	name += "_" + utoa(hash_val(suffix)) + "_";
+      }
+    }
+  } else {
     DevWarn ("no name for DECL_NODE");
     name = "__unknown__";
   }
 
   switch (TREE_CODE(decl_node)) {
-
-    case FUNCTION_DECL:
-      {
-        TY_IDX func_ty_idx = Get_TY(TREE_TYPE(decl_node));
-
-        if (DECL_WIDEN_RETVAL (decl_node)) {
-/*
+    
+  case FUNCTION_DECL:
+    {
+      TY_IDX func_ty_idx = Get_TY(TREE_TYPE(decl_node));
+      
+      if (DECL_WIDEN_RETVAL (decl_node)) {
+	/*
           extern tree long_long_integer_type_node;
           extern tree long_long_unsigned_type_node;
-*/
-          tree type_tree = TREE_TYPE(decl_node);
-          tree ret_type_tree = TREE_TYPE (type_tree);
-          TY_IDX ret_ty_idx = Get_TY(ret_type_tree);
-	  if (MTYPE_signed (TY_mtype (ret_ty_idx)))
-            TREE_TYPE (type_tree) = long_long_integer_type_node;
-          else
-            TREE_TYPE (type_tree) = long_long_unsigned_type_node;
-          TY_IDX old_func_ty_idx = func_ty_idx;
-          func_ty_idx = Create_TY_For_Tree (type_tree, TY_IDX_ZERO);
-          TREE_TYPE (type_tree) = ret_type_tree;
-          TYPE_TY_IDX(type_tree) = old_func_ty_idx;
-        }
-
-        sclass = SCLASS_EXTERN;
-        eclass = TREE_PUBLIC(decl_node) ? EXPORT_PREEMPTIBLE : EXPORT_LOCAL;
-        level  = GLOBAL_SYMTAB+1;
-
-        PU_IDX pu_idx;
-        PU&    pu = New_PU (pu_idx);
-
-        PU_Init (pu, func_ty_idx, level);
-
-        st = New_ST (GLOBAL_SYMTAB);
-
-        ST_Init (st,
-                 Save_Str ( IDENTIFIER_POINTER (DECL_ASSEMBLER_NAME (decl_node))),
-                 CLASS_FUNC, sclass, eclass, TY_IDX (pu_idx));
-/*
-       if (TREE_CODE(TREE_TYPE(decl_node)) == METHOD_TYPE)
-         fprintf (stderr, "Create_ST_For_Tree: METHOD_TYPE\n");
-*/
+	*/
+	tree type_tree = TREE_TYPE(decl_node);
+	tree ret_type_tree = TREE_TYPE (type_tree);
+	TY_IDX ret_ty_idx = Get_TY(ret_type_tree);
+	if (MTYPE_signed (TY_mtype (ret_ty_idx)))
+	  TREE_TYPE (type_tree) = long_long_integer_type_node;
+	else
+	  TREE_TYPE (type_tree) = long_long_unsigned_type_node;
+	TY_IDX old_func_ty_idx = func_ty_idx;
+	func_ty_idx = Create_TY_For_Tree (type_tree, TY_IDX_ZERO);
+	TREE_TYPE (type_tree) = ret_type_tree;
+	TYPE_TY_IDX(type_tree) = old_func_ty_idx;
       }
-      break;
+      
+      sclass = SCLASS_EXTERN;
+      eclass = TREE_PUBLIC(decl_node) ? EXPORT_PREEMPTIBLE : EXPORT_LOCAL;
+      level  = GLOBAL_SYMTAB+1;
+      
+      PU_IDX pu_idx;
+      PU&    pu = New_PU (pu_idx);
+      
+      PU_Init (pu, func_ty_idx, level);
+      
+      st = New_ST (GLOBAL_SYMTAB);
+      char *an;
+      
+      if (compiling_upc) {
+	Save_Upc_Rts_Calls((char *) name.c_str(), st);
+	an = IDENTIFIER_POINTER (DECL_ASSEMBLER_NAME (decl_node));
+	Upc_Translate_Name((char *) name.c_str(), &an);
+      }  else {
+	an = IDENTIFIER_POINTER (DECL_ASSEMBLER_NAME (decl_node));
+      }
+      if (strcmp(an, "main") == 0) {
+	an = "user_main";
+      }
+      
+      ST_Init (st,
+	       Save_Str (an),
+	       CLASS_FUNC, sclass, eclass, TY_IDX (pu_idx));
 
-    case PARM_DECL:
-    case VAR_DECL:
-      {
-        if (TREE_CODE(decl_node) == PARM_DECL) {
-          sclass = SCLASS_FORMAL;
-          eclass = EXPORT_LOCAL;
-          level = CURRENT_SYMTAB;
-        }
-        else {
-          if (DECL_CONTEXT (decl_node) == 0) {
-            if (TREE_PUBLIC (decl_node)) {
-	      if (DECL_INITIAL(decl_node))
-		sclass = SCLASS_DGLOBAL;
-	      else if (TREE_STATIC(decl_node)) {
-		if (flag_no_common || DECL_SECTION_NAME(decl_node))
-              	  sclass = SCLASS_UGLOBAL;
-		else
-              	  sclass = SCLASS_COMMON;
-	      }
+    }
+    break;
+    
+  case PARM_DECL:
+  case VAR_DECL:
+    {
+      if (TREE_CODE(decl_node) == PARM_DECL) {
+	sclass = SCLASS_FORMAL;
+	eclass = EXPORT_LOCAL;
+	level = CURRENT_SYMTAB;
+      }
+      else {
+	if (DECL_CONTEXT (decl_node) == 0) {
+	  if (TREE_PUBLIC (decl_node)) {
+	    if (DECL_INITIAL(decl_node))
+	      sclass = SCLASS_DGLOBAL;
+	    else if (TREE_STATIC(decl_node)) {
+	      if (flag_no_common || DECL_SECTION_NAME(decl_node))
+		sclass = SCLASS_UGLOBAL;
 	      else
-              	sclass = SCLASS_EXTERN;
-              eclass = EXPORT_PREEMPTIBLE;
-            }
-            else {
-              	sclass = SCLASS_FSTATIC;
-		eclass = EXPORT_LOCAL;
-            }
-            level = GLOBAL_SYMTAB;
-          }
-          else {
-            if (DECL_EXTERNAL(decl_node)) {
+		sclass = SCLASS_COMMON;
+	    }
+	    else
 	      sclass = SCLASS_EXTERN;
-	      level  = GLOBAL_SYMTAB;
-              eclass = EXPORT_PREEMPTIBLE;
-            }
-            else {
-	      if (TREE_STATIC (decl_node)) {
-		sclass = SCLASS_PSTATIC;
-		if (pstatic_as_global)
-			level = GLOBAL_SYMTAB;
-		else
-			level = CURRENT_SYMTAB;
+	    eclass = EXPORT_PREEMPTIBLE;
+	  }
+	  else {
+	    sclass = SCLASS_FSTATIC;
+	    eclass = EXPORT_LOCAL;
+	  }
+	  level = GLOBAL_SYMTAB;
+	}
+	else {
+	  if (DECL_EXTERNAL(decl_node)) {
+	    sclass = SCLASS_EXTERN;
+	    level  = GLOBAL_SYMTAB;
+	    eclass = EXPORT_PREEMPTIBLE;
+	  }
+	  else {
+	    if (TREE_STATIC (decl_node)) {
+	      sclass = SCLASS_PSTATIC;
+	      if (pstatic_as_global)
+		level = GLOBAL_SYMTAB;
+	      else
+		level = CURRENT_SYMTAB;
+	    }
+	    else {
+	      sclass = SCLASS_AUTO;
+	      level = decl_node->decl.symtab_idx ?
+		decl_node->decl.symtab_idx : CURRENT_SYMTAB;
               }
-              else {
-		sclass = SCLASS_AUTO;
-		level = decl_node->decl.symtab_idx ?
-                        decl_node->decl.symtab_idx : CURRENT_SYMTAB;
-              }
-              eclass = EXPORT_LOCAL;
-            }
-          }
-        }
-        st = New_ST (level);
-        ty_idx = Get_TY (TREE_TYPE(decl_node));
-        if (TY_kind (ty_idx) == KIND_ARRAY &&
+	    eclass = EXPORT_LOCAL;
+	  }
+	}
+      }
+      st = New_ST (level);
+      ty_idx = Get_TY (TREE_TYPE(decl_node));
+      
+      // UPC
+
+      if (TY_kind(ty_idx) == KIND_SCALAR && TREE_THIS_SHARED(decl_node)) {
+	//WEI: Don't do this, since blocksize is part of the type
+#if 0  
+	ty_idx = MTYPE_To_Shared_TY (TY_mtype(ty_idx));
+#endif
+	TYPE_TY_IDX(TREE_TYPE(decl_node)) = ty_idx;
+      }
+
+
+      if (TY_kind (ty_idx) == KIND_ARRAY &&
             TREE_STATIC (decl_node) &&
             DECL_INITIAL (decl_node) == FALSE &&
             TY_size (ty_idx) == 0) {
-          Set_TY_size (ty_idx, TY_size (Get_TY (TREE_TYPE (TREE_TYPE (decl_node)))));
-        }
-	if (TY_mtype (ty_idx) == MTYPE_M &&
-	    Aggregate_Alignment > 0 &&
-	    Aggregate_Alignment > TY_align (ty_idx))
-	  Set_TY_align (ty_idx, Aggregate_Alignment);
-	// qualifiers are set on decl nodes
-	if (TREE_READONLY(decl_node))
-		Set_TY_is_const (ty_idx);
-	if (TREE_THIS_VOLATILE(decl_node))
-		Set_TY_is_volatile (ty_idx);
-        ST_Init (st, Save_Str(name), CLASS_VAR, sclass, eclass, ty_idx);
-        if (TREE_CODE(decl_node) == PARM_DECL) {
-		Set_ST_is_value_parm(st);
-        }
+	Set_TY_size (ty_idx, TY_size (Get_TY (TREE_TYPE (TREE_TYPE (decl_node)))));
       }
-      break;
+      if (TY_mtype (ty_idx) == MTYPE_M &&
+	  Aggregate_Alignment > 0 &&
+	  Aggregate_Alignment > TY_align (ty_idx))
+	Set_TY_align (ty_idx, Aggregate_Alignment);
+      // qualifiers are set on decl nodes
+      if (TREE_READONLY(decl_node))
+	Set_TY_is_const (ty_idx);
+      if (TREE_THIS_VOLATILE(decl_node))
+	Set_TY_is_volatile (ty_idx);
+      ST_Init (st, Save_Str(name.c_str()), CLASS_VAR, sclass, eclass, ty_idx);
+      if (TREE_CODE(decl_node) == PARM_DECL) {
+	Set_ST_is_value_parm(st);
+      }
 
-    default:
-      {
-        Fail_FmtAssertion ("Create_ST_For_Tree: unexpected tree type");
+      /* UPC specific */
+      if(compiling_upc) {
+	if (TREE_CODE(decl_node) == VAR_DECL) {
+	  bool shared = TY_is_shared(ty_idx);
+	  unsigned int thread_dim = 0;
+	  tree decl_type = TREE_TYPE(decl_node);	  
+	  if (TY_kind(ty_idx) == KIND_POINTER && TY_is_shared(TY_pointed(ty_idx))) {
+	    //a local pointer to shared data
+	    if (is_star(TYPE_BLOCK_SIZE(TREE_TYPE(decl_type)))) {
+	      error("[*] qualifier may not be used in declaration of pointers");
+	    }
+	  }
+	  
+	  if (TY_is_shared(ty_idx)) {
+	    int bsize = Get_Type_Block_Size(ty_idx);
+	    if (TREE_CODE(decl_type) == ARRAY_TYPE) {
+	      //find the dimension that contains THREADS, and perform the appropriate checks
+	      int i = 1;
+	      for (tree base_type = decl_type; TREE_CODE(base_type) == ARRAY_TYPE; base_type = TREE_TYPE(base_type), i++) {
+		if (UPC_TYPE_HAS_THREADS(base_type)) {
+		  thread_dim = i;
+		  break;
+		}
+	      }
+	      if (bsize == 0 && thread_dim > 0) {
+		//we have an error here, since arrays with indef block size can't have threads in its dimension
+		error("In the dynamic translation environment, THREADS may not appear in the declarations of shared arrays with indefinite block size. Offending variable: %s", name.c_str());
+	      }
+	      if (bsize != 0 && threads_int == 0 && thread_dim == 0) {
+		error("In the dynamic translation environment, THREADS must appear exactly once in declaratons of shared arrays with definite block size.  Offending variable: %s", name.c_str());
+	      }
+	    } else if (is_star(TYPE_BLOCK_SIZE(decl_type))) {
+	      error("[*] qualifier is only allowed for arrays");
+	    }
+	    //cout << "SHARED: " << ST_name(st) << " " << ty_idx << " " << ST_st_idx(st) << endl;
+	    upc_st_orig_ty[ST_st_idx(st)] = CXX_NEW(bs_pair_t(ty_idx, thread_dim), &MEM_src_pool);
+	      
+	  } else if ((DECL_CONTEXT(decl_node) == 0 || TREE_STATIC(decl_node))) {
+	    if (name != "MYTHREAD" && name != "THREADS" &&
+		name != "UPCR_SHARED_SIZE_" && name != "UPCR_PSHARED_SIZE_") { 
+	      string type_str = getTypeStr(TREE_TYPE(decl_node));
+	      upc_tld[ST_st_idx(st)] = CXX_NEW(tld_pair_t(type_str, "NONE", TY_size(ty_idx)), &MEM_src_pool);
+	      //cout << "TLD: " << ST_name(st) << " " << ty_idx << " " << ST_st_idx(st) << endl;
+	    }
+	  }
+	}
+	
+	if (strcmp(name.c_str(), "MYTHREAD") == 0) 
+	  upc_mythread_st = st;
       }
+    }
+    break;
+    
+  default:
+    {
+      Fail_FmtAssertion ("Create_ST_For_Tree: unexpected tree type");
+    }
       break;
   }
 
