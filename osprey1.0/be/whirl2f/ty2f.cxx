@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.25 $
- * $Date: 2004-07-13 13:36:36 $
- * $Author: eraxxon $
+ * $Revision: 1.26 $
+ * $Date: 2004-08-02 22:27:21 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -1901,6 +1901,15 @@ TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
     TY2F_Equivalence_List(decl_tokens, ty_idx /*struct_ty*/);
 
   Append_And_Reclaim_Token_List(tokens, &decl_tokens);
+
+/* For named common block add "save" attribute---FMZ */
+  if (name != NULL && *name != '\0'){
+      decl_tokens = New_Token_Buffer();
+      Append_F77_Indented_Newline(decl_tokens, 1, NULL/*label*/);
+      Append_Token_String(decl_tokens,"SAVE");
+      Append_Token_String(decl_tokens, Concat3_Strings("/", name, "/"));
+      Append_And_Reclaim_Token_List(tokens, &decl_tokens);
+   }
 
 } /* TY2F_Translate_Common */
 
