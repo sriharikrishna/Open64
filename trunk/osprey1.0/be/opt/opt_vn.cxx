@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_vn.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:51 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2002-09-06 22:34:54 $
+// $Author: open64 $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn.cxx,v $
 //
 // ====================================================================
@@ -554,7 +554,8 @@ VN::_valnum_op(CODEREP *cr)
       // Calls (not counting OPR_INTRINSIC_OPs) are not real 
       // expressions, and they should have been handled in valnum_stmt().
       //
-      FmtAssert(FALSE, ("Unexpected opcode in VN::_valnum_op()"));
+      Fail_FmtAssertion("Unexpected opcode [%s] in VN::_valnum_op()",
+                        OPCODE_name (opc));
    }
    else if (opc == OPC_VPARM)
    {

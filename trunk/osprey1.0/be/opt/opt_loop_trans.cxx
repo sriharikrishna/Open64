@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_loop_trans.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:50 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2002-09-06 22:34:54 $
+// $Author: open64 $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_loop_trans.cxx,v $
 //
 // ====================================================================
@@ -91,7 +91,11 @@
 #include "opt_transform.h"
 #include "opt_main.h"
 
+#if 0 // FIXME
 #include <stack.h>
+#else
+#include <queue>
+#endif
 
 static bool check_hazardous_op(BB_NODE *bb)
 {

@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_sym.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:51 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2002-09-06 22:34:54 $
+// $Author: open64 $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_sym.cxx,v $
 //
 // ====================================================================
@@ -3450,19 +3450,34 @@ struct transfer_attributes_as_needed {
 	Expand_ST_into_base_and_ofst(st, 0, &base, &offset);
 	if (base != st) {
 	  // See if anyone local to our PU cares about this base...
+#if 0 // WTF is this, how did it ever compile?
 	  const ST **var_base_pos = find(nested_ref_bases.begin(),
 					 nested_ref_bases.end(), 
 					 base);
+#else
+	  vector<const ST *>::iterator var_base_pos =
+                                         find(nested_ref_bases.begin(),
+					 nested_ref_bases.end(), 
+					 base);
+#endif
+
 	  if (var_base_pos != nested_ref_bases.end()) {
 	    // Someone in the PU referred to this base and might need a
 	    // status update. See if any of the references to this base
 	    // from the PU overlap with the current symbol.
 	    INT var_base_index = (var_base_pos -
 				  nested_ref_bases.begin());
+#if 0 // WTF is this, how did it ever compile?
 	    const NEST_REF_CAND *first_nrc =
 	      nest_ref_cands[var_base_index].begin();
 	    const NEST_REF_CAND *last_nrc =
 	      nest_ref_cands[var_base_index].end();
+#else
+            vector<NEST_REF_CAND>::iterator first_nrc = 
+	      nest_ref_cands[var_base_index].begin();
+            vector<NEST_REF_CAND>::iterator last_nrc = 
+	      nest_ref_cands[var_base_index].end();
+#endif
 	    while (first_nrc != last_nrc) {
 	      if (Overlap(offset, TY_size(ST_type(st)),
 			  first_nrc->offset, first_nrc->size)) {
@@ -3527,9 +3542,16 @@ OPT_STAB::Collect_nested_ref_info(void)
 
       /* Not const */ ST_TAB *my_symtab = Find_symtab_of(var_base);
 
+#if 0 // Another WTF
       const ST **var_base_pos = find(nested_ref_bases.begin(),
 				     nested_ref_bases.end(),
 				     var_base);
+#else
+     vector<const ST *>::iterator var_base_pos =
+                                     find(nested_ref_bases.begin(),
+				     nested_ref_bases.end(),
+				     var_base);
+#endif
       INT var_base_index = var_base_pos - nested_ref_bases.begin();
 
       if (var_base_pos ==
@@ -3564,7 +3586,11 @@ OPT_STAB::Collect_nested_ref_info(void)
     }
   }
 
+#if 0 // WTF is this?
   /* Not const */ ST_TAB **symtab;
+#else
+  vector <ST_TAB *>::iterator symtab;
+#endif
 
   for (symtab = symtabs.begin();
        symtab != symtabs.end();

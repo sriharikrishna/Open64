@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_cfg_trans.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:47 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2002-09-06 22:34:54 $
+// $Author: open64 $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_cfg_trans.cxx,v $
 //
 // ====================================================================
@@ -195,7 +195,11 @@ reconstruct_CFG(successor_graph& g, CFG *cfg, bool trace)
 {
   if (trace) {
     fprintf(TFile, "edges: \n");
+#if 0 // FIXME
     for (successor_graph::iterator e = g.begin(); e != g.end(); ++e)
+#else
+    for (successor_graph::iterator e = g.begin(); !(e == g.end()); ++e)
+#endif
       fprintf(TFile, "(%d,%d)%c ",
 	      first(*e), second(*e), (*e).must_fall_thru?'y':'n');
     fprintf(TFile,"\n");
@@ -207,7 +211,11 @@ reconstruct_CFG(successor_graph& g, CFG *cfg, bool trace)
     vector<pair<edge,edge> > out_buffer;
     successor_graph::cluster_id next_cluster_id = g.size();
     for (successor_graph::iterator ep = g.begin(); 
+#if 0 // FIXME
 	 ep != g.end(); 
+#else
+	 !(ep == g.end()); 
+#endif
 	 ++ep) {
       if ((*ep).must_fall_thru) {
 	if (was_fall_thru_target[second(*ep)]) {
@@ -255,7 +263,11 @@ reconstruct_CFG(successor_graph& g, CFG *cfg, bool trace)
       fprintf(TFile, "\n");
       
       fprintf(TFile, "edges: \n");
+#if 0 // FIXME
       for (successor_graph::iterator e = g.begin(); e != g.end(); ++e)
+#else
+      for (successor_graph::iterator e = g.begin(); !(e == g.end()); ++e)
+#endif
 	fprintf(TFile, "(%d,%d)%c ",
 		first(*e), second(*e), (*e).must_fall_thru ? 'y' : 'n');
       fprintf(TFile,"\n");
@@ -370,7 +382,11 @@ reconstruct_CFG(successor_graph& g, CFG *cfg, bool trace)
 
   // Create bb->Succ() and bb->Pred().
   for (successor_graph::iterator e = g.begin(); 
+#if 0 // FIXME
        e != g.end(); 
+#else
+       !(e == g.end()); 
+#endif
        ++e) {
     BB_NODE *bb1 = cfg->Get_bb(first(*e));
     BB_NODE *bb2 = cfg->Get_bb(second(*e));
@@ -1136,7 +1152,11 @@ CFG_transformation(COMP_UNIT *cu, bool do_butterfly, bool trace, bool display)
     fprintf(TFile, "Successor graph:\n");
     print_nodes(g, TFile);
     fprintf(TFile, "edges: \n");
+#if 0 // FIXME
     for (successor_graph::iterator e = g.begin(); e != g.end(); ++e)
+#else
+    for (successor_graph::iterator e = g.begin(); !(e == g.end()); ++e)
+#endif
       fprintf(TFile, "(%d,%d)%c ",
 	      first(*e), second(*e), (*e).must_fall_thru?'y':'n');
     fprintf(TFile,"\n");

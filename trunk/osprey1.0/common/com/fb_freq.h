@@ -38,9 +38,9 @@
 // ====================================================================
 //
 // Module: fb_freq.h
-// $Revision: 1.2 $
-// $Date: 2002-07-12 16:48:31 $
-// $Author: fzhao $
+// $Revision: 1.3 $
+// $Date: 2002-09-06 22:34:55 $
+// $Author: open64 $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/fb_freq.h,v $
 //
 // Description:
@@ -363,6 +363,10 @@ public:
 
   friend bool operator< ( const FB_FREQ freq1, const FB_FREQ freq2 ) {
     return ( freq1._value < freq2._value );
+  }
+
+  friend bool operator<= ( const FB_FREQ freq1, const FB_FREQ freq2 ) {
+    return ( (freq1._value < freq2._value) || (freq1 == freq2) );
   }
 
   // Printing methods
