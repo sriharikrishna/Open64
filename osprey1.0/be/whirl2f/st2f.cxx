@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.28 $
- * $Date: 2004-01-06 19:07:07 $
+ * $Revision: 1.29 $
+ * $Date: 2004-01-12 21:13:43 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.28 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.29 $";
 #endif
 
 #include <ctype.h>
@@ -726,7 +726,7 @@ ST2F_decl_translate(TOKEN_BUFFER tokens, const ST *st)
 } 
 
 static void
-collectst(WN *wn,PARMSET &tempset)
+collectst(WN *wn,PARMSET &tempset,INT32 parms_num)
  {
 
    if (!wn) return;
@@ -735,13 +735,13 @@ collectst(WN *wn,PARMSET &tempset)
        WN_opc_operator(wn) == OPR_LDA)
       tempset.insert(WN_st_idx(wn));
    else
-     for (INT32 kidnum = 0; kidnum < WN_kid_count(wn); kidnum++)
-       collectst(WN_kid(wn, kidnum),tempset);
+     for (INT32 kidnum = 0; kidnum < parms_num; kidnum++)
+       collectst(WN_kid(wn, kidnum),tempset,parms_num);
    return;
  }
 
 
-static void GetStSet(ST_IDX bnd,PARMSET &tempset)
+static void GetStSet(ST_IDX bnd,PARMSET &tempset,INT32 parms_num)
 {
    WN * stmt;
    WN *first_stmt = WN_first(PU_Body);
@@ -755,7 +755,7 @@ static void GetStSet(ST_IDX bnd,PARMSET &tempset)
        stmt = WN_next(stmt);
 
   if (stmt && WN_kid(stmt,0))
-     collectst(WN_kid(stmt,0),tempset);
+     collectst(WN_kid(stmt,0),tempset,parms_num);
 }
 
 void ReorderParms(ST **parms,INT32 num_params)
@@ -794,10 +794,10 @@ void ReorderParms(ST **parms,INT32 num_params)
                      ;
              else {
               workset.insert(i);
-              if (!ARB_const_lbnd(arb)){
+              if (!ARB_const_lbnd(arb) && !ARB_empty_lbnd(arb)){
                  bdindex = ARB_lbnd_var(arb);
                  if (ST_is_temp_var(St_Table[bdindex])){
-                     GetStSet(bdindex,tempst);
+                     GetStSet(bdindex,tempst,num_params);
                      runner = tempst.begin();
                      while (runner != tempst.end()){
                      if (st_idx_to_parms[*runner]!=i)
@@ -807,10 +807,10 @@ void ReorderParms(ST **parms,INT32 num_params)
                   }
                  }
 
-              if (!ARB_const_ubnd(arb)){
+              if (!ARB_const_ubnd(arb) && !ARB_empty_ubnd(arb)){
                  bdindex = ARB_ubnd_var(arb);
                  if (ST_is_temp_var(St_Table[bdindex])){
-                     GetStSet(bdindex,tempst);
+                     GetStSet(bdindex,tempst,num_params);
                      runner = tempst.begin();
                      while (runner != tempst.end()){
                      if (st_idx_to_parms[*runner]!=i)
@@ -827,7 +827,7 @@ void ReorderParms(ST **parms,INT32 num_params)
   INT32 keep = 0;
 
   for (i = 0; i<num_params; i++){
-   if (dependset[i].begin()==dependset[i].end()){
+   if (dependset[i].empty()){
      workset.erase(i);
      reorder_parms[keep] = parms[i];
      keep++;
@@ -838,9 +838,9 @@ void ReorderParms(ST **parms,INT32 num_params)
   }
 
   PARMSET::iterator cleaner;
+  vector<int> elems;
  
-  INT32 size = workset.size()+1;
-  while (!workset.empty() && size )
+  if (!workset.empty())
    {
     runner = workset.begin();
     while (runner != workset.end()) {
@@ -852,12 +852,18 @@ void ReorderParms(ST **parms,INT32 num_params)
            dependset[*cleaner].erase(*runner);
            ++cleaner;
         }
-       workset.erase(*runner);
+         elems.push_back(*runner);
      }
      ++runner;
    }
-  size--;
  }
+
+ while (!elems.empty())
+  {
+    INT32 i = elems.back();
+    workset.erase(i);
+    elems.pop_back();
+  }
 
 //tempory for interface has temp variable but there is no assginment
 // statement kept in the interface block  
@@ -872,7 +878,6 @@ void ReorderParms(ST **parms,INT32 num_params)
 
   for(INT32 k=0; k<num_params; k++)
       parms[k] = reorder_parms[k];
-
   return;
 }
 
