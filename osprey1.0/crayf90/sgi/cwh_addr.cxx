@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.7 $
- * $Date: 2002-10-11 17:28:20 $
+ * $Revision: 1.8 $
+ * $Date: 2002-10-31 22:52:22 $
  * $Author: open64 $
  *
  * Revision history:
@@ -2100,8 +2100,10 @@ cwh_addr_store_WN(WN * lhs, OFFSET_64 off, TY_IDX dty, WN * rhs)
 
   default:
     DevAssert((0),("Odd WN store"));
+    wn = NULL;
+    break;
   }
-
+if (wn!=NULL) //fzhao Oct
   cwh_block_append(wn) ;
 } 
 
