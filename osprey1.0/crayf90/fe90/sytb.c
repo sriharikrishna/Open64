@@ -3979,7 +3979,7 @@ size_offset_type	stor_bit_size_of(int		 attr_idx,
                }
                else {
                   constant.fld	= CN_Tbl_Idx;
-                  constant.idx	= CN_INTEGER_ZERO_IDX;
+                  constant.idx  =CN_INTEGER_TWO_IDX;  
                }
             }
 
