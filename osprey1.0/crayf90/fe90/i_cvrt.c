@@ -6533,8 +6533,9 @@ CONTINUE_CO:
               else {
                if (BD_ARRAY_CLASS(bound_idx)!= Deferred_Shape &&  
                    BD_ARRAY_CLASS(bound_idx)!= Deferred_Shape1)
-                 cvrt_exp_to_pdg(BD_XT_IDX(bound_idx, dim),
-                                 BD_XT_FLD(bound_idx, dim));
+                 if (BD_XT_IDX(bound_idx, dim))
+                      cvrt_exp_to_pdg(BD_XT_IDX(bound_idx, dim),
+                                    BD_XT_FLD(bound_idx, dim));
                  else fei_implicit_expr();
               }
 
@@ -11390,7 +11391,11 @@ static TYPE get_type_desc(int	input_idx)
          }
 	 else {
          if (BD_XT_FLD(bd_idx, i) == CN_Tbl_Idx) {
-            extent = CN_INT_TO_C(BD_XT_IDX(bd_idx, i));
+           if (BD_XT_IDX(bd_idx,i))
+                 extent = CN_INT_TO_C(BD_XT_IDX(bd_idx, i));
+           else
+                 extent = BD_XT_IDX(bd_idx,i); 
+
             xt_vble = FALSE;
             span = extent * span;
          }
