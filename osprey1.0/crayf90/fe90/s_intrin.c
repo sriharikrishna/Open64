@@ -5366,7 +5366,7 @@ void    index_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = type_idx;
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 
+/* fzhao Jan  # if 0  */
 
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
@@ -5452,7 +5452,7 @@ void    index_intrinsic(opnd_type     *result_opnd,
       }
    }
 
-# endif
+/* fzhao Jan # endif */
          res_exp_desc->foldable = FALSE;
          res_exp_desc->will_fold_later = FALSE;
 
@@ -14084,6 +14084,7 @@ void    size_intrinsic(opnd_type     *result_opnd,
       }
 
       if (IL_FLD(list_idx2) == CN_Tbl_Idx) { /* DIM is a constant */
+
 goto EXIT; /* FEb */
 
          dim = (long) CN_INT_TO_C(IL_IDX(list_idx2));
@@ -14162,7 +14163,9 @@ goto EXIT; /* FEb */
             IL_FLD(idx2) = CN_Tbl_Idx;
             IL_LINE_NUM(idx2) = IR_LINE_NUM(ir_idx);
             IL_COL_NUM(idx2)  = IR_COL_NUM(ir_idx);
+
    goto EXIT;  /* Feb */
+
             ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
             IR_OPR(ir_idx) = Max_Opr;
 
@@ -14188,6 +14191,7 @@ goto EXIT; /* FEb */
       }
       else {
          /* dim is present, but not constant */
+
      goto EXIT; /* Feb */
 
          COPY_OPND(opnd, IL_OPND(list_idx2));
