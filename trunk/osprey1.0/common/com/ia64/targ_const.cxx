@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: targ_const.c
- * $Revision: 1.3 $
- * $Date: 2003-09-22 19:41:05 $
+ * $Revision: 1.4 $
+ * $Date: 2003-11-04 16:12:49 $
  *
  * Revision history:
  *  12-Jun-91 - Original Version
@@ -77,11 +77,6 @@
  * ====================================================================
  */
 
-/* Solaris workaround
- * Solaris standard C library does not have the following definitions 
- * of "float" version of mathmathic functions.
- */
-
 #define USE_STANDARD_TYPES 1
 #include <limits.h>
 #include <fp_class.h>
@@ -104,61 +99,36 @@
 #include "quadsim.h"
 
 #include <math.h>
+#include "x_math.h" // for hypot()
 
+
+/* Solaris workaround: The Solaris standard C library does not have
+ * "float" version of mathematic functions even though they are
+ * now in C99.
+ */
 #ifdef _SOLARIS_SOLARIS
+inline float sinf(float a) { return (float)sin(a); }
+inline float cosf(float a) { return (float)cos(a); }
+inline float tanf(float a) { return (float)tan(a); }
 
-float sinf(float a) { 
-  return (float)sin(a); }   
+inline float asinf(float a) { return (float)asin(a); }
+inline float acosf(float a) { return (float)acos(a); }
+inline float atanf(float a) { return (float)atan(a); }
+inline float atan2f(float a, float b) { return (float)atan2(a, b); }
 
-float cosf(float a) { 
-  return (float)cos(a); } 
+inline float sinhf(float a) { return (float)sinh(a); }
+inline float coshf(float a) { return (float)cosh(a); }
+inline float tanhf(float a) { return (float)tanh(a); }
 
-float sqrtf(float a) { 
-  return (float)sqrt(a); }
-
-float hypotf(float a, float b) {
-  return (float)hypot(a, b); }
-
-float expf(float a) { 
-  return (float)exp(a); } 
-
-float logf(float a) { 
-  return (float)log(a); } 
-
-float log10f(float a) {
-  return (float)log10(a); }   
-
-float tanf(float a) { 
-  return (float)tan(a); } 
-
-float acosf(float a) {
-  return (float)acos(a); }  
-
-float asinf(float a) {
-  return (float)asin(a); }
-
-float atanf(float a) {    
-  return (float)atan(a); }
-
-float coshf(float a) {
-  return (float)cosh(a); }
-
-float sinhf(float a) {
-  return (float)sinh(a); }
-
-float tanhf(float a) {
-  return (float)tanh(a); }
-  
-float atan2f(float a, float b) {
-  return (float)atan2(a, b); }
-
-float fabsf(float a) {
-  return (float)fabs(a); }
-
+inline float sqrtf(float a) { return (float)sqrt(a); }
+inline float expf(float a) { return (float)exp(a); }
+inline float logf(float a) { return (float)log(a); }
+inline float log10f(float a) { return (float)log10(a); }
+inline float fabsf(float a) { return (float)fabs(a); }
 #endif
 
-/* For fp_class */
 
+/* For fp_class */
 #define DMANTWIDTH      52
 #define DEXPWIDTH       11
 #define DSIGNMASK       0x7fffffffffffffffll
@@ -191,11 +161,6 @@ float fabsf(float a) {
 #undef QUAD_PRECISION_SUPPORTED
 #endif
 
-/*
-extern double atof(const char *);
-extern double sqrt(double);
-extern INT32 atoi(const char *);
-*/
 
 /* This initailization must be static because it may be used
  * before first call to Targ_WhirlOp.  Also WARNING: It requires
@@ -331,7 +296,7 @@ static TCON complex_sqrt(TCON c0)
     case MTYPE_C4:
       fr = TCON_R4(c0);
       fi = TCON_IR4(c0);
-      if( (fmag = hypotf(fr, fi)) == 0.)
+      if( (fmag = c_hypotf(fr, fi)) == 0.)
 	TCON_R4(r) = TCON_IR4(r) = 0.;
       else if (fr > 0) {
 	 TCON_R4(r) = sqrtf(0.5 * (fmag + fr) );
@@ -346,7 +311,7 @@ static TCON complex_sqrt(TCON c0)
     case MTYPE_C8:
       dr = TCON_R8(c0);
       di = TCON_IR8(c0);
-      if( (dmag = hypot(dr, di)) == 0.)
+      if( (dmag = c_hypot(dr, di)) == 0.)
 	TCON_R8(r) = TCON_IR8(r) = 0.;
       else if (dr > 0) {
 	 TCON_R8(r) = sqrt(0.5 * (dmag + dr) );

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: config_targ.c
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:43 $
- * $Author: jle $
+ * $Revision: 1.4 $
+ * $Date: 2003-11-04 16:12:49 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_targ.cxx,v $
  *
  *
@@ -58,6 +58,8 @@
  * ====================================================================
  * ====================================================================
  */
+
+#include "x_string.h" // for strcasecmp()
 
 #include "defs.h"
 #include "config.h"
@@ -383,7 +385,7 @@ Prepare_Target ( void )
   if ( ISA_Name != NULL ) {
     TARGET_ISA isa;
 
-    if ( strcasecmp ( ISA_Name, "intel1" ) == 0 ) {
+    if ( ux_strcasecmp ( ISA_Name, "intel1" ) == 0 ) {
       isa = TARGET_ISA_I1;
       targ_default = TARGET_ITANIUM;
     } else
@@ -412,7 +414,7 @@ Prepare_Target ( void )
   if ( Processor_Name != NULL ) {
     TARGET_PROCESSOR targ;
 
-    if ( strcasecmp ( Processor_Name, "itanium" ) == 0 ) {
+    if ( ux_strcasecmp ( Processor_Name, "itanium" ) == 0 ) {
       targ = TARGET_ITANIUM;
     } else {
       ErrMsg ( EC_Inv_TARG, "processor", Processor_Name );

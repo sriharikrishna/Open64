@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_dst.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:08 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-11-04 16:12:49 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 static char *source_file = __FILE__;
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -72,6 +72,9 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include <limits.h>
 #include <sys/stat.h>  
 #include <unistd.h>    
+
+#include "x_stdio.h" // for fileno()
+#include "x_string.h" // for strdup()
 
 #include "defs.h"
 #include "glob.h"
@@ -408,7 +411,7 @@ cwh_dst_mk_func(ST * st)
     n = strlen(r);
 
     if (r[n-1] == '_') {
-      l = strdup(r);
+      l = ux_strdup(r);
       l[n-1] = '\0';
       r = l ;
     }
@@ -2065,7 +2068,7 @@ DST_directory_of(char *file_path, char **dir_name, UINT32 *dir_length)
 {
    char *dir;
 
-   *dir_name = strdup(file_path);
+   *dir_name = ux_strdup(file_path);
    dir= strrchr(*dir_name,'/')  ;
 
    *dir = '\0';
@@ -2173,7 +2176,7 @@ cwh_dst_get_command_line_options(void)
       FILE *cmdfile;
 
       if ((cmdfile = fopen(FE_command_line, "r")) != NULL) {
-	  if (fstat(fileno(cmdfile), &statb) == 0) {
+	  if (fstat(ux_fileno(cmdfile), &statb) == 0) {
 	      char *endcp;
 	  
 	      /* allocate a buffer as big as the file: this is safe and fast */

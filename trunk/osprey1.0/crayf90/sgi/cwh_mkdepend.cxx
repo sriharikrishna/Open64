@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_pdgcs
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:09 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-11-04 16:12:49 $
+ * $Author: eraxxon $
  * $Source: 
  *
  * Revision history:
@@ -59,10 +59,12 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_mkdepend.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_mkdepend.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
+
+#include "x_string.h" // for strdup()
 
 /* sgi includes */
 
@@ -131,7 +133,7 @@ fei_next_name(INT32 num)
 extern void
 cwh_mkdepend_add_name(INT32 idx, char * name)
 {
-   SET_TABLE_IDX(name_table, idx, strdup(name));
+   SET_TABLE_IDX(name_table, idx, ux_strdup(name));
 }
 
 
@@ -146,7 +148,7 @@ cwh_add_to_used_files_table(char * name, INT duplicate)
    /* add it to the used files table */
    i = cwh_next_table_entry(&used_files_table);
    if (duplicate) {
-      t = strdup(name);
+      t = ux_strdup(name);
    } else {
       t = name;
    }

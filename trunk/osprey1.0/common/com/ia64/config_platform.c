@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: config_platform.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:03 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-11-04 16:12:49 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_platform.c,v $
  *
  * Revision history:
@@ -65,10 +65,10 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_platform.c,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_platform.c,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
-#include <string.h>
+#include "x_string.h" /* for strcasecmp() */
 #include "config_platform.h"
 
 PLATFORM Platform = IP0;	/* Target platform */
@@ -96,7 +96,7 @@ Get_Platform_Options ( char *name )
 
   /* Find matching entry in table: */
   for ( ix=1; PF_Opts[ix].id != IP_END; ix++ ) {
-    if ( strcasecmp ( name, PF_Opts[ix].name ) == 0 ) {
+    if ( ux_strcasecmp ( name, PF_Opts[ix].name ) == 0 ) {
       return &PF_Opts[ix];
     }
   }
