@@ -83,7 +83,7 @@
 /* #undef ssize_t */
 
 /* Define if cpp should also search $prefix/include.  */
-#define PREFIX_INCLUDE_DIR "/users/fzhao/gcc-try/gcc331/include"
+#define PREFIX_INCLUDE_DIR "/users/fzhao/gcc/gcc331/include"
 
 /* Define if you have the __argz_count function.  */
 #define HAVE___ARGZ_COUNT 1
@@ -308,8 +308,8 @@
 #define SIZEOF_INT 4
 
 /* The number of bytes in type long */
-/* FMZH #define SIZEOF_LONG 8 */
-#define SIZEOF_LONG 4
+/* #define SIZEOF_LONG 8 */
+#define SIZEOF_LONG 4 
 
 /* The number of bytes in type long long */
 #define SIZEOF_LONG_LONG 8

@@ -91,8 +91,14 @@ typedef		 int DItype	__attribute__ ((mode (DI)));
 typedef unsigned int UDItype	__attribute__ ((mode (DI)));
 #if MIN_UNITS_PER_WORD > 4
 /* These typedefs are usually forbidden on archs with UNITS_PER_WORD 4 */
+
+#if 0  /* FMZH*/
 typedef		 int TItype	__attribute__ ((mode (TI)));
 typedef unsigned int UTItype	__attribute__ ((mode (TI)));
+#endif
+typedef		 int TItype	__attribute__ ((mode (DI)));
+typedef unsigned int UTItype	__attribute__ ((mode (DI)));
+
 #endif
 #endif
 #endif
@@ -100,13 +106,15 @@ typedef unsigned int UTItype	__attribute__ ((mode (TI)));
 #if BITS_PER_UNIT == 8
 
 typedef 	float SFtype	__attribute__ ((mode (SF)));
+
 typedef		float DFtype	__attribute__ ((mode (DF)));
 
 #if LIBGCC2_LONG_DOUBLE_TYPE_SIZE == 96
 typedef		float XFtype	__attribute__ ((mode (XF)));
 #endif
 #if LIBGCC2_LONG_DOUBLE_TYPE_SIZE == 128
-typedef		float TFtype	__attribute__ ((mode (TF)));
+/*FMZH typedef		float TFtype	__attribute__ ((mode (TF)));*/
+typedef		float TFtype	__attribute__ ((mode (XF)));
 #endif
 
 #else /* BITS_PER_UNIT != 8 */

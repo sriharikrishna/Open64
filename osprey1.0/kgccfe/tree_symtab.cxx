@@ -151,6 +151,7 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 	tree type_size = TYPE_SIZE(type_tree);
 
 	UINT align = TYPE_ALIGN(type_tree) / BITSPERBYTE;
+
 	if (TREE_CODE(type_tree) == VOID_TYPE)
 		tsize = 0;
 	else
@@ -237,6 +238,7 @@ Create_TY_For_Tree (tree type_tree, TY_IDX idx)
 #endif /* TARG_MIPS */
 #ifdef TARG_IA64
 		case 12: mtype = MTYPE_F10; break;
+		case 16: mtype = MTYPE_FQ; break; //FMZH add
 #endif /* TARG_IA64 */
 #if defined(TARG_IA32) || defined(TARG_X8664)
 		case 12: mtype = MTYPE_FQ; break;
