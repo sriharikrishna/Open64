@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.9 $
- * $Date: 2002-09-18 17:53:20 $
+ * $Revision: 1.10 $
+ * $Date: 2002-09-20 08:47:42 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.10 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -2024,6 +2024,9 @@ cwh_stab_enter_hosted(ST * st)
  * as the ST for ld to resolve the executable from 
  * main_/crt0 but require the program name as a 
  * debuggable name.
+ * 
+ * clovis@par.univie.ac.at -> removed the name change
+ * in main program
  *
  * This builds the stem, and tacks it into the 
  * ST's AUXST. 
@@ -2043,10 +2046,10 @@ cwh_stab_adjust_name(ST * st)
   PU& pu = Pu_Table[ST_pu(st)];
   if (PU_is_mainpu(pu)) {
 
-    Set_ST_name(st, Save_Str(def_main_u));
+    //Set_ST_name(st, Save_Str(def_main_u));
 
-    if (!strcmp(crayf90_def_main,s)) 
-      s = def_main ;
+    //if (!strcmp(crayf90_def_main,s)) 
+    //  s = def_main ;
 
     n = strlen(s);
     p = (char *) malloc(n+1);
