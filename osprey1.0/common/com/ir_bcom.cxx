@@ -411,7 +411,7 @@ struct WRITE_TABLE_OP
 
 
 template <class TABLE>
-static Elf64_Word
+Elf64_Word
 write_table (TABLE& fld, off_t base_offset,
 	     Output_File *fl)
 {
