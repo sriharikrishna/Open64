@@ -1,4 +1,4 @@
-$Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/README.Open64,v 1.2 2004-11-23 20:41:58 eraxxon Exp $
+$Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/README.Open64,v 1.3 2004-12-01 16:18:09 eraxxon Exp $
 
 =============================================================================
 ==
@@ -82,7 +82,7 @@ The rest of these instructions are relative to your target directory.
   select compiler (BUILD_COMPILER is GNU or VENDOR)
 
 3. Compile by running 'make' within the target directory.  Or, you can
-individual compile components:
+compile individual components:
 
   F90 front end (mfef90):
     cd crayf90/sgi && make
@@ -144,5 +144,5 @@ Here is a list of some important documentation:
     (i.e. while it does not contain some new details, it does not
     generally mislead).
  
-See our webpage for information on the OPEN64 mailing list.
+See our web site for information on the OPEN64 mailing list.
 
