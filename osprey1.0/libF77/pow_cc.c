@@ -40,14 +40,11 @@
 #include "moremath.h"
 
 /* 
- * SGI (mapy) workaround
- * sincosf(), as well as sincos(), are GNU extension. For portability,
- * define them in situ. (sincos() is defined in pow_zz.c).
- * 
- * Solaris porting
+ * Because sincosf() and sincos() are GNU extensions, we want to avoid
+ * namespace confliict when using a GNU compiler.
+ * (sincos() is defined in pow_zz.c).
  */
-static void sincosf(float, float *, float *);
-static void sincosf(float x, float *sinfx, float *cosfx)
+static void my_sincosf(float x, float *sinfx, float *cosfx)
 {
    *sinfx = sinf(x);
    *cosfx = cosf(x);
@@ -65,7 +62,7 @@ complex __powcc(float areal, float aimag, float breal, float bimag)
   x = expf(logr*breal-logi*bimag);
   y = logr*bimag+logi*breal;
 
-  sincosf(y, &sinx, &cosx);
+  my_sincosf(y, &sinx, &cosx);
   r.real = x*cosx;
   r.imag = x*sinx;
 

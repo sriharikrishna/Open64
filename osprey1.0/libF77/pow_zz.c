@@ -41,14 +41,11 @@
 #include "moremath.h"
 
 /* 
- * SGI (mapy) workaround
- * sincosf(), as well as sincos(), are GNU extension. For portability,
- * define them in situ. (sincosf() is defined in pow_cc.c).
- * 
- * Solaris porting
+ * Because sincosf() and sincos() are GNU extensions, we want to avoid
+ * namespace confliict when using a GNU compiler.
+ * (sincosf() is defined in pow_cc.c).
  */
-static void sincos(double, double *, double *);
-static void sincos(double x, double *sinx, double *cosx)
+static void my_sincos(double x, double *sinx, double *cosx)
 {
    *sinx = sin(x);
    *cosx = cos(x);
@@ -66,7 +63,7 @@ dcomplex __powzz(double_t adreal, double_t adimag, double_t bdreal, double_t bdi
   x = exp(logr*bdreal-logi*bdimag);
   y = logr*bdimag+logi*bdreal;
 
-  sincos(y, &sinx, &cosx);
+  my_sincos(y, &sinx, &cosx);
   r.dreal = x*cosx;
   r.dimag = x*sinx;
 
