@@ -85,8 +85,8 @@ HOSTDEFS += -Dsgi
 HOSTDEFS += -Dlonglong
 # need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
 HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
-# need to define BUILD_WHIRL2C to get appropriate code from common sources
-HOSTDEFS += -DBACKEND -DMONGOOSE_BE -DBUILD_WHIRL2C
+# need to define BUILD_WNPREFETCH to get appropriate code from common sources
+HOSTDEFS += -DMONGOOSE_BE -DBUILD_WN_PREFETCH
 
 ifeq ($(BUILD_OPTIMIZE), DEBUG)
 HOSTDEFS += -DIs_True_On

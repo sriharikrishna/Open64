@@ -85,8 +85,8 @@ HOSTDEFS += -Dsgi
 HOSTDEFS += -Dlonglong
 # need to define _LONGLONG and _SVR4_SOURCE to allow compilation with -ansi.
 HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
-# need to define BUILD_WHIRL2F to get appropriate code from common sources
-HOSTDEFS += -DMONGOOSE_BE -DBUILD_WHIRL2F -D_LIBELF_XTND_64
+# need to define BUILD_WNPREFETCH to get appropriate code from common sources
+HOSTDEFS += -DMONGOOSE_BE -D_LIBELF_XTND_64
 
 ifeq ($(BUILD_VARIANT), DEBUG)
 HOSTDEFS += -DIs_True_On
@@ -301,7 +301,7 @@ endif
 
 ifeq ($(BUILD_OS), SOLARIS)
 CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_SVR4_SOURCE \
-	-DMONGOOSE_BE -DBUILD_WHIRL2F -D_LIBELF_XTND_64 $(LCINCS) $(OPTIMIZER)
+	-DMONGOOSE_BE -DBUILD_WNPREFETCH -D_LIBELF_XTND_64 $(LCINCS) $(OPTIMIZER)
  ifeq ($(BUILD_COMPILER), VENDOR)
  ifeq ($(BUILD_SB), YES)
  CFLAGS += -xsb
