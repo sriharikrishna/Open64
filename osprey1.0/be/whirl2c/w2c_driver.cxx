@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2c_driver.c
- * $Revision: 1.4 $
- * $Date: 2003-02-25 21:12:35 $
- * $Author: jle $
+ * $Revision: 1.5 $
+ * $Date: 2003-06-12 15:27:49 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -81,6 +81,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "tcon2c.h"
 #include "wn2c.h"
 #include "w2c_driver.h"
+#include "unparse_target_c.h"
 
 #include <string>
 #include <stdio.h>
@@ -176,6 +177,7 @@ BOOL          W2C_Prompf_Emission = FALSE; /* Emitting prompf xformed sources */
 const WN_MAP *W2C_Construct_Map = NULL;    /* Construct id mapping for prompf */
 WN_MAP        W2C_Frequency_Map = WN_MAP_UNDEFINED; /* Frequency mapping */
 BOOL          W2C_Cplus_Initializer = FALSE; /* Whether to call C++ init */
+Unparse_Target *W2X_Unparse_Target = NULL;
 
 
 /* ====================================================================
@@ -698,6 +700,7 @@ W2C_Init(void)
     * unchanged (note that a w2c invented name-suffix is added to 
     * disambiguate names).
     */
+   W2X_Unparse_Target = new Unparse_Target_C;
    Stab_initialize_flags();
    W2CF_Symtab_Push();
    W2C_Enter_Global_Symbols();
