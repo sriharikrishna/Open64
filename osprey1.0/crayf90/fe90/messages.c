@@ -37,6 +37,7 @@
 static char USMID[] = "\n@(#)5.0_pl/sources/messages.c	5.9	10/14/99 14:08:59\n";
 
 # include <stdarg.h>
+# include <stdlib.h> /* for putenv() */
 
 # include "defines.h"		/* Machine dependent ifdefs */
 
