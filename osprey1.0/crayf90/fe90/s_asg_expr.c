@@ -2984,7 +2984,7 @@ boolean  gen_whole_substring (opnd_type *opnd,
       }
    }
 
-   add_substring_length(sub_idx);
+   add_substring_length(sub_idx); 
 
    IR_ARRAY_SYNTAX(sub_idx) = FALSE;
 

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.6 $
- * $Date: 2002-08-22 15:48:38 $
+ * $Revision: 1.7 $
+ * $Date: 2002-08-23 21:58:49 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.7 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1611,8 +1611,11 @@ WN2F_arrsection(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
             */
        WN2F_translate(tokens, kid, context);
        reset_WN2F_CONTEXT_deref_addr(context);
-
-       WN2F_arrsection_bounds(tokens,wn,array_ty,context);
+    
+      if (ST_is_my_pointer(WN_st(kid)))
+            ;
+      else
+         WN2F_arrsection_bounds(tokens,wn,array_ty,context);
      }
    }
    return EMPTY_WN2F_STATUS;
@@ -2183,6 +2186,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 	WN2F_translate(tokens, base, context);
 	reset_WN2F_CONTEXT_deref_addr(context);
       }
+
  if (WN_operator(base) != OPR_CALL &&
      WN_operator(base) != OPR_LDA )
       WN2F_Substring(tokens, 
@@ -2190,6 +2194,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 		     lower_bnd,
 		     WN_Skip_Parm(length),
 		     context);
+
       return ;
    }
 } /* WN2F_String_Argument */

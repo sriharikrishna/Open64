@@ -2964,8 +2964,8 @@ boolean final_arg_work(opnd_type	*list_opnd,
             ATD_STOR_BLK_IDX(tmp_dv_idx) = SCP_SB_STACK_IDX(curr_scp_idx);
             AT_SEMANTICS_DONE(tmp_dv_idx) = TRUE;
             ATD_ARRAY_IDX(tmp_dv_idx) = ATD_ARRAY_IDX(dummy);
-/* March            ATD_POINTER(tmp_dv_idx) = TRUE; */
-/*            ATD_IM_A_DOPE(tmp_dv_idx) = TRUE; */
+            ATD_POINTER(tmp_dv_idx) = TRUE; 
+            ATD_IM_A_DOPE(tmp_dv_idx) = TRUE; 
 
             gen_opnd(&dv_opnd, 
                      tmp_dv_idx, 
@@ -3018,8 +3018,8 @@ boolean final_arg_work(opnd_type	*list_opnd,
             ATD_STOR_BLK_IDX(tmp_dv_idx) = SCP_SB_STACK_IDX(curr_scp_idx);
             AT_SEMANTICS_DONE(tmp_dv_idx) = TRUE;
             ATD_ARRAY_IDX(tmp_dv_idx) = NULL_IDX;
-/* March            ATD_POINTER(tmp_dv_idx) = TRUE; */
-/*            ATD_IM_A_DOPE(tmp_dv_idx) = TRUE; */
+            ATD_POINTER(tmp_dv_idx) = TRUE; 
+            ATD_IM_A_DOPE(tmp_dv_idx) = TRUE; 
 
             gen_opnd(&dv_opnd, 
                      tmp_dv_idx, 
@@ -4059,6 +4059,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
          case COPY_IN_MAKE_DV      :
 
             /* tmp_idx is the copy in tmp */
+# if 0
             COPY_OPND(opnd, IL_OPND(list_idx));
             tmp_idx = create_tmp_asg(&opnd,
                               (expr_arg_type *)&(arg_info_list[info_idx].ed), 
@@ -4066,6 +4067,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
                               Intent_In,
                               TRUE, 
                               FALSE);
+# endif
 
             if (! io_call &&
                 arg_info_list[info_idx].ed.rank != 0) {
@@ -4074,7 +4076,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
                PRINTMSG(line, 1438, Caution, col, "copy in");
             }
-
+# if 0
             /* tmp_dv_idx is the dope vector tmp */
 
             tmp_dv_idx = gen_compiler_tmp(line, col, Priv, TRUE);
@@ -4100,7 +4102,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
                ATD_ARRAY_IDX(tmp_dv_idx) = arg_info_list[info_idx].ed.rank;
             }
-/* March            ATD_IM_A_DOPE(tmp_dv_idx)    = TRUE; */
+            ATD_IM_A_DOPE(tmp_dv_idx)    = TRUE; 
 
             OPND_FLD(r_opnd) = AT_Tbl_Idx;
             OPND_IDX(r_opnd) = tmp_idx;
@@ -4133,6 +4135,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
             IR_COL_NUM_L(ir_idx)  = col;
 
             arg_info_list[info_idx].ed.dope_vector = TRUE;
+# endif
 
             break;
 
