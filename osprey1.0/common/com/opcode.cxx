@@ -37,8 +37,8 @@
 *** Implementation of external functions from opcode.h.
 **/
 
-/** $Revision: 1.3 $
-*** $Date: 2005-01-12 22:38:21 $
+/** $Revision: 1.4 $
+*** $Date: 2005-01-18 21:42:57 $
 *** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/opcode.cxx,v $
 **/
@@ -58,15 +58,15 @@
 const char *OPERATOR_name(OPERATOR opr)
 {
   using namespace ir_a2b;
-  return MapIntToString<OPERATOR_info_struct>(OPERATOR_info, 
-					      OPERATOR_LAST+1, (INT)opr);
+  return MapEnumToStr<OPERATOR_info_struct, OPERATOR_info, 
+                      OPERATOR_LAST+1>("OPERATOR_info", (INT)opr);
 }
 
 OPERATOR Name_To_OPERATOR(const char* nm)
 {
   using namespace ir_a2b;
-  return (OPERATOR)MapStringToInt<OPERATOR_info_struct, 
-                                  OPERATOR_info, OPERATOR_LAST+1>(nm);
+  return (OPERATOR)MapStrToEnum<OPERATOR_info_struct, OPERATOR_info, 
+                                OPERATOR_LAST+1>("OPERATOR_info", nm);
 }
 
 

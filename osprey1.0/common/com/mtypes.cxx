@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: mtypes.c
- * $Revision: 1.3 $
- * $Date: 2005-01-12 22:38:21 $
+ * $Revision: 1.4 $
+ * $Date: 2005-01-18 21:42:56 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/mtypes.cxx,v $
  *
@@ -66,13 +66,13 @@
 // mtypes.h is included in *many* C files (e.g. the gcc front-end,
 // libdwarf)
 
-struct MtypeToStr_t : public ir_a2b::i2s_tbl_entry_t {
+struct MtypeToStr_t : public ir_a2b::enum2str_tbl_entry_t {
   MtypeToStr_t(TYPE_ID id_ = 0, const char* name_ = 0) 
     : id(id_), name(name_) { }
   virtual ~MtypeToStr_t() { }
   
-  virtual INT getEnumVal()     { return id; }
-  virtual const char* getStr() { return name; }
+  virtual INT getEnumVal() const     { return id; }
+  virtual const char* getStr() const { return name; }
   
   TYPE_ID     id;   /* MTYPE_xxx */
   const char* name; /* name */
@@ -232,14 +232,16 @@ Mtype_Name (TYPE_ID tid)
 {
   // Do we need the BETYPE stuff?
   using namespace ir_a2b;
-  return MapIntToString<MtypeToStr_t>(MtypeToNameTbl, MTYPE_LAST+1, tid);
+  return MapEnumToStr<MtypeToStr_t, MtypeToNameTbl, 
+                      MTYPE_LAST+1>("MtypeToNameTbl", tid);
 }
 
 TYPE_ID
 Name_To_Mtype (const char* nm) 
 {
   using namespace ir_a2b;
-  return MapStringToInt<MtypeToStr_t, MtypeToNameTbl, MTYPE_LAST+1>(nm);
+  return MapStrToEnum<MtypeToStr_t, MtypeToNameTbl, 
+                      MTYPE_LAST+1>("MtypeToNameTbl", nm);
 }
 
 
