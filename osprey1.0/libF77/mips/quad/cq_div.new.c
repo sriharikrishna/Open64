@@ -46,7 +46,9 @@
 
 /* #include <sys/fpu.h>  -- replaced with ieeefp for a portable interface */
 
-#include "ieeefp.h"
+#if !defined(__alpha) /* FIXME: need a replacement for alpha-Tru64 */
+# include <ieeefp.h>
+#endif
 #include "quad.h"
 
   /* complex *32 division */
@@ -62,11 +64,19 @@
 
 qcomplex __cqdiv(long double xqreal, long double xqimag, long double yqreal, long double yqimag)
 {
+  qcomplex result;
+
+#if defined(__alpha) /* FIXME: need a replacement for alpha-Tru64 */
+
+  result.qreal = 0;
+  result.qimag = 0;
+
+#else
+
   long double tmp;
   unsigned int m, n;
   fp_except oldmask; 
   fp_except oldsticky;
-  qcomplex result;
 
   if ((xqreal != xqreal) || (xqimag != xqimag) ||
        (yqreal != yqreal) || (yqimag != yqimag)) {
@@ -134,6 +144,8 @@ qcomplex __cqdiv(long double xqreal, long double xqimag, long double yqreal, lon
 
   result.qreal = (xqreal + xqimag*tmp)/(yqreal + yqimag*tmp);
   result.qimag = (xqimag - xqreal*tmp)/(yqreal + yqimag*tmp);
+
+#endif /* __alpha */
 
   return result;
 }
