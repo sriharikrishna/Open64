@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: tcon2f.c
- * $Revision: 1.6 $
- * $Date: 2003-02-19 20:15:35 $
+ * $Revision: 1.7 $
+ * $Date: 2003-02-24 20:28:56 $
  *
  * Revision history:
  *  27-Apr-95 - Original Version
@@ -280,6 +280,7 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object
                              TCON2F_Append_String_Const(tokens, str,non_empty_length);
                              Append_Token_Special(tokens, ','); 
 	                   }
+                       }
 
                            non_empty_length=strlen-1;
                            while (str[non_empty_length]==' ')
@@ -287,7 +288,6 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object
                            ++non_empty_length;
                            str[non_empty_length] ='\0';
                            TCON2F_Append_String_Const(tokens, strbase,non_empty_length);
-                  }
  
            }
           else {
