@@ -934,7 +934,7 @@ void    sin_intrinsic(opnd_type     *result_opnd,
          break;
    }
 
-# if 0 /* March */
+# if 0 
 
    COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
    IR_OPND_R(ir_idx) = null_opnd;
