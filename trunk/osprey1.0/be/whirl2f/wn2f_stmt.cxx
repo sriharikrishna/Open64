@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.25 $
- * $Date: 2003-09-18 15:55:09 $
+ * $Revision: 1.26 $
+ * $Date: 2003-09-18 20:34:20 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.25 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.26 $";
 #endif
 
 #include <alloca.h>
@@ -1258,11 +1258,10 @@ public:
      char *stname = ST_name(st);
      BOOL variabledefinemodule = !strcmp(stbasename,scope_name);
 
-
-
        nomodulevar = !ST_is_in_module(st)||strcmp(stbasename,scope_name);
   
-     if (ST_class(st)==CLASS_TYPE) 
+     if (ST_class(st)==CLASS_TYPE &&
+            ST_is_in_module(st) )
         if (!TY_is_external(ST_type(st))){
             Append_F77_Indented_Newline(tokens,
                                         lines_between_decls, NULL/*label*/);
@@ -1273,8 +1272,6 @@ public:
         else
             return;
 
-int ffmm1=BE_ST_w2fc_referenced(st);
-int ffmm2 = ST_has_nested_ref(st); 
 
      if (!BE_ST_w2fc_referenced(st) && !ST_has_nested_ref(st)
             && !ST_is_in_module(st)   
@@ -1282,40 +1279,34 @@ int ffmm2 = ST_has_nested_ref(st);
             && ST_sclass(st)!= SCLASS_PSTATIC
             &&(nomodulevar 
                 || !strcmp(ST_name(st),stbasename))
-            && (ST_sclass(st) != SCLASS_EXTERN||
-                   symtab ==  GLOBAL_SYMTAB)) 
+            && ST_sclass(st) != SCLASS_EXTERN )
 	  return ;
+
 
      if (ST_sclass(st) == SCLASS_EXTERN &&
          symtab ==  GLOBAL_SYMTAB)
          return;
 
-     if (ST_is_in_module(st) && nomodulevar && !Stab_Is_Common_Block(stbase))
+     if (ST_sclass(st) == SCLASS_EXTERN &&
+          !BE_ST_w2fc_referenced(stbase) &&
+          !ST_is_in_module(st))
+             return;
+
+     if (ST_is_in_module(st) && 
+          nomodulevar && 
+          ST_sclass(st) != SCLASS_EXTERN &&
+           !Stab_Is_Common_Block(stbase))
           return;
 
-     if (ST_is_in_module(st)
-                  && !variabledefinemodule)
+     if (ST_is_in_module(st) &&
+         !variabledefinemodule &&
+          ST_sclass(st) != SCLASS_EXTERN)
           return;
      
       if (ST_sclass(st)==SCLASS_TEXT && variabledefinemodule) 
  /* don't redeclare recuresive function's type in this PU(recursive function PU */
           return;  
 
-#if 0
-     if (ST_sclass(stbase) == SCLASS_COMMON )
-          return;
-#endif
-
-#if 0
-     if(Stab_Is_Common_Block(stbase)) 
-       {
-         stcombase = ST_base(stbase);
-         stbasename = ST_name(stcombase);
-         if (strcmp(stbasename,scope_name))
-              return;
-        }
-# endif
-         
 
       if (ST_is_external(st))
          return;
@@ -1430,11 +1421,10 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
         WHIRL2F_Append_Comment(tokens,
                            "**** Global Variables ****", 1, 1);
   Append_And_Reclaim_Token_List(tokens, &decl_tokens);
-  Stab_Reset_Referenced_Flag(GLOBAL_SYMTAB);
 
   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(param_tokens)) {
       WHIRL2F_Append_Comment(tokens,
-                           "**** Parameters ****", 1, 1);
+                           "**** Parameters and Result ****", 1, 1);
 
      Append_And_Reclaim_Token_List(tokens, &param_tokens); //fzhao
    }
@@ -1442,6 +1432,7 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
   decl_tokens = New_Token_Buffer();
   WN2F_Append_Symtab_Vars(decl_tokens, symtab, 1/*Newlines*/);
   Stab_Reset_Referenced_Flag(symtab);
+  Stab_Reset_Referenced_Flag(GLOBAL_SYMTAB);
 
   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens)) 
         WHIRL2F_Append_Comment(tokens, 

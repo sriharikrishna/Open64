@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.20 $
- * $Date: 2003-09-18 17:41:17 $
+ * $Revision: 1.21 $
+ * $Date: 2003-09-18 20:34:20 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.21 $";
 #endif
 
 #include <ctype.h>
@@ -443,7 +443,6 @@ ST2F_decl_func(TOKEN_BUFFER tokens, ST *st)
    /* Specify whether or not the function is EXTERNAL */
 
    if ((ST_sclass(st) == SCLASS_EXTERN) &&
-       (!ST_is_in_module(st))           &&
       (strcmp(ST_name(st),"_ALLOCATE")!=0) &&
       (strcmp(ST_name(st),"_END")!=0) &&
       (strcmp(ST_name(st),"_DEALLOCATE") !=0)&&
