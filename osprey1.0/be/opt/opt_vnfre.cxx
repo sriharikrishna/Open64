@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_vnfre.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:52 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2002-09-06 22:34:55 $
+// $Author: open64 $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vnfre.cxx,v $
 //
 // ====================================================================
@@ -1872,7 +1872,11 @@ VALNUM_FRE::_ivc_coalesce(BB_NODE *loop_header, VN_IVC &vn_ivc)
 	 if (_tracing)
 	 {
 	    fprintf(TFile, "====> IVC for BB %d <====\n", loop_header->Id());
+#if 0 // FIXME
 	    for (memb_it = memb_it_start; memb_it != memb_it_end; ++memb_it)
+#else
+	    for (memb_it = memb_it_start; !(memb_it == memb_it_end); ++memb_it)
+#endif
 	       vn_ivc.print(*base_memb, *memb_it, TFile);
 	 }
 
@@ -1911,7 +1915,11 @@ VALNUM_FRE::_ivc_coalesce(BB_NODE *loop_header, VN_IVC &vn_ivc)
 	    CODEREP * const base_cr = temp_info.first;
 	    STMTREP * const base_stmt = temp_info.second;
 	    
+#if 0 // FIXME
 	    for (memb_it = memb_it_start; memb_it != memb_it_end; ++memb_it)
+#else
+	    for (memb_it = memb_it_start; !(memb_it == memb_it_end); ++memb_it)
+#endif
 	    {
 	       _ivc_substitute(loop_header,
 			       base_stmt,

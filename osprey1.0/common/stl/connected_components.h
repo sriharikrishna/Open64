@@ -38,7 +38,7 @@
 #define SGI_connected_components_h_INCLUDED
 
 #include "misc_extension.h"
-#include "stl_algobase.h"
+#include "algobase.h"
 
 namespace SGI {
 

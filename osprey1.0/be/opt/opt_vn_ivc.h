@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_vn_ivc.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:52 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2002-09-06 22:34:54 $
+// $Author: open64 $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn_ivc.h,v $
 //
 // ====================================================================
@@ -870,7 +870,11 @@ VN_IVC::finalize_for_coalescing(const EQCLASS_MEMBER    &base,
    VN_IVC::members_iterator memb;
    INT32                    hit_counter = 0;
 
+#if 0 // FIXME
    for (memb = memb_it_start; memb != memb_it_end; ++memb)
+#else
+   for (memb = memb_it_start; !(memb == memb_it_end); ++memb)
+#endif
    {
       const VN_VALNUM init_valnum = indvar_init_valnum(*memb);
       
@@ -1000,7 +1004,11 @@ VN_IVC_choose_eqclass_base_indvar(GET_NUM_OCCURS           get_num_occurs,
    // induction variable we want to retain for this equivalence class.
    // Also, set the number of worklist occurrences for each member.
    //
+#if 0 // FIXME
    for (memb_it = memb_it_start; memb_it != memb_it_end; ++memb_it)
+#else
+   for (memb_it = memb_it_start; !(memb_it == memb_it_end); ++memb_it)
+#endif
    {
       const INT32 num_occurs = get_num_occurs(vn_ivc.indvar_valnum(*memb_it));
 

@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_cfg_trans.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:47 $
+// $Revision: 1.2 $
+// $Date: 2002-09-06 22:34:54 $
 //
 // ====================================================================
 //
@@ -417,7 +417,11 @@ void find_reachable_vertex_set(Graph& g, Vertex_id v, vector<bool>& reachable)
 template <class Graph_in, class Graph_out>
 void subgraph(Graph_in& in, Graph_out& out, vector<bool>& vertex_set)
 {
+#if 0 // FIXME
   for (typename Graph_in::iterator e = in.begin(); e != in.end(); ++e)
+#else
+  for (typename Graph_in::iterator e = in.begin(); !(e == in.end()); ++e)
+#endif
     if (vertex_set[first(*e)] && vertex_set[second(*e)])
       add_edge(out, *e);
 }
@@ -481,7 +485,11 @@ template <class Graph>
 void print_edges(Graph& g, FILE *fp = stdout)
 {
   fprintf(fp, "edges: ");
+#if 0 // FIXME
   for (typename Graph::iterator e = g.begin(); e != g.end(); ++e)
+#else
+  for (typename Graph::iterator e = g.begin(); !(e == g.end()); ++e)
+#endif
     fprintf(fp, "(%d,%d) ", first(*e), second(*e));
   fprintf(fp, "\n");
 }
