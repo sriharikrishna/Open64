@@ -1082,8 +1082,7 @@ extern INTPTR fei_object          	  ( char  *name_string,
                                  	    INT32 node_2,
                                  	    INT32 line_num );
 
-extern INTPTR fei_derived_type_name       (char *name_string,
-                                           INT32 external);
+extern void fei_rename_list(char *name_string);
 
 extern INTPTR fei_array_dimen     	  ( INT32 flag_bits,
                                  	    INT64 low_bound,

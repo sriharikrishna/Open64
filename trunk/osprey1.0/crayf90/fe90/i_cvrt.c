@@ -9238,37 +9238,18 @@ CONTINUE:
 
     
    case Use_Opr:
+
         if (ATP_USE_LIST(IR_IDX_L(ir_idx)) != NULL_IDX) {
-             ro_idx = ATP_USE_LIST(IR_IDX_L(ir_idx));
-             while (ro_idx != NULL_IDX && 
-                              ATD_CLASS(RO_NAME_ATTR(ro_idx)) == Variable) {
-  /* Currently we only want to keep "Variable" in the rename list----fzhao */
-
-/*               PDG_AT_IDX(RO_NAME_ATTR(ro_idx)) = NULL_IDX; */ /* send anyway */
-               cvrt_exp_to_pdg(RO_NAME_ATTR(ro_idx),
-                               AT_Tbl_Idx);
-                   ++rename_only_num;
-               if (PDG_AT_IDX(RO_NAME_ATTR(ro_idx))!=NULL)
-                 {
-                 oldpdgatidx = PDG_AT_IDX(RO_NAME_ATTR(ro_idx));
-
-                 PDG_AT_IDX(RO_NAME_ATTR(ro_idx)) = NULL_IDX;  /* resend this attr */
-                 AT_NAME_IDX(RO_NAME_ATTR(ro_idx)) = 
-                              AT_ORIG_NAME_IDX(RO_NAME_ATTR(ro_idx));
-                 AT_NAME_LEN(RO_NAME_ATTR(ro_idx)) = 
-                              AT_ORIG_NAME_LEN(RO_NAME_ATTR(ro_idx));
-
-
-                  cvrt_exp_to_pdg(RO_NAME_ATTR(ro_idx),
-                                AT_Tbl_Idx);
-                  PDG_AT_IDX(RO_NAME_ATTR(ro_idx)) = oldpdgatidx; /*keep original PDG_AT_IDX*/
-                   }
-                   ++rename_only_num;
-                  ro_idx = RO_NEXT_IDX(ro_idx);
-         }
-       printf ("rename_only_num=%d\n",rename_only_num);
-
-   }
+           ro_idx = ATP_USE_LIST(IR_IDX_L(ir_idx));
+                        while (ro_idx != NULL_IDX) {
+                        fei_rename_list(&name_pool[AT_NAME_IDX(RO_NAME_ATTR(ro_idx))].name_char);
+                        
+                        ++rename_only_num;
+                        fei_rename_list(&name_pool[AT_ORIG_NAME_IDX(RO_NAME_ATTR(ro_idx))].name_char);
+                        ++rename_only_num;
+                    ro_idx = RO_NEXT_IDX(ro_idx);
+          }
+        }
 
        
        cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
@@ -14127,19 +14108,16 @@ static void send_attr_ntry(int		attr_idx)
       break;
 
    case Derived_Type:
-      /* These will be sent across when they are referenced. */
 
-      /*Think about use_stmt could "only" use this type name
-       *or,rename this type name,we have to send at least "name"
-       *to PDG....TODO:add some processing for special case like:
-       *USE mod,only:newnameoftype=>oldnameoftypeinmodule
-       *August,2002
-       */
+        if (ATT_TY_IDX(attr_idx)==NULL_IDX ) {
+            CLEAR_TBL_NTRY(type_tbl, TYP_WORK_IDX);
+            TYP_TYPE(TYP_WORK_IDX)      = Structure;
+            TYP_LINEAR(TYP_WORK_IDX)    = Structure_Type;
+            TYP_IDX(TYP_WORK_IDX)       = attr_idx;
+            ATT_TY_IDX(attr_idx)        = ntr_derived_type_tbl();
 
-/*    send_derived_type(ATD_TYPE_IDX(attr_idx)); */
-
-/*   PDG_AT_IDX(attr_idx) = fei_derived_type_name(AT_OBJ_NAME_PTR(attr_idx),*/
-/* August                                                   TRUE); */
+            send_derived_type(ATT_TY_IDX(attr_idx)); 
+        }
       goto EXIT; 
                
    case Namelist_Grp:

@@ -2764,6 +2764,22 @@ March # ifdef _DEBUG
 # define OLD_ATT_HALF_WORD_ALIGN(IDX)	attr_tbl[IDX].fld.flag26
 # endif
 
+
+/* Since even without any variable associate with a derived type,we still
+ * need a type table entry,we add  ATT_TY_IDX here to record the corresponding
+ * type table entry in the attr_tbl entry. ---fzhao
+ */
+
+# ifdef _DEBUG
+# define ATT_TY_IDX(IDX)                                                    \
+        ((AT_OBJ_CLASS(IDX) == Derived_Type) ?                                 \
+                attr_tbl : sytb_var_error("ATT_TY_IDX", IDX))               \
+                [IDX].fld.field5
+# else
+# define ATT_TY_IDX(IDX)             attr_tbl[IDX].fld.field5
+# endif
+
+
 # ifdef _DEBUG
 # define ATT_ALIGNMENT(IDX)						       \
 	((AT_OBJ_CLASS(IDX) == Derived_Type) ?				       \

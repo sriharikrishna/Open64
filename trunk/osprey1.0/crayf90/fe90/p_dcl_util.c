@@ -1304,7 +1304,10 @@ boolean parse_type_spec(boolean		chk_kind)
             TYP_TYPE(TYP_WORK_IDX)	= Structure;
             TYP_LINEAR(TYP_WORK_IDX)	= Structure_Type;
             TYP_IDX(TYP_WORK_IDX)	= attr_idx;
+
             ATD_TYPE_IDX(AT_WORK_IDX)	= ntr_type_tbl();
+ 
+            ATT_TY_IDX(attr_idx) = ATD_TYPE_IDX(AT_WORK_IDX); /*fzhao-working*/
 
             NEXT_LA_CH;			/* Skip Rparen */
          }
