@@ -23,7 +23,7 @@
 #
 
 #
-#  Makefile.base for riceopt 
+#  Makefile.base for libf90caf.a 
 #
 
 include	$(COMMONDEFS)
@@ -81,11 +81,11 @@ endif
 LCXXOPTS = $(LCOPTS)
 LCXXDEFS = $(LCDEFS)
 
-TARGETS = riceopt1 
+TARGETS = libf90caf.a 
 
 # Add OpenAnalysis header directory.
-OPENROOT = /home/jle/trice/OpenAnalysis
-XINC+= -I$(OPENROOT)/src
+#OPENROOT = /home/jle/trice/OpenAnalysis
+#XINC+= -I$(OPENROOT)/src
 
 
 COMMON_UTIL_DIR= $(BUILD_TOT)/common/util
@@ -172,7 +172,7 @@ CXXFILES =		             \
 
 ifeq ($(BUILD_OS), IRIX)
 CFLAGS += -D_SGI_SGI
-CXXFLAGS += -D_SGI_SGI -D_USE_STL_EXT
+CXXFLAGS += -D_SGI_SGI 
  ifeq ($(BUILD_COMPILER), VENDOR)
  CFLAGS += -woff 1174,1178,1552,1183
  CXXFLAGS += -woff 1174,1178,1552,1183
@@ -180,7 +180,6 @@ CXXFLAGS += -D_SGI_SGI -D_USE_STL_EXT
 endif
 
 ifeq ($(BUILD_OS), LINUX)
-CXXFLAGS += -D_USE_STL_EXT
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
@@ -192,7 +191,7 @@ CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -DIR_TOOLS -D_NEW_SYMTAB \
  endif
  endif
  ifeq ($(BUILD_COMPILER), GNU)
- CFLAGS += -D_USE_STL_EXT -D__GNU_BUG_WORKAROUND
+ CFLAGS +=  -D__GNU_BUG_WORKAROUND
  endif
 CXXFLAGS = $(CFLAGS) -w
 endif
@@ -224,7 +223,7 @@ DIRTS =
 #  Installation
 #----------------------------------------------------------------------
 install: default 
-	$(STD_INSTALL) -F /usr/sbin riceopt
+	$(STD_INSTALL) -F /usr/sbin libf90caf.a
 
 #----------------------------------------------------------------------
 #  Include the usual commonrules
@@ -238,15 +237,6 @@ include $(COMMONRULES)
 VPATH = $(BUILD_BASE) $(COMMON_UTIL_DIR) $(COMMON_COM_DIR) $(COMMON_COM_TARG_DIR)
 
 
-#----------------------------------------------------------------------
-#  Build executables
-#----------------------------------------------------------------------
-riceopt: $(OBJECTS) Pro64IRInterface.o riceopt.o $(OPENROOT)/OA.a
-	$(C++F) -o riceopt riceopt.o Pro64IRInterface.o $(OBJECTS) $(LDFLAGS) $(OPENROOT)/OA.a
-
-
-
-
-riceopt1: $(OBJECTS) 
-	ar -r libf90caf.a $(OBJECTS) 
+libf90caf.a: $(OBJECTS) 
+	ar -r $@ $(OBJECTS)
 

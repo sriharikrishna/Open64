@@ -7,7 +7,7 @@ SHELL = /bin/sh
 # Usually, to port the F90 front end to different platform, onl
 # need to change "BUILD_TARGET", "BUILD_OS" and "BUILD_COMPILER"
 #----------------------------------------------------------------------- 
- 
+
 BUILD_ABI      = 32BIT
 BUILD_ARCH     = IA32
 BUILD_TARGET   = IA64
@@ -25,7 +25,7 @@ BUILD_SB       = NO
 #  is not in the default search dirs of the chosen compiler, define it.
 #
 #-----------------------------------------------------------------------
-#STL_EXT_PATH = /scratch/gcc-3.0.4/inst/include/g++-v3/ext
-#STL_EXT_PATH = /local/gcc-3.0.4/inst/include/g++-v3/ext
 
 MAKE = gmake
+
+PLATFORM_DIRTS_SPECIFIC = 

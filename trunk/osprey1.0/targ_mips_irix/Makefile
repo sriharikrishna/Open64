@@ -33,7 +33,7 @@
 #
 
 #
-#  Makefile for targia32_ia64_nodebug
+#  Makefile for targ_mips_irix
 #
 
 #

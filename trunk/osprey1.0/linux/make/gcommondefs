@@ -33,7 +33,7 @@
 #
 #
 
-#ident "$Revision: 1.2 $"
+#ident "$Revision: 1.3 $"
 # 
 # This file has been heavily hacked for building on Linux
 #
@@ -328,6 +328,7 @@ LD_NO_UNRESOLVED=-no_unresolved
 LD_QUICKSTART_INFO=-quickstart_info
 
 ifeq ($(BUILD_OS), IRIX)
+CXXFLAGS += -LANG:std
 DSONAMEOPT  = -soname $@
 else
 DSONAMEOPT  =
@@ -410,7 +411,7 @@ INSTALL	= install
 #
 # MKDEPFILE is the name of the dependency database, included by commonrules.
 #
-MKDEPFILE = 
+MKDEPFILE = .d_*
 
 #
 # Flags to handle yacc and lex automatic dependency generation
@@ -570,3 +571,12 @@ LOCALDEFS  = ./localdefs
 LOCALRULES = ./localrules
 
 -include $(LOCALDEFS)
+
+
+# This variable selects between a developer build and a release build.
+# A release will remove all objects and dependency files after building
+# the components.  A developer release will leave objects and dependency
+# file intact. 
+ifeq ($(Open64BuildType), )
+Open64BuildType=Open64BuildDevelopment
+endif

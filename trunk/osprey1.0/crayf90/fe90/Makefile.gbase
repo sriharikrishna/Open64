@@ -178,8 +178,10 @@ FE90_SRCS = \
 CFILES = $(FE90_SRCS)
 FFILES = $(FOLD)
 
+LDIRT=fe90.a
+
 # extra files to be removed with make clobber
-LDIRT = 
+LDIRT = fe90.a
 
 VPATH    =  $(FE90_DIR)
 
@@ -224,7 +226,7 @@ endif
 
 ifeq ($(BUILD_OS), SOLARIS)
 CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_SVR4_SOURCE \
- 	-DNL_MSGSET=NL_SETD -DNL_ERR_MALLOC=NL_CAT_LOCALE $(LCINCS) $(OPTIMIZER)
+	-DNL_MSGSET=NL_SETD -DNL_ERR_MALLOC=NL_CAT_LOCALE $(LCINCS) $(OPTIMIZER)
  ifeq ($(BUILD_COMPILER), VENDOR)
  ifeq ($(BUILD_SB), YES)
  CFLAGS += -xsb
@@ -263,6 +265,10 @@ include $(BUILD_TOT)/Makeinclude
 #----------------------------------------------------------------------
 DIRTS = $(OBJECTS)
 
+REAL_OBJS = $(filter %.o,$(OBJECTS))
+
+$(LIBRARY) : $(REAL_OBJS)
+	$(AR) r $@ $(REAL_OBJS)
 
 #----------------------------------------------------------------------
 #  Build 'cf90fe'

@@ -32,7 +32,7 @@
 #
 #
 
-#ident "$Revision: 1.1.1.1 $"
+#ident "$Revision: 1.2 $"
 #
 # Common makefile rules.
 #
@@ -70,14 +70,21 @@ clobber: $(_FORCE)
 	rm -rf $(DIRT)
 	rm -rf $(TARGETS)
 	rm -rf $(MKDEPFILE)
+	rm -rf $(PLATFORM_DIRTS_COMMON)
+	rm -rf $(PLATFORM_DIRTS_SPECIFIC)
 	@for d in $(BUILD_SUBDIRS); do cd $(CWD)/$$d && $(MAKE) $@; done
 else
 clobber: clean rmtargets $(_FORCE)
-	rm -rf $(MKDEPFILE)
+	rm -rf $(DIRT)
+	rm -rf $(TARGETS)
 endif
 
 clean: $(_FORCE)
-	rm -rf $(DIRT)
+#	rm -rf $(DIRT)
+	rm -rf *.o *~ .*~ \#*
+	rm -rf $(MKDEPFILE)
+	rm -rf $(PLATFORM_DIRTS_COMMON)
+	rm -rf $(PLATFORM_DIRTS_SPECIFIC)
 ifdef BUILD_SUBDIRS
 	@for d in $(BUILD_SUBDIRS); do cd $(CWD)/$$d && $(MAKE) $@; done
 endif

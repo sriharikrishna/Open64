@@ -218,7 +218,7 @@ CFILES = $(LIB_SRCS)
 OBJECTS += $(F77FILES:.F=.o)
 
 # extra files to be removed with make clobber
-LDIRT = 
+LDIRT = libf90sgi.a
 
 .F.o:
 	$(F77) $(FFLAGS) -c $<
@@ -278,7 +278,7 @@ endif
 
 ifeq ($(BUILD_OS), SOLARIS)
 CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_SVR4_SOURCE -D_WORD32 \
- 	-D_ADDR32 -D_LIBU -DNL_MSGSET=NL_SETD $(LCINCS) $(OPTIMIZER)
+	-D_ADDR32 -D_LIBU -DNL_MSGSET=NL_SETD $(LCINCS) $(OPTIMIZER)
 # the next line only exists in case there is no installation of GNU g77
 F77 = f77
 FFLAGS := $(CFLAGS)
@@ -317,6 +317,13 @@ include $(BUILD_TOT)/Makeinclude
 #  built.
 #----------------------------------------------------------------------
 DIRTS = $(OBJECTS)
+
+
+REAL_OBJS = $(filter %.o,$(OBJECTS))
+
+$(LIBRARY) : $(REAL_OBJS)
+	$(AR) r $@ $(REAL_OBJS)
+
 
 exports:
 
