@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.13 $
- * $Date: 2003-04-01 17:00:34 $
+ * $Revision: 1.14 $
+ * $Date: 2003-04-01 21:27:26 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -3032,8 +3032,9 @@ fei_concat(INT32 numops)
   /* if an ARRAYEXP (ae) appeared it was an elemental */
   /* concat and an array valued temp is needed        */
 
-# if 0
   ty = cwh_types_mk_character_TY(WN_COPY_Tree(rsz),NULL,TRUE);
+
+#if 0
   if (ae != NULL) {
      ty = cwh_types_array_temp_TY(ae,ty) ;
      wt = cwh_expr_temp(ty,WN_COPY_Tree(rsz),f_T_PASSED);     
