@@ -43,9 +43,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: mtypes.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:32 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-12 22:38:21 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/mtypes.h,v $
  *
  * Revision history:
@@ -62,7 +62,7 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *mtypes_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/mtypes.h,v $ $Revision: 1.2 $";
+static char *mtypes_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/mtypes.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* The predefined machine data types, present on many machines: */
@@ -130,7 +130,6 @@ typedef struct type_desc {
   mBOOL		signed_type;	/* Signed numeric type? */
   mBOOL		float_type;	/* Floating point type? */
   mCLASS_INDEX	dummy4;		/* remove when incompatible change */
-  char		*name;		/* Print name */
   mUINT8        type_class_bits;/* The classification bits used by the simplifier */
   mUINT8        type_order;	/* The order of types (I8 > I4 for example) */
   mCLASS_INDEX	complement;	/* complementary signed partner (ex. U1 -> I1) */
@@ -154,7 +153,7 @@ extern TYPE_DESC Machine_Types[];
 #define MTYPE_align_best(n)	MTYPE_alignment(n)
 #define MTYPE_signed(n)		(Machine_Types[n].signed_type)
 #define MTYPE_float(n)		(Machine_Types[n].float_type)
-#define MTYPE_name(n)		(Machine_Types[n].name)
+#define MTYPE_name(n)		Mtype_Name(n)
 #define MTYPE_type_class(n)     (Machine_Types[n].type_class_bits)
 #define MTYPE_type_order(n)     (Machine_Types[n].type_order)
 #define MTYPE_complement(n)     (Machine_Types[n].complement)
@@ -198,10 +197,13 @@ extern MTYPE_MASK Machine_Types_Available;
  *
  *  Exported Functions
  *
- *    char * Mtype_Name ( TYPE_ID b)
+ *    const char * Mtype_Name (TYPE_ID tid)
  *
- *	Routine to provide printable type name.
+ *	given a MTYPE, return a string representation
  *
+ *    TYPE_ID Name_To_Mtype (const char * nm)
+ *
+ *	given a string, return a MTYPE
  *
  *    TYPE_ID Mtype_AlignmentClass(INT32 align, mUINT8 class)
  *
@@ -215,7 +217,9 @@ extern MTYPE_MASK Machine_Types_Available;
  *
  */
 
-extern char    *Mtype_Name ( TYPE_ID );
+extern const char* Mtype_Name ( TYPE_ID );
+extern TYPE_ID     Name_To_Mtype ( const char* nm );
+
 extern TYPE_ID	Mtype_AlignmentClass( INT32 , mUINT8 );
 extern TYPE_ID	Mtype_Promote_to_A4A8( TYPE_ID );
 extern TYPE_ID	Mtype_TransferSign( TYPE_ID, TYPE_ID );

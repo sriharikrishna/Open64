@@ -171,9 +171,9 @@
 ***         OPCODE_MAPCAT_{HDR,SCF,LDST,PRAGMA,OSTMT,OEXP,ARRAY,CALL}.
 **/
 
-/** $Revision: 1.2 $
-*** $Date: 2002-07-12 16:48:32 $
-*** $Author: fzhao $
+/** $Revision: 1.3 $
+*** $Date: 2005-01-12 22:38:21 $
+*** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/opcode.h,v $
 **/
 
@@ -181,7 +181,7 @@
 #define opcode_INCLUDED "opcode.h"
 
 #ifdef _KEEP_RCS_ID
-static char *opcode_rcs_id = opcode_INCLUDED "$Revision: 1.2 $";
+static char *opcode_rcs_id = opcode_INCLUDED "$Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "defs.h"
@@ -194,7 +194,10 @@ extern "C" {
 #endif
 
 extern const char	*OPERATOR_name(OPERATOR);
+extern OPERATOR         Name_To_OPERATOR(const char* nm);
+
 extern OPCODE           OPCODE_commutative_op(OPCODE op);
+
 
 /*
  * The order of these array subscripts is significant because wopt

@@ -269,20 +269,36 @@ extern void  Base_Symbol_And_Offset (
 );
 
 //----------------------------------------------------------------------
-// Printing routines
+// Enum value <-> string
 //----------------------------------------------------------------------
 
 const char *
-Class_Name (INT cl);
+Class_Name (ST_CLASS cl);
+
+ST_CLASS
+Name_To_Class (const char* nm);
+
 
 const char *
-Sclass_Name (INT s);
+Sclass_Name (ST_SCLASS sc);
+
+ST_SCLASS
+Name_To_Sclass (const char* nm);
+
 
 const char *
-Export_Name (INT );
+Export_Name (ST_EXPORT ex);
+
+ST_EXPORT
+Name_To_Export (const char* nm);
+
 
 const char *
-Kind_Name (INT k);
+Kind_Name (TY_KIND k);
+
+TY_KIND
+Name_To_Kind (const char* nm);
+
 
 void
 Print_local_symtab (FILE *f, const SCOPE& scope);

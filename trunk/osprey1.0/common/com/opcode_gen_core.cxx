@@ -41,1029 +41,1179 @@
 
 struct OPERATOR_info_struct OPERATOR_info[OPERATOR_LAST+1] = {
 
-  {"UNKNOWN_OPERATOR"},
-
-  {"OPR_ABS",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression },  
-
-  {"OPR_ADD",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression },
-
-  {"OPR_AGOTO",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_ALTENTRY",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym},
-
-  {"OPR_ARRAY",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_ARRAY /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_ndim                 |
-   OPERATOR_PROPERTY_esize }, 
-
-  {"OPR_ARRAYEXP",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */, 
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_ARRSECTION",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_ARRAY /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_ndim                 |
-   OPERATOR_PROPERTY_esize},
-
-  {"OPR_ASHR",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_ASSERT",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset},
-
-  {"OPR_BACKWARD_BARRIER",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_barrier},
-
-  {"OPR_BAND",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_BIOR",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_BLOCK",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_BNOR",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_BNOT",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_BXOR",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_CALL",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_CALL /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_call                 |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_flags},
-
-  {"OPR_CAND",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_CASEGOTO",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_label                |
-   OPERATOR_PROPERTY_value},
-
-  {"OPR_CEIL",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_CIOR",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_COMMA",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_COMMENT",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_not_executable       |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym},
-
-  {"OPR_COMPGOTO",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_num_entries          |
-   OPERATOR_PROPERTY_last_label},
-
-  {"OPR_PAIR",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_CONST",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_sym},
-
-  {"OPR_CSELECT",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_CVT",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_CVTL",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_bits},
-
-  {"OPR_DIV",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_DIVREM",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_DO_LOOP",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_DO_WHILE",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_EQ",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_compare              |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_EVAL",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_EXC_SCOPE_BEGIN",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_ereg_supp},
-
-  {"OPR_EXC_SCOPE_END",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset},
-
-  {"OPR_FALSEBR",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_label},
-
-  {"OPR_FLOOR",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_FORWARD_BARRIER",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_barrier},
-
-  {"OPR_FUNC_ENTRY",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_HDR /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym},
-
-  {"OPR_GE",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_compare              |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_GOTO",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_label},
-
-  {"OPR_GT",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_compare              |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_HIGHMPY",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_HIGHPART",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_ICALL",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_CALL /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_call                 |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_flags                |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_IDNAME",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset},
-
-  {"OPR_IF",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_ILDA",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_ILDBITS",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_load                 |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_2ty},
-
-  {"OPR_ILOAD",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_load                 |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_2ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_ILOADX",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_load                 |
-   OPERATOR_PROPERTY_2ty},
-
-  {"OPR_SECONDPART",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_INTCONST",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_value},
-
-  {"OPR_INTRINSIC_CALL",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_CALL /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_call                 |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_flags                |
-   OPERATOR_PROPERTY_inumber},
-
-  {"OPR_INTRINSIC_OP",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_flags                |
-   OPERATOR_PROPERTY_inumber},
-
-  {"OPR_IO",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_flags                |
-   OPERATOR_PROPERTY_inumber},
-
-  {"OPR_IO_ITEM",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_inumber              |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_ISTBITS",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_store                |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_ISTORE",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_store                |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-
-  {"OPR_ISTOREX",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_store                |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_LABEL",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_not_executable       |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_label                |
-   OPERATOR_PROPERTY_flags},
-
-  {"OPR_LAND",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_LDA",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_LDBITS",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_load                 |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_LDID",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_load                 |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_LE",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_compare              |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_LIOR",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_LNOT",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_LOOP_INFO",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_2offsets             |
-   OPERATOR_PROPERTY_flags},
-
-  {"OPR_LOWPART",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_LSHR",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_LT",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_compare              |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_MADD",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_MAX",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_MAXPART",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_MIN",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_MINMAX",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_MINPART",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_MLOAD",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_load                 |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_MOD",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_MPY",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_MSTORE",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_store                |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_MSUB",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_NE",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_compare              |
-   OPERATOR_PROPERTY_boolean},
-
-  {"OPR_NEG",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_NMADD",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_NMSUB",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_OPTPARM",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_not_executable},
-
-  {"OPR_OPT_CHI",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_OPT_RESERVE2",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_not_executable},
-
-  {"OPR_PAREN",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_PARM",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_not_executable       |
-   OPERATOR_PROPERTY_flags                |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_PICCALL",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_CALL /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_call                 |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_flags},
-
-  {"OPR_PRAGMA",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_PRAGMA /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_not_executable       |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_value},
-
-  {"OPR_PREFETCH",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_prefetch             |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_flags},
-
-  {"OPR_PREFETCHX",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_prefetch             |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_flags},
-
-  {"OPR_RCOMMA",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_FIRSTPART",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_RECIP",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_REGION",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_HDR /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_ereg_supp},
-
-  {"OPR_REGION_EXIT",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_label},
-
-  {"OPR_REM",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_RETURN",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_RETURN_VAL",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_RND",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_RSQRT",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_SELECT",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_SHL",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_SQRT",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_STBITS",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_store                |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_STID",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_store                |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_SUB",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_SWITCH",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_num_entries          |
-   OPERATOR_PROPERTY_last_label},
-
-  {"OPR_TAS",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_TRAP",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset},
-
-  {"OPR_TRIPLET",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_TRUEBR",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_label},
-
-  {"OPR_TRUNC",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_VFCALL",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_CALL /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_call                 |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_flags                |
-   OPERATOR_PROPERTY_1ty},
-
-  {"OPR_WHERE",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_WHILE_DO",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_XGOTO",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_SCF /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_num_entries},
-
-  {"OPR_XMPY",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_XPRAGMA",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_PRAGMA /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_not_executable       |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset},
-
-  {"OPR_AFFIRM",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_ALLOCA",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_DEALLOCA",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_next_prev},
-
-  {"OPR_LDMA",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_ASM_STMT",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |  /* SCLASS_NAME string symbol */
-   OPERATOR_PROPERTY_flags},
-
-  {"OPR_ASM_EXPR",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_sym                  |  /* SCLASS_NAME string symbol */
-   OPERATOR_PROPERTY_flags},
-
-  {"OPR_ASM_INPUT",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_sym},		     /* SCLASS_NAME constraint symbol */
-
-  {"OPR_RROTATE",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_LDA_LABEL",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_1ty		  |
-   OPERATOR_PROPERTY_label},
-
-  {"OPR_GOTO_OUTER_BLOCK",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_OSTMT /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_non_scf              |
-   OPERATOR_PROPERTY_endsbb               |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_label},
-
-  {"OPR_EXTRACT_BITS",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_COMPOSE_BITS",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
-
-  {"OPR_PSTORE",
-   2 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_store                |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty                  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_PSTID",
-   1 /* nkids */,
-   OPERATOR_MAPCAT_LDST /* mapcat */,
-   OPERATOR_PROPERTY_stmt                 |
-   OPERATOR_PROPERTY_store                |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym                  |
-   OPERATOR_PROPERTY_offset               |
-   OPERATOR_PROPERTY_1ty                  |
-   OPERATOR_PROPERTY_field_id},
-
-  {"OPR_USE",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_HDR /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym  },
+  OPERATOR_info_struct(OPERATOR_UNKNOWN,
+		       "UNKNOWN_OPERATOR",
+		       0 /* nkids */, 
+		       OPERATOR_MAPCAT_HDR /* mapcat */,
+		       0),
+
+  OPERATOR_info_struct(OPR_ABS,
+		       "OPR_ABS",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),  
+
+  OPERATOR_info_struct(OPR_ADD,
+		       "OPR_ADD",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_AGOTO,
+		       "OPR_AGOTO",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_ALTENTRY,
+		       "OPR_ALTENTRY",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym),
+
+  OPERATOR_info_struct(OPR_ARRAY,
+		       "OPR_ARRAY",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_ARRAY /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_ndim                 |
+		       OPERATOR_PROPERTY_esize), 
+
+  OPERATOR_info_struct(OPR_ARRAYEXP,
+		       "OPR_ARRAYEXP",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */, 
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_ARRSECTION,
+		       "OPR_ARRSECTION",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_ARRAY /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_ndim                 |
+		       OPERATOR_PROPERTY_esize),
+
+  OPERATOR_info_struct(OPR_ASHR,
+		       "OPR_ASHR",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_ASSERT,
+		       "OPR_ASSERT",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset),
+
+  OPERATOR_info_struct(OPR_BACKWARD_BARRIER,
+		       "OPR_BACKWARD_BARRIER",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_barrier),
+
+  OPERATOR_info_struct(OPR_BAND,
+		       "OPR_BAND",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_BIOR,
+		       "OPR_BIOR",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_BLOCK,
+		       "OPR_BLOCK",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_BNOR,
+		       "OPR_BNOR",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_BNOT,
+		       "OPR_BNOT",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_BXOR,
+		       "OPR_BXOR",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_CALL,
+		       "OPR_CALL",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_CALL /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_call                 |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_flags),
+
+  OPERATOR_info_struct(OPR_CAND,
+		       "OPR_CAND",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_CASEGOTO,
+		       "OPR_CASEGOTO",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_label                |
+		       OPERATOR_PROPERTY_value),
+
+  OPERATOR_info_struct(OPR_CEIL,
+		       "OPR_CEIL",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_CIOR,
+		       "OPR_CIOR",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_COMMA,
+		       "OPR_COMMA",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_COMMENT,
+		       "OPR_COMMENT",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_not_executable       |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym),
+
+  OPERATOR_info_struct(OPR_COMPGOTO,
+		       "OPR_COMPGOTO",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_num_entries          |
+		       OPERATOR_PROPERTY_last_label),
+
+  OPERATOR_info_struct(OPR_PAIR,
+		       "OPR_PAIR",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_CONST,
+		       "OPR_CONST",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_sym),
+
+  OPERATOR_info_struct(OPR_CSELECT,
+		       "OPR_CSELECT",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_CVT,
+		       "OPR_CVT",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_CVTL,
+		       "OPR_CVTL",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_bits),
+
+  OPERATOR_info_struct(OPR_DIV,
+		       "OPR_DIV",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_DIVREM,
+		       "OPR_DIVREM",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_DO_LOOP,
+		       "OPR_DO_LOOP",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_DO_WHILE,
+		       "OPR_DO_WHILE",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_EQ,
+		       "OPR_EQ",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_compare              |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_EVAL,
+		       "OPR_EVAL",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_EXC_SCOPE_BEGIN,
+		       "OPR_EXC_SCOPE_BEGIN",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_ereg_supp),
+
+  OPERATOR_info_struct(OPR_EXC_SCOPE_END,
+		       "OPR_EXC_SCOPE_END",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset),
+
+  OPERATOR_info_struct(OPR_FALSEBR,
+		       "OPR_FALSEBR",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_label),
+
+  OPERATOR_info_struct(OPR_FLOOR,
+		       "OPR_FLOOR",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_FORWARD_BARRIER,
+		       "OPR_FORWARD_BARRIER",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_barrier),
+
+  OPERATOR_info_struct(OPR_FUNC_ENTRY,
+		       "OPR_FUNC_ENTRY",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_HDR /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym),
+
+  OPERATOR_info_struct(OPR_GE,
+		       "OPR_GE",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_compare              |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_GOTO,
+		       "OPR_GOTO",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_label),
+
+  OPERATOR_info_struct(OPR_GT,
+		       "OPR_GT",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_compare              |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_HIGHMPY,
+		       "OPR_HIGHMPY",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_HIGHPART,
+		       "OPR_HIGHPART",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_ICALL,
+		       "OPR_ICALL",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_CALL /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_call                 |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_flags                |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_IDNAME,
+		       "OPR_IDNAME",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset),
+
+  OPERATOR_info_struct(OPR_IF,
+		       "OPR_IF",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_ILDA,
+		       "OPR_ILDA",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_ILDBITS,
+		       "OPR_ILDBITS",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_load                 |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_2ty),
+
+  OPERATOR_info_struct(OPR_ILOAD,
+		       "OPR_ILOAD",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_load                 |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_2ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_ILOADX,
+		       "OPR_ILOADX",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_load                 |
+		       OPERATOR_PROPERTY_2ty),
+
+  OPERATOR_info_struct(OPR_SECONDPART,
+		       "OPR_SECONDPART",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_INTCONST,
+		       "OPR_INTCONST",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_value),
+
+  OPERATOR_info_struct(OPR_INTRINSIC_CALL,
+		       "OPR_INTRINSIC_CALL",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_CALL /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_call                 |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_flags                |
+		       OPERATOR_PROPERTY_inumber),
+
+  OPERATOR_info_struct(OPR_INTRINSIC_OP,
+		       "OPR_INTRINSIC_OP",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_flags                |
+		       OPERATOR_PROPERTY_inumber),
+
+  OPERATOR_info_struct(OPR_IO,
+		       "OPR_IO",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_flags                |
+		       OPERATOR_PROPERTY_inumber),
+
+  OPERATOR_info_struct(OPR_IO_ITEM,
+		       "OPR_IO_ITEM",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_inumber              |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_ISTBITS,
+		       "OPR_ISTBITS",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_store                |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_ISTORE,
+		       "OPR_ISTORE",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_store                |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+
+  OPERATOR_info_struct(OPR_ISTOREX,
+		       "OPR_ISTOREX",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_store                |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_LABEL,
+		       "OPR_LABEL",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_not_executable       |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_label                |
+		       OPERATOR_PROPERTY_flags),
+
+  OPERATOR_info_struct(OPR_LAND,
+		       "OPR_LAND",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_LDA,
+		       "OPR_LDA",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_LDBITS,
+		       "OPR_LDBITS",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_load                 |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_LDID,
+		       "OPR_LDID",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_load                 |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_LE,
+		       "OPR_LE",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_compare              |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_LIOR,
+		       "OPR_LIOR",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_LNOT,
+		       "OPR_LNOT",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_LOOP_INFO,
+		       "OPR_LOOP_INFO",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_2offsets             |
+		       OPERATOR_PROPERTY_flags),
+
+  OPERATOR_info_struct(OPR_LOWPART,
+		       "OPR_LOWPART",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_LSHR,
+		       "OPR_LSHR",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_LT,
+		       "OPR_LT",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_compare              |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_MADD,
+		       "OPR_MADD",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_MAX,
+		       "OPR_MAX",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_MAXPART,
+		       "OPR_MAXPART",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_MIN,
+		       "OPR_MIN",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_MINMAX,
+		       "OPR_MINMAX",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_MINPART,
+		       "OPR_MINPART",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_MLOAD,
+		       "OPR_MLOAD",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_load                 |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_MOD,
+		       "OPR_MOD",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_MPY,
+		       "OPR_MPY",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_MSTORE,
+		       "OPR_MSTORE",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_store                |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_MSUB,
+		       "OPR_MSUB",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_NE,
+		       "OPR_NE",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_compare              |
+		       OPERATOR_PROPERTY_boolean),
+
+  OPERATOR_info_struct(OPR_NEG,
+		       "OPR_NEG",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_NMADD,
+		       "OPR_NMADD",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_NMSUB,
+		       "OPR_NMSUB",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_OPTPARM,
+		       "OPR_OPTPARM",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_not_executable),
+
+  OPERATOR_info_struct(OPR_OPT_CHI,
+		       "OPR_OPT_CHI",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_OPT_RESERVE2,
+		       "OPR_OPT_RESERVE2",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_not_executable),
+
+  OPERATOR_info_struct(OPR_PAREN,
+		       "OPR_PAREN",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_PARM,
+		       "OPR_PARM",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_not_executable       |
+		       OPERATOR_PROPERTY_flags                |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_PICCALL,
+		       "OPR_PICCALL",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_CALL /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_call                 |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_flags),
+
+  OPERATOR_info_struct(OPR_PRAGMA,
+		       "OPR_PRAGMA",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_PRAGMA /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_not_executable       |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_value),
+
+  OPERATOR_info_struct(OPR_PREFETCH,
+		       "OPR_PREFETCH",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_prefetch             |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_flags),
+
+  OPERATOR_info_struct(OPR_PREFETCHX,
+		       "OPR_PREFETCHX",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_prefetch             |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_flags),
+
+  OPERATOR_info_struct(OPR_RCOMMA,
+		       "OPR_RCOMMA",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_FIRSTPART,
+		       "OPR_FIRSTPART",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_RECIP,
+		       "OPR_RECIP",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_REGION,
+		       "OPR_REGION",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_HDR /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_ereg_supp),
+
+  OPERATOR_info_struct(OPR_REGION_EXIT,
+		       "OPR_REGION_EXIT",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_label),
+
+  OPERATOR_info_struct(OPR_REM,
+		       "OPR_REM",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_RETURN,
+		       "OPR_RETURN",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_RETURN_VAL,
+		       "OPR_RETURN_VAL",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_RND,
+		       "OPR_RND",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_RSQRT,
+		       "OPR_RSQRT",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_SELECT,
+		       "OPR_SELECT",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_SHL,
+		       "OPR_SHL",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_SQRT,
+		       "OPR_SQRT",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_STBITS,
+		       "OPR_STBITS",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_store                |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_STID,
+		       "OPR_STID",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_store                |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_SUB,
+		       "OPR_SUB",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_SWITCH,
+		       "OPR_SWITCH",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_num_entries          |
+		       OPERATOR_PROPERTY_last_label),
+
+  OPERATOR_info_struct(OPR_TAS,
+		       "OPR_TAS",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_TRAP,
+		       "OPR_TRAP",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset),
+
+  OPERATOR_info_struct(OPR_TRIPLET,
+		       "OPR_TRIPLET",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_TRUEBR,
+		       "OPR_TRUEBR",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_label),
+
+  OPERATOR_info_struct(OPR_TRUNC,
+		       "OPR_TRUNC",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_VFCALL,
+		       "OPR_VFCALL",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_CALL /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_call                 |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_flags                |
+		       OPERATOR_PROPERTY_1ty),
+
+  OPERATOR_info_struct(OPR_WHERE,
+		       "OPR_WHERE",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_WHILE_DO,
+		       "OPR_WHILE_DO",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_XGOTO,
+		       "OPR_XGOTO",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_SCF /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_num_entries),
+
+  OPERATOR_info_struct(OPR_XMPY,
+		       "OPR_XMPY",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_XPRAGMA,
+		       "OPR_XPRAGMA",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_PRAGMA /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_not_executable       |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset),
+
+  OPERATOR_info_struct(OPR_AFFIRM,
+		       "OPR_AFFIRM",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_ALLOCA,
+		       "OPR_ALLOCA",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_DEALLOCA,
+		       "OPR_DEALLOCA",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_next_prev),
+
+  OPERATOR_info_struct(OPR_LDMA,
+		       "OPR_LDMA",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_ASM_STMT,
+		       "OPR_ASM_STMT",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |  /* SCLASS_NAME string symbol */
+		       OPERATOR_PROPERTY_flags),
+
+  OPERATOR_info_struct(OPR_ASM_EXPR,
+		       "OPR_ASM_EXPR",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_sym                  |  /* SCLASS_NAME string symbol */
+		       OPERATOR_PROPERTY_flags),
+
+  OPERATOR_info_struct(OPR_ASM_INPUT,
+		       "OPR_ASM_INPUT",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_sym),		     /* SCLASS_NAME constraint symbol */
+
+  OPERATOR_info_struct(OPR_RROTATE,
+		       "OPR_RROTATE",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_LDA_LABEL,
+		       "OPR_LDA_LABEL",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_1ty		  |
+		       OPERATOR_PROPERTY_label),
+
+  OPERATOR_info_struct(OPR_GOTO_OUTER_BLOCK,
+		       "OPR_GOTO_OUTER_BLOCK",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_OSTMT /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_non_scf              |
+		       OPERATOR_PROPERTY_endsbb               |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_label),
+
+  OPERATOR_info_struct(OPR_EXTRACT_BITS,
+		       "OPR_EXTRACT_BITS",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_COMPOSE_BITS,
+		       "OPR_COMPOSE_BITS",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
+
+  OPERATOR_info_struct(OPR_PSTORE,
+		       "OPR_PSTORE",
+		       2 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_store                |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty                  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_PSTID,
+		       "OPR_PSTID",
+		       1 /* nkids */,
+		       OPERATOR_MAPCAT_LDST /* mapcat */,
+		       OPERATOR_PROPERTY_stmt                 |
+		       OPERATOR_PROPERTY_store                |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym                  |
+		       OPERATOR_PROPERTY_offset               |
+		       OPERATOR_PROPERTY_1ty                  |
+		       OPERATOR_PROPERTY_field_id),
+
+  OPERATOR_info_struct(OPR_USE,
+		       "OPR_USE",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_HDR /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym),
  
-  {"OPR_NAMELIST",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_HDR /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym  },
+  OPERATOR_info_struct(OPR_NAMELIST,
+		       "OPR_NAMELIST",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_HDR /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym),
 
-  {"OPR_CONST",
-   0 /* nkids */,
-   OPERATOR_MAPCAT_HDR /* mapcat */,
-   OPERATOR_PROPERTY_scf           |
-   OPERATOR_PROPERTY_leaf                 |
-   OPERATOR_PROPERTY_sym},
+  OPERATOR_info_struct(OPR_IMPLICIT_BND,
+		       "OPR_IMPLICIT_BND",
+		       0 /* nkids */,
+		       OPERATOR_MAPCAT_HDR /* mapcat */,
+		       OPERATOR_PROPERTY_scf           |
+		       OPERATOR_PROPERTY_leaf                 |
+		       OPERATOR_PROPERTY_sym),
 
-  {"OPR_SRCTRIPLET",
-   3 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
+  OPERATOR_info_struct(OPR_SRCTRIPLET,
+		       "OPR_SRCTRIPLET",
+		       3 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
 
-  {"OPR_NULLIFY",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_HDR /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym  },
-
-
-  {"OPR_INTERFACE",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_HDR /* mapcat */,
-   OPERATOR_PROPERTY_scf                  |
-   OPERATOR_PROPERTY_next_prev            |
-   OPERATOR_PROPERTY_sym  },
+  OPERATOR_info_struct(OPR_NULLIFY,
+		       "OPR_NULLIFY",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_HDR /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym),
 
 
-  {"OPR_ARRAY_CONSTRUCT",
-   -1 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
+  OPERATOR_info_struct(OPR_INTERFACE,
+		       "OPR_INTERFACE",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_HDR /* mapcat */,
+		       OPERATOR_PROPERTY_scf                  |
+		       OPERATOR_PROPERTY_next_prev            |
+		       OPERATOR_PROPERTY_sym),
 
+  OPERATOR_info_struct(OPR_ARRAY_CONSTRUCT,
+		       "OPR_ARRAY_CONSTRUCT",
+		       -1 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
 
-  {"OPR_IMPLIED_DO",
-   5 /* nkids */,
-   OPERATOR_MAPCAT_OEXP /* mapcat */,
-   OPERATOR_PROPERTY_expression},
+  OPERATOR_info_struct(OPR_IMPLIED_DO,
+		       "OPR_IMPLIED_DO",
+		       5 /* nkids */,
+		       OPERATOR_MAPCAT_OEXP /* mapcat */,
+		       OPERATOR_PROPERTY_expression),
 
 };
 

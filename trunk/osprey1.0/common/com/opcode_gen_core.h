@@ -40,6 +40,10 @@
 #include "mtypes.h"
 #endif
 
+#ifndef ir_a2b_util_INCLUDED
+#include "ir_a2b_util.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -59,14 +63,6 @@ typedef enum {
 
 #define WN_MAP_CATEGORIES 8
 
-/* operators, types, and attributes of the operators */
-
-extern struct OPERATOR_info_struct {
-  char		  _name[23];
-  mINT8		  nkids;
-  OPERATOR_MAPCAT mapcat;
-  mUINT32	  _flags;
-} OPERATOR_info[];
 
 /* Flag property bits, field _flag */
 
@@ -2131,6 +2127,33 @@ typedef enum {
 } OPCODE;
 
 /* typedef UINT32 OPCODE; */
+
+
+/* operators, types, and attributes of the operators */
+/* eraxxon (2005.01): Re-implement table and routines to support b2a
+   and a2b conversions. */
+struct OPERATOR_info_struct : public ir_a2b::i2s_tbl_entry_t {
+
+  OPERATOR_info_struct(OPERATOR opr_ = OPERATOR_UNKNOWN, 
+		       const char* name_ = NULL,
+		       INT8 nkids_ = 0,
+		       OPERATOR_MAPCAT mapcat_ = OPERATOR_MAPCAT_HDR,
+		       UINT32 flags_ = 0)
+    : opr(opr_), _name(name_), nkids(nkids_), mapcat(mapcat_), _flags(flags_)
+    { }
+  virtual ~OPERATOR_info_struct() { }
+
+  virtual INT getEnumVal()     { return opr; }
+  virtual const char* getStr() { return _name; }
+
+  OPERATOR        opr;
+  const char*     _name;
+  mINT8		  nkids;
+  OPERATOR_MAPCAT mapcat;
+  mUINT32	  _flags;
+};
+
+extern OPERATOR_info_struct OPERATOR_info[];
 
 #undef RTYPE
 #undef DESC
