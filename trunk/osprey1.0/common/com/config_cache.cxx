@@ -89,7 +89,7 @@ MHD_LEVEL::MHD_LEVEL(MHD_TYPE type, INT64 cs, INT32 ls,
   Compute_Effective_Size();
 }
 
-void MHD_LEVEL::operator = (const MHD_LEVEL& a)
+MHD_LEVEL& MHD_LEVEL::operator = (const MHD_LEVEL& a)
 {
   Type = a.Type;
   Line_Size = a.Line_Size;
@@ -121,6 +121,8 @@ void MHD_LEVEL::operator = (const MHD_LEVEL& a)
   TLB_DMP_Set = FALSE;
   TLB_Miss_Penalty = -1;
   TLB_MP_Set = FALSE;
+  
+  return *this;
 }
 
 BOOL MHD_LEVEL::Valid() const

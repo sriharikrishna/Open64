@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: config_cache.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:27 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-01 16:43:40 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_cache.h,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *config_cache_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_cache.h,v $ $Revision: 1.2 $";
+static char *config_cache_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_cache.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /*
@@ -359,12 +359,6 @@ typedef struct MHD_LEVEL {
   BOOL	  TLB_MP_Set;
 
 #if defined(_LANGUAGE_C_PLUS_PLUS)
-  void      operator = (const MHD_LEVEL&);
-  void      Print(FILE* f) const;
-  void      Merge_Options(const MHD_LEVEL& o);
-  BOOL      Valid() const;
-  BOOL      TLB_Valid() const;
-
   MHD_LEVEL() : Type(MHD_TYPE_NONE),
                 Size(-1), Line_Size(-1),
                 Clean_Miss_Penalty(-1), Dirty_Miss_Penalty(-1),
@@ -384,13 +378,20 @@ typedef struct MHD_LEVEL {
             INT32 tlb_cmp, INT32 tlb_dmp,
             double outstanding, double op_overlap_1, double op_overlap_2,
 	    INT32 pct_excess_writes_nonhidable);
+  MHD_LEVEL(const MHD_LEVEL& x) { *this = x; }
   ~MHD_LEVEL() {}
 
- private:
+  MHD_LEVEL& operator = (const MHD_LEVEL&);
 
-  MHD_LEVEL(const MHD_LEVEL&); /* undefined */
+  void      Print(FILE* f) const;
+  void      Merge_Options(const MHD_LEVEL& o);
+  BOOL      Valid() const;
+  BOOL      TLB_Valid() const;
+
+ private:
   void      Compute_Effective_Size();
 #endif
+
 } MHD_LEVEL;
 
 /* Don't forget to modify config_lno.c as well */
