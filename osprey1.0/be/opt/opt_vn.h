@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_vn.h
-// $Revision: 1.2 $
-// $Date: 2003-02-19 22:05:11 $
+// $Revision: 1.3 $
+// $Date: 2003-04-22 19:15:15 $
 // $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn.h,v $
 //
@@ -260,7 +260,9 @@
 #include "opt_vn_expr.h"    // For VN_VALNUM, VN_EXPR, and VN_EXPR_MAP
 #include "opt_vn_hashtab.h" // For VN_HASHTAB
 
-#ifdef __STL_USE_NAMESPACES
+
+//#ifdef __STL_USE_NAMESPACES
+#if defined(__GNUC__)
 using std::list;
 using std::vector;
 #endif

@@ -220,6 +220,9 @@ extern "C" void WFE_Set_Consistency(char *, int);
 void WFE_Set_Consistency (char *descriptor, int action)
 {
   
+  if(!compiling_upc)
+    return;
+
   WN_PRAGMA_ID prdesc;
   
   if (strcmp(descriptor, "relaxed") == 0) {

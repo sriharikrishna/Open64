@@ -1,5 +1,1 @@
-/* #include "intl/libintl.h" */
-
-/* FIXME.  */
-#include "/usr/include/libintl.h"
-
+//#include "intl/libintl.h"

@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_alias_class.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:46 $
+// $Revision: 1.2 $
+// $Date: 2003-04-22 19:15:15 $
 //
 // ====================================================================
 //
@@ -282,7 +282,7 @@ public:
 };
 
 
-#ifndef _USE_STL_EXT
+#if !defined(_USE_STL_EXT)
 typedef list<ALIAS_CLASS_MEMBER *,
               mempool_allocator<ALIAS_CLASS_MEMBER *> >
   ALIAS_CLASS_MEMBER_LIST;

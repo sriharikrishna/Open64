@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.4 $
- * $Date: 2003-02-25 21:12:35 $
+ * $Revision: 1.5 $
+ * $Date: 2003-04-22 19:15:16 $
  * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1590,7 +1590,8 @@ WN2C_based_lvalue(TOKEN_BUFFER expr_tokens,    /* lvalue or addr expr */
 	  *
 	  *   (object_ty *)&<expr_tokens> + addr_offset/sizeof(object_ty)
 	  */
-	 if (incompat_obj_tys)
+	//if (incompat_obj_tys && !expr_is_lvalue)
+	if (incompat_obj_tys)
 	 {
 	    WHIRL2C_parenthesize(expr_tokens);
 
@@ -2053,19 +2054,6 @@ WN2C_Append_Symtab_Consts(TOKEN_BUFFER tokens,
    }
 } /* WN2C_Append_Symtab_Consts */
 
-
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-struct ltstr
-{
-  bool operator()(const char* s1, const char* s2) const
-  {
-    return strcmp(s1, s2) < 0;
-  }
-};
-static std::set<const char*, ltstr> upcr_internal;
-
-#else
-
 struct eqstr
 {
   bool operator()(const char* s1, const char* s2) const
@@ -2073,9 +2061,8 @@ struct eqstr
     return strcmp(s1, s2) == 0;
   }
 };
-static hash_set<const char*, hash<const char*>, eqstr> upcr_internal;
-#endif
 
+static hash_set<const char*, hash<const char*>, eqstr> upcr_internal;
 static bool init = false;
 
 static bool lookup(const char* s) {
@@ -2195,8 +2182,10 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
 	ST_sclass(st) == SCLASS_FSTATIC || 
        ST_sclass(st) == SCLASS_UGLOBAL || ST_sclass(st) == SCLASS_DGLOBAL || 
        ST_sclass(st) == SCLASS_EXTERN || ST_sclass(st) == SCLASS_COMMON);
-     //WEI: for testing, block all extern function decl for now
-     global = global || (ST_sym_class(st) == CLASS_FUNC && ST_sclass(st) == SCLASS_EXTERN); 
+     //WEI: for testing, block all extern functions that returns void for now
+     bool extern_void_fun = (ST_sym_class(st) == CLASS_FUNC && ST_sclass(st) == SCLASS_EXTERN); 
+     extern_void_fun = extern_void_fun && (TY_mtype(TY_ret_type(ST_pu_type(st))) != MTYPE_F8);
+     global = global || extern_void_fun;
      global = Compile_Upc && global;
 
      TY_IDX st_ty  = ST_class(st) == CLASS_VAR ? ST_type(st) :
@@ -2231,7 +2220,6 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
 	 if (tokens != NULL)
 	    Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
 	 else {
-	   //cout << "Write to DOTH: " << ST_name(st) << endl;
 	   Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE], 
 				    NULL, /* No srcpos map */
 				    &tmp_tokens);
@@ -2457,7 +2445,8 @@ WN2C_Function_Call_Lhs(TOKEN_BUFFER rhs_tokens,  /* The function call */
 	    status = WN2C_lvalue_st(lhs_tokens,
 				    result_var,              /* base address */
 				    Stab_Pointer_To(var_ty), /* base type */
-				    return_ty, /* type object to be loaded */
+				    ST_type(result_var),
+				    //return_ty, /* type object to be loaded */
 				    var_offset,
 				    context);
 	    if (!STATUS_is_lvalue(status))

@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_cfg_trans.h
-// $Revision: 1.3 $
-// $Date: 2003-02-17 23:49:52 $
+// $Revision: 1.4 $
+// $Date: 2003-04-22 19:15:15 $
 //
 // ====================================================================
 //
@@ -62,8 +62,10 @@
 
 // Yuri: 01/28/03
 // #ifndef _USE_STL_EXT
-#if !defined(_USE_STL_EXT)
-#if ((defined(__GNUC__) && (((__GNUC__ == 3) && (__GNUC_MINOR__ > 0)) || (__GNUC__ > 3))) || (defined(__sun)))
+#ifndef _EXT_FUNCTIONAL
+//#if !defined(_USE_STL_EXT)
+//#if ((defined(__GNUC__) && (((__GNUC__ == 3) && (__GNUC_MINOR__ > 0)) || (__GNUC__ > 3))) || (defined(__sun)))
+#if defined(__sun) || (defined(__GNUC__) && (__GNUC__ < 3))
 template <class _Pair>
 struct _Select1st : public unary_function<_Pair, typename _Pair::first_type> 
 {
@@ -82,6 +84,9 @@ struct _Select2nd : public unary_function<_Pair, typename _Pair::second_type>
 // Yuri & Jason: 01/28/03
 //template <class _Pair> struct select1st : public _Select1st<_Pair> {};
 
+/* WEI: this seems to be already defined for gcc 3.2 */
+
+//#if !defined(__GNUC__) || (__GNUC__ < 3) 
 template <class _Pair> 
 struct select1st : public unary_function<_Pair, typename _Pair::first_type> 
 {
@@ -98,6 +103,9 @@ struct select2nd : public unary_function<_Pair, typename _Pair::second_type>
     return __x.second;
   }
 };
+
+#else 
+#include <function.h>
 #endif
 #endif
 

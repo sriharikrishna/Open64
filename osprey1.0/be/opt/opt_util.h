@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_util.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:51 $
+// $Revision: 1.2 $
+// $Date: 2003-04-22 19:15:15 $
 //
 // Revision history:
 //  15-SEP-94 shin - Original Version
@@ -148,9 +148,19 @@ INT Report_statistics();   // Report statistics of subphases of the optimizer
 #include <vector>
 #include "segmented_array.h" // For mempool_allocator
 
-#ifdef __STL_USE_NAMESPACES
+
+/* WEI:
+   we don't want to use stl_use_namespaces, since it's defined in gcc2.96 but not in gcc3.x
+*/
+#if defined(__GNUC__)
 using std::vector;
 #endif
+
+/*
+  #ifdef __STL_USE_NAMESPACES
+  using std::vector;
+  #endif
+*/
 
 typedef mempool_allocator<bool>         BVECTOR_ALLOCATOR;
 typedef vector<bool, BVECTOR_ALLOCATOR> BVECTOR; // TODO add range checks

@@ -1871,10 +1871,10 @@ main (INT argc, char **argv)
 	fprintf(stderr, "CANNOT OPEN CONFIGURATION FILE: %s\n", Config_File_Name);
 	exit(1);
       }
-      char line[MAX_LINE_LEN];
+      char line[MAX_LINE_LEN_UPC];
       int size;
-      char param[MAX_LINE_LEN];
-      while (fgets(line, MAX_LINE_LEN, config_file) != NULL) {
+      char param[MAX_LINE_LEN_UPC];
+      while (fgets(line, MAX_LINE_LEN_UPC, config_file) != NULL) {
 	if (sscanf(line, "%s\t%d", param, &size) != 2) {
 	  cerr << "Malformed Line in config file: " << line << endl;
 	  continue;

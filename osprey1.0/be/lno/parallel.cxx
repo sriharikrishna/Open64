@@ -345,7 +345,7 @@ PARALLEL_INFO::PARALLEL_INFO(WN* wn_outer,
   } else if (doall_cost<doacross_cost) {  
     // parallelize with doall
     _parallel_depth = parallel_depth;
-    _work_estimate = Compute_Work_Estimate(work_estimate,
+    _work_estimate = (int) Compute_Work_Estimate(work_estimate,
                        cache_cycles_per_iter);
     _cost = doall_cost;
     _is_doacross = FALSE;
@@ -356,7 +356,7 @@ PARALLEL_INFO::PARALLEL_INFO(WN* wn_outer,
   } else {
     // parallelize with doacross
     _parallel_depth = parallel_depth;  
-    _work_estimate = Compute_Work_Estimate(work_estimate,
+    _work_estimate = (int) Compute_Work_Estimate(work_estimate,
                        cache_cycles_per_iter);
     _cost = doacross_cost;
     _is_doacross = TRUE;
@@ -2466,7 +2466,7 @@ static double Doacross_Cost(WN* wn_outer,
   else
     cost = doall_cycle + doacross_delay_cycle + doacross_sync_cycle;
 
-  (*doacross_overhead_p) = doacross_delay_cycle + doacross_sync_cycle;
+  (*doacross_overhead_p) = (int) (doacross_delay_cycle + doacross_sync_cycle);
   if (parallel_debug_level >= 2) {
     printf("  sync vectors =              ");
     if (sync_distances[0]!= NULL_DIST)

@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_vnfre.cxx
-// $Revision: 1.2 $
-// $Date: 2002-09-06 22:34:55 $
-// $Author: open64 $
+// $Revision: 1.3 $
+// $Date: 2003-04-22 19:15:15 $
+// $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vnfre.cxx,v $
 //
 // ====================================================================
@@ -107,7 +107,8 @@
 // #define DO_VNFRE_TRACE 1
 
 
-#ifdef __STL_USE_NAMESPACES
+#if defined (__GNUC__)
+//#ifdef __STL_USE_NAMESPACES
 using std::stack;
 #endif
 

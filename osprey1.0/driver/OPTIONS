@@ -1959,5 +1959,6 @@ I-exp3		toggle(&proc,31);        ALL     NONE    "-TARG:proc=exp3"
 	""
 -fupc-threads-%d  set_upc_no_threads(optargd,optargs); u 	cfe "-fupc-threads-%d"
 	""
--fconfig-%s	set_config_file(optargs);	u	be 	self
+%special flag for the upc configuration file
+-fconfig-%s	set_config_file(optargs);	u	cfe 	"-fconfig-%s"
 	""

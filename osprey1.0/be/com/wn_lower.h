@@ -91,16 +91,12 @@ typedef INT64 LOWER_ACTIONS;
 #define LOWER_MLDID_MSTID	  0x004000000000ll
 #define LOWER_BIT_FIELD_ID	  0x008000000000ll
 #define LOWER_BITS_OP		  0x010000000000ll 
-#if 1
-/* jle: I added these because the sources sent from the UPC folks
-   use the constants but don't define them anywhere.  They must
-   have missed sending some of their changes.  */
-#define LOWER_UPC_FORALL	  0x020000000000ll 
-#define LOWER_UPC_INTRINSIC	  0x040000000000ll 
-#define LOWER_UPC_TO_INTR	  0x080000000000ll 
-#define LOWER_UPC_MFIELD	  0x100000000000ll 
-#define LOWER_UPC_CONSISTENCY	  0x200000000000ll 
-#endif
+#define LOWER_UPC_TO_INTR         0x020000000000ll
+#define LOWER_UPC_INTRINSIC       0x040000000000ll
+#define LOWER_UPC_CONSISTENCY     0x080000000000ll
+#define LOWER_UPC_FORALL          0x10000000000011
+#define LOWER_UPC_MFIELD          0x200000000000ll
+
 
 #define LOWER_TO_CG		  0x800000000000ll
 

@@ -147,7 +147,7 @@
 #include "w2c_weak.h"
 #include "w2f_weak.h"
 
-#define INFINITY 9999
+#define MY_INFINITY 9999
 #define absof(x) (((x)>0) ? (x) : (0-(x)))
 #define maxof(x, y) (((x)>(y)) ? (x) : (y))
 #define minof(x, y) (((x)<(y)) ? (x) : (y))
@@ -1575,7 +1575,7 @@ PF_VOLUME PF_LG::Volume () {
     ACCESS_ARRAY* aa =  (ACCESS_ARRAY*) WN_MAP_Get (LNO_Info_Map,
                                                     Get_Ref(_leading_ref));
     ACCESS_VECTOR* av = aa->Dim(aa->Num_Vec()-1);
-    INT stride = INFINITY;
+    INT stride = MY_INFINITY;
     // find stride, based on loop within thisnest that has the smallest coeff
     for (j=_depth; j<num_loops; j++) {
       INT64 cur = av->Loop_Coeff(j);
@@ -1583,7 +1583,7 @@ PF_VOLUME PF_LG::Volume () {
       cur = abs(cur);
       stride = minof (stride, cur);
     }
-    if (stride < INFINITY) {
+    if (stride < MY_INFINITY) {
       // "stride" elements
       stride = stride * (INT) WN_element_size(Get_Ref(_leading_ref));
       // now stride is in bytes. Is it within a cache line?
