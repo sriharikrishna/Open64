@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.7 $
- * $Date: 2002-09-12 21:47:46 $
+ * $Revision: 1.8 $
+ * $Date: 2002-09-18 17:51:41 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.8 $";
 #endif
 
 #include <alloca.h>
@@ -362,15 +362,20 @@ WN2F_Find_And_Mark_Nested_Address(WN * addr)
   /* fld, and belongs to the address ST, then return that   */
   /* ARRAY.                                                 */
 
- OPERATOR ffmm = WN_operator(addr); /*Sept test*/
   switch (WN_operator(addr))
   {
   case OPR_ARRAY: 
-  case OPR_ARRAYEXP: //Sept test
+  case OPR_ARRAYEXP: 
   case OPR_ARRSECTION:
     {
-      WN * kid = WN_kid0(addr);
+     WN * kid;     
+
+     if (WN_operator(addr)==OPR_ARRAYEXP)
+        addr = WN_kid0(addr);
+
+      kid = WN_kid0(addr);
       WN2F_Find_And_Mark_Nested_Address(kid);
+
       if ((_flds_left && _flds_left->arr_elt) &&
 	  (!(_base_is_array)))
       {
@@ -383,6 +388,7 @@ WN2F_Find_And_Mark_Nested_Address(WN * addr)
       _base_is_array = FALSE;
     }
     break;
+
 
   case OPR_ADD:
     {
@@ -446,6 +452,11 @@ WN2F_Sum_Offsets(WN *addr)
   switch (WN_operator(addr))
   {
     case OPR_ARRAY: 
+    case OPR_ARRAYEXP:
+    case OPR_ARRSECTION:
+   if (WN_operator(addr)==OPR_ARRAYEXP)
+       addr = WN_kid0(addr);
+
     sum += WN2F_Sum_Offsets(WN_kid0(addr));
     break;
 
@@ -525,6 +536,9 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
       st = ST_full(st);
       Set_BE_ST_w2fc_referenced(st);
       base_ty = ST_type(st);
+      if (TY_is_f90_pointer(base_ty)) //Sept
+         base_ty = TY_pointed(base_ty);
+
       addr_ty = Stab_Pointer_To(base_ty);
    }
 #endif 
@@ -533,7 +547,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
    /* Select variable-reference translation function */
    if (deref_val                      && 
        ST_sclass(st) != SCLASS_FORMAL && 
-       TY_Is_Pointer(ST_type(st)))
+       TY_Is_Pointer(ST_type(st)) && !TY_is_f90_pointer(ST_type(st)))
    {
       /* An explicitly dereference */
       translate_var_ref = &ST2F_deref_translate;
@@ -799,7 +813,9 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 
          WN_OFFSET tmp = WN2F_Sum_Offsets(addr);
          if (tmp < TY_size(TY_pointed(addr_ty)))
-         offset += tmp;
+             offset += tmp;
+         else 
+             offset = tmp;
 
 	 fld_path = TY2F_Get_Fld_Path(base_ty, object_ty, offset);
 	 ASSERT_DBG_WARN(fld_path != NULL,

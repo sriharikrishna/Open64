@@ -16816,7 +16816,6 @@ void    selected_int_kind_intrinsic(opnd_type     *result_opnd,
    list_idx1 = IR_IDX_R(ir_idx);
    info_idx1 = IL_ARG_DESC_IDX(list_idx1);
    ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx)) = INTEGER_DEFAULT_TYPE;
-
    if (arg_info_list[info_idx1].ed.rank != 0) {
       PRINTMSG(arg_info_list[info_idx1].line, 654,  Error, 
                arg_info_list[info_idx1].col);
@@ -17140,12 +17139,9 @@ void    selected_real_kind_intrinsic(opnd_type     *result_opnd,
    opnd_type	  opnd;
    int i;
 
-
    TRACE (Func_Entry, "selected_real_kind_intrinsic", NULL);
-# if 0
   for (i=0; i<=MAX_WORDS_FOR_NUMERIC-1;i++)
       folded_const[i]=0;
-# endif
 
    ATP_EXTERNAL_INTRIN(*spec_idx) = TRUE;
    ir_idx = OPND_IDX((*result_opnd));

@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: stab_attr.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:16 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-09-18 17:51:59 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.h,v $
  *
  * Revision history:
@@ -279,7 +279,7 @@ inline TY_IDX Stab_Mtype_To_Ty(TYPE_ID mtype) { return Be_Type_Tbl(mtype); }
 
 inline BOOL TY_Is_Pointer(TY_IDX ty)
 {
-   return TY_kind(ty) == KIND_POINTER;
+   return (TY_kind(ty) == KIND_POINTER && !TY_is_f90_pointer(ty));
 } /* TY_Is_Pointer */
 
 inline BOOL TY_Is_Array(TY_IDX ty)
@@ -341,7 +341,7 @@ inline BOOL TY_Is_Scalar(TY_IDX ty)
 
 inline BOOL TY_Is_Pointer_Or_Scalar(TY_IDX ty)
 {
-   return TY_Is_Scalar(ty) || TY_Is_Pointer(ty);
+   return (TY_Is_Scalar(ty) || (TY_Is_Pointer(ty)&&!TY_is_f90_pointer(ty)));
 } /* TY_Is_Pointer_Or_Scalar */
 
 #if (defined(BUILD_WHIRL2F) || defined(BUILD_PURPLE))

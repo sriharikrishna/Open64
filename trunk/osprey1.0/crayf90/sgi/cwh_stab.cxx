@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.8 $
- * $Date: 2002-09-10 18:19:50 $
+ * $Revision: 1.9 $
+ * $Date: 2002-09-18 17:53:20 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.9 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -786,6 +786,7 @@ fei_object(char * name_string,
 	   INT32       lineno)
 {
   TY_IDX  ty ;
+  TY_IDX  tr_idx;
   ST * st ;
   ST * st1;
   ST * base_st ;
@@ -1282,6 +1283,9 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
 
   if (test_flag(flag_bits, FEI_OBJECT_DV_IS_PTR)) {
     Set_ST_auxst_is_f90_pointer(st, TRUE);
+    tr_idx = Make_F90_Pointer_Type(ty);
+    Set_TY_is_f90_pointer(tr_idx);
+    Set_ST_type(st,tr_idx);
     Set_ST_is_my_pointer(st) ;
 
     if (ST_sclass(st) == SCLASS_FORMAL) {
@@ -1348,6 +1352,7 @@ fei_derived_type_name(char * name_string,
           SCLASS_UNKNOWN,
           EXPORT_LOCAL,
           (TY_IDX)0);
+return (cast_to_int(cwh_stab_packet(st,is_ST)));
 
 }
 

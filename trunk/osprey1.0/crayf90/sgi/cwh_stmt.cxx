@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.7 $
- * $Date: 2002-09-12 13:06:13 $
+ * $Revision: 1.8 $
+ * $Date: 2002-09-18 17:53:20 $
  * $Author: open64 $
  *
  * Revision history:
@@ -446,6 +446,8 @@ fei_pstore ( TYPE result_type )
   TY_IDX  ty;
   TY_IDX  ts;
 
+item_class ffmm; //Sept test
+
   FLD_det det ;
 
   if (cwh_stk_get_class() == STR_item) {
@@ -470,6 +472,8 @@ fei_pstore ( TYPE result_type )
       cwh_stk_pop_whatever() ;
       return ;
     }
+
+   ffmm = cwh_stk_get_class(); //test Sept
 
     switch(cwh_stk_get_class()) {
     case WN_item:

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.10 $
- * $Date: 2002-09-12 13:06:10 $
+ * $Revision: 1.11 $
+ * $Date: 2002-09-18 17:51:41 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.10 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.11 $";
 #endif
 
 #include <alloca.h>
@@ -2801,6 +2801,7 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    }
  
    reset_WN2F_CONTEXT_no_parenthesis(context);
+   reset_WN2F_CONTEXT_has_no_arr_elmt(context);
    Append_Token_Special(call_tokens, ')');
 }
 
