@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.17 $
- * $Date: 2003-05-23 22:17:30 $
+ * $Revision: 1.18 $
+ * $Date: 2003-06-06 21:58:47 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -3069,9 +3069,9 @@ fei_concat(INT32 numops)
   sc = numops;
 
   nm  = 2 * sc ;
-  sz  = (WN **) malloc(nm * sizeof(WN *)) ;
-  wn  = (WN **) malloc(nm * sizeof(WN *)) ;
-  va  = (BOOL *) malloc(nm * sizeof(BOOL)) ;
+  sz  = (WN **) malloc((nm+1) * sizeof(WN *)) ;
+  wn  = (WN **) malloc((nm+1) * sizeof(WN *)) ;
+  va  = (BOOL *) malloc((nm+1) * sizeof(BOOL)) ;
   rsz = WN_Zerocon(cwh_bound_int_typeid);
 
   for (i = sc ; i >= 1 ;  i--) {
