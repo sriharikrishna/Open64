@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:28 $
+ * $Revision: 1.4 $
+ * $Date: 2002-08-22 15:47:54 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -685,13 +685,16 @@ fei_user_type(char         *name_string,
 	      INT64         size,
 	      INT32         sequence_arg,
 	      INT32         cr_ty_idx,
-	      INT32         align)
+	      INT32         align,
+              INT32         external)
     
 {
   TY_IDX ty_idx    ;
   dtype_t  d ;
   FORT_SEQUENCE sequence;
   INT32 i;
+  ST *st;
+  
 
   sequence = (FORT_SEQUENCE) sequence_arg;
 
@@ -700,6 +703,18 @@ fei_user_type(char         *name_string,
   TY& ty = Ty_Table[ty_idx];
 
   TY_Init (ty, bit_to_byte(size), KIND_STRUCT, MTYPE_M, Save_Str(name_string));
+
+    st = New_ST(CURRENT_SYMTAB);
+
+    ST_Init(st,
+          Save_Str(name_string),
+          CLASS_TYPE,
+          SCLASS_UNKNOWN,
+          EXPORT_LOCAL,
+          ty_idx);
+
+  if (external)
+    Set_TY_is_external(ty);
 
   for (i=0; i<nbr_components; i++) {
      FLD_HANDLE fld = New_FLD ();

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:46 $
+ * $Revision: 1.4 $
+ * $Date: 2002-08-22 15:48:38 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.4 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -119,6 +119,7 @@ static void ST2F_decl_error(TOKEN_BUFFER tokens, ST *st);
 static void ST2F_decl_var(TOKEN_BUFFER tokens, ST *st);
 static void ST2F_decl_func(TOKEN_BUFFER tokens, ST *st);
 static void ST2F_decl_const(TOKEN_BUFFER tokens, ST *st);
+static void ST2F_decl_type (TOKEN_BUFFER tokens, ST *st);
 
 static void ST2F_use_error(TOKEN_BUFFER tokens, ST *st);
 static void ST2F_use_var(TOKEN_BUFFER tokens, ST *st);
@@ -140,6 +141,8 @@ static const ST2F_HANDLER_FUNC ST2F_Decl_Handler[CLASS_COUNT] =
   &ST2F_decl_error,  /* CLASS_PREG  == 0x04 */
   &ST2F_decl_error,  /* CLASS_BLOCK == 0x05 */
   &ST2F_decl_error,  /* CLASS_NAME  == 0x06 */
+  &ST2F_decl_error,  /* CLASS_MODULE == 0x07*/
+  &ST2F_decl_type,   /* CLASS_TYPE   ==0x08 */
 }; /* ST2F_Decl_Handler */
 
 static const ST2F_HANDLER_FUNC ST2F_Use_Handler[CLASS_COUNT] =
@@ -374,6 +377,33 @@ INITPRO:
 	 INITO2F_translate(Data_Stmt_Tokens, inito);
    }
 } /* ST2F_decl_var */
+
+
+static void 
+ST2F_decl_type(TOKEN_BUFFER tokens, ST *st)
+{
+   const char  *st_name = W2CF_Symtab_Nameof_St(st);
+   TOKEN_BUFFER decl_tokens = New_Token_Buffer();
+   TY_IDX       ty_rt = ST_type(st);
+   ST *base;
+
+   ASSERT_DBG_FATAL(ST_sym_class(st)==CLASS_TYPE, 
+		    (DIAG_W2F_UNEXPECTED_SYMCLASS, 
+		     ST_sym_class(st), "ST2F_decl_type"));
+
+   if (Current_scope > GLOBAL_SYMTAB) 
+       ASSERT_DBG_FATAL(!PUINFO_RETURN_TO_PARAM || st != PUINFO_RETURN_PARAM, 
+		       (DIAG_W2F_DECLARE_RETURN_PARAM, "ST2F_decl_var"));
+
+      if (Use_Purple_Array_Bnds_Placeholder && TY_Is_Array(ST_type(st)))
+	 TY2F_Translate_Purple_Array(decl_tokens, st, ST_type(st));
+      else {
+	 TY2F_translate(decl_tokens, ST_type(st),1);
+       }
+   TY2F_Prepend_Structures(decl_tokens);
+   Append_And_Reclaim_Token_List(tokens, &decl_tokens);
+
+} /* ST2F_decl_type */
 
 
 static void 
@@ -794,10 +824,10 @@ ST2F_func_header(TOKEN_BUFFER tokens,
  
    if (!is_altentry)
    {
-
       /* Emit parameter declarations, indented and on a new line */
       Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
       Append_Token_String(header_tokens, "IMPLICIT NONE");
+
 
       for (param = first_param; param < num_params -implicit_parms; param++)
       {
@@ -810,7 +840,6 @@ ST2F_func_header(TOKEN_BUFFER tokens,
               Append_Token_String(header_tokens,
                               W2CF_Symtab_Nameof_St(params[param]));
            }
-# if 0
         if (ST_is_intent_in_argument( params[param])) {
               Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
               Append_Token_String(header_tokens,"INTENT(in) ");
@@ -823,7 +852,6 @@ ST2F_func_header(TOKEN_BUFFER tokens,
               Append_Token_String(header_tokens,
                               W2CF_Symtab_Nameof_St(params[param]));
            }
-# endif
 
         } 
       }

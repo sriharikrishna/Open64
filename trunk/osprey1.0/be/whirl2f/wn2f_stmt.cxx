@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.4 $
- * $Date: 2002-08-16 19:30:47 $
+ * $Revision: 1.5 $
+ * $Date: 2002-08-22 15:48:38 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.5 $";
 #endif
 
 #include <alloca.h>
@@ -224,7 +224,7 @@ WN2F_Function_Call_Lhs(TOKEN_BUFFER rhs_tokens,  /* The function call */
 	 ST2F_use_translate(lhs_tokens,result_var);
 
       else
-	 WN2F_Offset_Symref(lhs_tokens,  // here1
+	 WN2F_Offset_Symref(lhs_tokens,  
 			    result_var, /* base variable */
 			    Stab_Pointer_To(ST_type(result_var)), /* addr */
 			    return_ty,  /* type of rhs */
@@ -1256,7 +1256,18 @@ public:
 
      nomodulevar = (strstr(stbasename,scope_name)==NULL &&
                     strstr(scope_name,stbasename)==NULL );
+  
+     if (ST_class(st)==CLASS_TYPE) 
+        if (!TY_is_external(ST_type(st))){
+            Append_F77_Indented_Newline(tokens,
+                                        lines_between_decls, NULL/*label*/);
 
+            ST2F_decl_translate(tokens,  st);
+             return;
+         }
+        else
+            return;
+ 
 
      if (!BE_ST_w2fc_referenced(st) && !ST_has_nested_ref(st)
             && !ST_is_in_module(st)   
@@ -2241,8 +2252,8 @@ WN2F_return(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	    /* PUinfo_init_pu() revealed that the return value is present
 	     * in a variable or non-return-register.  Now, move the value to
 	     * this return location.
-	     */
-	    TY_IDX rv_ty = ST_type(result_var);
+		     */
+		    TY_IDX rv_ty = ST_type(result_var);
 
 	    if (TY_kind(rv_ty) != KIND_STRUCT) 
 	    {
@@ -3185,7 +3196,6 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
            Append_Token_String(header_tokens,
                               W2CF_Symtab_Nameof_St(param_st[param]));
           }
-# if 0
         if (ST_is_intent_in_argument(param_st[param])) {
            Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
            Append_Token_String(header_tokens,"INTENT(in) ");
@@ -3198,7 +3208,6 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
            Append_Token_String(header_tokens,
                               W2CF_Symtab_Nameof_St(param_st[param]));
           }
-# endif
         }
 
       Append_Token_Special(header_tokens, '\n');

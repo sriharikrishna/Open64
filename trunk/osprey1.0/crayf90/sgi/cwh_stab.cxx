@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:28 $
+ * $Revision: 1.4 $
+ * $Date: 2002-08-22 15:47:54 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1120,11 +1120,11 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
 
         switch (arg_intent) {
            case 1:
-//              Set_ST_is_intent_in_argument(st);
+              Set_ST_is_intent_in_argument(st);
                break;
 
            case 2:
-//              Set_ST_is_intent_out_argument(st);
+              Set_ST_is_intent_out_argument(st);
               break;
            default:
               break;
@@ -1329,6 +1329,20 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   return(cast_to_int(o));
 }
 
+INTPTR
+fei_derived_type_name(char * name_string,
+                      INT32 external)
+{
+  ST *st;
+  st = New_ST(CURRENT_SYMTAB);
+    ST_Init(st,
+          Save_Str(name_string),
+          CLASS_TYPE,
+          SCLASS_UNKNOWN,
+          EXPORT_LOCAL,
+          (TY_IDX)0);
+
+}
 
 /*===================================================
  *

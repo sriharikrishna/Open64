@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: ty2f.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:34 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-22 15:48:38 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.h,v $
  *
  * Revision history:
@@ -128,6 +128,8 @@
 
 
 extern void TY2F_translate(TOKEN_BUFFER tokens, TY_IDX ty);
+extern void TY2F_translate(TOKEN_BUFFER tokens, TY_IDX ty,BOOL notyappend);
+
 extern void TY2F_Translate_Purple_Array(TOKEN_BUFFER tokens, ST *st, TY_IDX ty);
 extern void TY2F_Translate_ArrayElt(TOKEN_BUFFER tokens,
 				    TY_IDX       arr_ty,

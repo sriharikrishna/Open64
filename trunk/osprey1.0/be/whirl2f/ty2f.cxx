@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:34 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-22 15:48:38 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -79,6 +79,7 @@ static void TY2F_invalid(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty);
+static void TY2F_2_struct(TOKEN_BUFFER decl_tokens,TY_IDX ty);
 static void TY2F_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty);
 static void TY2F_void(TOKEN_BUFFER decl_tokens, TY_IDX ty) ;
 
@@ -1039,6 +1040,8 @@ TY2F_Translate_Structure(TY_IDX ty)
       TY2F_Structure_Decls = New_Token_Buffer();
 
    Set_Current_Indentation(current_indent);
+
+if (!TY_is_external(ty)) //August,2002
    Append_And_Reclaim_Token_List(TY2F_Structure_Decls, &struct_tokens);
 
 } /* TY2F_Translate_Structure */
@@ -1416,6 +1419,29 @@ TY2F_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty)
 
 
 static void
+TY2F_2_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty)
+{
+  /* Structs are supported by VAX-Fortran and Fortran-90.  Note
+   * that we here emit a RECORD declaration, while we expect
+   * the STRUCTURE to have been declared through a call to
+   * TY2F_Translate_Structure().
+   */
+  TY & ty_rt = Ty_Table[ty];
+
+  ASSERT_DBG_FATAL(TY_kind(ty_rt) == KIND_STRUCT, 
+		   (DIAG_W2F_UNEXPECTED_TYPE_KIND, 
+		    TY_kind(ty_rt), "TY2F_struct"));
+
+  if (!TY_is_translated_to_c(ty))
+    {
+      TY2F_Translate_Structure(ty);
+      Set_TY_is_translated_to_c(ty); /* Really, translated to Fortran, not C */
+    }
+
+} /* TY2F_2_struct */
+
+
+static void
 TY2F_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty)
 {
    if (!WN2F_F90_pu) {
@@ -1480,12 +1506,23 @@ TY2F_void(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 /*---------------------------------------------------------------------*/
 
 void
-TY2F_translate(TOKEN_BUFFER tokens, TY_IDX ty)
+TY2F_translate(TOKEN_BUFFER tokens, TY_IDX ty,BOOL notyapp)
 {
    /* Dispatch the translation-task to the appropriate handler function.
     */
-   TY2F_Handler[TY_kind(Ty_Table[ty])](tokens, ty);
+      if (!notyapp)
+       TY2F_Handler[TY_kind(Ty_Table[ty])](tokens, ty);
+      else
+         TY2F_2_struct(tokens,ty);
+
 } /* TY2F_translate */
+
+void 
+TY2F_translate(TOKEN_BUFFER tokens,TY_IDX ty)
+   {
+      TY2F_translate(tokens,ty,0);
+   }
+
 
 void 
 TY2F_Translate_Purple_Array(TOKEN_BUFFER tokens, ST *st, TY_IDX ty)
@@ -1760,8 +1797,14 @@ TY2F_Translate_Fld_Path(TOKEN_BUFFER   tokens,
 	{
 	  if (fld_path->arr_wn != NULL)
 	      WN2F_array_bounds(tokens,fld_path->arr_wn,FLD_type(f),context);	  
-	  else
-	      TY2F_Translate_ArrayElt(tokens,FLD_type(f),fld_path->arr_ofst);
+	  else 
+              ;
+
+//   TY2F_Translate_ArrayElt(tokens,FLD_type(f),fld_path->arr_ofst);
+/* Looks like this stmt(above) is a bug.We don't need translate array_element here
+ * since we already  get array information from an operator associated with this
+ * processing
+ */
 	}
 
       /* Separate fields with the dot-notation. */

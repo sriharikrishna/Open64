@@ -88,7 +88,8 @@
 # ifdef _HOST64
 #	define NUM_AA_WDS		3
 #	define NUM_AL_WDS		1
-#	define NUM_AT_WDS		7
+/* #	define NUM_AT_WDS		7*/
+#	define NUM_AT_WDS	        8	
 #	define NUM_BD_WDS		2
 #       define NUM_BLK_STK_WDS  	8
 #	define NUM_CN_WDS		2
@@ -121,7 +122,8 @@
 # else
 #	define NUM_AA_WDS		6
 #	define NUM_AL_WDS		2
-#	define NUM_AT_WDS		14
+/*#	define NUM_AT_WDS		14 */
+#	define NUM_AT_WDS		16 
 #	define NUM_BD_WDS		4 
 #       define NUM_BLK_STK_WDS  	16
 #	define NUM_CN_WDS		4
@@ -2841,13 +2843,15 @@ March # ifdef _DEBUG
 # define ATT_NON_DEFAULT_CPNT(IDX)		attr_tbl[IDX].fld.flag23
 # endif
 
+
+/* fzhao from 5==>_m*/
 # ifdef _DEBUG
 # define ATT_NUM_CPNTS(IDX)						       \
 	((AT_OBJ_CLASS(IDX) == Derived_Type) ?				       \
 		attr_tbl : sytb_var_error("ATT_NUM_CPNTS", IDX))	       \
-		[IDX].fld.field5
+		[IDX].fld.field_m
 # else
-# define ATT_NUM_CPNTS(IDX)		attr_tbl[IDX].fld.field5
+# define ATT_NUM_CPNTS(IDX)		attr_tbl[IDX].fld.field_m
 # endif
 
 # ifdef _DEBUG

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_io.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:35 $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-22 15:48:38 $
  *
  * Revision history:
  *  5-June-95 - Original Version
@@ -538,7 +538,7 @@ WN2F_io_list(TOKEN_BUFFER tokens,
 
 	set_WN2F_CONTEXT_deref_addr(context); 
 	WN2F_translate(tokens, WN_kid0(item), context);
-
+#if 0 //August 
 	if (kids > 2)  /* implied do? */
         {
 	  Append_Token_Special(tokens, '(');
@@ -556,6 +556,7 @@ WN2F_io_list(TOKEN_BUFFER tokens,
 	  }
 	  Append_Token_Special(tokens, ')');
 	}
+#endif
       }
       break ;
 
