@@ -38,8 +38,8 @@
 * ====================================================================
 *
 * Module: opt_alias_rule.h
-* $Revision: 1.1.1.1 $
-* $Date: 2002-05-22 20:06:32 $
+* $Revision: 1.2 $
+* $Date: 2003-12-11 22:12:27 $
 *
 * Revision history:
 *  04-APR-95 lo - Split from opt_alias.h
@@ -53,7 +53,7 @@
 #ifndef opt_alias_rule_INCLUDED
 #define opt_alias_rule_INCLUDED	"opt_alias_rule.h"
 #ifdef _KEEP_RCS_ID
-static char *opt_alias_rulercs_id = 	opt_alias_rule_INCLUDED"$Revision: 1.1.1.1 $";
+static char *opt_alias_rulercs_id = 	opt_alias_rule_INCLUDED"$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -396,8 +396,10 @@ private:
   BOOL Aliased_Base_Rule(const POINTS_TO *, const POINTS_TO *) const;
   // BOOL Aliased_Ofst_Rule(const POINTS_TO *, const POINTS_TO *);  // exported
   BOOL Aliased_Static_Nest_Rule(const POINTS_TO *, const POINTS_TO *) const;
-  BOOL Aliased_Classification_Rule(const POINTS_TO *, const POINTS_TO *) const;
-  BOOL Aliased_Ip_Classification_Rule(const POINTS_TO *, const POINTS_TO *) const;
+  BOOL Aliased_Classification_Rule(const POINTS_TO * const, 
+				   const POINTS_TO * const) const;
+  BOOL Aliased_Ip_Classification_Rule(const POINTS_TO *const, 
+				      const POINTS_TO *const) const;
   BOOL Aliased_F_Param_Rule(const POINTS_TO *, const POINTS_TO *) const;
   BOOL Aliased_ANSI_Type_Rule(const POINTS_TO *, const POINTS_TO *, TY_IDX, TY_IDX) const;
   BOOL Aliased_Qualifier_Rule(const POINTS_TO *, const POINTS_TO *, TY_IDX , TY_IDX ) const;
@@ -407,7 +409,8 @@ private:
   BOOL Aliased_Ragnarok_Restrict(const POINTS_TO *, const POINTS_TO *) const;
   BOOL Aliased_Disjoint(const POINTS_TO *, const POINTS_TO *) const;
   BOOL Aliased_Indirect_Rule(const POINTS_TO *, const POINTS_TO *) const;
-  BOOL Aliased_F90_Target_Rule(const POINTS_TO *, const POINTS_TO *,
+  BOOL Aliased_F90_Target_Rule(const POINTS_TO *const, 
+			       const POINTS_TO *const,
 			       TY_IDX , TY_IDX ) const;
   
 public:

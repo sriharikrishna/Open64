@@ -359,23 +359,23 @@ private:
 #endif // DEBUG_ID_MAP
     }
 
-  mINT32 Entry_lookup(KEY_TYPE) const;
+  mINT32 Entry_lookup(const KEY_TYPE) const;
 
 public:
-  ID_MAP(UINT32     initial_capacity,
-	 NODE_TYPE  not_found_value,
-	 MEM_POOL  *pool,
-	 BOOL       tracing);
+  ID_MAP(const UINT32     initial_capacity,
+	 const NODE_TYPE  not_found_value,
+	 MEM_POOL  *const pool,
+	 const BOOL       tracing);
   ~ID_MAP(void);
 
   void       Init(void);
   void       Init(UINT32);  // init with overriding table size
 
-  NODE_TYPE  Lookup(KEY_TYPE) const;
+  NODE_TYPE  Lookup(const KEY_TYPE) const;
 
-  void Insert(KEY_TYPE, NODE_TYPE);
+  void Insert(const KEY_TYPE, const NODE_TYPE);
 
-  void Delete(KEY_TYPE);
+  void Delete(const KEY_TYPE);
 
   void Print(FILE *) const;
 };

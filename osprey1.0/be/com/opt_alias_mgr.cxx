@@ -38,9 +38,9 @@
 * ====================================================================
 *
 * Module: opt_alias_mgr.cxx
-* $Revision: 1.1.1.1 $
-* $Date: 2002-05-22 20:06:32 $
-* $Author: dsystem $
+* $Revision: 1.2 $
+* $Date: 2003-12-11 22:12:27 $
+* $Author: eraxxon $
 * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/opt_alias_mgr.cxx,v $
 *
 * Revision history:
@@ -58,7 +58,7 @@
 #pragma hdrstop
 #ifdef _KEEP_RCS_ID
 #define opt_alias_mgr_CXX	"opt_alias_mgr.cxx"
-static char *rcs_id = 	opt_alias_mgr_CXX"$Revision: 1.1.1.1 $";
+static char *rcs_id = 	opt_alias_mgr_CXX"$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "string.h"
@@ -130,7 +130,7 @@ public:
 
   void Save_info(WN *);
   BOOL Restore_info(WN *, POINTS_TO *);
-  void Verify_info(const WN *, const POINTS_TO *);
+  void Verify_info(const WN * const, const POINTS_TO * const);
   void Set_alias_mgr(ALIAS_MANAGER *am) { _am = am; }
   void Erase_entry_if_invalid(WN *);
   void Remove_info(WN *);
