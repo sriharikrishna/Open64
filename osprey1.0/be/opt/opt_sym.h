@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_sym.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:51 $
+// $Revision: 1.2 $
+// $Date: 2003-12-09 19:24:50 $
 //
 // Revision history:
 //  28-SEP-94 shin - Original Version
@@ -801,7 +801,7 @@ private:
   // _dedicated        
   // _ref_formal          pt->Formal() && IS_FORTRAN && !ST_is_value_parm(st)
   // _named               pt->Named()
-  // _const               pt->Const()
+  // _a_const             pt->Const()
   // _unique_pt        
   // _virtual_var         WOPT_Enable_Update_Vsym && aux_stab[idx].Is_virtual()
   // _weak_var        
@@ -823,7 +823,7 @@ private:
   BS                        *_dedicated;
   BS                        *_ref_formal;
   BS                        *_named;
-  BS                        *_const;
+  BS                        *_a_const;
   BS                        *_unique_pt;
   BS                        *_virtual_var;
   BS                        *_weak_var;
@@ -1060,7 +1060,7 @@ public:
   BOOL     Dedicated(AUX_ID idx) const  {  return BS_MemberP(_dedicated, idx); }
   BOOL     Ref_formal(AUX_ID idx) const {  return BS_MemberP(_ref_formal, idx); }
   BOOL     Named(AUX_ID idx) const      {  return BS_MemberP(_named, idx); }
-  BOOL     Const(AUX_ID idx) const      {  return BS_MemberP(_const, idx); }
+  BOOL     Const(AUX_ID idx) const      {  return BS_MemberP(_a_const, idx); }
   BOOL     Unique_pt(AUX_ID idx) const  {  return BS_MemberP(_unique_pt, idx); }
 
   BOOL     Call_by_value(AUX_ID idx) const{ return BS_MemberP(_call_by_value, idx); }
@@ -1077,8 +1077,8 @@ public:
   void     Set_dedicated(AUX_ID idx)    {  _dedicated  = BS_Union1D(_dedicated, idx, mem_pool); }
   void     Set_ref_formal(AUX_ID idx)   {  _ref_formal = BS_Union1D(_ref_formal, idx, mem_pool); }
   void     Set_named(AUX_ID idx)        {  _named      = BS_Union1D(_named, idx, mem_pool); }
-  void     Set_const(AUX_ID idx)        {  _const      = BS_Union1D(_const, idx, mem_pool); }
-  void     Reset_const(AUX_ID idx)      {  _const      = BS_Difference1D(_const, idx); }
+  void     Set_const(AUX_ID idx)        {  _a_const    = BS_Union1D(_a_const, idx, mem_pool); }
+  void     Reset_const(AUX_ID idx)      {  _a_const    = BS_Difference1D(_a_const, idx); }
   void     Set_unique_pt(AUX_ID idx)    {  _unique_pt  = BS_Union1D(_unique_pt, idx, mem_pool); }
   void     Set_virtual_var(AUX_ID idx)  {  _virtual_var= BS_Union1D(_virtual_var, idx, mem_pool); }
   void     Set_weak_var(AUX_ID idx)     {  _weak_var   = BS_Union1D(_weak_var, idx, mem_pool); }
@@ -1092,7 +1092,7 @@ public:
   BS *     Dedicated(void) const        {  return _dedicated; }
   BS *     Ref_formal(void) const       {  return _ref_formal; }
   BS *     Named(void) const            {  return _named; }
-  BS *     Const(void) const            {  return _const; }
+  BS *     Const(void) const            {  return _a_const; }
   BS *     Unique_pt(void) const        {  return _unique_pt; }
   BS *     Indirect(void) const         {  return _indirect; }
   BS *     Inaccessible_to_callees(void) const { return _inaccessible_to_callees; }
@@ -1111,7 +1111,7 @@ public:
   void     Set_dedicated(BS *bs)        { _dedicated = bs; }
   void     Set_ref_formal(BS *bs)       { _ref_formal = bs; }
   void     Set_named(BS *bs)            { _named = bs; }
-  void     Set_const(BS *bs)            { _const = bs; }
+  void     Set_const(BS *bs)            { _a_const = bs; }
   void     Set_unique_pt(BS *bs)        { _unique_pt = bs; }
   void     Set_indirect(BS *bs)         { _indirect = bs; }
   void     Set_inaccessible_to_callees(BS *bs) { _inaccessible_to_callees = bs; }
