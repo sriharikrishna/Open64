@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.4 $
- * $Date: 2002-09-25 21:53:57 $
+ * $Revision: 1.5 $
+ * $Date: 2002-10-09 16:04:14 $
  * $Author: open64 $
  *
  * Revision history:
@@ -1840,8 +1840,12 @@ cwh_addr_store_ST(ST * st, OFFSET_64 off, TY_IDX dty,  WN * rhs)
 	
       } else {
    	wn = cwh_addr_stid(st,off,ts,rhs);
-   	cwh_block_append(wn) ;
-   	
+
+        if (still_in_preamble)
+              cwh_block_append_given_id(wn,First_Block,FALSE);
+        else
+              cwh_block_append(wn) ;
+
    	/* if CQ function result & shared entry temp */
    	/* store via the result address too          */
    	
@@ -1998,8 +2002,6 @@ cwh_addr_pstore_ST(ST * st, OFFSET_64 off, TY_IDX dty,  WN * rhs)
         /* by whirlconvert, those created by the FE will be in the    */
         /* preamble block, via fei_array_dimen                        */
 
-        if (still_in_preamble)
-          cwh_types_copyin_pragma(st);
       }
       break ;
 

@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.11 $
- * $Date: 2002-09-25 21:53:57 $
+ * $Revision: 1.12 $
+ * $Date: 2002-10-09 16:04:14 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.12 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -492,8 +492,6 @@ fei_proc_interface(char         *name_string,
   BOOL is_inline_func = FALSE;
   ST_EXPORT eclass;
   TY_IDX ret_ty;
-
-  still_in_preamble = TRUE;
 
   sym_class = (FUNCTION_SYM) Sym_class_arg;
   Class = (PROC_CLASS) Class_arg;

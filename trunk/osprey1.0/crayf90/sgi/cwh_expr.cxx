@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_expr
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:08 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-10-09 16:04:14 $
+ * $Author: open64 $
  * $Source: 
  *
  * Revision history:
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1494,6 +1494,7 @@ fei_null_expr (void)
 {
   WN *null_wn = NULL;
   cwh_stk_push(null_wn,WN_item);
+
 }
 
 /*=============================================
