@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.12 $
- * $Date: 2003-09-12 20:30:10 $
+ * $Revision: 1.13 $
+ * $Date: 2003-10-14 20:08:16 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.12 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.13 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -2243,8 +2243,14 @@ WN2C_Append_Symtab_Consts(TOKEN_BUFFER tokens,
    ST_IDX st_idx;
    FOREACH_SYMBOL(CURRENT_SYMTAB, st, st_idx)
    {
-      if ((ST_sym_class(st) == CLASS_VAR && ST_is_const_var(st)) || 
-	  (ST_sym_class(st) == CLASS_CONST))
+//      if ((ST_sym_class(st) == CLASS_VAR && ST_is_const_var(st)) || 
+//	  (ST_sym_class(st) == CLASS_CONST))
+// Only " ST_IS_CONST_VAR" need to be dumpout.
+// if "ST_sym_class(st) == CLASS_CONST",we never need to have explicit 
+// declaration for the symbol in unparsed code----fzhao
+
+     if (ST_sym_class(st) == CLASS_VAR && ST_is_const_var(st)) 
+     
       {
 	 tmp_tokens = New_Token_Buffer();
 	 ST2C_decl_translate(tmp_tokens, st, context);
@@ -2397,7 +2403,7 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
 
      TY_IDX st_ty  = ST_class(st) == CLASS_VAR ? ST_type(st) :
        ST_class(st) == CLASS_FUNC ? ST_pu_type(st) : ST_type(st);
-     //cout << "For ST: " << ST_name(st) << " " << st_ty << " " << TY_name(st_ty) << endl;      
+//     cout << "For ST: " << ST_name(st) << " " << st_ty << " " << TY_name(st_ty) << endl;      
      if (!ST_is_not_used(st)                         &&
 	 ST_sclass(st) != SCLASS_FORMAL              && 
 	 ST_sclass(st) != SCLASS_FORMAL_REF          &&
@@ -6148,6 +6154,11 @@ WN2C_translate_file_scope_defs(CONTEXT context)
 //#if 0 WEI(who is this?) set "#if 0/#endif" cause some static constant
 // missed output to the corresponding w2c.h file.This cause bug #19 (see bug
 // track website),get back the function call----fzhao
+
+/* we have to keep dumpout "ST_IS_CONST_VAR" symtab entry and get rid of
+   "CLASS_CONST" entry dumpout. Change the function "WN2C_Append_Symtab_Consts"
+    instead.----------fzhao
+ */
 
    Write_String(W2C_File[W2C_DOTH_FILE], NULL/* No srcpos map */,
 		"/* File-level symbolic constants */\n");
