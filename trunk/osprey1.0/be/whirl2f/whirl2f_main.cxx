@@ -47,9 +47,9 @@ extern void  W2F_Process_Command_Line(int, char**, int, char**);
 #include <stdio.h>		    /* for fprintf () */
 #include <stdlib.h>		    /* for getenv() */
 #include <unistd.h>		    /* for execv() */
-#include <string.h>		    /* for strcpy(),etc. */
+#include <string.h>		    /* for strcpy(), strerror(), etc. */
 #include <limits.h>		    /* for PATH_MAX */
-#include <errno.h>		    /* for errno, sys_errlist[] */
+#include <errno.h>		    /* for errno */
 #include <cmplrs/rcodes.h>
 #include "defs.h"
 
@@ -267,7 +267,7 @@ main (INT argc,       /* Number of command line arguments */
 
     execv (path, new_argv);
     fprintf (stderr, "%s: fail to execute %s: %s.\n", argv[0], path,
-	     sys_errlist[errno]);
+	     strerror(errno));
     exit(RC_SYSTEM_ERROR);
 
     return 0;
