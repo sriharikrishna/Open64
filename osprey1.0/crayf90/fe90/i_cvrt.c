@@ -690,7 +690,7 @@ static void cvrt_proc_to_pdg (char	*compiler_gen_date)
 
 {
    boolean	check_scp	= TRUE;
-   boolean      ismodule        = FALSE;
+   int          ismodule        = 0;
    int		mobes_sades;
    char	       *name_ptr;
    long		opt_flag;
@@ -780,7 +780,9 @@ PROCESS_SIBLING:
 
 # ifdef _ENABLE_FEI
   if (ATP_PGM_UNIT(pgm_attr_idx)==Module)  
-      ismodule=TRUE;
+      ismodule=1;
+   if (ATP_PGM_UNIT(pgm_attr_idx)==Blockdata)
+      ismodule=2;
    PDGCS_new_proc(2000,
                   PDG_AT_IDX(pgm_attr_idx), 
                   SCP_ALT_ENTRY_CNT(curr_scp_idx),
@@ -1252,12 +1254,13 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
                 INT32			big_int;
    		long64			bit_length 		= 0;
 		boolean			bound_chk;
-   		int			bound_idx;
+   		int			bound_idx               = 0;
    		int			cn_idx;
    		int			idx;
    		int			constant_class;
    		int			count;
-   		int			dim;
+   		int			dim                     = 0;
+                int                     co_dim                  = 0; 
    		long64			end;
 		long64			flags 			= 0;
    		int      		j;
@@ -1337,7 +1340,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
                 size_offset_type	offset2;
 		opnd_type		opnd;
                 size_offset_type	result;
-                int			pe_bd_idx;
+                int			pe_bd_idx               = 0;
    		long64			arith_constant[4];
    		int			arg_idx;
    		int			lhs_idx;
@@ -1347,8 +1350,8 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
                 int                     rename_only_num           = 0;
                 int                     ro_idx ;
                 int                     bonly        = 0;
-     int fm,fm1,fm2,fm3,fm4; /* for test */
-
+                INTPTR      oldpdgatidx;
+		int bootry;
 
    TRACE (Func_Entry, "cvrt_exp_to_pdg", NULL);
 
@@ -1879,7 +1882,6 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
 # endif
 
 # endif 
-      fm = IR_OPR(ir_idx);
 
       switch (IR_OPR(ir_idx)) { 
 
@@ -2124,6 +2126,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
       case Concat_Opr :
          cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                          IR_FLD_L(ir_idx));
+basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
          PDG_DBG_PRINT_START    
          PDG_DBG_PRINT_C("fei_concat");
@@ -3797,10 +3800,6 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
    case Asg_Opr :
    case Dv_Whole_Copy_Opr :
    case Dv_Def_Asg_Opr :
-        fm1 = Alt_Return_Opr;
-        fm2 = Asg_Opr;
-        fm3 = Dv_Whole_Copy_Opr;
-        fm4 = Dv_Def_Asg_Opr;
 
         if ((IR_FLD_L(ir_idx) == AT_Tbl_Idx) &&
             (AT_OBJ_CLASS(IR_IDX_L(ir_idx)) == Label)) {
@@ -6164,9 +6163,10 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
      
         attr_idx = find_base_attr(&IR_OPND_L(ir_idx), &line, &col);
         bound_idx = ATD_ARRAY_IDX(attr_idx);
-# if defined(COARRAY_FORTRAN) /* && defined(_TARGET_OS_MAX) May */
+# if defined(COARRAY_FORTRAN) 
         pe_bd_idx = ATD_PE_ARRAY_IDX(attr_idx);
 # endif
+
         base_attr = find_left_attr(&(IR_OPND_L(ir_idx)));
 
         bound_chk = (cdir_switches.bounds ||
@@ -6186,8 +6186,198 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
            dim = dim - 1;
         }
 
-        dim = IR_LIST_CNT_R(ir_idx);
+/*        dim = IR_LIST_CNT_R(ir_idx); */
+        dim = BD_RANK(bound_idx);
         ss = 0;
+
+# if defined(COARRAY_FORTRAN)
+/* co_dim could be 0 if the coarray referenced without co_rank */
+/*        co_dim = BD_RANK(pe_bd_idx);  */
+
+       co_dim = IR_LIST_CNT_R(ir_idx)-BD_RANK(bound_idx);
+
+        while (co_dim > 0) {  
+
+              if (stack_data_object) { 
+                 COPY_OPND(l_opnd, IL_OPND(next_idx));
+                 /* l_opnd will always be a scalar expression here */
+                 vv = 1;
+                 cn_idx = get_next_array_expr_element(&l_opnd, &vv);  
+                 COPY_OPND(IL_OPND(next_idx), l_opnd);
+                 static_subscripts[ss] = CN_INT_TO_C(cn_idx);
+
+# if defined(_TARGET_OS_MAX) || defined(_HOST32)  /* JEFFL */
+                 if (TYP_LINEAR(CN_TYPE_IDX(cn_idx)) != Integer_8) {
+                    SIGN_EXTEND(static_subscripts[ss]);
+                 }
+# endif
+                 goto CONTINUE_CO;
+              }
+
+              cvrt_exp_to_pdg(IL_IDX(next_idx),
+                              IL_FLD(next_idx));
+
+              if (ATD_IM_A_DOPE(attr_idx)) {
+                 cvrt_exp_to_pdg(IR_IDX_L(IR_IDX_L(ir_idx)),
+                                 IR_FLD_L(IR_IDX_L(ir_idx)));
+
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_get_dv_low_bnd");
+                 PDG_DBG_PRINT_D("(1) dim", dim);
+                 PDG_DBG_PRINT_D("(2) expand immed", EXPAND);
+                 PDG_DBG_PRINT_END
+# ifdef _ENABLE_FEI
+                 fei_get_dv_low_bnd(dim, EXPAND);
+# endif
+              }
+# if defined(COARRAY_FORTRAN)  && defined(_TARGET_OS_MAX) 
+              else if (IL_PE_SUBSCRIPT(next_idx)) {
+                 cvrt_exp_to_pdg(CN_INTEGER_ONE_IDX,
+                                 CN_Tbl_Idx);
+              }
+# endif
+              else {
+               if (BD_ARRAY_CLASS(pe_bd_idx)!= Deferred_Shape &&  
+                   BD_ARRAY_CLASS(pe_bd_idx)!= Deferred_Shape1)
+
+                 cvrt_exp_to_pdg(BD_LB_IDX(pe_bd_idx, co_dim),
+                                 BD_LB_FLD(pe_bd_idx, co_dim));
+               else fei_implicit_expr();
+              }
+
+              if (ATD_IM_A_DOPE(attr_idx)) {
+                 cvrt_exp_to_pdg(IR_IDX_L(IR_IDX_L(ir_idx)),
+                                 IR_FLD_L(IR_IDX_L(ir_idx)));
+
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_get_dv_extent");
+                 PDG_DBG_PRINT_D("(1) dim", dim);
+                 PDG_DBG_PRINT_D("(2) expand immed", EXPAND);
+                 PDG_DBG_PRINT_END
+# ifdef _ENABLE_FEI
+                 fei_get_dv_extent(dim, EXPAND);
+# endif
+              }
+# if defined(COARRAY_FORTRAN) && defined(_TARGET_OS_MAX)
+              else if (IL_PE_SUBSCRIPT(next_idx)) {
+                 cvrt_exp_to_pdg(BD_LEN_IDX(pe_bd_idx),
+                                 BD_LEN_FLD(pe_bd_idx));
+              }
+# endif
+              else {
+               if (BD_ARRAY_CLASS(pe_bd_idx)!= Deferred_Shape &&  
+                   BD_ARRAY_CLASS(pe_bd_idx)!= Deferred_Shape1)
+                 cvrt_exp_to_pdg(BD_XT_IDX(pe_bd_idx, co_dim),
+                                 BD_XT_FLD(pe_bd_idx, co_dim));
+                 else fei_implicit_expr();
+              }
+
+              if (ATD_IM_A_DOPE(attr_idx)) {
+                 cvrt_exp_to_pdg(IR_IDX_L(IR_IDX_L(ir_idx)),
+                                 IR_FLD_L(IR_IDX_L(ir_idx)));
+
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_get_dv_str_mult");
+                 PDG_DBG_PRINT_D("(1) dim", dim);
+                 PDG_DBG_PRINT_D("(2) expand immed", EXPAND);
+                 PDG_DBG_PRINT_END
+# ifdef _ENABLE_FEI
+                 fei_get_dv_str_mult(dim, EXPAND);
+# endif
+              }
+# if defined(_EXTENDED_CRI_CHAR_POINTER)
+              else if (AT_OBJ_CLASS(attr_idx) == Data_Obj &&
+                       ATD_CLASS(attr_idx) == CRI_Pointee &&
+                       TYP_TYPE(ATD_TYPE_IDX(attr_idx)) == Character &&
+                       TYP_CHAR_CLASS(ATD_TYPE_IDX(attr_idx)) == 
+                                                           Assumed_Size_Char) {
+                 cvrt_exp_to_pdg(BD_SM_IDX(pe_bd_idx, co_dim),
+                                 BD_SM_FLD(pe_bd_idx, co_dim));
+
+                 cvrt_exp_to_pdg(attr_idx, AT_Tbl_Idx);
+
+                 basic = get_basic_type(ATD_TYPE_IDX(attr_idx), 
+                                        ATD_ALIGNMENT(attr_idx),
+                                        attr_idx);
+
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_len");
+                 PDG_DBG_PRINT_END
+
+# ifdef _ENABLE_FEI
+/*                 fei_len(basic); */
+                 fei_len();
+# endif
+
+                 basic = get_basic_type(INTEGER_DEFAULT_TYPE, 
+                                       type_alignment_tbl[INTEGER_DEFAULT_TYPE],
+                                       NULL_IDX);
+
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_mult");
+                 PDG_DBG_PRINT_END
+
+# ifdef _ENABLE_FEI
+                 fei_mult(basic);
+# endif
+              }
+# endif
+# if defined(COARRAY_FORTRAN) && defined(_TARGET_OS_MAX)
+              else if (IL_PE_SUBSCRIPT(next_idx)) {
+                 cvrt_exp_to_pdg(CN_INTEGER_ONE_IDX,
+                                 CN_Tbl_Idx);
+              }
+# endif
+              else {
+               if (BD_ARRAY_CLASS(pe_bd_idx)!= Deferred_Shape &&  
+                   BD_ARRAY_CLASS(pe_bd_idx)!= Deferred_Shape1)
+
+                 cvrt_exp_to_pdg(BD_SM_IDX(pe_bd_idx, co_dim),
+                                 BD_SM_FLD(pe_bd_idx, co_dim));
+                 else fei_implicit_expr();
+              }
+
+              if (BD_ARRAY_CLASS(pe_bd_idx) == Assumed_Size) {
+                 if (BD_RANK(pe_bd_idx) == IR_LIST_CNT_R(ir_idx) && ss == 0) {
+                    bound_chk = FALSE;
+                 } 
+              } 
+
+              PDG_DBG_PRINT_START
+              PDG_DBG_PRINT_C("fei_subscr_size");
+              PDG_DBG_PRINT_T("(1) type", pdg_type_void);
+              PDG_DBG_PRINT_D("(2) bound_chk", bound_chk);
+              PDG_DBG_PRINT_END
+# ifdef _ENABLE_FEI
+              fei_subscr_size(pdg_type_void, bound_chk);
+# endif
+
+              if (ATD_IM_A_DOPE(attr_idx)) {
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_nseq_subscr");
+                 PDG_DBG_PRINT_T("(1) type", null_type);
+                 PDG_DBG_PRINT_END
+# ifdef _ENABLE_FEI
+                 fei_nseq_subscr(null_type);
+# endif
+              }
+              else {
+                 PDG_DBG_PRINT_START
+                 PDG_DBG_PRINT_C("fei_seq_subscr");
+                 PDG_DBG_PRINT_T("(1) type", null_type);
+                 PDG_DBG_PRINT_END
+# ifdef _ENABLE_FEI
+                 fei_seq_subscr(null_type,IR_LIST_CNT_R(ir_idx));
+# endif
+              }
+
+CONTINUE_CO:
+              next_idx = IL_PREV_LIST_IDX(next_idx);
+              co_dim =co_dim - 1;
+              ss = ss + 1;
+        }
+
+# endif /*COARRAY */
 
         while (dim > 0) {  
 
@@ -6223,7 +6413,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
                  fei_get_dv_low_bnd(dim, EXPAND);
 # endif
               }
-# if defined(COARRAY_FORTRAN) /* && defined(_TARGET_OS_MAX) May */
+# if defined(COARRAY_FORTRAN)  && defined(_TARGET_OS_MAX) 
               else if (IL_PE_SUBSCRIPT(next_idx)) {
                  cvrt_exp_to_pdg(CN_INTEGER_ONE_IDX,
                                  CN_Tbl_Idx);
@@ -6251,7 +6441,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
                  fei_get_dv_extent(dim, EXPAND);
 # endif
               }
-# if defined(COARRAY_FORTRAN)/* && defined(_TARGET_OS_MAX) May */
+# if defined(COARRAY_FORTRAN) && defined(_TARGET_OS_MAX)
               else if (IL_PE_SUBSCRIPT(next_idx)) {
                  cvrt_exp_to_pdg(BD_LEN_IDX(pe_bd_idx),
                                  BD_LEN_FLD(pe_bd_idx));
@@ -6315,7 +6505,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
 # endif
               }
 # endif
-# if defined(COARRAY_FORTRAN) /* && defined(_TARGET_OS_MAX)May */
+# if defined(COARRAY_FORTRAN) && defined(_TARGET_OS_MAX)
               else if (IL_PE_SUBSCRIPT(next_idx)) {
                  cvrt_exp_to_pdg(CN_INTEGER_ONE_IDX,
                                  CN_Tbl_Idx);
@@ -6360,7 +6550,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
                  PDG_DBG_PRINT_T("(1) type", null_type);
                  PDG_DBG_PRINT_END
 # ifdef _ENABLE_FEI
-                 fei_seq_subscr(null_type);
+                 fei_seq_subscr(null_type,IR_LIST_CNT_R(ir_idx));
 # endif
               }
 
@@ -6369,6 +6559,7 @@ CONTINUE:
               dim = dim - 1;
               ss = ss + 1;
         }
+        
         
         if (stack_data_object) {
            PDG_DBG_PRINT_START
@@ -6762,6 +6953,9 @@ CONTINUE:
         else {
            number_actual_args = IR_LIST_CNT_R(ir_idx);
         }
+ 
+        bootry = ATP_PGM_UNIT(IR_IDX_L(ir_idx)) == Subroutine;
+        bootry = ATP_EXTRA_DARG(IR_IDX_L(ir_idx));
 
         if (ATP_PGM_UNIT(IR_IDX_L(ir_idx)) == Subroutine ||
             ATP_EXTRA_DARG(IR_IDX_L(ir_idx))) {
@@ -8993,15 +9187,21 @@ CONTINUE:
                cvrt_exp_to_pdg(RO_NAME_ATTR(ro_idx),
                                AT_Tbl_Idx);
                    ++rename_only_num;
-               PDG_AT_IDX(RO_NAME_ATTR(ro_idx)) = NULL_IDX;  /* resend this attr */
-               AT_NAME_IDX(RO_NAME_ATTR(ro_idx)) = 
+               if (PDG_AT_IDX(RO_NAME_ATTR(ro_idx))!=NULL)
+                 {
+                 oldpdgatidx = PDG_AT_IDX(RO_NAME_ATTR(ro_idx));
+
+                 PDG_AT_IDX(RO_NAME_ATTR(ro_idx)) = NULL_IDX;  /* resend this attr */
+                 AT_NAME_IDX(RO_NAME_ATTR(ro_idx)) = 
                               AT_ORIG_NAME_IDX(RO_NAME_ATTR(ro_idx));
-               AT_NAME_LEN(RO_NAME_ATTR(ro_idx)) = 
+                 AT_NAME_LEN(RO_NAME_ATTR(ro_idx)) = 
                               AT_ORIG_NAME_LEN(RO_NAME_ATTR(ro_idx));
 
 
-               cvrt_exp_to_pdg(RO_NAME_ATTR(ro_idx),
+                  cvrt_exp_to_pdg(RO_NAME_ATTR(ro_idx),
                                 AT_Tbl_Idx);
+                  PDG_AT_IDX(RO_NAME_ATTR(ro_idx)) = oldpdgatidx; /*keep original PDG_AT_IDX*/
+                   }
                    ++rename_only_num;
                   ro_idx = RO_NEXT_IDX(ro_idx);
          }
@@ -10736,9 +10936,7 @@ static TYPE get_type_desc(int	input_idx)
    int      		type_flag	= 0;
    TYPE			type_idx;
 
-/* # if defined(_TARGET_OS_MAX)  May*/
-   int			pe_bd_idx;
-/*# endif  */
+   int			pe_bd_idx       = 0;
 
 
    TRACE (Func_Entry, "get_type_desc", NULL);
@@ -10889,7 +11087,7 @@ static TYPE get_type_desc(int	input_idx)
       }
 # endif
 
-
+   pe_bd_idx = ATD_PE_ARRAY_IDX(attr_idx);
 
       for (i = 1; i <= BD_RANK(bd_idx); i++) {  
 
@@ -11070,7 +11268,7 @@ static TYPE get_type_desc(int	input_idx)
 # endif
 
 # if defined(GENERATE_WHIRL)
-         if (i == BD_RANK(bd_idx)) {  
+         if (i == BD_RANK(bd_idx) && pe_bd_idx == 0) {   
 # endif
             PDG_DBG_PRINT_START
             PDG_DBG_PRINT_C("fei_descriptor");
@@ -11100,13 +11298,10 @@ static TYPE get_type_desc(int	input_idx)
    }
 
 # if defined(COARRAY_FORTRAN)
-/* # if defined(_TARGET_OS_MAX)  May*/
+
    pe_bd_idx = ATD_PE_ARRAY_IDX(attr_idx);
-
-   if (pe_bd_idx &&
-       ! ATD_ALLOCATABLE(attr_idx)) {
-
-      dist_idx = NULL_IDX;
+   if (pe_bd_idx) {
+      dist_idx = ATD_DISTRIBUTION_IDX(attr_idx);
       basic_type = pdg_basic_type[TYP_TYPE(ATD_TYPE_IDX(attr_idx))];
 
       switch (TYP_LINEAR(ATD_TYPE_IDX(attr_idx))) {
@@ -11140,49 +11335,199 @@ static TYPE get_type_desc(int	input_idx)
          break;
       }
 
-      lbound = (long64) 1;
-      span = (long64) 0;
-
-      if (BD_LEN_FLD(pe_bd_idx) == CN_Tbl_Idx) {
-         extent = CN_INT_TO_C(BD_LEN_IDX(pe_bd_idx));
-         xt_vble = FALSE;
-      }
-      else {
-         extent = BD_LEN_IDX(pe_bd_idx);
-         xt_vble = TRUE;
-
-# ifdef _TARGET_OS_MAX
-         xt_symcon = ATD_SYMBOLIC_CONSTANT(extent);
-         xt_vble = !ATD_SYMBOLIC_CONSTANT(extent);
-# endif
-
-         if (PDG_AT_IDX(extent) == NULL_IDX) {
-            send_attr_ntry(extent);
-         }
-         extent = PDG_AT_IDX(extent);
-      }
-
-      flag = (xt_symcon << FEI_ARRAY_DIMEN_SCON_EXT)|
-             (xt_vble   << FEI_ARRAY_DIMEN_VARY_EXT);
-
-
-      flag |= 1 << FEI_ARRAY_DIMENCOARRAY_FORTRAN_REMOTE;
-
-      flag |= (BD_FLOW_DEPENDENT(pe_bd_idx) << FEI_ARRAY_DIMEN_FLOW_DEPENDENT);
 
       temp_attr_idx = attr_idx;
+
       if (ATD_CLASS(attr_idx) == CRI__Pointee &&
           ATD_PTR_IDX(attr_idx) != NULL_IDX) {
          temp_attr_idx = ATD_PTR_IDX(attr_idx);
       }
+      else if (ATD_AUTOMATIC(attr_idx) &&
+               ATD_AUTO_BASE_IDX(attr_idx) != NULL_IDX) {
+         temp_attr_idx = ATD_AUTO_BASE_IDX(attr_idx);
+      }
 
       if (ATD_STOR_BLK_IDX(temp_attr_idx) != NULL_IDX &&
           SB_SCP_IDX(ATD_STOR_BLK_IDX(temp_attr_idx)) != curr_scp_idx) {
-         flag = flag | (1 << FEI_ARRAY_DIMEN_HOSTED_TYPE);
+         type_flag = type_flag | (1 << FEI_DESCRIPTOR_HOSTED_TYPE);
       }
 
+      size = stor_bit_size_of(attr_idx, FALSE, FALSE);
+
+      if (size.fld == CN_Tbl_Idx) {
+         span = CN_INT_TO_C(size.idx);
+      }
+      else {
+         span = F_INT_TO_C(size.constant, TYP_LINEAR(size.type_idx));
+      }
+
+# ifdef _DEBUG
+      if (! BD_RESOLVED(pe_bd_idx)) {
+          PRINTMSG(1, 626, Internal, 1,
+                  "resolved bounds entry",
+                  "get_type_desc");
+      }
+# endif
+
+
+      for (i = 1; i <= BD_RANK(pe_bd_idx); i++) {
+
+         if (BD_LB_FLD(pe_bd_idx, i) == NO_Tbl_Idx)
+           {
+             lb_empty = TRUE;
+           }
+
+         else {
+
+         if (BD_LB_FLD(pe_bd_idx, i) == CN_Tbl_Idx) {
+            lbound = CN_INT_TO_C(BD_LB_IDX(pe_bd_idx, i));
+            lb_vble = FALSE;
+         }
+         else {
+            lbound = BD_LB_IDX(pe_bd_idx, i);
+            lb_vble = TRUE;
+
+# ifdef _TARGET_OS_MAX
+            lb_symcon = ATD_SYMBOLIC_CONSTANT(lbound);
+            lb_vble = !ATD_SYMBOLIC_CONSTANT(lbound);
+# endif
+
+            if (PDG_AT_IDX(lbound) == NULL_IDX) {
+
+               if (template_tmp) {
+                  COPY_ATTR_NTRY(AT_WORK_IDX, lbound);
+                  AT_REFERENCED(lbound) = Referenced;
+                  ATD_OFFSET_ASSIGNED(lbound) = FALSE;
+                  ATD_STOR_BLK_IDX(lbound) = SCP_SB_STACK_IDX(curr_scp_idx);
+                  send_attr_ntry(lbound);
+                  COPY_ATTR_NTRY(lbound, AT_WORK_IDX);
+               }
+               else {
+                  send_attr_ntry(lbound);
+               }
+            }
+            lbound = PDG_AT_IDX(lbound);
+         }
+        }
+         if (BD_UB_FLD(pe_bd_idx, i) == NO_Tbl_Idx) {
+          
+              ub_empty = TRUE;
+         }
+         else {
+         if (BD_UB_FLD(pe_bd_idx, i) == CN_Tbl_Idx) {
+            ubound = CN_INT_TO_C(BD_UB_IDX(pe_bd_idx, i));
+            ub_vble = FALSE;
+         }
+         else {
+            ubound = BD_UB_IDX(pe_bd_idx, i);
+            ub_vble = TRUE;
+
+# ifdef _TARGET_OS_MAX
+            ub_symcon = ATD_SYMBOLIC_CONSTANT(ubound);
+            ub_vble = !ATD_SYMBOLIC_CONSTANT(ubound);
+# endif
+
+            if (PDG_AT_IDX(ubound) == NULL_IDX) {
+
+               if (template_tmp) {
+                  COPY_ATTR_NTRY(AT_WORK_IDX, ubound);
+                  AT_REFERENCED(ubound) = Referenced;
+                  ATD_OFFSET_ASSIGNED(ubound) = FALSE;
+                  ATD_STOR_BLK_IDX(ubound) = SCP_SB_STACK_IDX(curr_scp_idx);
+                  send_attr_ntry(ubound);
+                  COPY_ATTR_NTRY(ubound, AT_WORK_IDX);
+               }
+               else {
+                  send_attr_ntry(ubound);
+               }
+            }
+            ubound = PDG_AT_IDX(ubound);
+         }
+        }
+
+         if (BD_XT_FLD(pe_bd_idx,i)  == NO_Tbl_Idx) {
+             xt_empty = TRUE;
+             span = (long64) 0;
+         }
+         else {
+         if (BD_XT_FLD(pe_bd_idx, i) == CN_Tbl_Idx) {
+            extent = CN_INT_TO_C(BD_XT_IDX(pe_bd_idx, i));
+            xt_vble = FALSE;
+            span = extent * span;
+         }
+         else {
+            extent = BD_XT_IDX(pe_bd_idx, i);
+            xt_vble = TRUE;
+
+# ifdef _TARGET_OS_MAX
+            xt_symcon = ATD_SYMBOLIC_CONSTANT(extent);
+            xt_vble = !ATD_SYMBOLIC_CONSTANT(extent);
+# endif
+
+            if (PDG_AT_IDX(extent) == NULL_IDX) {
+
+               if (template_tmp) {
+                  COPY_ATTR_NTRY(AT_WORK_IDX, extent);
+                  AT_REFERENCED(extent) = Referenced;
+                  ATD_OFFSET_ASSIGNED(extent) = FALSE;
+                  ATD_STOR_BLK_IDX(extent) = SCP_SB_STACK_IDX(curr_scp_idx);
+                  send_attr_ntry(extent);
+                  COPY_ATTR_NTRY(extent, AT_WORK_IDX);
+               }
+               else {
+                  send_attr_ntry(extent);
+               }
+            }
+            extent = PDG_AT_IDX(extent);
+            span = (long64) 0;
+         }
+       }
+
+         flag = (lb_symcon << FEI_ARRAY_DIMEN_SCON_LB)|
+                (lb_vble   << FEI_ARRAY_DIMEN_VARY_LB)|
+                (ub_symcon << FEI_ARRAY_DIMEN_SCON_UB)|
+                (ub_vble   << FEI_ARRAY_DIMEN_VARY_UB)|
+                (xt_symcon << FEI_ARRAY_DIMEN_SCON_EXT)|
+                (xt_vble   << FEI_ARRAY_DIMEN_VARY_EXT)|
+                (lb_empty  << FEI_ARRAY_DIMEN_EMPTY_LB)|
+                (xt_empty  << FEI_ARRAY_DIMEN_EMPTY_EXT)|
+                (ub_empty   << FEI_ARRAY_DIMEN_EMPTY_UB);
+
+         flag |= (BD_FLOW_DEPENDENT(bd_idx) << FEI_ARRAY_DIMEN_FLOW_DEPENDENT);
+
+         temp_attr_idx = attr_idx;
+         if (ATD_CLASS(attr_idx) == CRI__Pointee &&
+             ATD_PTR_IDX(attr_idx) != NULL_IDX) {
+            temp_attr_idx = ATD_PTR_IDX(attr_idx);
+         }
+
+         if (ATD_STOR_BLK_IDX(temp_attr_idx) != NULL_IDX &&
+             SB_SCP_IDX(ATD_STOR_BLK_IDX(temp_attr_idx)) != curr_scp_idx) {
+            flag = flag | (1 << FEI_ARRAY_DIMEN_HOSTED_TYPE);
+         }
+
+         if (dist_idx != NULL_IDX) {
+            if (BD_CYCLIC_IDX(dist_idx, i) != NULL_IDX) {
+               cvrt_exp_to_pdg(BD_CYCLIC_IDX(dist_idx, i),
+                               BD_CYCLIC_FLD(dist_idx, i));
+               flag = flag | (1 << FEI_ARRAY_DIMEN_DIST_EXPR);
+            }
+
+            if (BD_ONTO_IDX(dist_idx, i) != NULL_IDX) {
+               cvrt_exp_to_pdg(BD_ONTO_IDX(dist_idx, i),
+                               BD_ONTO_FLD(dist_idx, i));
+               flag = flag | (1 << FEI_ARRAY_DIMEN_ONTO_EXPR);
+            }
+
+            distribution = BD_DISTRIBUTION(dist_idx, i);
+
+            flag = flag | (BD_DISTRIBUTE_RESHAPE(dist_idx) <<
+                                   FEI_ARRAY_DIMEN_DIST_RESHAPE);
+         }
+
+
       PDG_DBG_PRINT_START
-      PDG_DBG_PRINT_C("fei_array_dimen");
+      PDG_DBG_PRINT_C("fei_co_array_dimen");
       PDG_DBG_PRINT_O("(1) flags", flag);
       PDG_DBG_PRINT_LLD("(2) lbound", lbound);
       PDG_DBG_PRINT_LLD("(3) extent", extent);
@@ -11197,12 +11542,15 @@ static TYPE get_type_desc(int	input_idx)
       pdg_array_idx = fei_co_array_dimen(flag,
                                       lbound,
                                       extent,
-                                      i,
+/*                                      BD_RANK(bd_idx)+i, */
+ 				      i,
                                       type_idx,
                                       span,
                                       distribution,
                                       ubound);
 # endif
+
+if (i == BD_RANK(pe_bd_idx)) { 
 
       PDG_DBG_PRINT_START
       PDG_DBG_PRINT_C("fei_descriptor");
@@ -11224,10 +11572,10 @@ static TYPE get_type_desc(int	input_idx)
       PDG_DBG_PRINT_START
       PDG_DBG_PRINT_T("(r) type", type_idx);
       PDG_DBG_PRINT_END
+     }
    }
+ }
 # endif 
-/* # endif May*/
-
 
 EXIT:
 
@@ -11722,10 +12070,12 @@ static void  send_procedure(int			attr_idx,
       }
 
       if (ATP_PROC(attr_idx) == Unknown_Proc   ||   
-          ATP_PROC(attr_idx) == Module_Proc    ||   
-          ATP_PROC(attr_idx) == Intrin_Proc ) {
+          ATP_PROC(attr_idx) == Module_Proc ) {      
          proc = Extern_Proc;
       }
+
+      if (ATP_PROC(attr_idx) == Intrin_Proc)
+         proc = Intrin_src_Proc;  /*fzhao add June*/
 
       if (alt_entry_idx != NULL_IDX) {
          if (ATP_ALT_ENTRY(attr_idx)) {
@@ -11748,7 +12098,19 @@ static void  send_procedure(int			attr_idx,
          pdg_alt_entry_idx = parent_idx;
       }
    }
-   else {
+   else if (ATP_PROC(attr_idx) == Intrin_Proc) 
+          {
+           if (ATP_INTRIN_ENUM(attr_idx)==Sync_Images_Intrinsic ||
+               ATP_INTRIN_ENUM(attr_idx)==Rem_Images_Intrinsic  ||
+               ATP_INTRIN_ENUM(attr_idx)==Log2_Images_Intrinsic ||
+               ATP_INTRIN_ENUM(attr_idx)==This_Image_Intrinsic  ||
+               ATP_INTRIN_ENUM(attr_idx)==Num_Images_Intrinsic)
+                     proc = Imported_Proc; /*June*/
+           else proc = Intrin_src_Proc;
+           }
+              /* fzhao add June  */
+     else
+      {
       proc = (ATP_PROC(attr_idx) == Intern_Proc) ? Intern_Proc_Refd :
                                                         Imported_Proc;
 
@@ -12838,6 +13200,9 @@ static void send_attr_ntry(int		attr_idx)
             /* change the tmp to a variable */
 
             ATD_CLASS(ATD_CONST_IDX(attr_idx)) = Variable;
+
+            AT_MODULE_OBJECT(ATD_CONST_IDX(attr_idx)) = AT_MODULE_OBJECT(attr_idx);
+/* fzhao add June */
             send_attr_ntry(ATD_CONST_IDX(attr_idx));
             ATD_CLASS(ATD_CONST_IDX(attr_idx)) = Compiler_Tmp;
             goto EXIT;
@@ -13125,6 +13490,10 @@ static void send_attr_ntry(int		attr_idx)
          case Deferred_Shape1:
             flag = flag | ((long64) 1 << FEI_OBJECT_DEFERRED_SHAPE);
             break;   
+  
+         case Deferred_Shape:
+            flag = flag | ((long64) 1 << FEI_OBJECT_DEFERRED_SHAPE);
+            break; 
          }
       }
 
@@ -13180,6 +13549,10 @@ static void send_attr_ntry(int		attr_idx)
       ((long64) AT_NAMELIST_OBJ(attr_idx) 	<< FEI_OBJECT_NAMELIST_ITEM)|
  
       ((long64) AT_MODULE_OBJECT(attr_idx)      << FEI_OBJECT_IN_MODULE)); 
+
+      fm = AT_MODULE_OBJECT(attr_idx);  /*ftry June*/
+
+
       if (AT_MODULE_IDX(attr_idx)!=NULL_IDX ||
           AT_ORIG_MODULE_IDX(attr_idx)!=NULL_IDX) {
         flag = flag | ((long64) 1 << FEI_OBJECT_EXTERNAL);
