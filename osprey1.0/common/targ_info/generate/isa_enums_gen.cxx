@@ -40,8 +40,8 @@
 //
 /////////////////////////////////////
 //
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:06 $
+//  $Revision: 1.2 $
+//  $Date: 2003-12-11 22:22:18 $
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -158,7 +158,7 @@ void ISA_Create_Enum_Class ( const char* name, ...)
 }
 
 
-static char*
+static const char*
 Print_ECV_EName (const char *name)
 {
   // will print direct to file, so can use temp buffers
