@@ -1,7 +1,7 @@
 documentation: open64.ps
 
 open64.ps: open64.dvi
-	dvi2ps -f open64.dvi > open64.ps
+	dvips -f open64.dvi > open64.ps
 
 open64.dvi: open64.tex whirl.tex symtab.tex
 	latex open64
