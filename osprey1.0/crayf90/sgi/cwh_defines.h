@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_defines.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:07 $
+ * $Revision: 1.3 $
+ * $Date: 2003-12-11 22:10:55 $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -52,16 +52,17 @@
 #ifndef CWH_DEFINES_INCLUDED
 #define CWH_DEFINES_INCLUDED
 
+#include "defs.h" /* for mUINT32 */
 
 /* dubious casts and types for use with PDGCS */
 
 typedef INT64 OFFSET_64 ; 
 typedef unsigned long ULONG ;
 typedef long SLONG ;
-#define cast_to_TY(x) ((TY_IDX) (void *)x) 
+#define cast_to_TY(x) ((TY_IDX) (mUINT32)x) /* eraxxon: replace (void *) */
 #define cast_to_WN(x) ((WN *) (void *)x) 
 #define cast_to_ST(x) ((ST *) (void *)x) 
-#define cast_to_LB(x) ((LABEL_IDX) (void *)x) 
+#define cast_to_LB(x) ((LABEL_IDX) (mUINT32)x) /* eraxxon: replace (void *) */
 #define cast_to_uint(x) ((unsigned long) (void *)x)
 #define cast_to_int(x) ((long ) (void *)x)
 #define cast_to_void(x) ((void *)x)
