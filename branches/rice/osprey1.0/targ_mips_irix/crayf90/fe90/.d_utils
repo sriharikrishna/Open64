@@ -1,0 +1,15 @@
+# dependences for compilation
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../arith/arith.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/debug.m
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/defines.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/globals.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/globals.m
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/host.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/host.m
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/sytb.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/sytb.m
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/target.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/target.m
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/tokens.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/tokens.m
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/utils.c

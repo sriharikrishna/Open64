@@ -1,0 +1,19 @@
+# dependences for compilation
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../clibinc/cray/nlcatmsg.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/cif.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/debug.m
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/defines.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/globals.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/globals.m
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/host.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/host.m
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/messages.c
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/messages.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/messages.m
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/sytb.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/sytb.m
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/target.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/target.m
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/tokens.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../crayf90/fe90/tokens.m
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/fe90/../../../linux/mfef90_includes/stdarg.h

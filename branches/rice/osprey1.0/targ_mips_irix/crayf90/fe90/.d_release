@@ -1,0 +1,5 @@
+# dependences for compilation
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/defines.h
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/globals.m
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../crayf90/fe90/release.c
+/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/fe90/../../../include/stamp.h

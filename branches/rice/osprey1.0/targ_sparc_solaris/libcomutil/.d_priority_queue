@@ -1,0 +1,10 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/com/config_host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/com/defs.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/com/err_host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/com/srcpos.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/util/errdesc.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/util/errors.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/util/mempool.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/util/priority_queue.c
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcomutil/../../common/util/priority_queue.h

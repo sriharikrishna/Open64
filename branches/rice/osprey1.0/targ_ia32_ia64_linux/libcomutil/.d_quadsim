@@ -1,0 +1,9 @@
+# dependences for compilation
+../include/bstring.h
+../include/stddef.h
+../include/stdio.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/com/defs.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/util/quad.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/util/quadsim.c
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../common/util/quadsim.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/libcomutil/../../include/fp_class.h

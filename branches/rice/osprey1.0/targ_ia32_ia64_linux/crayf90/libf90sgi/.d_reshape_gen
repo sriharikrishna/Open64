@@ -1,0 +1,13 @@
+# dependences for compilation
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../clibinc/cray/dopevec.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../clibinc/cray/portdefs.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../clibinc/cray/solaris.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../clibinc/fmath.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../clibinc/fortran.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../clibinc/liberrno.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../libfi/array/reshape_gen.c
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../libfi/include/f90_intrinsic.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../linux/mfef90_includes/inttypes.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../linux/mfef90_includes/sgidefs.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../linux/mfef90_includes/standards.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/crayf90/libf90sgi/../../../linux/mfef90_includes/stdarg.h

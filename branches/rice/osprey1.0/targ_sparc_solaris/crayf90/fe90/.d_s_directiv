@@ -1,0 +1,16 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/debug.m
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/defines.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/globals.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/globals.m
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/host.m
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/s_directiv.c
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/s_globals.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/s_globals.m
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/sytb.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/sytb.m
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/target.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/target.m
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/tokens.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/fe90/../../../crayf90/fe90/tokens.m

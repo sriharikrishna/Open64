@@ -1,0 +1,8 @@
+# dependences for compilation
+../include/bstring.h
+../include/limits.h
+../include/stddef.h
+../include/stdio.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/whirl2f/../../be/whirl2f/../whirl2f/whirl2f_main.cxx
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/whirl2f/../../common/com/defs.h
+/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/whirl2f/../../include/cmplrs/rcodes.h
