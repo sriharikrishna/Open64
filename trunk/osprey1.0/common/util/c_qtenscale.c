@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: c_qtenscale:
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:08 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-11-04 16:08:40 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/c_qtenscale.c,v $
  *
  * Revision history:
@@ -52,9 +52,8 @@
  */
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/c_qtenscale.c,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/c_qtenscale.c,v $ $Revision: 1.2 $";
 
-#include <values.h>
 #include "defs.h"
 
 #define min(x,y) ((x)<(y)? (x): (y))
