@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.9 $
- * $Date: 2002-10-24 19:42:43 $
+ * $Revision: 1.10 $
+ * $Date: 2002-10-31 22:52:22 $
  * $Author: open64 $
  *
  * Revision history:
@@ -3575,7 +3575,6 @@ fei_else(void)
 {
    WN *if_else;
    WN *if_cnstrct;
-
    /* pop off the if construct */
    if_cnstrct = cwh_stk_pop_WN();
 
@@ -3586,7 +3585,6 @@ fei_else(void)
 
    /* push the if_cnstrct back on the stack */
    cwh_stk_push(if_cnstrct, WN_item);
-
    return;
 }
 

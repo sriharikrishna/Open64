@@ -2334,6 +2334,8 @@ boolean final_arg_work(opnd_type	*list_opnd,
    }
 
    list_idx = OPND_IDX((*list_opnd));
+# if 0 /*don't know why we need "check_call_for_global_def"
+         will think about it later---fzhao Oct */
 
    if (!ATP_EXPL_ITRFC(spec_idx) &&         /* Global semantics */
        !io_call && 
@@ -2344,6 +2346,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
       check_call_for_global_def(list_idx, spec_idx, num_args); 
    }
+# endif
 
    if (ATP_EXTRA_DARG(spec_idx)) {
       list_idx = IL_NEXT_LIST_IDX(list_idx);
@@ -6476,7 +6479,7 @@ void flatten_function_call(opnd_type     *result)
 
    num_args = IR_LIST_CNT_R(ir_idx);
 
-   if (FUNCTION_MUST_BE_SUBROUTINE(attr_idx) && FALSE) {  /* March */
+   if (FALSE && FUNCTION_MUST_BE_SUBROUTINE(attr_idx) ) {  /* March */
 
       NTR_IR_LIST_TBL(res_list_idx);
       IL_ARG_DESC_VARIANT(res_list_idx)  = TRUE;
@@ -6875,7 +6878,7 @@ void flatten_function_call(opnd_type     *result)
                             Before);
       }
 
-      if (FUNCTION_MUST_BE_SUBROUTINE(attr_idx) && FALSE) {  /* March */
+      if ( FALSE && FUNCTION_MUST_BE_SUBROUTINE(attr_idx) ) {  /* March */
          /* insert tmp as first argument to call */
 
          OPND_FLD(opnd) = AT_Tbl_Idx;
@@ -11225,7 +11228,7 @@ static void check_call_for_global_def(int	list_idx,
 
          /* In this case, ntr_ref just hangs the new ref off the older one. */
 
-         global_name_semantics(ga_idx, NULL_IDX, list_idx, spec_idx, NULL_IDX);
+/*Oct fzhao     global_name_semantics(ga_idx, NULL_IDX, list_idx, spec_idx, NULL_IDX);*/
 
          new_ga_idx = ntr_global_attr_tbl(spec_idx, name_idx);
          GAP_NEXT_PGM_UNIT_IDX(new_ga_idx) = ga_idx;
@@ -11245,7 +11248,9 @@ static void check_call_for_global_def(int	list_idx,
                                name_idx);
       }
       else {  /* True DEF to REF call */
-         global_name_semantics(ga_idx, NULL_IDX, list_idx, spec_idx, NULL_IDX);
+/* Oct fzhao    global_name_semantics(ga_idx, NULL_IDX, list_idx, spec_idx, NULL_IDX);*/
+     ;
+
       }
    }
    else {

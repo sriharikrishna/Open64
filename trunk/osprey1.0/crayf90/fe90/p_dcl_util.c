@@ -2997,11 +2997,11 @@ static boolean	parse_int_spec_expr(long		*len_idx,
                *field_type	= CN_Tbl_Idx;
             }
             else {
-/* # if 0  fzhao May */
+# if 0 /*  fzhao May */
                *field_type      		= AT_Tbl_Idx;
                *len_idx				= ntr_bnds_tmp_list(&len_opnd);
                ATD_TMP_HAS_CVRT_OPR(*len_idx)	= TRUE;
-/* # endif  May */
+# endif/*  May */
             }
          }
          else {

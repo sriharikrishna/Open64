@@ -3805,15 +3805,13 @@ void else_stmt_semantics (void)
          }
 
          /* set up control mask */
-
          mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd,
                                         Intent_In, FALSE, TRUE);
-
          and_idx = gen_ir(OPND_FLD(pending_mask_opnd), 
                                        OPND_IDX(pending_mask_opnd),
                       And_Opr, exp_desc.type_idx, line, col,
                           OPND_FLD(mask_expr_opnd), OPND_IDX(mask_expr_opnd));
-   
+ 
          gen_opnd(&opnd, and_idx, IR_Tbl_Idx, line, col);
 
          NTR_IR_LIST_TBL(list_idx);
@@ -5691,17 +5689,28 @@ void where_stmt_semantics (void)
 
       save_where_ir_idx = where_ir_idx;
 
+# if 0 /*fzhao Oct*/
       mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd,
                                  Intent_In, FALSE, TRUE);
       if (where_ir_idx > 0) {
          and_idx = gen_ir(IR_Tbl_Idx, where_ir_idx,
                      And_Opr, exp_desc.type_idx, line, col,
                           OPND_FLD(mask_expr_opnd), OPND_IDX(mask_expr_opnd));
+#endif
+      if (where_ir_idx > 0) {
+         and_idx = gen_ir(IR_Tbl_Idx, where_ir_idx,
+                     And_Opr, exp_desc.type_idx, line, col,
+                          OPND_FLD(opnd), OPND_IDX(opnd));
+
 
          gen_opnd(&opnd, and_idx, IR_Tbl_Idx, line, col);
       }
       else {
+
+# if 0 /*fzhao Oct */
          COPY_OPND(opnd, mask_expr_opnd);
+# endif 
+           ;
       }
 
       /* Check the next statement.  If it is a statement number statement */
@@ -5749,6 +5758,7 @@ void where_stmt_semantics (void)
 
       /* set up control mask */
 
+# if 0 /*fzhao Oct*/
       mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd, 
                                      Intent_In, FALSE, TRUE);
 
@@ -5762,6 +5772,15 @@ void where_stmt_semantics (void)
       else {
          COPY_OPND(opnd, mask_expr_opnd);
       }
+# endif
+      if (where_ir_idx > 0) {
+         and_idx = gen_ir(IR_Tbl_Idx, where_ir_idx,
+                      And_Opr, exp_desc.type_idx, line, col,
+                          OPND_FLD(opnd), OPND_IDX(opnd));
+
+         gen_opnd(&opnd, and_idx, IR_Tbl_Idx, line, col);
+      }
+
 
       NTR_IR_LIST_TBL(list_idx);
       IR_FLD_L(ir_idx) = IL_Tbl_Idx;
@@ -5771,7 +5790,7 @@ void where_stmt_semantics (void)
       COPY_OPND(IL_OPND(list_idx), opnd);
 
       /* set up pending mask */
-
+# if 0 /*fzhao Oct*/
       gen_opnd(&opnd, 
                gen_ir(OPND_FLD(mask_expr_opnd), OPND_IDX(mask_expr_opnd),
                   Not_Opr, exp_desc.type_idx, line, col,
@@ -5779,6 +5798,16 @@ void where_stmt_semantics (void)
                IR_Tbl_Idx,
                line,
                col);
+# endif
+      gen_opnd(&opnd,
+               gen_ir(OPND_FLD(opnd), OPND_IDX(opnd),
+                  Not_Opr, exp_desc.type_idx, line, col,
+                      NO_Tbl_Idx, NULL_IDX),
+               IR_Tbl_Idx,
+               line,
+               col);
+
+
 
       if (where_ir_idx > 0) {
          and_idx = gen_ir(IR_Tbl_Idx, where_ir_idx,
@@ -10866,6 +10895,14 @@ boolean check_where_conformance(expr_arg_type	*exp_desc)
 
    TRACE (Func_Entry, "check_where_conformance", NULL);
 
+# if 0
+
+/* We keep the original mask or logical expression
+ * instead of generating array types temporary variables
+ * especially for avoiding "deferred shape" logical arrays
+ * such as  "LOGICAL($) t$1(:,:,:)" ---fzhao
+ */
+
    tmp_idx = find_left_attr(&IR_OPND_L(where_ir_idx));
 
 # ifdef _DEBUG
@@ -10895,6 +10932,8 @@ boolean check_where_conformance(expr_arg_type	*exp_desc)
          }
       }
    }
+# endif
+   ok = TRUE;
 
    TRACE (Func_Exit, "check_where_conformance", NULL);
 
