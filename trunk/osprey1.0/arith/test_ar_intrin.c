@@ -40,6 +40,8 @@
 # include <fortran.h>
 #endif
 
+#include <string.h>
+
 #include "arith.h"
 
 static int				pass = 0;
@@ -442,4 +444,4 @@ int				rsize;
 
 
 static char USMID [] = "\n%Z%%M%	%I%	%G% %U%\n";
-static char rcsid [] = "$Id: test_ar_intrin.c,v 1.1.1.1 2002-05-22 20:06:19 dsystem Exp $";
+static char rcsid [] = "$Id: test_ar_intrin.c,v 1.2 2003-11-04 16:04:58 eraxxon Exp $";

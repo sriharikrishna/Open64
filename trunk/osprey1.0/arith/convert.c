@@ -42,6 +42,7 @@
 #include "arith.internal.h"
 #include "int64.h"
 
+#include <string.h> /* for memcpy() */
 
 /* Cray single -> integer */
 int
@@ -1395,4 +1396,4 @@ ar_crnd128 (AR_CRAY_128 *rnd,
 
 
 static char USMID [] = "\n%Z%%M%	%I%	%G% %U%\n";
-static char rcsid [] = "$Id: convert.c,v 1.1.1.1 2002-05-22 20:06:18 dsystem Exp $";
+static char rcsid [] = "$Id: convert.c,v 1.2 2003-11-04 16:04:58 eraxxon Exp $";
