@@ -200,6 +200,9 @@ public:
 	return ValueBoolPair(v, true);
       }
     }
+    
+    assert(false);
+    return ValueBoolPair((const Value)NULL, false); // should never reach!
   } // erase
 
   ValueBoolPair modify(const KeyValuePair& p) {
