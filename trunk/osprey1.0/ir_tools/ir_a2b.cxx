@@ -38,12 +38,8 @@
 #include <sys/stat.h>
 #include <elf.h>
 
-#if !defined(__CYGWIN__) 
-  // Cygwin doesn't yet have libgen.h or basename(). Sigh.
-# include <libgen.h>		    /* for basename() */
-#endif
-
 #include "defs.h"
+#include "x_libgen.h"		    /* for basename() */
 #include "mempool.h"
 #include "wn.h"			    /* for ir_reader.h */
 #include "wn_simp.h"
@@ -324,27 +320,12 @@ main (INT argc, char *argv[])
     Set_Error_Line(ERROR_LINE_UNKNOWN);
     WHIRL_Mldid_Mstid_On = TRUE;
     
-#if defined(__CYGWIN__)
-    // cygwin workaround: starting from the furthest possible offset
-    // within 'progname' search for a match using strstr().
-    // FIXME (see <libgen.h> above)
-    progname = argv[0];
-
-    int maxProgLen = strlen("ir_a2b");
-    int eoffset = MIN(maxProgLen, strlen(progname)); // offset from end
-    int boffset = strlen(progname) - eoffset;        // offset from beginning
-
-    a2b = (strstr (&progname[boffset], "ir_a2b") != NULL);
-    b2a = (strstr (&progname[boffset], "ir_b2a") != NULL);
-    sel = (strstr (&progname[boffset], "ir_sel") != NULL);
-#else
-    progname = basename (argv[0]);
+    progname = ux_basename (argv[0]);
     // weird linux bug with basename where it doesn't strip the leading /
     if (*progname == '/') ++progname;
     a2b = (strcmp (progname, "ir_a2b") == 0);
     b2a = (strcmp (progname, "ir_b2a") == 0);
     sel = (strcmp (progname, "ir_sel") == 0);
-#endif
 
     if (a2b) {
 	usage (progname);

@@ -39,12 +39,8 @@
 #include <algorithm>
 using namespace std;
 
-#if !defined(__CYGWIN__)
-  // Cygwin doesn't yet have libgen.h or basename(). Sigh.
-# include <libgen.h>		    /* for basename() */
-#endif
-
 #include "defs.h"
+#include "x_libgen.h"		    /* for basename() */
 #include "pu_info.h"
 #include "opcode.h"
 #include "wn.h"
@@ -174,11 +170,7 @@ main (INT argc, char *argv[])
     Set_Error_File(NULL);
     Set_Error_Line(ERROR_LINE_UNKNOWN);
 
-#if defined(__CYGWIN__) 
-    progname = argv[0]; // FIXME: see <libgen.h> above
-#else
-    progname = basename (argv[0]);
-#endif
+    progname = ux_basename (argv[0]);
 
     if (argc < 2)
 	usage(progname);
