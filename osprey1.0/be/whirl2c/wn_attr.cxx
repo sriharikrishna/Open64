@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn_attr.c
- * $Revision: 1.7 $
- * $Date: 2003-09-10 19:13:56 $
+ * $Revision: 1.7.2.1 $
+ * $Date: 2004-11-24 20:48:05 $
  *
  * Revision history:
  *  07-Mar-95 - Original Version
@@ -258,6 +258,17 @@ WN_intrinsic_return_ty(OPCODE wn_opc, INTRINSIC intr_opc, const WN *call)
    case IRETURN_M:
      ret_ty = Stab_Mtype_To_Ty(MTYPE_M);
      break;
+//#ifdef KEY 
+   case IRETURN_PC:
+      ret_ty = Stab_Pointer_To(Stab_Mtype_To_Ty(MTYPE_V));
+      break;
+   case IRETURN_SZT:
+      ret_ty = Stab_Mtype_To_Ty(MTYPE_I4);
+      break;
+//#endif
+   case IRETURN_F10:
+      ret_ty = Stab_Mtype_To_Ty(MTYPE_F10);
+      break;
    default:
       Is_True(FALSE, 
 	      ("Unexpected INTRN_RETKIND in WN_intrinsic_return_ty()"));
