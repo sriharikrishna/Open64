@@ -64,14 +64,7 @@ static mDED_PREG_NUM Output_Base_Preg = 127;
 #define I0 (Int_Preg_Min_Offset - 1)
 #define F0 Float_Preg_Min_Offset
 
-/* Solaris workaround
- * SIM_Info was previously declared as 'extern'
- */
 
-//#ifndef _LP64
-#ifdef _LP64
-static
-#endif /* _LP64 */
 SIM SIM_Info[] = {
 	/* flags */
 	/* int args, flt args, dbl args */

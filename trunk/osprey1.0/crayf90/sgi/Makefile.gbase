@@ -390,13 +390,15 @@ mfef90: $(OBJECTS) $(LIBRARIES)
 	$(C++F) -o $@ $(OBJECTS) compiler_build_date.o $(TARG_COMUTIL_DIR)/libcomutil.a \
 	$(LDFLAGS)
 ifeq ($(BUILD_OS), LINUX)
-	$(BUILD_TOT)/linux/tools/caterr -c cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.msgs
+#	$(BUILD_TOT)/linux/tools/caterr -c cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.msgs
+	gencat cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.i
 endif
 ifeq ($(BUILD_OS), SOLARIS) # cf90.i must be created on IRIX by running caterr cf90.msgs > cf90.i
 	gencat cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.i
 endif
 ifeq ($(BUILD_OS), IRIX)
-	caterr -c cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.msgs
+	gencat cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.i
+#	caterr -c cf90.cat $(BUILD_TOT)/crayf90/fe90/cf90.msgs
 endif
 
 cf90.i: $(FE90_DIR)/cf90.msgs

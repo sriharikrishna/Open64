@@ -134,17 +134,7 @@ typedef struct subprogram_interface {
 					 * parameter passing for that 
 					 * implicit arg. */
 
-
-// gcc and edg have different restrictions on how to do a forward decl
-// of an initialized object.
-// 20020408 (jle): Apparently, modern versions of gcc act properly, so
-// I've predicated this ifdef on versions of gcc prior to 3.0.  Also,
-// why is this predicated on "linux" instead of GNU?
-#if defined(linux) && !defined(_LP64) && (__GNUC__ < 3)
-static SIM SIM_Info[];
-#else
 extern SIM SIM_Info[];
-#endif
 #define SIM_INFO	SIM_Info[Target_ABI]
 
 #define SIM_varargs_floats	((SIM_INFO.flags & SIM_VARARGS_FLOATS) != 0)
