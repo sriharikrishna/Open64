@@ -3863,8 +3863,8 @@ void	use_stmt_semantics(void)
    int		 start_ln_idx;
    boolean	 use_only;
    int		 use_ir_idx;
-   int ro_idx;
-
+   int 		 ro_idx;
+   boolean	 error_break=0;
 
    TRACE (Func_Entry, "use_stmt_semantics", NULL);
 
@@ -3967,6 +3967,7 @@ void	use_stmt_semantics(void)
       if (!find_prog_unit_tbl(module_attr_idx)) {
 
          /* Couldn't find the module or bad reads */
+         error_break = 1;
 
          goto EXIT;
       }
@@ -4206,11 +4207,13 @@ void	use_stmt_semantics(void)
 
 EXIT:
       ATP_SCP_ALIVE(module_attr_idx)	= FALSE;
-       ro_idx = ATP_USE_LIST(module_attr_idx);
-       while (ro_idx!=NULL_IDX) {
-         RO_NAME_ATTR(ro_idx)= ML_AT_IDX(RO_NAME_ATTR(ro_idx));
-         ro_idx =  RO_NEXT_IDX(ro_idx);
+      if (!error_break) {
+        ro_idx = ATP_USE_LIST(module_attr_idx);
+        while (ro_idx!=NULL_IDX) {
+          RO_NAME_ATTR(ro_idx)= ML_AT_IDX(RO_NAME_ATTR(ro_idx));
+          ro_idx =  RO_NEXT_IDX(ro_idx);
             }  
+       }
       TBL_FREE(mod_link_tbl);
    }
 
