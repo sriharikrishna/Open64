@@ -801,12 +801,4 @@ static INTPTR fei_proc_imp     ( INT32         lineno,
 
 static void cwh_stab_adjust_base_name(ST * st);
 
-
-
-			     
-
-
-
-
-
-
+static INT32  interface_pu = 0;

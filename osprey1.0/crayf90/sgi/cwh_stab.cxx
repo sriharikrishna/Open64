@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.16 $
- * $Date: 2003-03-06 16:28:48 $
+ * $Revision: 1.17 $
+ * $Date: 2003-05-22 19:08:17 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.17 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -948,17 +948,24 @@ fei_object(char * name_string,
   ty = cast_to_TY(t_TY(type));
   p  = cast_to_STB(storage_idx);
 
-# if 0 
-  hosted = (sym_class == Hosted_Dummy_Procedure) ||
+// # if 0 
+
+/* need to seperate two cases:interface & contained pu */
+
+ if (!interface_pu) 
+    hosted = (sym_class == Hosted_Dummy_Procedure) ||
            (sym_class == Hosted_Dummy_Arg ) || 
-           (sym_class == Hosted_Compiler_Temp) || 
-           (sym_class == Hosted_User_Variable ) ||
+//           (sym_class == Hosted_Compiler_Temp) || 
+//           (sym_class == Hosted_User_Variable ) ||
            (sym_class == CRI_Pointee && 
 	    (test_flag(flag_bits,FEI_OBJECT_INNER_REF) ||
 	     test_flag(flag_bits,FEI_OBJECT_INNER_DEF))) ;
-# endif
+ else 
+    hosted = FALSE;
+ 
+// # endif
   
-  hosted = FALSE;
+//  hosted = FALSE;
 
   /* ignore hosted args w/o inner ref/defs because don't    */
   /* want duplicates in symbol table for debug info (only   */
@@ -1405,7 +1412,7 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   if (IS_FORMAL(st)) {
 
     if (! hosted )
-      cwh_auxst_add_dummy(st,test_flag(flag_bits,FEI_OBJECT_RESULT_TEMP));
+       cwh_auxst_add_dummy(st,test_flag(flag_bits,FEI_OBJECT_RESULT_TEMP));
   } 
 
   /* Add COMMON or EQUIVALENCEd item to internal lists */
@@ -1692,7 +1699,7 @@ fei_name (char *name_string,
 
     if (st_idx != 0){
 
-     if (entry_point_count >= 1 ) {  
+     if (entry_point_count > 1 ) {  
 
 	p = cast_to_STB(st_idx);
 
@@ -3569,3 +3576,13 @@ fei_interface(char  * name_string,
 }
 
 
+void fei_set_in_interface_processing()
+  {
+     interface_pu = 1;
+  }
+
+
+void fei_reset_in_interface_processing()
+  {
+    interface_pu = 0;
+  }
