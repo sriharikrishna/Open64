@@ -86,7 +86,7 @@ struct Cif_filedir **fdir;
 	_Cif_filetbl[cifd].ifull = NO; 
 	fd = _Cif_filetbl[cifd].fd;
 	if (fread (buf, sizeof(char), 1, fd) != 1) {
-		if (feof(fd)) rtype = NULL;
+		if (feof(fd)) rtype = 0;
 		else return (CIF_SYSERR);
 	}
 	rtype = ((struct Cif_generic *)buf)->rectype;
