@@ -1,4 +1,4 @@
-/* $Id: x_string.c,v 1.1 2003-11-04 15:59:37 eraxxon Exp $ */
+/* $Id: x_string.c,v 1.2 2003-11-28 15:44:47 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -29,4 +29,4 @@ char *ux_strdup(const char *s1)
 
 void *ux_memccpy(void * /*restrict*/ s1, const void * /*restrict*/ s2, 
 		int c, size_t n)
-{ memccpy(s1, s2, c, n); }
+{ return memccpy(s1, s2, c, n); }
