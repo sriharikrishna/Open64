@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <symtab.h>
 #include <symtab_utils.h>
 #include <upc_symtab_utils.h>
@@ -269,7 +270,9 @@ UINT Adjusted_Type_Size(TY_IDX idx, unsigned int pshared, unsigned int shared) {
     return 0;
   }
   
-
+  assert(false);
+  /* NOTREACHED */
+  return 0;
 }
 
 
@@ -819,6 +822,9 @@ TY_IDX Fix_Intrinsic_Return_Type(INTRINSIC op)
   case INTRN_ADD_S:
   case INTRN_P_TO_S:
     return shared_ptr_idx;
+  default: 
+    assert(false);
+    return 0;
   }
 }
 

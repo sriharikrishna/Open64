@@ -479,6 +479,10 @@ string get_TY_string(TY_IDX idx) {
   case KIND_VOID:
     return "void";
   }
+  
+  FmtAssert(FALSE, ("TY_kind: unexpected KIND"));
+  /* NOTREACHED */
+  return "";
 }
 
 class Idx_Pair {
@@ -1929,7 +1933,7 @@ ST::Print (FILE *f, BOOL verbose) const
 
        mUINT64 flags_ext = St_Table[st_idx].flags_ext;
        if (flags_ext)
-          fprintf (f, "\n\t\tFlags_ext:\t0x%016x", flags_ext);
+          fprintf (f, "\n\t\tFlags_ext:\t0x%016llx", flags_ext);
        if (flags_ext) {
          if (flags_ext & ST_IS_POINTER)  	 fprintf (f, " pointer");
          if (flags_ext & ST_IS_ALLOCATABLE)  	 fprintf (f, " allocatable ");

@@ -142,6 +142,10 @@ WN_Type_To_Intrinsic(OPERATOR opr, int mtype, int strict=1, BOOL phaseless = TRU
   default:
     Is_True(0, ("Operator not supported in WFE_Type_To_Intrinsic",""));
   }
+
+  /* NOTREACHED */
+  Is_True(0, ("Programming error.",""));
+  return INTRINSIC_INVALID;
 }
 
 
