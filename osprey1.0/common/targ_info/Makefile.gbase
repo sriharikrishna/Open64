@@ -157,7 +157,12 @@ SO_TARGETS =
 endif
 ifeq ($(BUILD_TARGET), IA64)
 LDIRT += itanium_si_gen
+# We are now building the target so for linux (for LNO).
+ifeq ($(BUILD_OS), LINUX)
+SO_TARGETS = itanium.so
+else
 SO_TARGETS = 
+endif
 endif
 ifeq ($(BUILD_TARGET), IA32)
 LDIRT += pentium_si_gen
@@ -285,7 +290,7 @@ include $(BUILD_TOT)/Makeinclude
 DIRTS =
 
 ifeq ($(BUILD_COMPILER), GNU)
-SETPATH = LD_LIBRARY_PATH=.
+SETPATH =
 else
 SETPATH = 
 endif
