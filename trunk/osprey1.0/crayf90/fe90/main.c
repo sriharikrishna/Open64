@@ -39,13 +39,12 @@ static char USMID[] = "\n@(#)5.0_pl/sources/main.c	5.15	10/14/99 15:25:09\n";
 
 # include "defines.h"		/* Machine dependent ifdefs */
 
-/* # if (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX)) */	/* Needed for timing information. */
-# if (defined(_HOST_OS_IRIX))	/* Needed for timing information. */
+# if (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))      /* Needed for timing information. */
 # include <sys/time.h>
 # include <sys/resource.h>
-# else
-# include <time.h>
 # endif
+
+# include <time.h>
 
 # include "host.m"		/* Host machine dependent macros.*/
 # include "host.h"		/* Host machine dependent header.*/
