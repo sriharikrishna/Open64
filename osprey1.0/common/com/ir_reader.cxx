@@ -1233,7 +1233,7 @@ static void ir_put_expr(WN * wn, INT indent)
         ir_put_stmt(wn2, indent+1);
       else
 //March	 fprintf(ir_ofile, "%*sopcode %d not an expression\n", indent+1, "", op);
-	 if (op = OPC_IMPLICIT_BND)
+	 if (op == OPC_IMPLICIT_BND)
                 fprintf(ir_ofile,"%*sIMPLICIT_BND\n",indent+1,""); 
          else
       	 fprintf(ir_ofile, "%*sopcode %d not an expression\n", indent+1, "", op);
