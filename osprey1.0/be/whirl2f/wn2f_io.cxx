@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_io.c
- * $Revision: 1.5 $
- * $Date: 2003-02-26 16:47:29 $
+ * $Revision: 1.6 $
+ * $Date: 2003-02-28 22:54:55 $
  *
  * Revision history:
  *  5-June-95 - Original Version
@@ -190,6 +190,7 @@ WN2F_io_unit(TOKEN_BUFFER tokens,
    
    BOOL emitted = TRUE; /*  if a unit specifier was emitted */
    const char * p = "UNIT";
+   const BOOL issue_asterisk = WN2F_CONTEXT_issue_ioc_asterisk(context);
 
    /* Any arguments assumed to be by reference unless otherwise noted */
    set_WN2F_CONTEXT_deref_addr(context);
@@ -198,26 +199,28 @@ WN2F_io_unit(TOKEN_BUFFER tokens,
    {
    case IOU_NONE: 
 
-#if 0 /*if it's NONE,don't declare UNIT--fzhao*/
-     if (WN2F_CONTEXT_cray_io(context))
+     if (WN2F_CONTEXT_cray_io(context) && 
+             issue_asterisk)
      {
        WN2F_emit_ctrl(tokens,p,context);
        Append_Token_Special(tokens, '*');
      } else
-#endif
-
        emitted = FALSE;  /* eg: inquire by file */
+
       break;
       
    case IOU_DEFAULT: /* asterisk or double astrisk */
-#if 0 /*if it's default,keep it default*/
-      WN2F_emit_ctrl(tokens,p,context);
-      if (WN_const_val(WN_kid0(item)) == 0)
-	Append_Token_String(tokens, "**");
-      else
-	Append_Token_Special(tokens, '*');
-#endif
-     emitted =FALSE;
+
+      if (issue_asterisk){
+           WN2F_emit_ctrl(tokens,p,context);
+           if (WN_const_val(WN_kid0(item)) == 0)
+	     Append_Token_String(tokens, "**");
+           else
+	     Append_Token_Special(tokens, '*');
+        }
+       else
+           emitted =FALSE;
+
       break;
 
    case IOU_EXTERNAL:    /* unit number */
@@ -1003,6 +1006,8 @@ WN2F_ios_print(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    
    Append_Token_String(tokens, "PRINT");
 
+   set_WN2F_CONTEXT_issue_ioc_asterisk(context);
+
    /* We do not really expect to have a unit specification for a "PRINT"
     * statement, but just in the case one occurs anyway, we skip it here.
     */
@@ -1016,6 +1021,9 @@ WN2F_ios_print(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       Append_Token_Special(tokens, ',');
       WN2F_Append_IO_List(tokens, wn, iol_kid, context);
    }
+
+   reset_WN2F_CONTEXT_issue_ioc_asterisk(context);
+
 } /* WN2F_ios_print */
 
 
@@ -1033,6 +1041,7 @@ WN2F_ios_read(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    
    
    Append_Token_String(tokens, "READ");
+   set_WN2F_CONTEXT_issue_ioc_asterisk(context);
 
    /* Determine whether or not we have the "READ f [,iolist]" format.
     */
@@ -1073,6 +1082,9 @@ WN2F_ios_read(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       set_WN2F_CONTEXT_deref_io_item(context); /* Assume pass-by-reference */
       WN2F_Append_IO_List(tokens, wn, iol_kid, context);
    }
+
+    reset_WN2F_CONTEXT_issue_ioc_asterisk(context);
+
 } /* WN2F_ios_read */
 
 
@@ -1091,6 +1103,7 @@ WN2F_ios_rewrite(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 		IOSTATEMENT_name(WN_IOSTMT(wn)), "WN2F_ios_rewrite"));
 
    Append_Token_String(tokens, "REWRITE");
+   set_WN2F_CONTEXT_issue_ioc_asterisk(context);
 
    /* Determine if we should use the "unit=" or "fmt=" keyword notation,
     * and which kid is the last control specification itemx.
@@ -1113,6 +1126,8 @@ WN2F_ios_rewrite(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    /* Get the io_list */
    if (iol_kid < WN_kid_count(wn))
       WN2F_Append_IO_List(tokens, wn, iol_kid, context);
+
+   reset_WN2F_CONTEXT_issue_ioc_asterisk(context);
 
 } /* WN2F_ios_rewrite */
 
@@ -1148,6 +1163,8 @@ WN2F_ios_write(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    
    Append_Token_String(tokens, "WRITE");
 
+   set_WN2F_CONTEXT_issue_ioc_asterisk(context);
+
    /* Determine if we should use the "unit=" or "fmt=" keyword notation,
     * and which kid is the last control specification item.
     */
@@ -1170,6 +1187,8 @@ WN2F_ios_write(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    if (iol_kid < WN_kid_count(wn))
       WN2F_Append_IO_List(tokens, wn, iol_kid, context);
 
+   reset_WN2F_CONTEXT_issue_ioc_asterisk(context);
+
 } /* WN2F_ios_write */
 
 
@@ -1190,6 +1209,8 @@ WN2F_ios_cr(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	       WN_IOSTMT(wn) == IOS_CR_FRU,
 	       (DIAG_W2F_UNEXPECTED_IOS, 
 		IOSTATEMENT_name(WN_IOSTMT(wn)), "WN2F_ios_cr"));
+
+   set_WN2F_CONTEXT_issue_ioc_asterisk(context);
 
    /* See if this is the first/last part of a 3-call IO stmt. If so punt */
    /* - it just duplicates some detail from the main stmt.               */
@@ -1239,6 +1260,8 @@ WN2F_ios_cr(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    if (iol_kid < WN_kid_count(wn))
       WN2F_Append_IO_List(tokens, wn, iol_kid, context);
+
+   reset_WN2F_CONTEXT_issue_ioc_asterisk(context);
 
 } /* WN2F_ios_cr */
 

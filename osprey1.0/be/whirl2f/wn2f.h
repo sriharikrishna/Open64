@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: wn2f.h
- * $Revision: 1.5 $
- * $Date: 2003-01-10 02:47:29 $
+ * $Revision: 1.6 $
+ * $Date: 2003-02-28 22:54:55 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.h,v $
  *
@@ -321,7 +321,20 @@ typedef struct WN2F_Context
 #define reset_WN2F_CONTEXT_has_no_arr_elmt(c)\
    ((c).flags = (c).flags & ~WN2F_CONTEXT_HAS_NO_ARR_ELMT)
 
+/*add a flag to see if we need issue default UNIT in io stmts
+ *in READ/WRITE/PRINT stmts,must have UNIT=*
+ *but in other stmt such as INQUIRE if there already
+ *is FILE,issue UNIT=* will cause problems
+ *-----fzhao
+ */
 
+#define WN2F_CONTEXT_ISSUE_IOC_UNIT_ASTERISK 0x00008000
+#define WN2F_CONTEXT_issue_ioc_asterisk(c)\
+   ((c).flags & WN2F_CONTEXT_ISSUE_IOC_UNIT_ASTERISK)
+#define set_WN2F_CONTEXT_issue_ioc_asterisk(c)\
+   ((c).flags = (c).flags | WN2F_CONTEXT_ISSUE_IOC_UNIT_ASTERISK)
+#define reset_WN2F_CONTEXT_issue_ioc_asterisk(c)\
+   ((c).flags = (c).flags & ~WN2F_CONTEXT_ISSUE_IOC_UNIT_ASTERISK)
 
     /* ---- Utilities to aid in WN to Fortran translation ---- */
     /* ------------------------------------------------------- */
