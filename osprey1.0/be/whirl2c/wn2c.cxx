@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.20 $
- * $Date: 2004-07-02 14:45:35 $
+ * $Revision: 1.21 $
+ * $Date: 2004-10-04 22:01:18 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.21 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -5886,7 +5886,10 @@ WN2C_lda(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
 	 if (STATUS_is_lvalue(lda_status))
 	    Prepend_Token_Special(expr_tokens, '&');
 	 
-	 WN2C_prepend_cast(expr_tokens, WN_ty(wn), FALSE/*ptr_to_type*/);
+//	 WN2C_prepend_cast(expr_tokens, WN_ty(wn), FALSE/*ptr_to_type*/);
+// unparsed code with the type casting will 
+// cause gcc/frontend issue warnings----FMZ
+
 	 STATUS_reset_lvalue(lda_status); /* Not returning an lvalue */
       }
       else if (STATUS_is_lvalue(lda_status) && !CONTEXT_needs_lvalue(context))
