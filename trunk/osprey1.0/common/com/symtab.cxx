@@ -2002,9 +2002,14 @@ TY::Print (FILE *f) const
 	Print_TY_IDX_verbose (f, Etype ());
 	if (Arb () != 0) {
 	   ARB_HANDLE arb(Arb());
-	   INT i,ndim;
+	   INT i,ndim,co_dim,array_dim;
 	   
 	   ndim = ARB_dimension(arb);
+           co_dim = ARB_co_dimension(arb);
+	   array_dim = ndim-co_dim;
+
+           fprintf(f,"\n\t\t dimension (%d) ,co_dimension(%d) ",array_dim,co_dim);
+
 	   for (i = 0; i < ndim; i++) {
 	      fputs (" (", f);
 	      (*arb[i].Entry()).Print (f);
