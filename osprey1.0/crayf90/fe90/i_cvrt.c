@@ -12134,6 +12134,7 @@ static void  send_procedure(int			attr_idx,
    int			prev_idx;
    int			proc;
    TYPE			type_desc;
+   int           in_interface = ATP_IN_INTERFACE_BLK(attr_idx);
 
 
    TRACE (Func_Entry, "send_procedure", NULL);
@@ -12403,7 +12404,8 @@ static void  send_procedure(int			attr_idx,
                                    pdg_alt_entry_idx,
                                    type_desc,
                                    PDG_AT_IDX(attr_idx),
-                                   flag3);
+                                   flag3,
+				   in_interface);
 # endif
 
    PDG_DBG_PRINT_START
