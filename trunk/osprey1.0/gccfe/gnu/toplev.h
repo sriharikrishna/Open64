@@ -147,6 +147,7 @@ extern void set_fatal_function PARAMS ((void (*) (const char *, va_list)));
 extern int is_ia32;
 extern unsigned int pshared_size, shared_size;
 extern unsigned long max_bsize;
+extern int keep_decl_for_w2c;
 
 #ifdef SGI_MONGOOSE
 extern void dump_parse_tree    PARAMS ((char *, union tree_node *));

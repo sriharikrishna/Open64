@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2c.c
- * $Revision: 1.5 $
- * $Date: 2003-06-19 19:22:34 $
- * $Author: broom $
+ * $Revision: 1.6 $
+ * $Date: 2003-10-21 17:38:04 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $
  *
  * Revision history:
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -670,7 +670,7 @@ static void TY2C_complete_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT co
 	 /* Prepend the start-of-union character, followed by a newline
 	  * to precede the struct and alignment fields.
 	  */
-	 Prepend_Token_String(decl_tokens, TY_is_union(ty)? "union": "struct");
+	 Prepend_Token_String(decl_tokens, TY_is_union(ty)? "UNION": "struct");
 	 Prepend_Indented_Newline(decl_tokens, 1);
 	 Decrement_Indentation();
 	 Prepend_Token_Special(decl_tokens, '{');
@@ -717,7 +717,8 @@ static void TY2C_Output_Struct_Type(TY_IDX ty,
 			     INT lines_between_decls,
 			     CONTEXT context) {
 
-  if (TY_is_translated_to_c(ty) || struct_names.find(TY_name(ty)) != struct_names.end()) {
+  if (TY_is_translated_to_c(ty) || struct_names.find(TY_name(ty)) != struct_names.end()
+       || TY_is_written(ty) == 0 ) {
     //don't output duplicate struct definitions
     return;
   }
@@ -776,7 +777,8 @@ TY2C_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
   Prepend_Token_String(decl_tokens, W2CF_Symtab_Nameof_Ty(ty));
   
   BOOL    is_equivalenced = Stab_Is_Equivalenced_Struct(ty);
-  if (TY_is_union(ty) || is_equivalenced)
+//  if (TY_is_union(ty) || is_equivalenced) //fzhao
+  if (TY_is_union(ty) )
     Prepend_Token_String(decl_tokens, "union");
   else
     Prepend_Token_String(decl_tokens, "struct");

@@ -44,6 +44,7 @@ Boston, MA 02111-1307, USA.  */
 #ifdef SGI_MONGOOSE
 #include "wfe_decl.h"
 extern ST * Create_ST_For_Tree (tree);
+extern void Mark_TY_Written(tree);
 #endif /* SGI_MONGOOSE */
 
 #if USE_CPPLIB
@@ -101,6 +102,7 @@ struct consistency_value *global_consistency_stack;
 struct consistency_value *stmt_consistency_stack;
 struct consistency_value *current_consistency_stack;
 struct consistency_nesting_level *stmt_consistency_nesting_level;
+extern int keep_decl_for_w2c;
 
 
 /* While defining an enum type, this is 1 plus the last enumerator
@@ -5836,6 +5838,12 @@ finish_struct (t, fieldlist, attributes)
 
   /* Finish debugging output for this type.  */
   rest_of_type_compilation (t, toplevel);
+  /* mark the type for w2c */
+
+  if (keep_decl_for_w2c) {
+    Mark_TY_Written(t);
+  }
+
 
   return t;
 }

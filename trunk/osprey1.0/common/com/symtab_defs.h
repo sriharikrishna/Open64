@@ -497,7 +497,8 @@ enum TY_FLAGS
     TY_IS_SHARED        = 0x10000,       // UPC shared type
     TY_IS_STRICT        = 0x20000,
     TY_IS_RELAXED       = 0x40000,
-    TY_IS_CO_ARRAY      = 0x80000
+    TY_IS_CO_ARRAY      = 0x80000,
+    TY_IS_WRITTEN	= 0x100000	//make w2c to output the type definition
 };
 
 
