@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.9 $
- * $Date: 2003-03-04 20:03:04 $
+ * $Revision: 1.10 $
+ * $Date: 2003-03-04 21:08:20 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.10 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -629,25 +629,24 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 
    /* Operation */
 
-  if ( (wn0!=NULL &&TY_is_logical(WN_ty(wn0))) ||
-        ( (wn1!=NULL) &&TY_is_logical(WN_ty(wn1))))
-        set_WN2F_CONTEXT_is_logical_operation(context);
 
   switch (OPCODE_operator(opcode)) {
     case  OPR_EQ:
-      if (WN2F_CONTEXT_is_logical_operation(context))
+
+      if ( (wn0!=NULL &&TY_is_logical(WN_ty(wn0))) ||
+           ( (wn1!=NULL) &&TY_is_logical(WN_ty(wn1))))
+
             Append_Token_String(tokens,".eqv.");
       else
             Append_Token_String(tokens,".eq.");
-      reset_WN2F_CONTEXT_is_logical_operation(context);
 
      break;
     case  OPR_NE:
-      if (WN2F_CONTEXT_is_logical_operation(context))
+      if ( (wn0!=NULL &&TY_is_logical(WN_ty(wn0))) ||
+           ((wn1!=NULL) &&TY_is_logical(WN_ty(wn1))))
             Append_Token_String(tokens,".neqv.");
       else
             Append_Token_String(tokens,".ne.");
-      reset_WN2F_CONTEXT_is_logical_operation(context);
 
      break;
 
@@ -691,25 +690,23 @@ WN2F_Funcall_Op(TOKEN_BUFFER tokens,
    if (TY_kind(dty) == KIND_VOID)
       dty = rty;
 
- if ((wn0 !=NULL) && TY_is_logical(WN_ty(wn0)) ||
-        (( wn1 !=NULL) && TY_is_logical(WN_ty(wn1))))
-        set_WN2F_CONTEXT_is_logical_operation(context);
 
  switch (OPCODE_operator(opcode)) {
     case  OPR_EQ:
-      if (WN2F_CONTEXT_is_logical_operation(context))
+      if ((wn0 !=NULL) && TY_is_logical(WN_ty(wn0)) ||
+           (( wn1 !=NULL) && TY_is_logical(WN_ty(wn1))))
+     
             Append_Token_String(tokens,".eqv.");
       else
             Append_Token_String(tokens,".eq.");
-      reset_WN2F_CONTEXT_is_logical_operation(context);
 
      break;
     case  OPR_NE:
-      if (WN2F_CONTEXT_is_logical_operation(context))
+      if ((wn0 !=NULL) && TY_is_logical(WN_ty(wn0)) ||
+           (( wn1 !=NULL) && TY_is_logical(WN_ty(wn1))))
             Append_Token_String(tokens,".neq.");
       else
             Append_Token_String(tokens,".ne.");
-      reset_WN2F_CONTEXT_is_logical_operation(context);
 
      break;
 
