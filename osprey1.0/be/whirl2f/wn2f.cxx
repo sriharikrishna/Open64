@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.12 $
- * $Date: 2003-01-10 02:47:29 $
+ * $Revision: 1.13 $
+ * $Date: 2003-01-21 22:55:45 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.12 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.13 $";
 #endif
 
 #include <alloca.h>
@@ -1115,8 +1115,6 @@ const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
     * we are entering a context where we expect this expression
     * to be a logically valued argument.
     */
-// if (wn ==NULL)
-//    assert(0);
 
    if (OPCODE_is_boolean(WN_opcode(wn)) && 
        WN2F_expr_has_boolean_arg(WN_opcode(wn)))  /* expect logical args */
@@ -1136,17 +1134,12 @@ const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
        */
       reset_WN2F_CONTEXT_has_logical_arg(context);
       set_WN2F_CONTEXT_is_logical_arg(context);
+    ;
    }
    else
    {
 
       reset_WN2F_CONTEXT_has_logical_arg(context);
-
-/* WN2F_CONTEXT_IS_LOGICAL_ARG and WN2F_CONTEXT_NO_PARENTHESIS use
- * same flag,cause we cannot set no parenthesis for assignment stmts
- * most outside parenthesis flag,temparary comment out next stmt---fzhao
- * it did cause problem,so redefine the flag in wn2f.h--fzhao
- */
 
       reset_WN2F_CONTEXT_is_logical_arg(context);
    }

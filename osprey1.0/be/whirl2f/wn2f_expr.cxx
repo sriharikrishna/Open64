@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.6 $
- * $Date: 2002-09-20 20:49:26 $
- * $Author: open64 $
+ * $Revision: 1.7 $
+ * $Date: 2003-01-21 22:55:45 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.7 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -730,7 +730,10 @@ WN2F_Intr_Funcall(TOKEN_BUFFER tokens,
    if  (WN_intrinsic(wn)==INTRN_LENTRIM)
       Append_Token_String(tokens,"LEN_TRIM");
    else
-   Append_Token_String(tokens, func_name);
+     if (WN_intrinsic(wn)==INTRN_F90INDEX)
+       Append_Token_String(tokens,"INDEX");
+     else
+       Append_Token_String(tokens, func_name);
    
    /* Append the argument list to the function reference, skipping
     * implicit character-string-length arguments assumed to be the
@@ -738,53 +741,107 @@ WN2F_Intr_Funcall(TOKEN_BUFFER tokens,
     */
    Append_Token_Special(tokens, '(');
    set_WN2F_CONTEXT_no_parenthesis(context);
-   for (arg_idx = first_arg_idx, implicit_args = 0; 
-	arg_idx <= last_arg_idx - implicit_args; 
-	arg_idx++)
-   {
-      opnd_type = WN_Tree_Type(WN_kid(wn, arg_idx));
 
-      if (TY_Is_Character_Reference(opnd_type) ||
-	  TY_Is_Chararray_Reference(opnd_type))
+switch (WN_intrinsic(wn))
+  {
+   case INTRN_F90INDEX:
+   case INTRN_SCAN:
+   case INTRN_VERIFY:
+     for (arg_idx = first_arg_idx;
+           arg_idx < last_arg_idx ;
+           arg_idx=arg_idx+2)
       {
-	 implicit_args++;
-	 WN2F_String_Argument(tokens,
-			      WN_kid(wn, arg_idx), /* string base */
-			      WN_kid(wn, 
+         opnd_type = WN_Tree_Type(WN_kid(wn, arg_idx));
+
+         if (TY_Is_Character_Reference(opnd_type) ||
+             TY_Is_Chararray_Reference(opnd_type))
+          {
+             WN2F_String_Argument(tokens,
+                               WN_kid(wn, arg_idx), /* string base */
+                               WN_kid(wn,
+                                     last_arg_idx 
+                                      ), /* string length */
+                              context);
+          }
+          else {
+  
+                 WN2F_Translate_Arithmetic_Operand(tokens,
+                                                  WN_kid(wn, arg_idx),
+                                                  opnd_type,
+                                                  call_by_value,
+                                                  context);
+
+              }
+
+          if ((arg_idx) < WN_kid_count(wn) - 1)
+                    Append_Token_Special(tokens, ',');
+
+      }
+
+      set_WN2F_CONTEXT_has_logical_arg(context);
+ 
+      WN2F_Translate_Arithmetic_Operand(tokens,
+                                        WN_kid(wn, last_arg_idx),
+                                        opnd_type,
+                                        call_by_value,
+                                        context);
+
+      reset_WN2F_CONTEXT_has_logical_arg(context);
+
+
+     break;
+
+   default:
+
+     for (arg_idx = first_arg_idx, implicit_args = 0; 
+	   arg_idx <= last_arg_idx - implicit_args; 
+	   arg_idx++)
+      {
+         opnd_type = WN_Tree_Type(WN_kid(wn, arg_idx));
+
+         if (TY_Is_Character_Reference(opnd_type) ||
+	     TY_Is_Chararray_Reference(opnd_type))
+          {
+	     implicit_args++;
+	     WN2F_String_Argument(tokens,
+			       WN_kid(wn, arg_idx), /* string base */
+			       WN_kid(wn, 
 				     last_arg_idx - 
 				     (total_implicit_args - 
 				      implicit_args)), /* string length */
 			      context);
-         if ((arg_idx+implicit_args) < WN_kid_count(wn) - 1)
-                Append_Token_Special(tokens, ',');
-      }
-      else
+             if ((arg_idx+implicit_args) < WN_kid_count(wn) - 1)
+                    Append_Token_Special(tokens, ',');
+          }
+          else
  
-        if ((WN_intrinsic(wn)==INTRN_SUM||   
-             INTRN_MAXVAL||
-             INTRN_PRODUCT) && 
-              (WN_opc_operator(WN_kid0(WN_kid(wn,arg_idx)))== OPR_INTCONST) &&
-               (WN_const_val(WN_kid0(WN_kid(wn,arg_idx)))==0)) {
+            if ((WN_intrinsic(wn)==INTRN_SUM||   
+                 INTRN_MAXVAL||
+                 INTRN_PRODUCT) && 
+                  (WN_opc_operator(WN_kid0(WN_kid(wn,arg_idx)))== OPR_INTCONST) &&
+                   (WN_const_val(WN_kid0(WN_kid(wn,arg_idx)))==0)) {
 
-           } else {
+               } else {
    
-	 WN2F_Translate_Arithmetic_Operand(tokens,
-					   WN_kid(wn, arg_idx),
-					   opnd_type,
-					   call_by_value,
-					   context);
+	         WN2F_Translate_Arithmetic_Operand(tokens,
+					          WN_kid(wn, arg_idx),
+					          opnd_type,
+					          call_by_value,
+					          context);
 
 //          if ((arg_idx+implicit_args) < WN_kid_count(wn) - 1) 
-          if ((arg_idx+implicit_args) < last_arg_idx) 
-               if ((WN_intrinsic(wn)==INTRN_SUM ||
-                    INTRN_MAXVAL||
-                    INTRN_PRODUCT) &&
-                  (WN_opc_operator(WN_kid0(WN_kid(wn,arg_idx+1)))== OPR_INTCONST) &&
-                   (WN_const_val(WN_kid0(WN_kid(wn,arg_idx+1)))==0)) {
+              if ((arg_idx+implicit_args) < last_arg_idx) 
+                   if ((WN_intrinsic(wn)==INTRN_SUM ||
+                        INTRN_MAXVAL||
+                        INTRN_PRODUCT) &&
+                      (WN_opc_operator(WN_kid0(WN_kid(wn,arg_idx+1)))== OPR_INTCONST) &&
+                       (WN_const_val(WN_kid0(WN_kid(wn,arg_idx+1)))==0)) {
       
-             } else
-        	 Append_Token_Special(tokens, ',');}
-   }
+                 } else
+        	     Append_Token_Special(tokens, ',');}
+              }
+         break;
+ }
    Append_Token_Special(tokens, ')');
 
    /* TODO: See if we need to cast the resultant value */
@@ -1808,7 +1865,8 @@ WN2F_parm(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     */
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_PARM, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_parm"));
-   if ( TY_is_logical(Ty_Table[WN_ty(wn)]))
+   if ( TY_is_logical(Ty_Table[WN_ty(wn)]) || 
+            WN2F_CONTEXT_is_logical_arg(context)) //fzhao Jan
       {
         set_WN2F_CONTEXT_has_logical_arg(context);
         WN2F_translate(tokens, WN_kid0(wn), context);
