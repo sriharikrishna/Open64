@@ -3541,7 +3541,7 @@ intrin_tbl_type         intrin_tbl[MAX_INTRIN_TBL_SIZE] =
    {"LOG10",5,1,1,0,0,0,0,0,0,0,Log10_Intrinsic,Real_4},
       {"X",1,0,0,0,0,0,0,0,0,0,0,REAL_MASK},
 {"LOG2_IMAGES",11,0,1,0,0,0,0,1,1,1,0,0},
-   {"shmem_n_pes",11,0,1,0,0,0,0,0,1,0,Log2_Images_Intrinsic,Integer_4},
+   {"LOG2_IMAGES",11,0,1,0,0,0,0,0,1,0,Log2_Images_Intrinsic,Integer_4},
 {"LOGICAL",7,1,1,0,0,0,0,1,0,1,0,0},
    {"LOGICAL",7,1,1,0,0,0,0,0,0,0,Logical_Intrinsic,Logical_4},
       {"L",1,0,0,0,0,0,0,0,0,0,0,LOGICAL_MASK},
@@ -10710,7 +10710,7 @@ intrin_tbl_type         intrin_tbl[MAX_INTRIN_TBL_SIZE] =
    {"REMOTE_WRITE_BARRIER",20,1,0,0,0,0,0,0,1,0,
                                Remote_Write_Barrier_Intrinsic,0},
 {"REM_IMAGES",10,0,1,0,0,0,0,1,1,1,0,0},
-   {"shmem_n_pes",11,0,1,0,0,0,0,0,1,0,Rem_Images_Intrinsic,Integer_4},
+   {"REM_IMAGES",11,0,1,0,0,0,0,0,1,0,Rem_Images_Intrinsic,Integer_4},
 {"REPEAT",6,0,1,0,1,0,0,1,0,1,0,0},
 # if (defined(_TARGET_OS_IRIX) || defined(_TARGET_OS_LINUX))
    {"_F90_REPEAT",11,0,1,0,1,0,1,0,0,0,Repeat_Intrinsic,0},
