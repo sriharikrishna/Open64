@@ -37,9 +37,9 @@
 *** Implementation of external functions from opcode.h.
 **/
 
-/** $Revision: 1.2 $
-*** $Date: 2002-07-12 16:48:32 $
-*** $Author: fzhao $
+/** $Revision: 1.3 $
+*** $Date: 2005-01-12 22:38:21 $
+*** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/opcode.cxx,v $
 **/
 
@@ -49,16 +49,26 @@
 
 
 /**
-*** Looks up the name of this operator in the table from opcode_gen.c
+*** Convert between operator name and string
 **/
+
+// eraxxon (2005.01): Re-implement table and routines to support b2a
+// and a2b conversions.
 
 const char *OPERATOR_name(OPERATOR opr)
 {
-  Is_True(opr >= OPERATOR_FIRST && opr <= OPERATOR_LAST,
-	  ("Bad OPERATOR %d", opr));
-
-  return (const char *) OPERATOR_info[opr]._name;
+  using namespace ir_a2b;
+  return MapIntToString<OPERATOR_info_struct>(OPERATOR_info, 
+					      OPERATOR_LAST+1, (INT)opr);
 }
+
+OPERATOR Name_To_OPERATOR(const char* nm)
+{
+  using namespace ir_a2b;
+  return (OPERATOR)MapStringToInt<OPERATOR_info_struct, 
+                                  OPERATOR_info, OPERATOR_LAST+1>(nm);
+}
+
 
 /**
 *** To make this lookup routine routine simple but efficient, we use a closed

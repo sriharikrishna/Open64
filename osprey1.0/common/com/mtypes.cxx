@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: mtypes.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:32 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-12 22:38:21 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/mtypes.cxx,v $
  *
  * Revision history:
@@ -57,36 +57,91 @@
 #include "defs.h"
 #include "mtypes.h"
 
-TYPE_DESC Machine_Types[] =
-{ { MTYPE_UNKNOWN, 0, 0, 0, 0, 0, 0, 0, 0, 0, "",0,0, MTYPE_UNKNOWN },
-  { MTYPE_B,	 1,  0,	 0, 0,	0, 0,	0, 0, 0, "B",MTYPE_CLASS_INTEGER,0, MTYPE_B },
-  { MTYPE_I1,	 8,  8,	 8, 1,	1, 1,	1, 0, 0, "I1",MTYPE_CLASS_INTEGER,1, MTYPE_U1 },
-  { MTYPE_I2,	16, 16,	16, 2,	2, 2,	1, 0, 0, "I2",MTYPE_CLASS_INTEGER,3, MTYPE_U2 },
-  { MTYPE_I4,	32, 32,	32, 4,	4, 4,	1, 0, 0, "I4",MTYPE_CLASS_INTEGER,5, MTYPE_U4 },
-  { MTYPE_I8,	64, 64,	64, 8,	8, 8,	1, 0, 0, "I8",MTYPE_CLASS_INTEGER,7, MTYPE_U8 },
-  { MTYPE_U1,	 8,  8,	 8, 1,	1, 1,	0, 0, 0, "U1",MTYPE_CLASS_UNSIGNED_INTEGER,2, MTYPE_I1 },
-  { MTYPE_U2,	16, 16,	16, 2,	2, 2,	0, 0, 0, "U2",MTYPE_CLASS_UNSIGNED_INTEGER,4, MTYPE_I2 },
-  { MTYPE_U4,	32, 32,	32, 4,	4, 4,	0, 0, 0, "U4",MTYPE_CLASS_UNSIGNED_INTEGER,6, MTYPE_I4 },
-  { MTYPE_U8,	64, 64,	64, 8,	8, 8,	0, 0, 0, "U8",MTYPE_CLASS_UNSIGNED_INTEGER,8, MTYPE_I8 },
-  { MTYPE_F4,	32, 32,	32, 4,	4, 4,	1, 1, 0, "F4",MTYPE_CLASS_FLOAT,9, MTYPE_F4 },
-  { MTYPE_F8,	64, 64,	64, 8,	8, 8,	1, 1, 0, "F8",MTYPE_CLASS_FLOAT,11, MTYPE_F8 },
-  { MTYPE_F10, 128,128,128,16, 16,16,	1, 1, 0, "F10",MTYPE_CLASS_FLOAT,13, MTYPE_F10 },
-  { MTYPE_F16, 128,128,128,16, 16,16,	1, 1, 0, "F16",MTYPE_CLASS_FLOAT,15, MTYPE_F16 },
-  { MTYPE_STR,	 0,  0,	 0, 1,	1, 4,	0, 0, 0, "STR",MTYPE_CLASS_STR,0, MTYPE_STR },
-  { MTYPE_FQ,  128,128,128,16, 16,16,	1, 1, 0, "FQ",MTYPE_CLASS_FLOAT,14, MTYPE_FQ },
-  { MTYPE_M,	 0,  0,	 0, 0,	0, 0,	0, 0, 0, "M",0,0, MTYPE_M },
-  { MTYPE_C4,	 64, 64,64, 4,	4, 4,	0, 1, 0, "C4",MTYPE_CLASS_COMPLEX_FLOAT,10, MTYPE_C4 },
-  { MTYPE_C8,	 128,128,128, 8,  8, 8,	0, 1, 0, "C8",MTYPE_CLASS_COMPLEX_FLOAT,12, MTYPE_C8 },
-  { MTYPE_CQ,	 256,256,256,16, 16,16,	0, 1, 0, "CQ",MTYPE_CLASS_COMPLEX_FLOAT,16, MTYPE_CQ },
-  { MTYPE_V,	 0,  0,	 0, 0,	0, 0,	0, 0, 0, "V",0,0, MTYPE_V },
-  { MTYPE_BS,	 1,  0,	 0, 0,	0, 0,	0, 0, 0, "BS",MTYPE_CLASS_INTEGER,0, MTYPE_BS },
-  { MTYPE_A4,	32, 32,	32, 4,	4, 4,	0, 0, 0, "A4",MTYPE_CLASS_UNSIGNED_INTEGER,6, MTYPE_A4 },
-  { MTYPE_A8,	64, 64,	64, 8,	8, 8,	0, 0, 0, "A8",MTYPE_CLASS_UNSIGNED_INTEGER,8, MTYPE_A8 },
-  { MTYPE_C10,	 256,256,256,16, 16,16,	0, 1, 0, "C10",MTYPE_CLASS_COMPLEX_FLOAT,16, MTYPE_C10 },
-  { MTYPE_C16,	 256,256,256,16, 16,16,	0, 1, 0, "C16",MTYPE_CLASS_COMPLEX_FLOAT,16, MTYPE_C16 },
-  { MTYPE_I16,	 256,256,256,16, 16,16,	0, 1, 0, "I16",MTYPE_CLASS_INTEGER,16, MTYPE_I16 },
-  { MTYPE_U16,	 256,256,256,16, 16,16,	0, 1, 0, "U16",MTYPE_CLASS_UNSIGNED_INTEGER,16, MTYPE_U16 }
+#include "ir_a2b_util.h"
+
+// eraxxon (2005.01): Re-implement table and routines to support b2a
+// and a2b conversions.
+// 
+// N.B.: We cannot simply change the definition of TYPE_DESC because
+// mtypes.h is included in *many* C files (e.g. the gcc front-end,
+// libdwarf)
+
+struct MtypeToStr_t : public ir_a2b::i2s_tbl_entry_t {
+  MtypeToStr_t(TYPE_ID id_ = 0, const char* name_ = 0) 
+    : id(id_), name(name_) { }
+  virtual ~MtypeToStr_t() { }
+  
+  virtual INT getEnumVal()     { return id; }
+  virtual const char* getStr() { return name; }
+  
+  TYPE_ID     id;   /* MTYPE_xxx */
+  const char* name; /* name */
 };
+
+
+TYPE_DESC Machine_Types[] =
+{ { MTYPE_UNKNOWN, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, MTYPE_UNKNOWN },
+  { MTYPE_B,	 1,  0,	 0, 0,	0, 0,	0, 0, 0, MTYPE_CLASS_INTEGER,0, MTYPE_B },
+  { MTYPE_I1,	 8,  8,	 8, 1,	1, 1,	1, 0, 0, MTYPE_CLASS_INTEGER,1, MTYPE_U1 },
+  { MTYPE_I2,	16, 16,	16, 2,	2, 2,	1, 0, 0, MTYPE_CLASS_INTEGER,3, MTYPE_U2 },
+  { MTYPE_I4,	32, 32,	32, 4,	4, 4,	1, 0, 0, MTYPE_CLASS_INTEGER,5, MTYPE_U4 },
+  { MTYPE_I8,	64, 64,	64, 8,	8, 8,	1, 0, 0, MTYPE_CLASS_INTEGER,7, MTYPE_U8 },
+  { MTYPE_U1,	 8,  8,	 8, 1,	1, 1,	0, 0, 0, MTYPE_CLASS_UNSIGNED_INTEGER,2, MTYPE_I1 },
+  { MTYPE_U2,	16, 16,	16, 2,	2, 2,	0, 0, 0, MTYPE_CLASS_UNSIGNED_INTEGER,4, MTYPE_I2 },
+  { MTYPE_U4,	32, 32,	32, 4,	4, 4,	0, 0, 0, MTYPE_CLASS_UNSIGNED_INTEGER,6, MTYPE_I4 },
+  { MTYPE_U8,	64, 64,	64, 8,	8, 8,	0, 0, 0, MTYPE_CLASS_UNSIGNED_INTEGER,8, MTYPE_I8 },
+  { MTYPE_F4,	32, 32,	32, 4,	4, 4,	1, 1, 0, MTYPE_CLASS_FLOAT,9, MTYPE_F4 },
+  { MTYPE_F8,	64, 64,	64, 8,	8, 8,	1, 1, 0, MTYPE_CLASS_FLOAT,11, MTYPE_F8 },
+  { MTYPE_F10, 128,128,128,16, 16,16,	1, 1, 0, MTYPE_CLASS_FLOAT,13, MTYPE_F10 },
+  { MTYPE_F16, 128,128,128,16, 16,16,	1, 1, 0, MTYPE_CLASS_FLOAT,15, MTYPE_F16 },
+  { MTYPE_STR,	 0,  0,	 0, 1,	1, 4,	0, 0, 0, MTYPE_CLASS_STR,0, MTYPE_STR },
+  { MTYPE_FQ,  128,128,128,16, 16,16,	1, 1, 0, MTYPE_CLASS_FLOAT,14, MTYPE_FQ },
+  { MTYPE_M,	 0,  0,	 0, 0,	0, 0,	0, 0, 0, 0,0, MTYPE_M },
+  { MTYPE_C4,	 64, 64,64, 4,	4, 4,	0, 1, 0, MTYPE_CLASS_COMPLEX_FLOAT,10, MTYPE_C4 },
+  { MTYPE_C8,	 128,128,128, 8,  8, 8,	0, 1, 0, MTYPE_CLASS_COMPLEX_FLOAT,12, MTYPE_C8 },
+  { MTYPE_CQ,	 256,256,256,16, 16,16,	0, 1, 0, MTYPE_CLASS_COMPLEX_FLOAT,16, MTYPE_CQ },
+  { MTYPE_V,	 0,  0,	 0, 0,	0, 0,	0, 0, 0, 0,0, MTYPE_V },
+  { MTYPE_BS,	 1,  0,	 0, 0,	0, 0,	0, 0, 0, MTYPE_CLASS_INTEGER,0, MTYPE_BS },
+  { MTYPE_A4,	32, 32,	32, 4,	4, 4,	0, 0, 0, MTYPE_CLASS_UNSIGNED_INTEGER,6, MTYPE_A4 },
+  { MTYPE_A8,	64, 64,	64, 8,	8, 8,	0, 0, 0, MTYPE_CLASS_UNSIGNED_INTEGER,8, MTYPE_A8 },
+  { MTYPE_C10,	 256,256,256,16, 16,16,	0, 1, 0, MTYPE_CLASS_COMPLEX_FLOAT,16, MTYPE_C10 },
+  { MTYPE_C16,	 256,256,256,16, 16,16,	0, 1, 0, MTYPE_CLASS_COMPLEX_FLOAT,16, MTYPE_C16 },
+  { MTYPE_I16,	 256,256,256,16, 16,16,	0, 1, 0, MTYPE_CLASS_INTEGER,16, MTYPE_I16 },
+  { MTYPE_U16,	 256,256,256,16, 16,16,	0, 1, 0, MTYPE_CLASS_UNSIGNED_INTEGER,16, MTYPE_U16 }
+};
+
+
+MtypeToStr_t MtypeToNameTbl[] = {
+  MtypeToStr_t(MTYPE_UNKNOWN, "UNK"),
+  MtypeToStr_t(MTYPE_B,       "B"),
+  MtypeToStr_t(MTYPE_I1,      "I1"),
+  MtypeToStr_t(MTYPE_I2,      "I2"),
+  MtypeToStr_t(MTYPE_I4,      "I4"),
+  MtypeToStr_t(MTYPE_I8,      "I8"),
+  MtypeToStr_t(MTYPE_U1,      "U1"),
+  MtypeToStr_t(MTYPE_U2,      "U2"),
+  MtypeToStr_t(MTYPE_U4,      "U4"),
+  MtypeToStr_t(MTYPE_U8,      "U8"),
+  MtypeToStr_t(MTYPE_F4,      "F4"),
+  MtypeToStr_t(MTYPE_F8,      "F8"),
+  MtypeToStr_t(MTYPE_F10,     "F10"),
+  MtypeToStr_t(MTYPE_F16,     "F16"),
+  MtypeToStr_t(MTYPE_STR,     "STR"),
+  MtypeToStr_t(MTYPE_FQ,      "FQ"),
+  MtypeToStr_t(MTYPE_M,       "M"),
+  MtypeToStr_t(MTYPE_C4,      "C4"),
+  MtypeToStr_t(MTYPE_C8,      "C8"),
+  MtypeToStr_t(MTYPE_CQ,      "CQ"),
+  MtypeToStr_t(MTYPE_V,	      "V"),
+  MtypeToStr_t(MTYPE_BS,      "BS"),
+  MtypeToStr_t(MTYPE_A4,      "A4"),
+  MtypeToStr_t(MTYPE_A8,      "A8"),
+  MtypeToStr_t(MTYPE_C10,     "C10"),
+  MtypeToStr_t(MTYPE_C16,     "C16"),
+  MtypeToStr_t(MTYPE_I16,     "I16"),
+  MtypeToStr_t(MTYPE_U16,     "U16")
+};
+
 
 static TYPE_ID Machine_Next_Alignment[] =
 {
@@ -150,14 +205,15 @@ MTYPE_MASK Machine_Types_Available = 0x1fdffe;
 
 /* ====================================================================
  *
- * Mtype_Name
+ * Mtype_Name: given a MTYPE, return a string representation
  *
- * Return a string containing a printable name for an MTYPE.
+ * Name_To_Mtype: given a string, return a MTYPE
  *
  * ====================================================================
  */
 
-char *
+#if 0
+const char *
 Mtype_Name (TYPE_ID b)
 {
   static char buf[32];
@@ -169,6 +225,23 @@ Mtype_Name (TYPE_ID b)
     return buf;
   }
 }
+#endif
+
+const char *
+Mtype_Name (TYPE_ID tid)
+{
+  // Do we need the BETYPE stuff?
+  using namespace ir_a2b;
+  return MapIntToString<MtypeToStr_t>(MtypeToNameTbl, MTYPE_LAST+1, tid);
+}
+
+TYPE_ID
+Name_To_Mtype (const char* nm) 
+{
+  using namespace ir_a2b;
+  return MapStringToInt<MtypeToStr_t, MtypeToNameTbl, MTYPE_LAST+1>(nm);
+}
+
 
 /* ====================================================================
  *

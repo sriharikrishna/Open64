@@ -54,6 +54,7 @@ using namespace stlCompatibility;
 
 #include "symtab.h"
 #include "irbdata.h"                    // for INITO_st_idx
+#include "ir_a2b_util.h"                // for b2a and a2b utilities
 #include "const.h"                      // for MAX_SYMBOLIC_CONST_NAME_LEN
 #include "ttype.h"
 #include "targ_sim.h"
@@ -1496,152 +1497,149 @@ Base_Symbol_And_Offset (ST     *st,
 /* ====================================================================
  *
  * Class_Name / Sclass_Name / Export_Name / Kind_Name
+ *   Given ST field values, convert to ASCII names.
  *
- * Return ASCII names of ST fields for tracing purposes.
+ * Name_To_Class / Name_To_Sclass / Name_To_Export / Name_To_Kind
+ *   Given ASCII names, convert to ST field values.
  *
  * ====================================================================
  */
 
-const char *
-Class_Name (INT cl)
-{
-    switch (cl) {
-    case CLASS_UNK :
-	return "CLASS_UNK";
-    case CLASS_VAR :
-	return "CLASS_VAR";
-    case CLASS_FUNC :
-	return "CLASS_FUNC";
-    case CLASS_CONST :
-	return "CLASS_CONST";
-    case CLASS_PREG :
-	return "CLASS_PREG";
-    case CLASS_BLOCK :
-	return "CLASS_BLOCK";
-    case CLASS_NAME:
-	return "CLASS_NAME";
-    case CLASS_PARAMETER:
-        return "CLASS_PARAMETER";
-    default:
-	{
-	  static char buf[32];
-	  sprintf(buf, "Unknown_CLASS(%d)", cl);
-	  return buf;
-	}
-    }
-} // Class_Name
+// eraxxon (2005.01): Re-implement these routines to support
+// conversion in both directions.
+
+// The type for enumeration value -> string tables
+struct EnumToStr_t : public ir_a2b::i2s_tbl_entry_t {
+  EnumToStr_t(INT val_ = 0, const char* str_ = 0) 
+    : val(val_), str(str_) { }
+
+  virtual ~EnumToStr_t() { }
+
+  virtual INT getEnumVal()     { return val; }
+  virtual const char* getStr() { return str; }
+
+  INT         val;
+  const char* str;
+};
+
+
+// The data tables
+EnumToStr_t STClassToNameTbl[CLASS_COUNT] = {
+  EnumToStr_t(CLASS_UNK,       "C_UNK"),
+  EnumToStr_t(CLASS_VAR,       "C_VAR"),
+  EnumToStr_t(CLASS_FUNC,      "C_FUNC"),
+  EnumToStr_t(CLASS_CONST,     "C_CONST"),
+  EnumToStr_t(CLASS_PREG,      "C_PREG"),
+  EnumToStr_t(CLASS_BLOCK,     "C_BLOCK"),
+  EnumToStr_t(CLASS_NAME,      "C_NAME"),
+  EnumToStr_t(CLASS_MODULE,    "C_MODULE"),
+  EnumToStr_t(CLASS_TYPE,      "C_TYPE"),
+  EnumToStr_t(CLASS_PARAMETER, "C_PARAMETER")
+};
+
+EnumToStr_t STSclassToNameTbl[SCLASS_COUNT] = {
+  EnumToStr_t(SCLASS_UNKNOWN,   "S_UNKNOWN"),
+  EnumToStr_t(SCLASS_AUTO,      "S_AUTO"),
+  EnumToStr_t(SCLASS_FORMAL,    "S_FORMAL"),
+  EnumToStr_t(SCLASS_FORMAL_REF,"S_FORMAL_REF"),
+  EnumToStr_t(SCLASS_PSTATIC,   "S_PSTATIC"),
+  EnumToStr_t(SCLASS_FSTATIC,   "S_FSTATIC"),
+  EnumToStr_t(SCLASS_COMMON,    "S_COMMON"),
+  EnumToStr_t(SCLASS_EXTERN,    "S_EXTERN"),
+  EnumToStr_t(SCLASS_UGLOBAL,   "S_UGLOBAL"),
+  EnumToStr_t(SCLASS_DGLOBAL,   "S_DGLOBAL"),
+  EnumToStr_t(SCLASS_TEXT,      "S_TEXT"),
+  EnumToStr_t(SCLASS_REG,       "S_REG"),
+  EnumToStr_t(SCLASS_CPLINIT,   "S_CPLINIT"),
+  EnumToStr_t(SCLASS_EH_REGION, "S_EH_REGION"),
+  EnumToStr_t(SCLASS_EH_REGION_SUPP, "S_EH_REGION_SUPP"),
+  EnumToStr_t(SCLASS_DISTR_ARRAY, "S_DISTR_ARRAY"),
+  EnumToStr_t(SCLASS_COMMENT,   "S_COMMENT"),
+  EnumToStr_t(SCLASS_THREAD_PRIVATE_FUNCS, "S_THREAD_PRIVATE_FUNCS"),
+  EnumToStr_t(SCLASS_MODULE,    "S_MODULE"),
+  EnumToStr_t(SCLASS_COMMON1,   "S_COMMON1"),
+};
+
+EnumToStr_t STExportToNameTbl[EXPORT_COUNT] = {
+  EnumToStr_t(EXPORT_LOCAL,          "X_LOCAL"),
+  EnumToStr_t(EXPORT_LOCAL_INTERNAL, "X_LOCAL_INTERNAL"),
+  EnumToStr_t(EXPORT_INTERNAL,       "X_INTERNAL"),
+  EnumToStr_t(EXPORT_HIDDEN,         "X_HIDDEN"),
+  EnumToStr_t(EXPORT_PROTECTED,      "X_PROTECTED"),
+  EnumToStr_t(EXPORT_PREEMPTIBLE,    "X_PREEMPTIBLE"),
+  EnumToStr_t(EXPORT_OPTIONAL,       "X_OPTIONAL"),
+};
+
+EnumToStr_t TYKindToNameTbl[KIND_LAST] = {
+  EnumToStr_t(KIND_INVALID,  "INVALID"),
+  EnumToStr_t(KIND_SCALAR,   "SCALAR"),
+  EnumToStr_t(KIND_ARRAY,    "ARRAY"),
+  EnumToStr_t(KIND_STRUCT,   "STRUCT"),
+  EnumToStr_t(KIND_POINTER,  "POINTER"),
+  EnumToStr_t(KIND_FUNCTION, "FUNCTION"),
+  EnumToStr_t(KIND_VOID,     "VOID"),
+};
 
 
 const char *
-Sclass_Name (INT s)
+Class_Name (ST_CLASS cl)
 {
-    switch (s) {
-    case SCLASS_UNKNOWN: 
-	return "UNKNOWN";
-    case SCLASS_AUTO:    
-	return "AUTO";
-    case SCLASS_FORMAL:  
-	return "FORMAL";
-    case SCLASS_FORMAL_REF:  
-	return "FORMAL_REF";
-    case SCLASS_PSTATIC: 
-	return "PSTATIC";
-    case SCLASS_FSTATIC: 
-	return "FSTATIC";
-    case SCLASS_COMMON:  
-	return "COMMON";
-    case SCLASS_EXTERN:  
-	return "EXTERN";
-    case SCLASS_UGLOBAL: 
-	return "UGLOBAL";
-    case SCLASS_DGLOBAL: 
-	return "DGLOBAL";
-    case SCLASS_TEXT:    
-	return "TEXT";
-    case SCLASS_REG:    
-	return "REG";
-    case SCLASS_CPLINIT:    
-	return "CPLINIT";
-    case SCLASS_EH_REGION:    
-	return "EH_REGION";
-    case SCLASS_EH_REGION_SUPP:
-	return "EH_REGION_SUPP";
-    case SCLASS_DISTR_ARRAY:    
-	return "DISTR_ARRAY";
-    case SCLASS_THREAD_PRIVATE_FUNCS:    
-	return "THREAD_PRIVATE_FUNCS";
-    case SCLASS_COMMENT:    
-	return "COMMENT";
-    case SCLASS_MODULE:
-        return "MODULE";   
-    case SCLASS_COMMON1:
-        return "COMMON1";  
-    default:
-	{
-	  static char buf[32];
-	  sprintf(buf, "Unknown_SCLASS(%d)", s);
-	  return buf;
-	}
-    }
-} // Sclass_Name
+  using namespace ir_a2b;
+  return MapIntToString<EnumToStr_t>(STClassToNameTbl, CLASS_COUNT, (INT)cl);
+}
+
+ST_CLASS
+Name_To_Class (const char* nm) 
+{
+  using namespace ir_a2b;
+  return (ST_CLASS)MapStringToInt<EnumToStr_t, STClassToNameTbl, CLASS_COUNT>(nm);
+}
+
 
 const char *
-Export_Name (INT e)
+Sclass_Name (ST_SCLASS sc)
 {
-    switch (e) {
-    case EXPORT_LOCAL:
-	return "XLOCAL";
-    case EXPORT_LOCAL_INTERNAL:
-	return "XLOCAL_INTERNAL";
-    case EXPORT_INTERNAL:
-	return "XINTERNAL";
-    case EXPORT_HIDDEN:
-	return "XHIDDEN";
-    case EXPORT_PROTECTED:
-	return "XPROTECTED";
-    case EXPORT_PREEMPTIBLE:
-	return "XPREEMPTIBLE";
-    case EXPORT_OPTIONAL:
-	return "XOPTIONAL";
-    default:
-	{
-	  static char buf[32];
-	  sprintf(buf, "Unknown_Export_Scope(%d)", e);
-	  return buf;
-	}
-    }
-} // Export_Name
+  using namespace ir_a2b;
+  return MapIntToString<EnumToStr_t>(STSclassToNameTbl, SCLASS_COUNT, (INT)sc);
+}
+
+ST_SCLASS
+Name_To_Sclass (const char* nm)
+{
+  using namespace ir_a2b;
+  return (ST_SCLASS)MapStringToInt<EnumToStr_t, STSclassToNameTbl, SCLASS_COUNT>(nm);
+}
+
 
 const char *
-Kind_Name (INT k)
+Export_Name (ST_EXPORT ex)
 {
-    struct knm {
-	char name[32];
-    };
-    static struct knm knb[4];
-    static INT16 knb_used;
-    char *r;
+  using namespace ir_a2b;
+  return MapIntToString<EnumToStr_t>(STExportToNameTbl, EXPORT_COUNT, (INT)ex);
+}
 
-    switch ( k ) {
-    case KIND_SCALAR:
-	return "KIND_SCALAR";
-    case KIND_ARRAY:
-	return "KIND_ARRAY";
-    case KIND_STRUCT:
-	return "KIND_STRUCT";
-    case KIND_POINTER:
-	return "KIND_POINTER";
-    case KIND_FUNCTION:
-	return "KIND_FUNCTION";
-    case KIND_VOID:
-	return "KIND_VOID";
-    }
+ST_EXPORT
+Name_To_Export (const char* nm)
+{
+  using namespace ir_a2b;
+  return (ST_EXPORT)MapStringToInt<EnumToStr_t, STExportToNameTbl, EXPORT_COUNT>(nm);
+}
 
-    r = knb[knb_used].name;
-    knb_used = (knb_used + 1) % 4;
-    sprintf ( r, "KIND_%1d", k );
-    return r;
-} // Kind_Name
+
+const char *
+Kind_Name (TY_KIND k)
+{
+  using namespace ir_a2b;
+  return MapIntToString<EnumToStr_t>(TYKindToNameTbl, KIND_LAST, (INT)k);
+}
+
+TY_KIND
+Name_To_Kind (const char* nm)
+{
+  using namespace ir_a2b;
+  return (TY_KIND)MapStringToInt<EnumToStr_t, TYKindToNameTbl, KIND_LAST>(nm);
+}
+
 
 
 static void
@@ -2775,6 +2773,7 @@ Initialize_Symbol_Tables (BOOL reserve_index_zero)
 		sizeof(INITV));
 	Init_Constab ();
 	New_Scope (GLOBAL_SYMTAB, Malloc_Mem_Pool, TRUE);
+	
 	Create_Special_Global_Symbols ();
 	Create_All_Preg_Symbols();
     }
@@ -2806,7 +2805,7 @@ Enter_tcon (const TCON& tcon)
 } // Enter_tcon
 
 
-inline void
+void
 Init_Constab ()
 {
     if (Tcon_Table.Size () == 0) {
