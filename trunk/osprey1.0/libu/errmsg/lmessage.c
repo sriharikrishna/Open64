@@ -53,26 +53,15 @@
 # include <siohdr.h>
 #endif
 
-#if defined(_LITTLE_ENDIAN)
-# include <cray/nlcatmsg.h>
-#endif
+#include <cray/nlcatmsg.h> /* Open64 header */
 
 #ifdef	_UNICOS
-
 # include <tapereq.h>
-
   extern char	**_argv;
 # define CMDNAME (*_argv)
-
 #else
-
 # include <cray/portdefs.h>
-# if defined(_LITTLE_ENDIAN)
-#  include <cray/nlcatmsg.h>
-# endif
-
 # define CMDNAME ""
-
 #endif
 
 

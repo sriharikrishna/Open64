@@ -58,33 +58,24 @@
 
 #define DISABLE_NL_TYPES_SYMBOL_RENAMING 1 /* for our <nl_types.h> */
 
-#ifdef _SOLARIS_SOLARIS
-#define MSG_FORMAT	"MSG_FORMAT"
-#define D_MSG_FORMAT	"%G-%N %C: %S %P\n  %M\n"
-#endif
-
-#ifdef	_LITTLE_ENDIAN
-#include <locale.h>
-#include <nl_types.h>
-#include <cray/nlcatmsg.h>
-#include <stdio.h>
-#include <string.h>
-#else					/* Else _LITTLE_ENDIAN */
-#ifndef _LIBU
-#include "synonyms.h"
-#endif
-
 #include <locale.h>
 #include <stdio.h>
-#define __NLS_INTERNALS 1
-#include <nl_types.h>
-#undef __NLS_INTERNALS
 #include <string.h>
-#include <pfmt.h>
-#endif					/* End _LITTLE_ENDIAN */
-
 #include <stdlib.h>
 #include <time.h>
+#include <nl_types.h>
+
+#include <cray/nlcatmsg.h> /* Open64 header */
+
+/* SGI's <nl_types.h> defines MSG_FORMAT and D_MSG_FORMAT when
+   __NLS_INTERNALS is defined */
+#ifndef MSG_FORMAT
+# define MSG_FORMAT "MSG_FORMAT"
+#endif
+
+#ifndef D_MSG_FORMAT
+# define D_MSG_FORMAT "%G-%N %C: %S %P\n  %M\n"
+#endif
 
 #define OCTAL		8
 #define HEXADECIMAL	16
