@@ -14039,6 +14039,10 @@ static void send_attr_ntry(int		attr_idx)
  * Whirl,here we have to generate a bounch of OPR_FUNC_ENTRY and
  * send all dummy arguments for "OPR_INTERFACE"
  ****************************************************************/
+    if (AT_MODULE_OBJECT(attr_idx) &&
+         ATP_PGM_UNIT(SCP_ATTR_IDX(curr_scp_idx)) != Module)
+        ;
+    else
      if (!AT_IS_INTRIN(attr_idx)||ATI_USER_SPECIFIED(attr_idx)) 
           send_interface_list(attr_idx);
 

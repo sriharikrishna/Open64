@@ -5776,7 +5776,6 @@ void array_bounds_resolution(int	attr_idx,
    /* array_dim_resolution will not set BD_RESOLVED and this    */
    /* array should get resolved during decl_semantics.          */
 
-/* Sept   array_dim_resolution(attr_idx, TRUE);  */
    array_dim_resolution(attr_idx, FALSE);  
 
    /* Need to use ATD_ARRAY_IDX, because bd_idx may change in resolution */

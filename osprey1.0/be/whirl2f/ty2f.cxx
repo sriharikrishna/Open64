@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.7 $
- * $Date: 2002-09-18 17:51:41 $
+ * $Revision: 1.8 $
+ * $Date: 2002-09-18 17:56:42 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -64,7 +64,6 @@ extern WN* PU_Body;
 extern BOOL Array_Bnd_Temp_Var;
 
 #define NUMBER_OF_OPERATORS (OPERATOR_LAST + 1)
-#define  DBGPATH 1
 typedef WN2F_STATUS (*WN2F_HANDLER_FUNC)(TOKEN_BUFFER, WN*, WN2F_CONTEXT);
 extern WN2F_HANDLER_FUNC  WN2F_Handler[NUMBER_OF_OPERATORS];
 BOOL Use_Purple_Array_Bnds_Placeholder = FALSE;

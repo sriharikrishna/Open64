@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.7 $
- * $Date: 2002-09-12 21:15:36 $
+ * $Revision: 1.8 $
+ * $Date: 2002-09-18 17:53:20 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.8 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -764,6 +764,7 @@ fei_member(char          *name_string,
 {
   dtype_t d ;
   TY_IDX ty_idx;
+  TY_IDX tr_idx;
   BOOL p1   ;
   INT64  off;
   INT32 ret_val;
@@ -792,7 +793,13 @@ fei_member(char          *name_string,
 
   FLD_HANDLE fld (d.dty_last);
 
-  FLD_Init (fld, Save_Str(name_string), ty_idx, off);
+   if (p1) {
+     tr_idx = Make_F90_Pointer_Type(ty_idx);
+     Set_TY_is_f90_pointer(tr_idx);
+    }
+   else 
+     tr_idx = ty_idx;
+  FLD_Init (fld, Save_Str(name_string), tr_idx, off);
 
   if (p1)
    Set_FLD_is_pointer(fld);

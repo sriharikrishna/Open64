@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.9 $
- * $Date: 2002-09-10 18:20:32 $
+ * $Revision: 1.10 $
+ * $Date: 2002-09-18 17:51:41 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.10 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -616,7 +616,6 @@ WN2F_pstore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    TOKEN_BUFFER  lhs_tokens;
    TOKEN_BUFFER  rhs_tokens;
    TY_IDX        base_ty;
-
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_PSTORE,
                     (DIAG_W2F_UNEXPECTED_OPC, "WN2F_pstore"));
 
@@ -626,14 +625,18 @@ WN2F_pstore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       base_ty = WN_ty(wn);
 
    /* Get the lhs of the assignment (dereference address) */
-   lhs_tokens = New_Token_Buffer();
-   WN2F_Offset_Memref(lhs_tokens,
-                      WN_kid1(wn),           /* base-symbol */
-                      base_ty,               /* base-type */
-                      TY_pointed(WN_ty(wn)), /* object-type */
-                      WN_store_offset(wn),   /* object-ofst */
-                      context);
-  
+      lhs_tokens = New_Token_Buffer();
+
+      set_WN2F_CONTEXT_has_no_arr_elmt(context);
+
+      WN2F_Offset_Memref(lhs_tokens,
+                         WN_kid1(wn),           /* base-symbol */
+                         base_ty,               /* base-type */
+                         TY_pointed(WN_ty(wn)), /* object-type */
+                         WN_store_offset(wn),   /* object-ofst */
+                         context);
+      reset_WN2F_CONTEXT_has_no_arr_elmt(context);
+
    /* The rhs */
    rhs_tokens = New_Token_Buffer();
    if (TY_is_logical(Ty_Table[TY_pointed(WN_ty(wn))]))
@@ -643,7 +646,10 @@ WN2F_pstore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       reset_WN2F_CONTEXT_has_logical_arg(context);
    }
    else
+     {
+
       WN2F_translate(rhs_tokens, WN_kid0(wn), context);
+     }
 
    /* See if we need to apply a "char" conversion to the rhs
     */
@@ -703,7 +709,6 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* Get the lhs of the assignment (dereference address) */
    lhs_tokens = New_Token_Buffer();
-   set_WN2F_CONTEXT_has_no_arr_elmt(context); 
    WN2F_Offset_Memref(lhs_tokens, 
 		      WN_kid1(wn),           /* base-symbol */
 		      base_ty,               /* base-type */
@@ -1033,7 +1038,6 @@ WN2F_iload(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     
    /* Get the object to be loaded (dereference address) */
 
-   set_WN2F_CONTEXT_has_no_arr_elmt(context); //otherwise should be OPR_ARRAY
    WN2F_Offset_Memref(tokens, 
 		      WN_kid0(wn),                     /* base-symbol */
 		      base_ty,                         /* base-type */
@@ -1281,7 +1285,7 @@ WN2F_lda(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    * we infer a type here.
    */
 
-  if (TY_Is_Pointer(WN_ty(wn)))
+  if (TY_Is_Pointer(WN_ty(wn)) )
     {
       object_ty = TY_pointed(WN_ty(wn));
     }
@@ -1295,6 +1299,7 @@ WN2F_lda(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
   ST * st = WN_st(wn);
   TY_IDX ty ;
+  TY_IDX ty_1;
   reset_WN2F_CONTEXT_deref_addr(context);
 
   if (ST_sym_class(st) == CLASS_BLOCK)
@@ -1303,7 +1308,15 @@ WN2F_lda(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
   }
   else 
   {
-    ty = Stab_Pointer_To(ST_type(st));
+    if (TY_is_f90_pointer(ST_type(st)))
+         ty_1= TY_pointed(ST_type(st));
+    else
+         ty_1= ST_type(st);
+
+     ty =  Stab_Pointer_To(ty_1);
+
+//    ty = Stab_Pointer_To(ST_type(st));
+       
 
     WN2F_Offset_Symref(tokens, 
 		       WN_st(wn),                           /* base-symbol */
@@ -1613,10 +1626,10 @@ WN2F_arrsection(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
             */
        WN2F_translate(tokens, kid, context);
        reset_WN2F_CONTEXT_deref_addr(context);
-    
-      if (ST_is_my_pointer(WN_st(kid)))
+
+   if ( WN2F_CONTEXT_has_no_arr_elmt(context))
             ;
-      else
+   else
          WN2F_arrsection_bounds(tokens,wn,array_ty,context);
      }
    }
@@ -1685,6 +1698,8 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    else 
    {
      array_ty = W2F_TY_pointed(ptr_ty, "base of OPC_ARRAY");
+     if (TY_is_f90_pointer(array_ty))
+        array_ty = TY_pointed(array_ty);
 
      if (WN_opc_operator(kid) == OPR_LDID       &&
 	 ST_sclass(WN_st(kid)) == SCLASS_FORMAL &&
@@ -2008,6 +2023,7 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
 
 //   Append_Token_Special(tokens, '(');
 //  set_WN2F_CONTEXT_no_parenthesis(context);
+
 
   if (TY_Is_Array(array_ty) && TY_AR_ndims(array_ty) >= WN_num_dim(wn))
     {
