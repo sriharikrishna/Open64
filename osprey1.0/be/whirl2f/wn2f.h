@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: wn2f.h
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:46 $
+ * $Revision: 1.4 $
+ * $Date: 2002-08-30 21:21:21 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.h,v $
  *
@@ -311,6 +311,15 @@ typedef struct WN2F_Context
    ((c).flags = (c).flags | WN2F_CONTEXT_CRAY_IO)
 #define reset_WN2F_CONTEXT_cray_io(c)\
    ((c).flags = (c).flags & ~WN2F_CONTEXT_CRAY_IO)
+
+
+#define WN2F_CONTEXT_HAS_NO_ARR_ELMT  0x00004000
+#define WN2F_CONTEXT_has_no_arr_elmt(c)\
+   ((c).flags & WN2F_CONTEXT_HAS_NO_ARR_ELMT)
+#define set_WN2F_CONTEXT_has_no_arr_elmt(c)\
+   ((c).flags = (c).flags | WN2F_CONTEXT_HAS_NO_ARR_ELMT)
+#define reset_WN2F_CONTEXT_has_no_arr_elmt(c)\
+   ((c).flags = (c).flags & ~WN2F_CONTEXT_HAS_NO_ARR_ELMT)
 
 
     /* ---- Utilities to aid in WN to Fortran translation ---- */

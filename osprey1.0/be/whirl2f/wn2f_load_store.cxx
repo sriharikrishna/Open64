@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.7 $
- * $Date: 2002-08-23 21:58:49 $
+ * $Revision: 1.8 $
+ * $Date: 2002-08-30 21:21:21 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.8 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1035,15 +1035,13 @@ WN2F_iload(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    if (!TY_Is_Pointer(base_ty))
       base_ty = WN_load_addr_ty(wn);
     
-   WN2F_translate(tokens,WN_kid0(wn), context); 
-
    /* Get the object to be loaded (dereference address) */
-//   WN2F_Offset_Memref(tokens, 
-//		      WN_kid0(wn),                     /* base-symbol */
-//		      base_ty,                         /* base-type */
-//		      TY_pointed(WN_load_addr_ty(wn)), /* object-type */
-//		      WN_load_offset(wn),              /* object-ofst */
-//		      context);
+   WN2F_Offset_Memref(tokens, 
+		      WN_kid0(wn),                     /* base-symbol */
+		      base_ty,                         /* base-type */
+		      TY_pointed(WN_load_addr_ty(wn)), /* object-type */
+		      WN_load_offset(wn),              /* object-ofst */
+		      context);
 
    /* See if there is any prefetch information with this load, and 
     * if so insert information about it as a comment on a separate
@@ -1594,15 +1592,21 @@ WN2F_arrsection(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
           * of intrinsic functions, except when the substrings are to be
           * handled as integral types and thus are encountered here.
           */
-
+#if 0
        if (!WN2F_F90_pu)
        {
          Append_Token_String(tokens, "ichar");
          Append_Token_Special(tokens, '(');
        }
+# endif 
+
        WN2F_String_Argument(tokens, wn, WN2F_INTCONST_ONE, context);
+# if 0
+
        if (!WN2F_F90_pu)
          Append_Token_Special(tokens, ')');
+# endif
+
      }
      else /* A regular array access */
      {
@@ -1706,15 +1710,21 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	  * of intrinsic functions, except when the substrings are to be
 	  * handled as integral types and thus are encountered here.
 	  */
-
+# if 0
        if (!WN2F_F90_pu)
        {
 	 Append_Token_String(tokens, "ichar");
 	 Append_Token_Special(tokens, '(');
        }
+# endif
+
        WN2F_String_Argument(tokens, wn, WN2F_INTCONST_ONE, context);
+
+# if 0
        if (!WN2F_F90_pu)
 	 Append_Token_Special(tokens, ')');
+# endif
+
      }
      else /* A regular array access */
      {
@@ -1861,6 +1871,8 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
    */
 
   kid = WN_kid0(wn);
+if (WN_operator(kid)==OPR_LDA)
+ {
   st  =  WN_st(kid);
   if (TY_Is_Pointer(ST_type(st)))
       arb_base = TY_arb(TY_pointed(ST_type(st)));
@@ -1869,6 +1881,10 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
 
   dim =  ARB_dimension(arb_base);
   co_dim = ARB_co_dimension(arb_base);
+ } else {
+   co_dim =0;
+   dim = WN_num_dim(wn);
+ }
 
   if (co_dim <= 0)
       co_dim = 0;
@@ -1992,6 +2008,7 @@ WN2F_arrsection_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT
 
       WN2F_Normalize_Idx_To_Onedim(tokens, wn, context);
     }
+
 }
 
 
@@ -2049,7 +2066,7 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
 		      (DIAG_UNIMPLEMENTED, 
 		       "access/declaration mismatch in array dimensions"));
 
-      WN2F_Normalize_Idx_To_Onedim(tokens, wn, context);
+     WN2F_Normalize_Idx_To_Onedim(tokens, wn, context);
     }
 //   Append_Token_Special(tokens, ')');
 }
@@ -2079,6 +2096,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
     * is the first argument and the length is the second argument.
     */
    WN   *base = WN_Skip_Parm(base_parm);
+   WN   *base1 = WN_Skip_Parm(base_parm);
    WN   *lower_bnd;
    WN   *arg_expr;
    TY_IDX str_ty;
@@ -2180,21 +2198,21 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 			(DIAG_W2F_EXPECTED_PTR_TO_CHARACTER,
 			 "WN2F_String_Argument"));
 
-
 	/* Get the string base and substring notation for the argument.  */
 	set_WN2F_CONTEXT_deref_addr(context);
 	WN2F_translate(tokens, base, context);
 	reset_WN2F_CONTEXT_deref_addr(context);
       }
-
  if (WN_operator(base) != OPR_CALL &&
-     WN_operator(base) != OPR_LDA )
+     WN_operator(base) != OPR_LDA &&
+      (WN_operator(base1) != OPR_ARRAY ||
+        WN_operator(base1)==OPR_ARRAY &&
+        WN_operator(base)==OPR_ARRAY ))
       WN2F_Substring(tokens, 
 		     str_length,
 		     lower_bnd,
 		     WN_Skip_Parm(length),
 		     context);
-
       return ;
    }
 } /* WN2F_String_Argument */

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.8 $
- * $Date: 2002-08-23 21:58:49 $
+ * $Revision: 1.9 $
+ * $Date: 2002-08-30 21:21:21 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.9 $";
 #endif
 
 #include <alloca.h>
@@ -94,7 +94,7 @@ extern BOOL    W2F_Emit_Cgtag;      /* Defined in w2f_driver.c */
 
 
 static const char WN2F_Purple_Region_Name[] = "prp___region";
-static const char unnamed_interface[] = "unnamedinterface"; 
+static const char unnamed_interface[] = "unnamed interface"; 
 
 #define WN_pragma_nest(wn) WN_pragma_arg1(wn)
 
@@ -1312,6 +1312,11 @@ public:
           if ( ST_export(st) == EXPORT_LOCAL_INTERNAL) 
           return;
 
+      if (ST_sym_class(st) ==CLASS_FUNC)
+          if (!(ST_sclass(st) == SCLASS_EXTERN))
+          return; 
+
+
       BOOL dop ;
 
       dop = ST_sclass(st) != SCLASS_FORMAL && 	
@@ -1561,8 +1566,10 @@ WN2F_Append_Block_Data(TOKEN_BUFFER  tokens)
       Append_F77_Indented_Newline(tokens, 1, NULL);
       Append_Token_String(tokens, "BLOCK DATA");
 
+# if 0
       Append_F77_Indented_Newline(tokens, 1, NULL);
       Append_Token_String(tokens, "IMPLICIT NONE");
+# endif
 
       WHIRL2F_Append_Comment(tokens, "**** Variables ****", 1, 1);
       Append_F77_Indented_Newline(tokens, 1, NULL);
@@ -2592,7 +2599,10 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
           if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE")== 0 )    
              Append_Token_String(call_tokens,"ALLOCATE");
           else if (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE")== 0)
+           {
             Append_Token_String(call_tokens,"DEALLOCATE");
+            set_WN2F_CONTEXT_has_no_arr_elmt(context);
+           }
          }
 
         if (strcmp(ST_name(WN_st(wn)),"ALLOCATED")== 0)
@@ -2722,11 +2732,11 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
   	 if ((is_user_call) &&
              (cur_idx == first_arg_idx) &&
              (cur_idx == first_arg_idx) && (WN_kid_count(wn) >= cur_idx + 2) &&
+            ( WN_kid(wn,cur_idx+1) != NULL) &&
              (WN_Parm_By_Value(WN_kid(wn,cur_idx + 1))) &&
              ((return_ty != 0) && (TY_kind(return_ty) == KIND_VOID))) 
          {
 	      len_idx = cur_idx + 1 ;
-//              arg_idx ++ ;                /* NB: bump loop varbl past length */
          }
          else                
  	   len_idx = last_arg_idx - (total_implicit_args - implicit_args); 
@@ -3123,7 +3133,7 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
 //   const char *st_name =  W2CF_Symtab_Nameof_St(WN_st(wn));
     
-    const char *st_name = ST_name(st);
+   const char *st_name = ST_name(st);
 
     ASSERT_DBG_FATAL(WN_operator(wn) == OPR_INTERFACE,
                      (DIAG_W2F_UNEXPECTED_OPC, "WN2F_interface_blk"));
@@ -3178,34 +3188,34 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
         return_ty = Func_Return_Type(funtype);
 
-  if (ST_is_in_module(st) ) {
-     Append_Token_String(header_tokens,"module procedure ");
-     Append_Token_String(header_tokens, W2CF_Symtab_Nameof_St(st));     
-   }
-  else {
-    if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
+     if (ST_is_in_module(st) ) {
+          Append_Token_String(header_tokens,"module procedure ");
+          Append_Token_String(header_tokens, W2CF_Symtab_Nameof_St(st));     
+       }
+     else {
+      if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
 
-     {
-       Append_Token_String(header_tokens, "FUNCTION");
+        {
+          Append_Token_String(header_tokens, "FUNCTION");
 
-       if (PU_recursive(Get_Current_PU())) 
-           Prepend_Token_String(header_tokens, "RECURSIVE");
+          if (PU_recursive(Get_Current_PU())) 
+              Prepend_Token_String(header_tokens, "RECURSIVE");
 
        /* Note that we cannot have functions returning pointer types
         * in Fortran, so we use the corresponding integral type
         * instead.
         */
 
-        if (TY_Is_Pointer(return_ty))
+          if (TY_Is_Pointer(return_ty))
              TY2F_translate(header_tokens,
                          Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-         else
+          else
              TY2F_translate(header_tokens, return_ty);
-       }
-      else /* subroutine */
-       {
-         Append_Token_String(header_tokens, "SUBROUTINE");
-       }
+         }
+       else /* subroutine */
+         {
+           Append_Token_String(header_tokens, "SUBROUTINE");
+         }
 
         Append_Token_String(header_tokens, W2CF_Symtab_Nameof_St(st));
 
@@ -3214,54 +3224,54 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     * Such implicit parameters should be at the end of the parameter list.
     */
 
-   first_param = ST2F_FIRST_PARAM_IDX(funtype);
+       first_param = ST2F_FIRST_PARAM_IDX(funtype);
 
-   if (param_st[first_param] != NULL)
-   {
-      Append_Token_Special(header_tokens, '(');
-      for (param = first_param;
-           param < num_params;
-           param++)
-      {
-         if (implicit){
-              param_st[param] = NULL;
-              implicit = 0;
-         }
-         else {
-              if (STAB_PARAM_HAS_IMPLICIT_LENGTH(param_st[param])) 
-                  implicit = 1;
-             if (!ST_is_return_var(param_st[param])) {
-              Append_Token_String(header_tokens,
-                             W2CF_Symtab_Nameof_St(param_st[param]));
+      if (param_st[first_param] != NULL)
+         {
+          Append_Token_Special(header_tokens, '(');
+          for (param = first_param;
+               param < num_params;
+               param++)
+          {
+              if (implicit){
+                  param_st[param] = NULL;
+                  implicit = 0;
+               }
+              else {
+                 if (STAB_PARAM_HAS_IMPLICIT_LENGTH(param_st[param])) 
+                       implicit = 1;
+                 if (!ST_is_return_var(param_st[param])) {
+                       Append_Token_String(header_tokens,
+                                           W2CF_Symtab_Nameof_St(param_st[param]));
 
-              if (param+1 < num_params)
-                    Append_Token_Special(header_tokens, ',');
-             }else
-            rslt = param_st[param];
+                  if (param+1 < num_params)
+                        Append_Token_Special(header_tokens, ',');
+                   }else
+                      rslt = param_st[param];
 
-         }
-      }
-      Append_Token_Special(header_tokens, ')');
-   }
-   else 
-   {
-      /* Use the "()" notation for "no parameters" */
-      Append_Token_Special(header_tokens, '(');
-      Append_Token_Special(header_tokens, ')');
-   }
+               }
+           }
+           Append_Token_Special(header_tokens, ')');
+       }
+     else 
+       {
+          /* Use the "()" notation for "no parameters" */
+        Append_Token_Special(header_tokens, '(');
+        Append_Token_Special(header_tokens, ')');
+     }
    
-     if (rslt !=NULL){
-         Append_Token_String(header_tokens,"result(");
-         Append_Token_String( header_tokens,
-                                W2CF_Symtab_Nameof_St(rslt));
-         Append_Token_Special(header_tokens, ')');
-        }
+      if (rslt !=NULL) {
+               Append_Token_String(header_tokens,"result(");
+               Append_Token_String( header_tokens,
+                                    W2CF_Symtab_Nameof_St(rslt));
+               Append_Token_Special(header_tokens, ')');
+         }
       /* Emit parameter declarations, indented and on a new line */
 
       for (param = first_param; param < num_params ; param++)
    
          if (param_st[param] != NULL) {
-         Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+            Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
            ST2F_decl_translate(header_tokens, param_st[param]);
          if (ST_is_optional_argument(param_st[param])) {
            Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
@@ -3287,17 +3297,16 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
       Append_F77_Indented_Newline(header_tokens, 0, NULL);
 
-    if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
-         Append_Token_String(header_tokens, "END FUNCTION");
+      if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
+              Append_Token_String(header_tokens, "END FUNCTION");
       else /* subroutine */
-         Append_Token_String(header_tokens, "END SUBROUTINE");
-   }
+              Append_Token_String(header_tokens, "END SUBROUTINE");
+    }
 
-     Append_Token_Special(header_tokens, '\n');
-     Append_F77_Indented_Newline(tokens, 0, NULL);
-     Append_And_Reclaim_Token_List(tokens, &header_tokens);
-
-
+       Append_Token_Special(header_tokens, '\n');
+       Append_F77_Indented_Newline(tokens, 0, NULL);
+       Append_And_Reclaim_Token_List(tokens, &header_tokens);
+  
  }
      Decrement_Indentation();
 

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:46 $
+ * $Revision: 1.4 $
+ * $Date: 2002-08-30 21:21:20 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.4 $";
 #endif
 
 #include <alloca.h>
@@ -562,11 +562,16 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
 
       if (TY_Is_Character_String(base_ty))
       {
+# if 0
 	 Append_Token_String(tokens, "ichar");
 	 Append_Token_Special(tokens, '(');
+# endif
 	 translate_var_ref(tokens, st);
 	 TY2F_Translate_ArrayElt(tokens, base_ty, offset);
+#if 0
 	 Append_Token_Special(tokens, ')');
+#endif
+
       }
       else
       {
@@ -731,16 +736,26 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 
 	 if (TY_Is_Character_String(base_ty))
 	 {
+# if 0
 	    Append_Token_String(tokens, "ichar");
 	    Append_Token_Special(tokens, '(');
+# endif
+
 	    (void)WN2F_translate(tokens, addr, context); /* String lvalue */
 	    TY2F_Translate_ArrayElt(tokens, base_ty, offset);
+# if 0
 	    Append_Token_Special(tokens, ')');
+# endif
+
 	 }
 	 else
 	 {
 	    (void)WN2F_translate(tokens, addr, context); /* Array lvalue */
+
+      if (!WN2F_CONTEXT_has_no_arr_elmt(context))
 	    TY2F_Translate_ArrayElt(tokens, base_ty, offset);
+      else
+           reset_WN2F_CONTEXT_has_no_arr_elmt(context);
 	 }
        }
        else if ((WN_opc_operator(addr) == OPR_LDA || 
@@ -1126,8 +1141,11 @@ WN2F_translate_purple_main(TOKEN_BUFFER tokens,
     */
    WN2F_Stmt_Newline(tokens, NULL/*label*/, WN_Get_Linenum(pu), context);
    Append_Token_String(tokens, "PROGRAM MAIN");
+
+# if 0
    WN2F_Stmt_Newline(tokens, NULL/*label*/, WN_Get_Linenum(pu), context);
    Append_Token_String(tokens, "IMPLICIT NONE");
+# endif
 
    /* Write program local variables (region parameters)
     */
