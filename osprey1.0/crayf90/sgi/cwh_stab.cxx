@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.7 $
- * $Date: 2002-09-05 21:42:18 $
+ * $Revision: 1.8 $
+ * $Date: 2002-09-10 18:19:50 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.8 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -431,11 +431,11 @@ fei_proc_def(char         *name_string,
 /* but don't know if there is problem if comment out this function call */
 /* completely,will think about it later ----fzhao                       */
 
-if (test_flag(flags,FEI_PROC_IN_INTERFACE))
-        cwh_block_init_pu();
+    if (!test_flag(flags,FEI_PROC_IN_INTERFACE))
+           cwh_block_init_pu();
 
-    if (test_flag(flags, FEI_PROC_HAS_ALT_ENTRY)) 
-      Set_PU_has_altentry(pu);
+     if (test_flag(flags, FEI_PROC_HAS_ALT_ENTRY)) 
+           Set_PU_has_altentry(pu);
   }
 
   if ((Class == PDGCS_Proc_Extern) || 

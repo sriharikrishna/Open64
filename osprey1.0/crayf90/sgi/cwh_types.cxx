@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.5 $
- * $Date: 2002-08-30 21:27:13 $
+ * $Revision: 1.6 $
+ * $Date: 2002-09-10 18:19:50 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -1252,13 +1252,15 @@ if (co_top_decl_bounds != ANULL) {
        Set_ARB_last_dimen(bounds[n-1]);
 //       Set_ARB_last_dimen(bounds[top_of_decl_bounds-co_top_decl_bounds]);
 
-  if ( const_str ) {
+//  if ( const_str ) {
+  if ( const_str && size!=0) {
     
     Set_TY_size(ty_idx, size);
 
   } else {
 
-    Set_TY_size(ty_idx, 0);
+//    Set_TY_size(ty_idx, 0);
+    Set_TY_size(ty_idx, 4); //need handle pointer in derived type
 
   }
 

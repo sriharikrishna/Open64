@@ -634,8 +634,9 @@ static void parse_cpnt_dcl_stmt()
                ATD_POINTER(AT_WORK_IDX)		= TRUE;
 /*               ATD_IM_A_DOPE(AT_WORK_IDX)	= TRUE; */
                ATT_POINTER_CPNT(CURR_BLK_NAME)	= TRUE;
-               ATT_NUMERIC_CPNT(CURR_BLK_NAME)	= TRUE;
-               break;
+              ATT_NUMERIC_CPNT(CURR_BLK_NAME)	= TRUE;
+
+              break; 
 
             case Tok_Kwd_Dimension:
 
@@ -951,8 +952,8 @@ static void parse_cpnt_dcl_stmt()
          old_bd_idx	= ATD_ARRAY_IDX(attr_idx);
 
          if (old_bd_idx != NULL_IDX && 
-             old_bd_idx == ATD_ARRAY_IDX(AT_WORK_IDX) &&
-             BD_ARRAY_CLASS(old_bd_idx) != Deferred_Shape) {
+             old_bd_idx == ATD_ARRAY_IDX(AT_WORK_IDX) ){ /*  && */
+/* Sept            BD_ARRAY_CLASS(old_bd_idx) != Deferred_Shape) { &*/
             bd_idx = reserve_array_ntry(BD_RANK(old_bd_idx));
             COPY_BD_NTRY(bd_idx, old_bd_idx);
             ATD_ARRAY_IDX(attr_idx) = ntr_array_in_bd_tbl(bd_idx);
@@ -962,9 +963,11 @@ static void parse_cpnt_dcl_stmt()
       if (ATD_ARRAY_IDX(attr_idx) != NULL_IDX) {
          bd_idx	= ATD_ARRAY_IDX(attr_idx);
       
-         if (BD_RESOLVED(bd_idx) ||
+         if (BD_RESOLVED(bd_idx) ) { /* || */
+# if 0 /*Sept */
              BD_ARRAY_CLASS(bd_idx) == Deferred_Shape ||
              BD_ARRAY_CLASS(bd_idx) == Assumed_Shape) {
+# endif
          }
          else {
 
@@ -5773,7 +5776,8 @@ void array_bounds_resolution(int	attr_idx,
    /* array_dim_resolution will not set BD_RESOLVED and this    */
    /* array should get resolved during decl_semantics.          */
 
-   array_dim_resolution(attr_idx, TRUE);
+/* Sept   array_dim_resolution(attr_idx, TRUE);  */
+   array_dim_resolution(attr_idx, FALSE);  
 
    /* Need to use ATD_ARRAY_IDX, because bd_idx may change in resolution */
 

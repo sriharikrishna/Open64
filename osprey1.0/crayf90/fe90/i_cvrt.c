@@ -11420,7 +11420,6 @@ static TYPE get_type_desc(int	input_idx)
       }
 # endif
 
-
       for (i = 1; i <= BD_RANK(pe_bd_idx); i++) {
 
          if (BD_LB_FLD(pe_bd_idx, i) == NO_Tbl_Idx)
@@ -13037,7 +13036,8 @@ static void send_interface_list(int ng_attr_idx)
        kids_count = ATI_NUM_SPECIFICS(ng_attr_idx);
        sn_idx = ATI_FIRST_SPECIFIC_IDX(ng_attr_idx);
             for (i = 0; i < ATI_NUM_SPECIFICS(ng_attr_idx); i++) {
-                 if (AT_MODULE_IDX(SN_ATTR_IDX(sn_idx))==NULL){
+                 if (AT_MODULE_IDX(SN_ATTR_IDX(sn_idx))==NULL &&
+                      ATP_PROC(SN_ATTR_IDX(sn_idx)) != Intrin_Proc ){
                         send_procedure(SN_ATTR_IDX(sn_idx),
                                     NULL_IDX,
                                     In_Interface);
@@ -13071,7 +13071,7 @@ static void send_interface_list(int ng_attr_idx)
 					  kids_count,
                                           kind_interface,
                                           is_imported);
-   PDG_AT_IDX(ng_attr_idx) = NULL;
+
 # endif
 # endif
 
@@ -13916,8 +13916,9 @@ static void send_attr_ntry(int		attr_idx)
  * Whirl,here we have to generate a bounch of OPR_FUNC_ENTRY and
  * send all dummy arguments for "OPR_INTERFACE"
  ****************************************************************/
-    if (!AT_IS_INTRIN(attr_idx))
-        send_interface_list(attr_idx);
+/*     if (!AT_IS_INTRIN(attr_idx)) */
+     if (ATI_USER_SPECIFIED(attr_idx))
+          send_interface_list(attr_idx);
 
       break;
 

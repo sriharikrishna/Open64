@@ -2494,6 +2494,7 @@ boolean  gen_whole_subscript (opnd_type *opnd, expr_arg_type *exp_desc)
    int		tlst2_idx;
    int		tlst3_idx;
    int		trip_idx;
+   enum fld_values ffmm;
 
 
    TRACE (Func_Entry, "gen_whole_subscript", NULL);
@@ -2708,6 +2709,8 @@ boolean  gen_whole_subscript (opnd_type *opnd, expr_arg_type *exp_desc)
          if (IL_FLD(tlst1_idx) == AT_Tbl_Idx) {
             ADD_TMP_TO_SHARED_LIST(IL_IDX(tlst1_idx));
          }
+
+ffmm = IL_FLD(tlst1_idx);
 
          if (IL_FLD(tlst1_idx) != CN_Tbl_Idx) {
 

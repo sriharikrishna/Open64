@@ -1618,6 +1618,10 @@ ST::Print (FILE *f, BOOL verbose) const
     case CLASS_NAME:
 	fputs ("Name-only", f);
 	break;
+   
+    case CLASS_TYPE:
+        fputs ("Derived_Type Name",f);
+        break;
 	
     default:
 	fprintf (f, "INVALID CLASS (%d)", sym_class);

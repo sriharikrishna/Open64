@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.4 $
- * $Date: 2002-08-30 21:21:20 $
+ * $Revision: 1.5 $
+ * $Date: 2002-09-10 18:20:32 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -688,6 +688,8 @@ Construct_Fld_Path(FLD_HANDLE   fld,
 	   desired_offset);
 #endif
 
+ 
+
    if (desired_offset < fld_offset ||
        desired_offset >= (fld_offset + TY_size(fld_ty)))
    {
@@ -1328,7 +1330,7 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
       {
 	ARB_HANDLE arb = arb_base[dim-1];
 
-    if (TY_is_f90_deferred_shape(ty_idx))
+    if (TY_is_f90_deferred_shape(ty_idx) || TY_is_f90_pointer(ty_idx))
          Append_Token_Special(decl_tokens, ':');
     else
     if (TY_is_f90_assumed_size(ty_idx) &&
@@ -1366,11 +1368,13 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 //    else
 //        TY2F_Append_ARB(decl_tokens, arb , FALSE);
 
-
-    if ( co_dim==1 && !TY_is_f90_deferred_shape(ty))
-        TY2F_Append_ARB(decl_tokens, arb , TRUE);
+    if (TY_is_f90_deferred_shape(ty))
+       Append_Token_Special(decl_tokens,':');
     else
-        TY2F_Append_ARB(decl_tokens, arb , FALSE);
+       if ( co_dim==1)
+           TY2F_Append_ARB(decl_tokens, arb , TRUE);
+       else
+           TY2F_Append_ARB(decl_tokens, arb , FALSE);
 
 
       dim--;
