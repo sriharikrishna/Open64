@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.8 $
- * $Date: 2003-02-19 20:15:35 $
+ * $Revision: 1.9 $
+ * $Date: 2003-03-04 20:03:04 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.9 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -628,7 +628,34 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
       } 
 
    /* Operation */
-   Append_Token_String(tokens, Opc_Fname[opcode]);
+
+  if ( (wn0!=NULL &&TY_is_logical(WN_ty(wn0))) ||
+        ( (wn1!=NULL) &&TY_is_logical(WN_ty(wn1))))
+        set_WN2F_CONTEXT_is_logical_operation(context);
+
+  switch (OPCODE_operator(opcode)) {
+    case  OPR_EQ:
+      if (WN2F_CONTEXT_is_logical_operation(context))
+            Append_Token_String(tokens,".eqv.");
+      else
+            Append_Token_String(tokens,".eq.");
+      reset_WN2F_CONTEXT_is_logical_operation(context);
+
+     break;
+    case  OPR_NE:
+      if (WN2F_CONTEXT_is_logical_operation(context))
+            Append_Token_String(tokens,".neqv.");
+      else
+            Append_Token_String(tokens,".ne.");
+      reset_WN2F_CONTEXT_is_logical_operation(context);
+
+     break;
+
+    default:
+      Append_Token_String(tokens, Opc_Fname[opcode]);
+      reset_WN2F_CONTEXT_is_logical_operation(context);
+      break;
+    } /*switch */
 
    /* Second operand, or only operand for unary operation */
 
@@ -664,7 +691,36 @@ WN2F_Funcall_Op(TOKEN_BUFFER tokens,
    if (TY_kind(dty) == KIND_VOID)
       dty = rty;
 
-   Append_Token_String(tokens, Opc_Fname[opcode]);
+ if ((wn0 !=NULL) && TY_is_logical(WN_ty(wn0)) ||
+        (( wn1 !=NULL) && TY_is_logical(WN_ty(wn1))))
+        set_WN2F_CONTEXT_is_logical_operation(context);
+
+ switch (OPCODE_operator(opcode)) {
+    case  OPR_EQ:
+      if (WN2F_CONTEXT_is_logical_operation(context))
+            Append_Token_String(tokens,".eqv.");
+      else
+            Append_Token_String(tokens,".eq.");
+      reset_WN2F_CONTEXT_is_logical_operation(context);
+
+     break;
+    case  OPR_NE:
+      if (WN2F_CONTEXT_is_logical_operation(context))
+            Append_Token_String(tokens,".neq.");
+      else
+            Append_Token_String(tokens,".ne.");
+      reset_WN2F_CONTEXT_is_logical_operation(context);
+
+     break;
+
+    default:
+      Append_Token_String(tokens, Opc_Fname[opcode]);
+      reset_WN2F_CONTEXT_is_logical_operation(context);
+
+      break;
+    } /*switch */
+
+
    Append_Token_Special(tokens, '(');
    
    /* No need to parenthesize subexpressions */
@@ -981,6 +1037,8 @@ WN2F_binaryop(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 		      context);
    else
       ASSERT_DBG_FATAL(FALSE, (DIAG_W2F_UNEXPECTED_OPC, "WN2F_binaryop"));
+
+   reset_WN2F_CONTEXT_is_logical_operation(context);
 
    return EMPTY_WN2F_STATUS;
 } /* WN2F_binaryop */
