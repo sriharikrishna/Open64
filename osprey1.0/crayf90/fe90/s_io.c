@@ -2957,15 +2957,17 @@ int fm;
                               i   == FMT_IDX &&
                               !(namelist_expected) &&
                ( io_type == Write || io_type == Read)){  
-            if (ATD_CLASS(IL_IDX(list_idx)) == Constant)
-                 IL_IDX(list_idx) = ATD_CONST_IDX(IL_IDX(list_idx));
-            else 
-            if (ATD_CLASS(IL_IDX(list_idx)) ==Atd_Unknown &&
-                AT_ATTR_LINK(IL_IDX(list_idx)) != NULL   &&
-                ATD_CLASS(AT_ATTR_LINK(IL_IDX(list_idx)))== Constant )
-                 IL_IDX(list_idx) = ATD_CONST_IDX(AT_ATTR_LINK(IL_IDX(list_idx)));
-            else
-                 IL_IDX(list_idx)=ATD_TMP_IDX(ATL_FORMAT_TMP(IL_IDX(list_idx))); 
+            if (AT_OBJ_CLASS(IL_IDX(list_idx)) ==  Data_Obj){
+                if (ATD_CLASS(IL_IDX(list_idx)) == Constant)
+                    IL_IDX(list_idx) = ATD_CONST_IDX(IL_IDX(list_idx));
+                else 
+                if (ATD_CLASS(IL_IDX(list_idx)) ==Atd_Unknown &&
+                   AT_ATTR_LINK(IL_IDX(list_idx)) != NULL   &&
+                   ATD_CLASS(AT_ATTR_LINK(IL_IDX(list_idx)))== Constant )
+                   IL_IDX(list_idx) = ATD_CONST_IDX(AT_ATTR_LINK(IL_IDX(list_idx)));
+                else
+                   IL_IDX(list_idx)=ATD_TMP_IDX(ATL_FORMAT_TMP(IL_IDX(list_idx))); 
+               }
 
              IL_FLD(list_idx) = CN_Tbl_Idx; 
 
