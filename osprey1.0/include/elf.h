@@ -52,14 +52,26 @@
 /***************************************************************************/
 /* eraxxon: Manually declare needed stuff from cdefs.h */
 
+#ifdef __BEGIN_DECLS
+# undef __BEGIN_DECLS
+#endif
+
+#ifdef __END_DECLS
+# undef __END_DECLS
+#endif
+
+#ifdef _DOTDOTDOT
+# undef _DOTDOTDOT
+#endif
+
 #if defined(__cplusplus)
-#define __BEGIN_DECLS	extern "C" {
-#define __END_DECLS	};
-#define _DOTDOTDOT ...
+# define __BEGIN_DECLS	extern "C" {
+# define __END_DECLS	};
+# define _DOTDOTDOT ...
 #else
-#define __BEGIN_DECLS
-#define __END_DECLS
-#define _DOTDOTDOT
+# define __BEGIN_DECLS
+# define __END_DECLS
+# define _DOTDOTDOT
 #endif
 
 /***************************************************************************/
