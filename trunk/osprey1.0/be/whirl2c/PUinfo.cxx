@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: PUinfo.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:15 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-21 03:10:54 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>
@@ -260,6 +260,14 @@ Mtype_to_Ukind(MTYPE mtype)
       ukind = PREG_AS_CQ;
       break;
    default:
+      ukind = PREG_AS_UNKNOWN; 
+
+/* fix a bug here,if don't give a value to ukind in this
+ * case,will cause segmentation fault in Linux version and 
+ * Solaris version,but it's OK for Irix version.Since Irix
+ * version give this variable "0" value,this is exactly what we
+ * give it here
+ */
       Is_True(FALSE, ("Illegal MTYPE for Mtype_to_Ukind mapping"));
       break;
    }
@@ -301,9 +309,12 @@ Accumulate_Preg_Info(TY_IDX preg_ty, INT16 preg_num)
    preg_info = Get_Preg_Info(preg_num);
    if (preg_info == NULL)
    {
+
       /* Add a new entry to the hash-table */
-      if (Free_Preg_Info == NULL)
+      if (Free_Preg_Info == NULL) {
+        
 	 preg_info = TYPE_ALLOC_N(PREG_INFO, 1);
+      }
       else
       {
 	 preg_info = Free_Preg_Info;
@@ -311,12 +322,14 @@ Accumulate_Preg_Info(TY_IDX preg_ty, INT16 preg_num)
       }
 
       /* Reset the usage and also set the other fields */
+
       for (usage_kind = (INT)FIRST_PREG_USAGE_KIND; 
 	   usage_kind <= (INT)LAST_PREG_USAGE_KIND; 
 	   usage_kind++)
       {
 	 PREG_INFO_decl(preg_info, usage_kind) = FALSE;
 	 PREG_INFO_use(preg_info, usage_kind) = FALSE;
+
       }
       PREG_INFO_preg_num(preg_info) = preg_num;
       PREG_INFO_next(preg_info) = 
@@ -325,8 +338,11 @@ Accumulate_Preg_Info(TY_IDX preg_ty, INT16 preg_num)
 //    }
    
    /* Record this usage */
+
    usage_kind = (INT)Mtype_to_Ukind(TY_mtype(preg_ty));
+
    PREG_INFO_use(preg_info, usage_kind) = TRUE;
+
   }
 } /* Accumulate_Preg_Info */
 
