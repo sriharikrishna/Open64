@@ -1167,7 +1167,7 @@ WN_write_prefetch (PU_Info *pu, WN_MAP off_map, Output_File *fl)
     free(pf_ldsts);
 
     /* write out a -1 to mark the end */
-    node_offset = -1;
+    node_offset = (Elf64_Word)-1;
     ir_b_save_buf(&node_offset, sizeof(Elf64_Word), sizeof(Elf64_Word), 0, fl);
 
     Set_PU_Info_state(pu, WT_PREFETCH, Subsect_Written);
@@ -1256,7 +1256,7 @@ WN_write_generic_map(PU_Info        *pu,
   free(nodes_represented);
     
   /* write out a -1 to mark the end */
-  node_offset = -1;
+  node_offset = (Elf64_Word)-1;
   ir_b_save_buf(&node_offset, sizeof(Elf64_Word), sizeof(Elf64_Word), 0, fl);
 
   Set_PU_Info_state(pu, subsection_type, Subsect_Written);

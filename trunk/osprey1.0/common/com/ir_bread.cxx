@@ -302,7 +302,7 @@ WN_get_global_symtab (void *handle)
  * Assume that global symtab and string table are already read.
  */
 
-UINT
+INT
 WN_get_symtab (void *handle, PU_Info *pu)
 {
     Subsect_State st = PU_Info_state(pu, WT_SYMTAB);
@@ -383,7 +383,7 @@ WN_get_symtab (void *handle, PU_Info *pu)
 } /* WN_get_symtab */
 
 
-UINT
+INT
 WN_get_strtab (void *handle)
 {
     OFFSET_AND_SIZE shdr = get_section (handle, SHT_MIPS_WHIRL, WT_STRTAB);
@@ -1086,7 +1086,7 @@ WN_get_prefetch (void *handle, PU_Info *pu)
 	node_offset = *(Elf64_Word *)cur_addr;
 	cur_addr += (sizeof(Elf64_Word));
 
-	if (node_offset == -1) break;
+	if (node_offset == (Elf64_Word)-1) break;
 
 	cur_addr = (char *)ir_b_align((off_t)cur_addr, ALIGNOF(PF_POINTER),
 				      0);
@@ -1187,7 +1187,7 @@ WN_read_generic_map(void           *handle,
 	
     cur_addr += (sizeof(Elf64_Word));	// advance over WN offset
 
-    if (node_offset == -1)
+    if (node_offset == (Elf64_Word)-1)
       break;
 
     // Why do we align here but not for the WN offset? -- RK 980615
