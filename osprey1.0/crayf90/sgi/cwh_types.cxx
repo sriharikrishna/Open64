@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.17 $
- * $Date: 2004-02-17 20:24:34 $
+ * $Revision: 1.18 $
+ * $Date: 2004-02-17 22:41:52 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.17 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.18 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -597,7 +597,7 @@ fei_co_array_dimen(INT32  flag_bits,
  if (top_of_decl_bounds == ANULL) 
         top_of_decl_bounds = axis-1;
  else
-        top_of_decl_bounds++;
+        top_of_decl_bounds = top_of_decl_bounds+(axis-1);
 
   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_ONTO_EXPR)) {
     distribute_onto=TRUE;
