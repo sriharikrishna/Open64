@@ -314,8 +314,6 @@ int  make_ro_entry(int		module_idx,
       RO_COLUMN_NUM(ro_idx)	= TOKEN_COLUMN(token);
       RO_NAME_LEN(ro_idx)	= TOKEN_LEN(token);
       RO_NAME_IDX(ro_idx)	= np_idx;
-
-
    }
 
    if (rename_entry) {   /* Do not sort - assume it is a rename entry */
@@ -564,6 +562,7 @@ extern	void	create_mod_info_file(void)
          }
       }
    }
+
    if (num_prog_unit_errors > 0) {
 
       if (ga_idx != NULL_IDX && GAP_FP_IDX(ga_idx) != NULL_IDX) {
@@ -1748,11 +1747,10 @@ static	void  set_mod_link_tbl_for_bd(int	bd_idx)
             KEEP_ATTR(BD_UB_IDX(bd_idx, dim));
          }
 
-         if (BD_XT_FLD(bd_idx, dim) == CN_Tbl_Idx ) {
-            if (BD_XT_IDX(bd_idx, dim))
-               KEEP_CN(BD_XT_IDX(bd_idx, dim));
-            else
-	       ;
+         if (BD_XT_FLD(bd_idx, dim) == CN_Tbl_Idx) {
+	    if (BD_XT_IDX(bd_idx, dim)) {
+	      KEEP_CN(BD_XT_IDX(bd_idx, dim));
+	    }
          }
          else if (BD_XT_FLD(bd_idx, dim) == AT_Tbl_Idx) {
             KEEP_ATTR(BD_XT_IDX(bd_idx, dim));
@@ -2568,7 +2566,7 @@ static void  compress_tbls(int		al_idx,
    /* mod_idx	= (only_update_new_tbl_entries) ? bd_idx + 1 : 1; */
    mod_idx	= 1;
 
- while (mod_idx <= bd_idx && BD_NTRY_SIZE(mod_idx)!= 0) {
+   while (mod_idx <= bd_idx && BD_NTRY_SIZE(mod_idx)!= 0) {
 
 /* for some reason some deferred shape array BD_NTRY_SIZE(mod_idx)
    is 0; need to read the code
@@ -2577,7 +2575,6 @@ static void  compress_tbls(int		al_idx,
 
       if (!BD_USED_NTRY(mod_idx)) {  /* Entry from the free list */
          BD_NEXT_FREE_NTRY(mod_idx)	= ML_BD_IDX(BD_NEXT_FREE_NTRY(mod_idx));
-
          mod_idx = mod_idx + BD_NTRY_SIZE(mod_idx);
       }
       else if (BD_DIST_NTRY(mod_idx)) {
@@ -2646,8 +2643,8 @@ static void  compress_tbls(int		al_idx,
          mod_idx = mod_idx + BD_RANK(mod_idx) + 1;  /* 1 for header */
       }
       else {
-/*         mod_idx++;*/
-         mod_idx = mod_idx + BD_RANK(mod_idx) + 1;
+	 /* mod_idx++; */
+  	 mod_idx = mod_idx + BD_RANK(mod_idx) + 1;
       }
    }
 
@@ -3974,6 +3971,7 @@ void	use_stmt_semantics(void)
 
          goto EXIT;
       }
+
       start_ln_idx	= loc_name_tbl_idx - MD_NUM_ENTRIES(Loc_Name_Tbl) + 1;
       attr_idx		= attr_tbl_idx - MD_NUM_ENTRIES(Attr_Tbl) + 1;
 
@@ -4215,8 +4213,8 @@ EXIT:
         while (ro_idx!=NULL_IDX) {
           RO_NAME_ATTR(ro_idx)= ML_AT_IDX(RO_NAME_ATTR(ro_idx));
           ro_idx =  RO_NEXT_IDX(ro_idx);
-            }  
-       }
+	}  
+      }
       TBL_FREE(mod_link_tbl);
    }
 
@@ -4267,12 +4265,10 @@ EXIT:
    free_attr_list(attr_list_free_list);
    free_attr_list(SCP_USED_MODULE_LIST(curr_scp_idx));
 
-/*   SCP_USED_MODULE_LIST(curr_scp_idx)	= NULL_IDX; */
    SCP_USED_MODULE_LIST(curr_scp_idx)	= NULL_IDX;
 
-/*   TBL_FREE(rename_only_tbl); */
-  
-/*    keep_module_procs			= FALSE; */
+/* TBL_FREE(rename_only_tbl); */
+
    keep_module_procs			= FALSE;
 
    TRACE (Func_Exit, "use_stmt_semantics", NULL);
@@ -4319,7 +4315,6 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
    int		 np_idx;
    int		 rename_idx;
    int		 ro_idx;
-   int fm;
 
 # if defined(_HOST64) && !defined(_WHIRL_HOST64_TARGET64)
    long		*name_tbl_base;		/* name table base address */
@@ -4329,8 +4324,6 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
    TRACE (Func_Entry, "rename_only_semantics", NULL);
 
    ro_idx	= ATP_USE_LIST(module_attr_idx);
-   fm = MD_NUM_ENTRIES(Loc_Name_Tbl);
-
    ln_idx	= loc_name_tbl_idx - MD_NUM_ENTRIES(Loc_Name_Tbl) + 1;
    begin_idx	= SCP_LN_FW_IDX(curr_scp_idx);
    end_idx	= SCP_LN_LW_IDX(curr_scp_idx);
@@ -4349,7 +4342,6 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
 
    while (ro_idx != NULL_IDX) {
       rename_idx	= RO_RENAME_IDX(ro_idx);
-
       attr_idx		= NULL_IDX;
    
       /* This WHILE finds the specified name in the local */
@@ -4463,7 +4455,6 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
                AT_NAME_LEN(attr_idx)		= RO_NAME_LEN(ro_idx);
                AT_ORIG_NAME_IDX(attr_idx)	= RO_NAME_IDX(ro_idx);
                AT_ORIG_NAME_LEN(attr_idx)	= RO_NAME_LEN(ro_idx);
-
 
                /* Need to set this as USE ASSOCIATED from the module */
                /* to prevent bad error recovery problems.            */
@@ -4605,7 +4596,7 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
          LN_IN_ONLY_LIST(name_idx)	= TRUE;
          AT_DEF_LINE(attr_idx)		= RO_LINE_NUM(ro_idx);
          AT_DEF_COLUMN(attr_idx)	= RO_COLUMN_NUM(ro_idx);
-         
+
          if ((cif_flags & XREF_RECS) != 0) {  /* Only */
             cif_usage_rec(attr_idx,
                           AT_Tbl_Idx,
@@ -4657,7 +4648,6 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
 
          LN_RENAMED(name_idx)		= TRUE;
          ML_AT_LN_NAME(attr_idx)	= TRUE;
-        
 
          /* The current scopes SCP_LN_FW_IDX and SCP_LN_LW_IDX have been */
          /* set to point to the new scope.  It may not be NULL, but that */
@@ -4712,7 +4702,7 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
          AT_DEF_LINE(attr_idx)		= RO_LINE_NUM(rename_idx);
          AT_DEF_COLUMN(attr_idx)	= RO_COLUMN_NUM(rename_idx);
 
-         RO_NAME_ATTR(ro_idx) = LN_ATTR_IDX(new_name_idx); 
+         RO_NAME_ATTR(ro_idx) = LN_ATTR_IDX(new_name_idx);
 
          if (cif_flags & BASIC_RECS) {
             cif_symbol_id = cif_rename_rec(ro_idx,
@@ -4737,7 +4727,6 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
 
          AT_NAME_IDX(attr_idx)		= LN_NAME_IDX(new_name_idx);
          AT_NAME_LEN(attr_idx)		= LN_NAME_LEN(new_name_idx);
-         
          AT_ORIG_MODULE_IDX(attr_idx)	= module_attr_idx;
 
          if (AT_OBJ_CLASS(attr_idx) == Interface ||
@@ -5858,12 +5847,12 @@ static	boolean	srch_for_module_tbl(int		 module_attr_idx,
 
       if (MD_PDT_HDR_TYPE != COMPILER_INFO_TABLE_TYPE) {
    
-/* fty# if defined(_DEBUG) */
+# if defined(_DEBUG)
 
          if (dump_flags.pdt_dump) {
             dump_pdt(mod_file_ptr);
          }
-/* # endif */
+# endif
          /* Not a module information table.  Find the next loader */
          /* table in this file.  Reset to start of this table and */
          /* then seek to the end of this table.  If the header    */
@@ -5912,12 +5901,12 @@ static	boolean	srch_for_module_tbl(int		 module_attr_idx,
          break;
       }
 
-/*  # if defined(_DEBUG) */
+# if defined(_DEBUG)
 
       if (dump_flags.pdt_dump) {
          dump_pdt(mod_file_ptr);
       }
-/* # endif */
+# endif
 
       /* Found a module.  Save the information in the file_path_tbl. */
       /* If it matches we need the info, if it doesn't it will be    */
@@ -6226,12 +6215,12 @@ static	boolean  read_in_module_tbl(int		 fp_file_idx,
                                sizeof(mit_header_type),
                                1,
                                mod_file_ptr);
-/*  # if defined(_DEBUG) */
+# if defined(_DEBUG)
 
          if (dump_flags.pdt_dump) {
             dump_pdt(mod_file_ptr);
          }
-/* # endif */
+# endif
 
          if (num_recs_read != 1) {
             PRINTMSG(AT_DEF_LINE(module_attr_idx), 726, Error,
@@ -6500,8 +6489,7 @@ static	boolean  read_in_module_tbl(int		 fp_file_idx,
       /* where i is host associated, i's storage block does not get copied   */
       /* down until attr resolution time.                                    */
 #if 0
-      else 
-if (SB_IS_COMMON(idx) &&
+      else if (SB_IS_COMMON(idx) &&
                (compare_names(AT_OBJ_NAME_LONG(SB_MODULE_IDX(srch_sb_idx)),
                               AT_NAME_LEN(SB_MODULE_IDX(srch_sb_idx)),
                               AT_OBJ_NAME_LONG(SB_MODULE_IDX(idx)),
@@ -6526,7 +6514,6 @@ if (SB_IS_COMMON(idx) &&
          SB_MERGED_BLK_IDX(sb_idx)	= srch_sb_idx;
       }
 #endif
-
       else { /* This is the same common block from the same module or it     */
              /* is a static based or darg block.  Share the block.           */
 
@@ -7314,7 +7301,6 @@ static void  assign_new_idxs_after_input(int	module_attr_idx)
    int		stmt_idx;
    int		typ_idx		= type_tbl_idx - MD_NUM_ENTRIES(Type_Tbl);
    int		type_idx;
-   int          fm;
 
 
    TRACE (Func_Entry, "assign_new_idxs_after_input", NULL);
@@ -7405,9 +7391,7 @@ static void  assign_new_idxs_after_input(int	module_attr_idx)
       AT_DEF_LINE(attr_idx)		= line;
       AT_DEF_COLUMN(attr_idx)		= column;
       AT_NAME_IDX(attr_idx)		= np_idx + AT_NAME_IDX(attr_idx);
-      fm = AT_NAME_IDX(attr_idx);  
       AT_ORIG_NAME_IDX(attr_idx)	= np_idx + AT_ORIG_NAME_IDX(attr_idx);
-      fm = AT_ORIG_NAME_IDX(attr_idx); 
       AT_ATTR_LINK(attr_idx)		= (AT_ATTR_LINK(attr_idx) == NULL_IDX) ?
                                          NULL_IDX:at_idx+AT_ATTR_LINK(attr_idx);
       if (!inline_search) {
@@ -9567,7 +9551,7 @@ void	collapse_interface_blk(int	interface_idx)
    only_update_new_tbl_entries	= TRUE;
 
    ML_AT_IDX(0)         = BLK_AT_IDX(blk_stk_idx);
-   ML_BD_IDX(0)         = BLK_BD_IDX(blk_stk_idx); 
+   ML_BD_IDX(0)         = BLK_BD_IDX(blk_stk_idx);
    ML_NP_IDX(0)         = BLK_NP_IDX(blk_stk_idx);
    ML_SB_IDX(0)         = BLK_SB_IDX(blk_stk_idx);
    ML_SN_IDX(0)         = BLK_SN_IDX(blk_stk_idx);
@@ -9958,8 +9942,6 @@ static	void	find_files_in_directory(int	dir_idx)
                okay = TRUE;
             }
 # endif
-
-
 /* when running mfef90 on Solaris, it's default that 
  * on_off_flags.module_to_mod == FALSE, as a result, when compiling a .f
  * file containing "use ***", and that *** module is in a .mod file (since
@@ -10604,7 +10586,7 @@ static	void  check_il_for_attrs(int	list_idx)
 |*	NOTHING								      *|
 |*									      *|
 \******************************************************************************/
-/* # if defined(_DEBUG) */
+# if defined(_DEBUG)
 
 static	void	dump_pdt(FILE	*mod_file_ptr)
 {
@@ -10867,4 +10849,4 @@ static	void	print_mod_tbl()
 
 }   /* print_mod_tbl */
 
-/*  # endif */
+# endif
