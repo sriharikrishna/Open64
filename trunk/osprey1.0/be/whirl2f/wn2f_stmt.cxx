@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.17 $
- * $Date: 2002-10-21 19:30:57 $
+ * $Revision: 1.18 $
+ * $Date: 2002-10-24 19:46:08 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.17 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.18 $";
 #endif
 
 #include <alloca.h>
@@ -2403,24 +2403,15 @@ WN2F_intrinsic_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    switch (WN_intrinsic(wn))
    {
    case INTRN_CONCATEXPR:
-      WN2F_Stmt_Newline(tokens, NULL/*label*/, WN_Get_Linenum(wn), context);
 
       /* In the context of an IO statement, emit the concatenation
        * but disregard the temporary result buffer.
        */
-      if (!WN2F_CONTEXT_io_stmt(context))
-      {
-	 WN2F_String_Argument(tokens,
-			      WN_kid(wn,0), /* base of destination */
-			      WN_kid(wn,1), /* length of base */
-			      context);
-	 Append_Token_Special(tokens, '=');
-      }
       
       /* Determine the range of kids denoting the base of the string-
        * arguments and the the length of these strings respectively.
        */
-      str_kid = 2;
+      str_kid = 1;
       length_kid = first_length_kid = (WN_kid_count(wn) + 2)/2;
 
       /* Emit the concatenation operations */
@@ -2438,7 +2429,6 @@ WN2F_intrinsic_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 			      context);
       }
       break;
-
    case INTRN_CASSIGNSTMT:
       WN2F_Stmt_Newline(tokens, NULL/*label*/, WN_Get_Linenum(wn), context);
       WN2F_String_Argument(tokens,
