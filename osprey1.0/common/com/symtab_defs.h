@@ -478,7 +478,7 @@ enum TY_KIND
     KIND_POINTER	= 4,		// pointer
     KIND_FUNCTION	= 5,		// function/procedure
     KIND_VOID		= 6,		// C void type
-    KIND_LAST		= 8
+    KIND_LAST		= 7
 };
 
 
