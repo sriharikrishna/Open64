@@ -131,6 +131,7 @@ INT64       Get_Next_Construct_Id(void) { return 0; }
 }
 #endif
 
+
 // symbols defined in cg.so
 #if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
@@ -165,8 +166,8 @@ extern void (*EH_Generate_Range_List_p) (WN *);
 #pragma weak CG_Generate_Code
 #pragma weak EH_Generate_Range_List
 
-
 #endif // __linux__
+
 
 // symbols defined in wopt.so
 #if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
@@ -212,6 +213,7 @@ extern BOOL (*Verify_alias_p) (ALIAS_MANAGER *, WN *);
 
 #endif // __linux__
 
+
 // symbols defined in lno.so
 #if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
@@ -235,6 +237,7 @@ extern WN* (*Perform_Loop_Nest_Optimization_p) (PU_Info*, WN*, WN*, BOOL);
 #pragma weak Perform_Loop_Nest_Optimization
 
 #endif // __linux__
+
 
 // symbols defined in ipl.so
 #if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
@@ -265,8 +268,10 @@ extern void (*Perform_Procedure_Summary_Phase_p) (WN*, DU_MANAGER*,
 
 #endif // __linux__
 
+
 #include "w2c_weak.h"
 #include "w2f_weak.h"
+
 
 #if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 void        Anl_Process_Command_Line (INT phase_argc, char *phase_argv[],
@@ -307,6 +312,7 @@ void        Prompf_Emit_Whirl_to_Source(PU_Info* current_pu,
 #pragma weak Anl_Fini
 
 #endif
+
 
 /* Solaris CC porting
  * Solaris CC #pragma weak can be either followed by one mangled name in
@@ -1351,7 +1357,7 @@ Preprocess_PU (PU_Info *current_pu)
 			    *pu_hdr);
 	// turn off other feedback I/O
 	Instrumentation_Enabled = FALSE;
-	bzero (Feedback_Enabled, PROFILE_PHASE_LAST * sizeof(BOOL));
+	memset (Feedback_Enabled, '\0', PROFILE_PHASE_LAST * sizeof(BOOL));
     } else
 	Cur_PU_Feedback = NULL;
   } else {			    /* retrieve transferred maps */
@@ -1371,7 +1377,7 @@ Preprocess_PU (PU_Info *current_pu)
 	  Is_True(Cur_PU_Feedback, ("invalid PU_Info for feedback"));
               // turn off other feedback I/O
 	  Instrumentation_Enabled = FALSE;
-          bzero(Feedback_Enabled, PROFILE_PHASE_LAST * sizeof(BOOL));
+          memset(Feedback_Enabled, '\0', PROFILE_PHASE_LAST * sizeof(BOOL));
       } else
           Cur_PU_Feedback = NULL;
     } else {
