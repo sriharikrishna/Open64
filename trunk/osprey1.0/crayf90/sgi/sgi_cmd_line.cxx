@@ -36,6 +36,8 @@
 
 static char *source_file = __FILE__;
 
+#include "x_string.h" // for strcasecmp(), strdup()
+
 /* SGI includes */
 #include "stamp.h"
 #include "defs.h"
@@ -148,7 +150,9 @@ static OPTION_DESC Options_FE[] = {
     0, 0, 0,	&Mv_Matmul_Inline,	&Mv_Matmul_Inline_Set },
   { OVK_BOOL,   OV_INTERNAL,    FALSE, "call_never_return", "call_never_return",
     0, 0, 0,    &FE_Call_Never_Return,  NULL },
-  { OVK_COUNT }         /* List terminator -- must be last */
+  
+  { OVK_COUNT, 0, FALSE, NULL, NULL,  /* List terminator -- must be last */
+    0, 0, 0, NULL, NULL, NULL }
 };
 
 OPTION_GROUP FE_Option_Groups [] = {
@@ -174,22 +178,22 @@ static char *object_file_name=NULL;
 static WN_PRAGMA_SCHEDTYPE_KIND
 identify_schedtype(char *text)
 {
-   if (strncasecmp(text, "simple",6)==0  ||
-       strncasecmp(text, "static",6)==0) {
+   if (ux_strncasecmp(text, "simple",6)==0  ||
+       ux_strncasecmp(text, "static",6)==0) {
       return WN_PRAGMA_SCHEDTYPE_SIMPLE;
-   } else if (strncasecmp(text, "dynamic",7)==0) {
+   } else if (ux_strncasecmp(text, "dynamic",7)==0) {
       return WN_PRAGMA_SCHEDTYPE_DYNAMIC;
-   } else if (strncasecmp(text, "interleaved",11)==0) {
+   } else if (ux_strncasecmp(text, "interleaved",11)==0) {
       return WN_PRAGMA_SCHEDTYPE_INTERLEAVE;
-   } else if ( strncasecmp(text, "interleave",10)==0) {
+   } else if ( ux_strncasecmp(text, "interleave",10)==0) {
       return WN_PRAGMA_SCHEDTYPE_INTERLEAVE;
-   } else if (strncasecmp(text, "runtime",7)==0) {
+   } else if (ux_strncasecmp(text, "runtime",7)==0) {
       return WN_PRAGMA_SCHEDTYPE_RUNTIME;
-   } else if (strncasecmp(text, "gss",3)==0) {
+   } else if (ux_strncasecmp(text, "gss",3)==0) {
       return WN_PRAGMA_SCHEDTYPE_GSS;
-   } else if (strncasecmp(text, "guided",6)==0) {
+   } else if (ux_strncasecmp(text, "guided",6)==0) {
       return WN_PRAGMA_SCHEDTYPE_GSS;
-   } else if (strncasecmp(text, "pseudolowered",13)==0) {
+   } else if (ux_strncasecmp(text, "pseudolowered",13)==0) {
       return WN_PRAGMA_SCHEDTYPE_PSEUDOLOWERED;
    } else {
       ErrMsg(EC_Unknown_Mpsched,text);
@@ -209,7 +213,7 @@ void add_cray_args(char *arg)
    }
    
    if (arg) {
-      argv_cray[num_cray_args] = strdup(arg);
+      argv_cray[num_cray_args] = ux_strdup(arg);
    } else {
       argv_cray[num_cray_args] = NULL;
    }
@@ -228,7 +232,7 @@ void add_deferred_cray_args(char *arg)
    }
    
    if (arg) {
-      deferred_argv_cray[num_deferred_cray_args] = strdup(arg);
+      deferred_argv_cray[num_deferred_cray_args] = ux_strdup(arg);
    } else {
       deferred_argv_cray[num_deferred_cray_args] = NULL;
    }      
@@ -432,11 +436,11 @@ void Process_Command_Line (INT argc, char ** argv)
 		  switch ( c ) {
 		     
 		   case 'b': /* Library file already processed -- ignore: */
-		     Lib_File_Name = strdup(cp);
+		     Lib_File_Name = ux_strdup(cp);
 		     break;
 		     
 		   case 'B': /* WHIRL file: */
-		     Irb_File_Name = strdup(cp);
+		     Irb_File_Name = ux_strdup(cp);
 		     break;
 
 		   case 'C': /* CIF file */
@@ -458,27 +462,27 @@ void Process_Command_Line (INT argc, char ** argv)
 		      break;
 		     
 		   case 'S': /* Original source file name (used for -mp option) */
-		     Orig_Src_File_Name = strdup(cp);
+		     Orig_Src_File_Name = ux_strdup(cp);
 		     break;
 		     
 		   case 'e': /* Error file: */
-		     Err_File_Name = strdup(cp);
+		     Err_File_Name = ux_strdup(cp);
 		     break;
 		     
 		   case 'I': /* Ipa_File_Name: ignore it */
 		     break;
 		     
 		   case 'l': /* Listing file: */
-		     Lst_File_Name = strdup(cp);
+		     Lst_File_Name = ux_strdup(cp);
 		     break;
 
 		   case 'o': /* Object file: */
-		     object_file_name = strdup(cp);
+		     object_file_name = ux_strdup(cp);
 		     break;
 
 		   case 't': /* Error file: */
 		     Tracing_Enabled = TRUE;
-		     Trc_File_Name = strdup(cp);
+		     Trc_File_Name = ux_strdup(cp);
 		     break;
 
 		   default:
@@ -585,11 +589,11 @@ void Process_Command_Line (INT argc, char ** argv)
 	       break;
 	     case 'M':
 	       if (strcmp(cp, "Dtarget") == 0) {
-		  mdtarget_file = strdup(argv[i+1]);
+		  mdtarget_file = ux_strdup(argv[i+1]);
 		  ++i;
 		  pass_option = FALSE;
 	       } else if (strcmp(cp, "Dupdate") == 0) {
-		  mdupdate_file = strdup(argv[i+1]);
+		  mdupdate_file = ux_strdup(argv[i+1]);
 		  ++i;
 		  pass_option = FALSE;
 	       }
@@ -644,7 +648,7 @@ void Process_Command_Line (INT argc, char ** argv)
 	       {
 		  /* -rii : set rii_file_name */
 		  cp += 2;
-		  rii_file_name = strdup(cp);
+		  rii_file_name = ux_strdup(cp);
 		  pass_option = FALSE;
 	       }
 	       break;
