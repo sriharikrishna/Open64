@@ -6533,8 +6533,9 @@ CONTINUE_CO:
               else {
                if (BD_ARRAY_CLASS(bound_idx)!= Deferred_Shape &&  
                    BD_ARRAY_CLASS(bound_idx)!= Deferred_Shape1)
-                 cvrt_exp_to_pdg(BD_XT_IDX(bound_idx, dim),
-                                 BD_XT_FLD(bound_idx, dim));
+                 if (BD_XT_IDX(bound_idx, dim))
+                      cvrt_exp_to_pdg(BD_XT_IDX(bound_idx, dim),
+                                    BD_XT_FLD(bound_idx, dim));
                  else fei_implicit_expr();
               }
 
