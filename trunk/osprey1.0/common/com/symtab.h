@@ -604,9 +604,7 @@ const UINT32 MAX_PREDEFINED_TCON_IDX = 2;
 TCON_IDX
 Enter_tcon (const TCON& tcon);
 
-// In symtab.cxx this function is defined as inline!
-// type conflict error if not fixed, with Solaris CC compiler.
-inline void Init_Constab (void);
+void Init_Constab (void);
 
 inline UINT32
 TCON_Table_Size ()			{ return Tcon_Table.Size (); }
