@@ -11165,7 +11165,7 @@ static void check_call_for_global_def(int	list_idx,
          }
 
 # if defined(_DEBUG)
-
+#if 0
          /* ga_idx should always be valid in this else clause. */
 
          if (ga_idx == NULL_IDX) { 
@@ -11173,6 +11173,7 @@ static void check_call_for_global_def(int	list_idx,
                     "valid attr_idx",
                     "check_call_for_global_def");
          }
+#endif /*Sept*/
 # endif
       }
 
