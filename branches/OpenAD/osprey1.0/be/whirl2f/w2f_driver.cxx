@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.9 $
- * $Date: 2004-07-13 13:37:19 $
+ * $Revision: 1.9.2.1 $
+ * $Date: 2004-07-16 15:26:36 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.9.2.1 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -162,6 +162,9 @@ BOOL   W2F_Emit_Pcf = FALSE;        /* Force Pcf pragmas wherever possible */
 BOOL   W2F_Emit_Omp = FALSE;        /* Force OMP pragmas wherever possible */
 INT32  W2F_Line_Length = 0;         /* 'zero' means: use the default */
 
+BOOL   W2F_OpenAD;                 /* Special OpenAD mode */
+
+
 /* External data set through the API or otherwise */
 BOOL    W2F_Only_Mark_Loads = FALSE; /* Only mark, do not translate loads */
 BOOL    WN2F_F90_pu = FALSE;        /* Global variable indicating F90 or F77 */
@@ -170,6 +173,47 @@ BOOL    W2F_Prompf_Emission = FALSE; /* Emitting prompf transformed sources */
 WN_MAP *W2F_Construct_Map = NULL;    /* Construct id mapping for prompf */
 WN_MAP  W2F_Frequency_Map = WN_MAP_UNDEFINED; /* Frequency mapping */
 Unparse_Target *W2X_Unparse_Target = NULL;
+
+
+/* ====================================================================
+ *
+ * Process_Command_Line
+ *
+ * Process the command line arguments specific to W2F (a.k.a
+ * phase-specific args).
+ *
+ * ====================================================================
+ */
+
+static void
+Process_Command_Line (INT argc, char **argv)
+{
+   /* For now we only have the -openad flag. */
+  INT16 i;
+  char *cp;
+  
+  /* Check the command line flags: */
+  for ( i=0; i<argc; i++ ) {
+     if ( argv[i] != NULL && *(argv[i]) == '-' ) {
+        cp = argv[i]+1;	    /* Pointer to next flag character */
+	
+#if 0
+      /* First try to process as command-line option group */
+	if (Process_Command_Line_Group(cp, Cg_Option_Groups))
+	  continue;
+#endif
+      
+	switch ( *cp++ ) {
+	  
+        case 'o':
+	  if ( strcmp( cp, "penad") == 0 ) {
+	    W2F_OpenAD = TRUE;
+	  }
+	  break;
+	}
+     }
+  }
+}
 
 
 /* ====================================================================
@@ -686,7 +730,8 @@ W2F_Process_Command_Line (INT phase_argc, char *phase_argv[],
     W2F_Emit_Pcf = FLIST_emit_pcf;
     W2F_Emit_Omp = FLIST_emit_omp;
     W2F_Line_Length = FLIST_line_length;
-
+    
+    Process_Command_Line(phase_argc, phase_argv);
     Process_Filename_Options(Src_File_Name, Irb_File_Name);
 
     if (W2F_Ansi_Format)
