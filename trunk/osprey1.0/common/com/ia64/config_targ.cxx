@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: config_targ.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:03 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-02-17 23:51:59 $
+ * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_targ.cxx,v $
  *
  *
@@ -48,11 +48,11 @@
  * Configuration specific to the target machine/system.
  *
  * NOTE:  There is an approximate distinction between -TARG option
- * group flags and their configuration (in config_TARG.c), and more
+ * group flags and their configuration (in config_targ2.c), and more
  * generic target configuration (in this file).  Note that the related
  * header file config_targ.h is included in config.h, and hence in most
- * source files, whereas config_TARG.h is only included directly, so
- * putting new -TARG option-related variables in config_TARG.c is to
+ * source files, whereas config_targ2.h is only included directly, so
+ * putting new -TARG option-related variables in config_targ2.c is to
  * be preferred to putting them here.
  *
  * ====================================================================
@@ -63,7 +63,7 @@
 #include "config.h"
 #include "config_asm.h"
 #include "config_debug.h"
-#include "config_TARG.h"
+#include "config_targ2.h"
 #include "config_opt.h"
 #include "erglob.h"
 #include "tracing.h"
