@@ -51,8 +51,22 @@
 #include "ir_reader.h"
 #include "targ_sim.h"
 
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
+
+// symbols defined in prompf_anl.so (and stubbed in driver.cxx)
+// from be/prompf_anl/anl_driver.h
+
+extern "C" INT64 Get_Next_Construct_Id() { return 0; }
+extern "C" INT64 New_Construct_Id() { return 0; }
+extern "C" const char * Anl_File_Path() { return NULL; }
+
+#else 
+
 #pragma weak New_Construct_Id 
 #pragma weak Get_Next_Construct_Id
+#pragma weak Anl_File_Path
+
+#endif
 
 PROMPF_INFO* Prompf_Info = NULL; 
 MEM_POOL PROMPF_pool;

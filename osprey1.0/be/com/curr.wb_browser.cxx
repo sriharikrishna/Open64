@@ -60,7 +60,7 @@
 #include "whirl2src.h"
 
 
-#if defined(_GCC_NO_PRAGMAWEAK)
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 void WB_BROWSER::Summary(FILE *fp) { }
 void ACCESS_ARRAY::Print(FILE *, int) const { }

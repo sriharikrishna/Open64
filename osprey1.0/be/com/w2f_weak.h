@@ -42,7 +42,7 @@
 // and used in be, be.so and lno.so
 // (additional ones may be needed for prompf_anl.so)
 
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 /* keep those for whirl2f || defined(_GCC_NO_PRAGMAWEAK) */
 
 extern void (*W2F_Cleanup_p)(void);
@@ -75,6 +75,7 @@ extern void (*W2F_Translate_Wn_Str_p)(char *strbuf, UINT bufsize, WN *wn);
 #define W2F_Should_Emit_Nested_PUs (*W2F_Should_Emit_Nested_PUs_p)
 #define W2F_Translate_Istore_Lhs (*W2F_Translate_Istore_Lhs_p)
 #define W2F_Translate_Wn (*W2F_Translate_Wn_p)
+#define W2F_Translate_Wn_Str (*W2F_Translate_Wn_Str_p)
 
 #else // __linux__
 

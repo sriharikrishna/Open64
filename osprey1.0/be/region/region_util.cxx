@@ -36,8 +36,8 @@
 /*-*-c++-*-*/
 /* ====================================================================
  * Module: opt_region_util.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:53 $
+ * $Revision: 1.2 $
+ * $Date: 2003-11-04 16:07:35 $
  *
  * Revision history:
  *  31-MAY-95 wdl - Original Version
@@ -64,7 +64,7 @@
 /* this next header should be after the external declarations in the others */
 #include "pragma_weak.h"	/* weak pragmas for Valid_alias...	*/
 
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 extern void (*Print_points_to_p) (FILE *fp, POINTS_TO *ptmp);
 #define Print_points_to (*Print_points_to_p)
 #else

@@ -44,7 +44,7 @@ static const char source_file[] = __FILE__;
 
 #include "ti_res.h"
 
-#if defined(_GCC_NO_PRAGMAWEAK)
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 SI_ISSUE_SLOT* const SI_issue_slots[];
 const INT SI_issue_slot_count;

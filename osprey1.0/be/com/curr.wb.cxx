@@ -55,7 +55,7 @@
 
 // Solaris CC workaround
 
-#if defined(_GCC_NO_PRAGMAWEAK)
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 void cg_sdebug(char init_buffer[]) { } 
 void s_lno_debug(char init_buffer[]) { }
 #endif
