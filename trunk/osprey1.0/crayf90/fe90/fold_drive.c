@@ -2604,7 +2604,7 @@ CONTINUE:
                str_len2.v[0] = str_len2.v[1];
             }
          }
-# endif
+# endif 
 
 
          SHIFT_ARITH_ARG(str_len1.v, res_linear_type);
@@ -2626,8 +2626,9 @@ CONTINUE:
          for (i = 0; i < num_host_wds[res_linear_type]; i++) {
             result[i] = loc_result.v[i];
          }
-
+#if 0 /*fzhao March*/
          ARITH_ERROR_RESULT_TEST(mask, (*res_type_idx), ok, line, col);
+# endif
          break;
 
 
