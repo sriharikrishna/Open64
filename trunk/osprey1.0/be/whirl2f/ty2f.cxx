@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.5 $
- * $Date: 2002-09-10 18:20:32 $
+ * $Revision: 1.6 $
+ * $Date: 2002-09-12 21:15:51 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -1007,7 +1007,7 @@ TY2F_Translate_Structure(TY_IDX ty)
 					       FALSE/*common*/, 
 					       FALSE/*alt_ret_name*/));
 
-             if (TY_is_f90_pointer(FLD_type(fld)))
+             if (FLD_is_pointer(fld))
                 Prepend_Token_String(fld_tokens,",POINTER::");
 
   	     TY2F_translate(fld_tokens, FLD_type(fld));

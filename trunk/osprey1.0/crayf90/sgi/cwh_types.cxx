@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.6 $
- * $Date: 2002-09-10 18:19:50 $
+ * $Revision: 1.7 $
+ * $Date: 2002-09-12 21:15:36 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -783,8 +783,6 @@ fei_member(char          *name_string,
     Is_True(!TY_is_f90_pointer(Ty_Table[ty_idx]),(" extra f90ptr"));
   }
 
-  if (p1)
-    Set_TY_is_f90_pointer(ty_idx); 
 
   d = cwh_types_pop_dtype();
 
@@ -795,6 +793,9 @@ fei_member(char          *name_string,
   FLD_HANDLE fld (d.dty_last);
 
   FLD_Init (fld, Save_Str(name_string), ty_idx, off);
+
+  if (p1)
+   Set_FLD_is_pointer(fld);
 
   ret_val = d.dty_last;
 
