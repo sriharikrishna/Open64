@@ -47,8 +47,8 @@ extern "C" {
  * ====================================================================
  *
  * Module: errors.h
- * $Revision: 1.3 $
- * $Date: 2003-08-05 16:01:53 $
+ * $Revision: 1.4 $
+ * $Date: 2003-11-04 16:10:42 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/errors.h,v $
  *
@@ -661,6 +661,21 @@ public:
       Set_Error_Phase(saved_error_phase);
   }
 };
+
+
+/* ====================================================================
+ *
+ * Handling Errors from Signals
+ *
+ * ====================================================================
+ */
+
+/* Returns a string describing the signal number passed in the
+   argument sig. The string can only be used until the next call. */
+
+extern const char* StrSignal(int sig);
+
+
 
 #endif /* __cplusplus */
 

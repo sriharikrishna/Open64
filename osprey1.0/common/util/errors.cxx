@@ -63,12 +63,6 @@
  * ====================================================================
  */
 
-// Solaris CC workaround
-#ifdef _SOLARIS_SOLARIS
-extern char *sys_siglist[];
-extern char *sys_errlist[];
-#endif
-
 #define USE_STANDARD_TYPES
 #include <stdarg.h>
 #include <stdlib.h>
@@ -76,6 +70,7 @@ extern char *sys_errlist[];
 #include <sys/types.h>
 #include <signal.h>
 #include <ctype.h>
+#include <string.h>
 
 #ifdef _SGI_SGI
 #define _LANGUAGE_C			/* work around system header bug */
@@ -221,18 +216,18 @@ catch_signal (INT sig, INT error_num)
 {
     signal ( sig, SIG_DFL );
 
-
+    
     switch (sig) {
     case SIGBUS:
     case SIGSEGV:
-	if (error_num == ENXIO || error_num == ENOSPC)
-	    /* special case for I/O error on mmapped object: report as an
-	       ordinary fatal error */ 
-	    Fatal_Error ("I/O error in mmapped object: %s",
-			 sys_errlist[error_num]);
+      if (error_num == ENXIO || error_num == ENOSPC) {
+	/* special case for I/O error on mmapped object: report as an
+	   ordinary fatal error */ 
+	Fatal_Error ("I/O error in mmapped object: %s", strerror(error_num));
+      }
     }
     
-    printf ( "Signal: %s", _sys_siglist[sig] );
+    printf ( "Signal: %s", StrSignal(sig) );
     fflush ( stdout );
     printf ( " in %s phase.\n", Current_Phase );
     
@@ -245,7 +240,7 @@ catch_signal (INT sig, INT error_num)
     signal ( SIGILL, SIG_DFL );
     signal ( SIGBUS, SIG_DFL );
     ErrMsgLine ( EC_Signal, ERROR_LINE_UNKNOWN,
-		_sys_siglist[sig], Current_Phase );
+		StrSignal(sig), Current_Phase );
     /*NOTREACHED*/
     exit(RC_INTERNAL_ERROR);
 }
@@ -284,7 +279,7 @@ Handle_Signals ( void )
     setup_signal_handler (SIGQUIT);
     setup_signal_handler (SIGILL);
     setup_signal_handler (SIGTRAP);
-    setup_signal_handler (SIGIOT);
+    setup_signal_handler (SIGABRT); // SIGABRT replaces SIGIOT
 #ifndef linux
     setup_signal_handler (SIGEMT);
 #endif
@@ -682,12 +677,6 @@ ErrMsg_Report_Nonuser ( ERROR_DESC *edesc, INT ecode, INT line,
   vstring emsg;
   INTPS mparm[MAX_ERR_PARMS];
 
-  /* Interface to Unix system error messages: */
-  extern INT sys_nerr;
-#ifndef linux
-  extern char *sys_errlist[];
-#endif
-
   /* Formatting buffer: */
 # define BUFLEN 512
   INT loc;
@@ -793,13 +782,8 @@ ErrMsg_Report_Nonuser ( ERROR_DESC *edesc, INT ecode, INT line,
       case ET_SYSERR:	parm = (INTPS) va_arg(vp,int);
       			if (parm < 0) {
 			  mparm[pnum] = (INTPS) host_errlist[-parm];
-			} else if ( parm <= sys_nerr ) {
-			  mparm[pnum] = (INTPS) sys_errlist[parm];
 			} else {
-			  result = &buf[++loc];
-			  loc += sprintf ( &buf[loc],
-					   "Unix error %ld", parm );
-			  mparm[pnum] = (INTPS) result;
+			  mparm[pnum] = (INTPS) strerror(parm);
 			}
 			break;
 
@@ -857,12 +841,6 @@ ErrMsg_Report_User (ERROR_DESC *edesc, INT ecode, INT line,
   char hmsg[512];
   vstring emsg;
   INTPS mparm[MAX_ERR_PARMS];
-
-  /* Interface to Unix system error messages: */
-  extern INT sys_nerr;
-#ifndef linux
-  extern char *sys_errlist[];
-#endif
 
   /* Formatting buffer: */
 # define BUFLEN 512
@@ -959,13 +937,8 @@ ErrMsg_Report_User (ERROR_DESC *edesc, INT ecode, INT line,
       case ET_SYSERR:	parm = (INTPS) va_arg(vp,int);
       			if (parm < 0) {
 			  mparm[pnum] = (INTPS) host_errlist[-parm];
-			} else if ( parm <= sys_nerr ) {
-			  mparm[pnum] = (INTPS) sys_errlist[parm];
 			} else {
-			  result = &buf[++loc];
-			  loc += sprintf ( &buf[loc],
-					   "Unix error %ld", parm );
-			  mparm[pnum] = (INTPS) result;
+			  mparm[pnum] = (INTPS) strerror(parm);
 			}
 			break;
 
@@ -1501,3 +1474,52 @@ Had_Internal_Error (void)
 {
 	return Had_Compiler_Error;
 }
+
+/* ====================================================================
+ *
+ * Handling Errors from Signals
+ *
+ * ====================================================================
+ */
+
+
+// StrSignal: See interface description
+extern const char* StrSignal(int sig)
+{
+  // eraxxon: As of now, there is no portable method for collecting
+  // string representations of signal errors.  Many platforms define
+  // an external array indexed by error number such as _sys_siglist[].
+  // There has been some attempt at sanitizing this into a call to
+  // 'strsignal()' but this is not yet widely available.  Sigh.
+
+  // -------------------------------------------------------  
+
+  // The following platforms access via an accursed array of char*
+  // defined in <signal.h>
+  char** my_sys_siglist = NULL;
+#if defined(__sgi)
+# define I_USE_THE_CRUSTY_SYS_SIGLIST_ARRAY 1
+  my_sys_siglist = (char**)_sys_siglist;
+#elif defined(__MACH__) /* MacOS */
+# define I_USE_THE_CRUSTY_SYS_SIGLIST_ARRAY 1
+  my_sys_siglist = (char**)sys_siglist;
+#elif defined(__digital__)
+# define I_USE_THE_CRUSTY_SYS_SIGLIST_ARRAY 1
+  my_sys_siglist = (char**)__sys_siglist;
+#endif
+
+  // Other platforms use strsignal() from <string.h>: Linux, cygwin,
+  // Solaris
+
+  // -------------------------------------------------------  
+  
+#if defined(I_USE_THE_CRUSTY_SYS_SIGLIST_ARRAY)
+    // The code originally used sys_siglist[] directly, without
+    // checking for bad indices or copying the string to a static
+    // buffer.  So we just simulate that behavior.
+    return my_sys_siglist[sig];
+#else
+    return strsignal(sig);
+#endif
+}
+
