@@ -42,9 +42,9 @@
  * ====================================================================
  *
  * Module: inner_fission.cxx
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:39 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-02-17 23:49:52 $
+ * $Author: dotsenko $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/lno/inner_fission.cxx,v $
  *
  * Revision history:
@@ -63,13 +63,13 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/lno/inner_fission.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/lno/inner_fission.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <sys/types.h>
 #include <stdlib.h>
 #include "defs.h"
-#include "config_TARG.h"
+#include "config_targ2.h"
 #include "wn.h"
 #include "wn_map.h"
 #include "model.h"

@@ -75,7 +75,7 @@ TARGETS = $(LIBRARY)
 COMMON_UTIL_DIR= $(BUILD_TOT)/common/util
 COMMON_COM_DIR= $(BUILD_TOT)/common/com
 
-LDIRT = arith.i
+LDIRT = arith.i arith.a
 
 LCINCS = -I$(BUILD_BASE) \
 	$(XINC)
@@ -228,3 +228,9 @@ arith.cat: $(BUILD_BASE)/arith.msg
 #----------------------------------------------------------------------
 
 DIRTS = $(OBJECTS)
+
+REAL_OBJS = $(filter %.o,$(OBJECTS))
+
+$(LIBRARY) : $(REAL_OBJS)
+	$(AR) r $@ $(REAL_OBJS)
+

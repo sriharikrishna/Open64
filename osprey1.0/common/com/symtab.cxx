@@ -43,12 +43,9 @@
 
 #include <algorithm>
 
-// Solaris CC workaround
-#ifndef _USE_STL_EXT
 #include <map>
-#else
-#include <hash_map>
-#endif
+#include "HashTable.h"
+using namespace stlCompatibility;
 
 #include "defs.h"
 #include "config.h"
@@ -307,11 +304,6 @@ typedef std::pair<TY_IDX, UINT32> TY_POINTEE_KEY;
 // hash_pointee_key contains the hash function for hash_map, we should 
 // no longer use it after replacing hash_map with map
 //
-#ifndef _USE_STL_EXT
-typedef std::map<TY_POINTEE_KEY, TY_IDX>
-    TY_IDX_POINTER_MAP;
-
-#else
 struct hash_pointee_key
 {
     UINT32 operator() (TY_POINTEE_KEY key) const {
@@ -319,17 +311,12 @@ struct hash_pointee_key
     }
 };
 
-typedef std::hash_map<TY_POINTEE_KEY, TY_IDX, hash_pointee_key>
-    TY_IDX_POINTER_MAP;
-#endif
-
+typedef HashTable<TY_POINTEE_KEY, TY_IDX, hash_pointee_key> TY_IDX_POINTER_MAP;
+// pointer_map maps a pointee to its corresponding pointer
 static TY_IDX_POINTER_MAP pointer_map;
 static std::pair<TY_POINTEE_KEY, TY_IDX> last_valid_map_entry;
 
-// pointer_map maps a pointee to its corresponding pointer
 
-
-// Solaris CC workaround
 static BOOL
 Invalid_Pointer_Map_Entry (const TY_IDX_POINTER_MAP::value_type& entry)
 {
@@ -357,31 +344,42 @@ Invalid_Pointer_Map_Entry (const TY_IDX_POINTER_MAP::value_type& entry)
 static void
 Validate_Pointer_Map ()
 {
-    typedef TY_IDX_POINTER_MAP::iterator ITER;
-    std::vector<ITER> invalid_entries;
-    UINT last_valid = 0;
-    last_valid_map_entry.second = 0;
-    
-    for (ITER i = pointer_map.begin (); i != pointer_map.end (); ++i) {
-	if (Invalid_Pointer_Map_Entry (*i))
-	    invalid_entries.push_back (i);
-	else {
-	    if (last_valid < TY_IDX_index ((*i).second)) {
-		last_valid = TY_IDX_index ((*i).second);
+  typedef std::vector<TY_IDX_POINTER_MAP::KeyType> InvalidEntries;
+  class FindInvalidEntries : public TY_IDX_POINTER_MAP::ForAllAction {
+    TY_IDX_POINTER_MAP * map;
+    InvalidEntries invalid_entries;
 
-// Solaris CC workaround
-last_valid_map_entry.first  =  (*i).first;
-last_valid_map_entry.second =  (*i).second;
-	    
-	     }
+  public:
+    FindInvalidEntries(TY_IDX_POINTER_MAP& _map) : map(&_map) {}
+    
+    void handle(const TY_IDX_POINTER_MAP::KeyType k, 
+		TY_IDX_POINTER_MAP::ValueType &v) {
+      UINT last_valid = 0;
+      TY_IDX_POINTER_MAP::value_type kv(k, v);
+      if (Invalid_Pointer_Map_Entry (kv))
+	invalid_entries.push_back(k);
+      else {
+	if (last_valid < TY_IDX_index (v)) {
+	  last_valid = TY_IDX_index (v);
+	  last_valid_map_entry.first  =  k;
+	  last_valid_map_entry.second =  v;
 	}
+      }
     }
 
-    for (std::vector<ITER>::const_iterator first = invalid_entries.begin ();
-	 first != invalid_entries.end (); ++first)
-	pointer_map.erase (*first);
-}
+    void eraseInvalidEntries() {
+      InvalidEntries::const_iterator ieIterator;
+      for ( ieIterator = invalid_entries.begin();
+	    ieIterator != invalid_entries.end(); 
+	    ++ieIterator )
+	map->erase(*ieIterator);
+    }
+  }; // class FindInvalidEntries
 
+  FindInvalidEntries fie(pointer_map);
+  pointer_map.forAll(fie);
+  fie.eraseInvalidEntries();
+}
 
 struct update_pointer_map
 {
@@ -397,45 +395,37 @@ struct update_pointer_map
 static void
 Update_Pointer_Map ()
 {
-
-// Solaris CC workaround
-// CC complains - the formal argument to Invalid_Pointer_Map_Entry
-// should be pair<const pair<unsigned, unsigned>, unsigned>, but
-// last_valid_map_entry is pair<pair<unsigned, unsigned>, unsigned>
-// Note this function is called by reference
-//
-const TY_IDX_POINTER_MAP::value_type ss_entry( last_valid_map_entry.first,
-					       last_valid_map_entry.second);
+  const TY_IDX_POINTER_MAP::value_type ss_entry( last_valid_map_entry.first,
+						 last_valid_map_entry.second);
   
-    if ( TY_IDX_index (last_valid_map_entry.second) != 0 &&
-        Invalid_Pointer_Map_Entry (ss_entry)) {
+  if ( TY_IDX_index (last_valid_map_entry.second) != 0 &&
+       Invalid_Pointer_Map_Entry (ss_entry)) {
 
-	DevWarn ("Rehashing TY pointer map -- this should NOT happen often");
-	Validate_Pointer_Map ();
-    }
-    For_all_entries (Ty_tab, update_pointer_map (),
-		     TY_IDX_index (last_valid_map_entry.second) + 1);
+    DevWarn ("Rehashing TY pointer map -- this should NOT happen often");
+    Validate_Pointer_Map ();
+  }
+  For_all_entries (Ty_tab, update_pointer_map (),
+		   TY_IDX_index (last_valid_map_entry.second) + 1);
 }
 
 
 static inline TY_IDX
 Find_Ty_Pointer (TY_POINTEE_KEY key)
 {
-    TY_IDX_POINTER_MAP::iterator result = pointer_map.find (key);
+  TY_IDX_POINTER_MAP::ValueBoolPair result = pointer_map.find(key);
 
-    if (result == pointer_map.end ())
-	return 0;
+  if (result.second == false) return 0;
 
-    if (Invalid_Pointer_Map_Entry (*result)) {
-	DevWarn ("Rehashing TY pointer map -- this should NOT happen often");
-	Validate_Pointer_Map ();
-	return 0;
-    }
-
-    TY_IDX pointer = (*result).second;
-    Set_TY_align (pointer, Pointer_Size);
-    return pointer;
-
+  TY_IDX_POINTER_MAP::value_type vt(key, result.first);
+  if (Invalid_Pointer_Map_Entry (vt)) {
+    DevWarn ("Rehashing TY pointer map -- this should NOT happen often");
+    Validate_Pointer_Map ();
+    return 0;
+  }
+  
+  TY_IDX pointer = result.first;
+  Set_TY_align (pointer, Pointer_Size);
+  return pointer;
 } // Find_Ty_Pointer	
 
 
@@ -452,7 +442,6 @@ TY_pointer (TY_IDX pointee, BOOL f90_pointer)
     }
 
     return result;
-
 } // TY_pointer
 
 
@@ -478,20 +467,15 @@ make_ptr_type (TY_IDX ty_idx, BOOL f90_pointer)
 TY_IDX
 Make_Pointer_Type (TY_IDX ty_idx, BOOL)
 {
-    //
-    // This now only returns non-f90 pointers. It ignores the second argument
-    //
-    return make_ptr_type (ty_idx, FALSE);
+  // This now only returns non-f90 pointers. It ignores the second argument
+  return make_ptr_type (ty_idx, FALSE);
 } // Make_Pointer_Type
 
 TY_IDX
 Make_F90_Pointer_Type (TY_IDX ty_idx)
 {
-   //
-   // This now only returns f90 pointers
-   //
-    return make_ptr_type (ty_idx, TRUE);
-    
+  // This now only returns f90 pointers
+  return make_ptr_type (ty_idx, TRUE);
 } // Make_F90_Pointer_Type
 
 
@@ -775,69 +759,44 @@ TY_struct_hash (const TY& ty) {
 } // TY_struct_hash
  
 
-// Solaris CC workaround
-// we should no longer need this struct if we use <map> instead of 
-// <hash_map>
-#ifdef _USE_STL_EXT
-// The hash function: TY_IDX --> size_t
+size_t TY_hash_func(const TY_IDX ty_id) {
+  TY &ty = Ty_Table[ty_id];
+  switch (TY_kind(ty)) {
+  case KIND_SCALAR:
+  case KIND_VOID:
+    return TY_mtype(ty);
+  case KIND_ARRAY:
+    return TY_array_hash(ty);
+  case KIND_POINTER:
+    return TY_mtype(Ty_Table [TY_pointed(ty)]);
+  case KIND_FUNCTION:
+    return TY_fun_hash(ty);
+  case KIND_STRUCT:
+    return TY_struct_hash(ty);
+  case KIND_INVALID:
+  default:
+  case KIND_LAST:     
+    Fail_FmtAssertion ("invalid TY_KIND in hash fn");
+    return 0;
+  } // switch
+} // TY_hash_func
+
 struct TY_hash {
-  size_t operator()(TY_IDX ty_id) const { 
-    TY &ty = Ty_Table[ty_id];
-    switch (TY_kind(ty)) {
-    case KIND_SCALAR:
-    case KIND_VOID:
-      return TY_mtype(ty);
-    case KIND_ARRAY:
-      return TY_array_hash(ty);
-    case KIND_POINTER:
-      return TY_mtype(Ty_Table [TY_pointed(ty)]);
-    case KIND_FUNCTION:
-      return TY_fun_hash(ty);
-    case KIND_STRUCT:
-      return TY_struct_hash(ty);
-    case KIND_INVALID:
-    default:
-    case KIND_LAST:     
-      Fail_FmtAssertion ("invalid TY_KIND in hash fn");
-      return 0;
-    } // switch
+  size_t operator()(const TY_IDX ty_id) const { 
+    return TY_hash_func(ty_id);
   } // operator()
 }; // struct TY_hash
-#endif
 
 
-// Hash key comparison function
-// When are two entries in the hash table "equal"?
-
-// Solaris CC workaround
-// we should no longer need this struct if we use <map> instead of
-// <hash_map>
-#ifndef _USE_STL_EXT
-struct TY_IDX_ne_compare
-{
-  bool operator() ( TY_IDX k1,  TY_IDX k2) const
-    {
-       return k1 < k2;
-    }
-};
-#else
 struct TY_EQUIV
 {
-  bool operator () ( TY_IDX k1,  TY_IDX k2) const 
+  bool operator () ( const TY_IDX k1, const TY_IDX k2) const 
     {
       return TY_are_equivalent(k1, k2);
     }
 };
-#endif
 
-// Solaris CC workaround
-// NOTE this is the second hash_map class in this file. 
-//
-#ifndef _USE_STL_EXT
-typedef std::map<TY_IDX, TY_IDX, TY_IDX_ne_compare> HASH_TY_TABLE;
-#else
-typedef std::hash_map<TY_IDX, TY_IDX, TY_hash, TY_EQUIV> HASH_TY_TABLE;
-#endif
+typedef HashTable<TY_IDX, TY_IDX, TY_hash, TY_EQUIV> HASH_TY_TABLE;
 
 // The global Hash Table data structures
 // Depending on the TY_KIND we pick one of the five tables below.
@@ -1203,13 +1162,32 @@ static inline TY_IDX
 TY_is_unique_op (const TY_IDX ty_idx, HASH_TY_TABLE& hash_ty_table)
 {
   TY_IDX return_idx = ty_idx;
-  HASH_TY_TABLE::const_iterator hash_entry = hash_ty_table.find (ty_idx);
+
+  HASH_TY_TABLE::ValueBoolPair isInserted = 
+    hash_ty_table.insert(HASH_TY_TABLE::KeyValuePair(ty_idx, return_idx));
+
+  if (isInserted.second == false) {
+    // match was found
+    Set_TY_IDX_index(return_idx, TY_IDX_index(isInserted.first));
+  }
+  return return_idx;
+
+/*
+  //  HASH_TY_TABLE::const_iterator hash_entry = hash_ty_table.find (ty_idx);
+  HASH_TY_TABLE::const_iterator hash_entry;
+  for ( hash_entry = hash_ty_table.begin(); 
+        hash_entry != hash_ty_table.end();
+	hash_entry++ ) {
+    if (TY_are_equivalent(ty_idx, hash_entry->first)) break;
+  }
+
   if (hash_entry != hash_ty_table.end ())
     // step b: If found, return the TY_IDX of the duplicate
      Set_TY_IDX_index(return_idx, TY_IDX_index((*hash_entry).second));
   else
     hash_ty_table.insert (HASH_TY_TABLE::value_type(ty_idx, ty_idx));
   return return_idx;
+*/
 }
 
 
@@ -2071,6 +2049,7 @@ print_op<T>::operator () (UINT idx, T *entry) const {
 
 
 // specialization for printing TCONs
+template <>
 inline void
 print_op<TCON>::operator () (UINT idx, TCON *c) const
 {

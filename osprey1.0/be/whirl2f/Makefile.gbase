@@ -288,7 +288,6 @@ endif
 #---------------------------------------------------------------------
 
 ifeq ($(BUILD_OS), IRIX)
-CXXFLAGS += -D_USE_STL_EXT
  ifeq ($(BUILD_COMPILER), VENDOR)
  CXXFLAGS += -woff 1744,1552
  endif
@@ -296,7 +295,7 @@ endif
 
 ifeq ($(BUILD_OS), LINUX)
 CFLAGS  += -D_LINUX_LINUX
-CXXFLAGS += -D_LINUX_LINUX -D_USE_STL_EXT
+CXXFLAGS += -D_LINUX_LINUX
 endif
 
 
@@ -309,7 +308,7 @@ CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_SVR4_SOURCE \
  endif
  endif
  ifeq ($(BUILD_COMPILER), GNU)
- CFLAGS += -D_USE_STL_EXT -D__GNU_BUG_WORKAROUND
+ CFLAGS +=  -D__GNU_BUG_WORKAROUND
  endif
 CXXFLAGS = $(CFLAGS) -w
 endif

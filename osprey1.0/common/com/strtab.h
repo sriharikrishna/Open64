@@ -40,8 +40,8 @@
  * ====================================================================
  *
  * Module: strtab.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:33 $
+ * $Revision: 1.3 $
+ * $Date: 2003-02-17 23:49:53 $
  *
  * Description:
  *
@@ -56,6 +56,9 @@
 #ifndef symtab_idx_INCLUDED
 #include "symtab_idx.h"
 #endif
+
+//#include "HashTable.h"
+//using namespace stlCompatibility;
 
 // From a user point of view, the string table is a collection of unique
 // strings, each of which can be indentified by STR_IDX.  The actual
@@ -126,17 +129,8 @@ Index_to_char_array (UINT32 idx);
 
 #ifdef MONGOOSE_BE
 
-#ifndef __SGI_STL_HASH_MAP_H
-
-#ifndef _USE_STL_EXT
 #include <map>
-#else
-#include <hash_map>
-#endif
-
 using namespace std;
-
-#endif
 
 #ifndef mempool_allocator_INCLUDED
 #include "mempool_allocator.h"
@@ -149,51 +143,33 @@ using namespace std;
 class STR_IDX_MAP {
 private:
 
-#ifndef _USE_STL_EXT
 
-struct STR_IDX_compare {
-    bool operator() (STR_IDX idx1, STR_IDX idx2)
+  struct STR_IDX_compare {
+    bool operator() (const STR_IDX idx1, const STR_IDX idx2) const
     {
-        return idx1 < idx2;
+      return idx1 < idx2;
     }};
-
-    typedef map<STR_IDX, STR_IDX, STR_IDX_compare, mempool_allocator<STR_IDX> > 
-        rep_type;
-
-#else
-
-  typedef hash_map<STR_IDX, STR_IDX, hash<STR_IDX>, equal_to<STR_IDX>,
-      mempool_allocator<STR_IDX> > rep_type;
-#endif
+  
+  typedef map<STR_IDX, STR_IDX, STR_IDX_compare, mempool_allocator<STR_IDX> > 
+    rep_type;
 
   rep_type rep;  
 
 public:
 
-  typedef rep_type::allocator_type allocator_type;
-
   STR_IDX_MAP ( rep_type::size_type n = 0,
-
-#ifndef _USE_STL_EXT
-                rep_type::key_compare cmp  = rep_type::key_compare(),
-#else
-                rep_type::hasher hf = rep_type::hasher(),
-                rep_type::key_equal eq  = rep_type::key_equal(),
-#endif
+		rep_type::key_compare cmp  = rep_type::key_compare(),
                 rep_type::allocator_type a = rep_type::allocator_type() )
-
-#ifndef _USE_STL_EXT
-        : rep(cmp)
-#else
-	: rep(n, hf, eq, a)
-#endif
+    : rep(cmp)
     { }
 
+  
   STR_IDX& operator[](STR_IDX idx) { return rep[idx]; }
   STR_IDX operator[](STR_IDX idx) const {
     rep_type::const_iterator i = rep.find(idx);
     return i != rep.end() ? i->second : STR_IDX(0);
   }
+  
 };
 
 extern void

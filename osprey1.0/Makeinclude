@@ -53,9 +53,9 @@ endif
 
 $(TARGETS): $(DEPENDS)
 
-$(LIBRARY): $(LIBRARY)($(OBJECTS)) $(DEPENDS)
+#$(LIBRARY): $(LIBRARY)($(OBJECTS)) $(DEPENDS)
 
-$(LIBRARY)(%.o) : %.o .d_%
+#$(LIBRARY)(%.o) : %.o .d_%
 
 %.o : %.c .d_%
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -82,6 +82,16 @@ $(LIBRARY)(%.o) : %.o .d_%
 #----------------------------------------------------------------------
 # In case we want to delete all object files after archieving, define
 # DIRTS in individual Makefile.gbase and rm them explicitly
+# PLATFORM_DIRTS_SPECIFIC is to delete compiler cache, when broken
 #----------------------------------------------------------------------
+
+ifeq ($(Open64BuildType), Open64BuildRelease)
+PLATFORM_DIRTS_COMMON = *~ *.o \#* \#.*
 last : 
-	-rm -f $(DIRTS)
+	if test -f itanium.o; then mv itanium.o itanium.o.last; fi
+	rm -rf $(DIRTS) $(PLATFORM_DIRTS_COMMON) $(PLATFORM_DIRTS_SPECIFIC)
+	if test -f itanium.o.last; then mv itanium.o.last itanium.o; fi
+else
+last :
+	rm -rf $(PLATFORM_DIRTS_SPECIFIC)
+endif

@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_cfg_trans.h
-// $Revision: 1.2 $
-// $Date: 2002-09-06 22:34:54 $
+// $Revision: 1.3 $
+// $Date: 2003-02-17 23:49:52 $
 //
 // ====================================================================
 //
@@ -60,7 +60,10 @@
 // defined in SGI's stl_function.h and are not part of standard STL.
 // the following code is copied from stl_function.h
 
-#ifndef _USE_STL_EXT
+// Yuri: 01/28/03
+// #ifndef _USE_STL_EXT
+#if !defined(_USE_STL_EXT)
+#if ((defined(__GNUC__) && (((__GNUC__ == 3) && (__GNUC_MINOR__ > 0)) || (__GNUC__ > 3))) || (defined(__sun)))
 template <class _Pair>
 struct _Select1st : public unary_function<_Pair, typename _Pair::first_type> 
 {
@@ -75,13 +78,33 @@ struct _Select2nd : public unary_function<_Pair, typename _Pair::second_type>
     return __x.second;
   }
 };
-template <class _Pair> struct select1st : public _Select1st<_Pair> {};
-template <class _Pair> struct select2nd : public _Select2nd<_Pair> {};
+
+// Yuri & Jason: 01/28/03
+//template <class _Pair> struct select1st : public _Select1st<_Pair> {};
+
+template <class _Pair> 
+struct select1st : public unary_function<_Pair, typename _Pair::first_type> 
+{
+  const typename _Pair::first_type& operator()(const _Pair& __x) const {
+    return __x.first;
+  }
+};
+
+//template <class _Pair> struct select2nd : public _Select2nd<_Pair> {};
+template <class _Pair> 
+struct select2nd : public unary_function<_Pair, typename _Pair::second_type>
+{
+  const typename _Pair::second_type& operator()(const _Pair& __x) const {
+    return __x.second;
+  }
+};
+#endif
 #endif
 
 #include <iterator>
 #include <set>
 #include <map>
+#include <vector>
 #include <functional>
 
 using namespace std;
@@ -215,11 +238,11 @@ public:
   typedef T value_type;
   typedef IndexFunction index_function;
   typedef cluster_vector<T, IndexFunction> self;
-  typedef vector<value_type> cluster_type;
-  typedef cluster_type::iterator      fast_iterator;
-  typedef cluster_type::size_type     size_type;
+  typedef vector<T> cluster_type;
+  typedef typename cluster_type::iterator      fast_iterator;
+  typedef typename cluster_type::size_type     size_type;
   typedef vector<cluster_type>        cluster_container;
-  typedef cluster_container::iterator cluster_iterator;
+  typedef typename vector<cluster_type>::iterator cluster_iterator;
   typedef composite_iterator<cluster_iterator, fast_iterator> iterator;
 
 private:
@@ -682,6 +705,7 @@ struct path_type {
 };
 
 namespace std {  /* gcc-3.0 requires this explicit */
+template <>
 struct less<path_type*> {
   bool operator()(path_type *p1, path_type *p2) {
     return (*p1).wt < (*p2).wt;

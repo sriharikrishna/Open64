@@ -38,8 +38,8 @@
 // ====================================================================
 //
 // Module: fb_whirl.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:31 $
+// $Revision: 1.2 $
+// $Date: 2003-02-17 23:49:51 $
 //
 // Description:
 //
@@ -267,7 +267,9 @@ FEEDBACK::Add_index_invoke( WN *wn )
 #if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
    _invokes.push_back( FB_Info_Invoke() );
 #else
-   _invokes.push_back();
+   // Yuri and Jason: 01/28/03; NOTE: several similar places!!!
+   //   _invokes.push_back();
+   _invokes.push_back( FB_Info_Invoke() );
 #endif
 
     IPA_WN_MAP32_Set( _maptab, WN_MAP_FEEDBACK, wn, fb_index );
@@ -291,7 +293,8 @@ FEEDBACK::Add_index_branch( WN *wn )
 #if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
    _branches.push_back( FB_Info_Branch() );
 #else
-   _branches.push_back();
+   _branches.push_back( FB_Info_Branch() );
+   //_branches.push_back();
 #endif
 
     IPA_WN_MAP32_Set( _maptab, WN_MAP_FEEDBACK, wn, fb_index );
@@ -315,7 +318,8 @@ FEEDBACK::Add_index_loop( WN *wn )
 #if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
       _loops.push_back( FB_Info_Loop() );
 #else
-      _loops.push_back();
+      //_loops.push_back();
+      _loops.push_back( FB_Info_Loop() );
 #endif
 
     IPA_WN_MAP32_Set( _maptab, WN_MAP_FEEDBACK, wn, fb_index );
@@ -339,7 +343,8 @@ FEEDBACK::Add_index_circuit( WN *wn )
 #if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
       _circuits.push_back( FB_Info_Circuit() );
 #else
-      _circuits.push_back();
+      _circuits.push_back( FB_Info_Circuit() );
+      //      _circuits.push_back();
 #endif
 
     IPA_WN_MAP32_Set( _maptab, WN_MAP_FEEDBACK, wn, fb_index );
@@ -363,7 +368,8 @@ FEEDBACK::Add_index_call( WN *wn )
 #if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
     _calls.push_back( FB_Info_Call() );
 #else
-    _calls.push_back();
+    _calls.push_back( FB_Info_Call() );
+    //_calls.push_back();
 #endif
 
     IPA_WN_MAP32_Set( _maptab, WN_MAP_FEEDBACK, wn, fb_index );
@@ -387,7 +393,8 @@ FEEDBACK::Add_index_switch( WN *wn )
 #if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
     _switches.push_back( FB_Info_Switch() );
 #else
-    _switches.push_back();
+    _switches.push_back( FB_Info_Switch() );
+    //_switches.push_back();
 #endif
 
     IPA_WN_MAP32_Set( _maptab, WN_MAP_FEEDBACK, wn, fb_index );

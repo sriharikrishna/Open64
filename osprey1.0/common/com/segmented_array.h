@@ -46,6 +46,7 @@
 #undef long
 #endif // defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
 
+using namespace std;
 #include <vector>
 
 #endif // __SGI_STL_VECTOR_H
@@ -152,11 +153,7 @@ class SEGMENTED_ARRAY
 {
 private:
 
-#ifndef _USE_STL_EXT
     std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *,BOOL> > > map;
-#else
-    std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> > map;
-#endif
 
     MEM_POOL *pool;
     UINT size_;				// total number of elements inserted
@@ -234,7 +231,10 @@ public:
   ~SEGMENTED_ARRAY() {
     // Free memory from blocks. Map memory gets freed when the map
     // vector is destructed.
-    for (std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> >::iterator
+
+    // Yuri: 1/24/03
+    // for (std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> >::iterator
+    for (std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *, BOOL> > >::iterator
 	   entry = map.begin();
 	 entry != map.end();
 	 ++entry) {

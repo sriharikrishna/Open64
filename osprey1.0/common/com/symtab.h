@@ -41,17 +41,8 @@
 // This file should contain only inlined functions for accessing various
 // fields in the symbol table classes.
 
-#ifndef __SGI_STL_SLIST_H
-
-#ifndef _USE_STL_EXT
-#  include <list>
-#else
-#  include <slist>
-#endif
-
+#include <list>
 using namespace std;
-
-#endif // __SGI_STL_SLIST_H
 
 #ifndef segmented_array_INCLUDED
 #include "segmented_array.h"
