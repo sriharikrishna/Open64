@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.16 $
- * $Date: 2004-03-02 21:34:03 $
- * $Author: fzhao $
+ * $Revision: 1.17 $
+ * $Date: 2004-04-13 19:55:11 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.17 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -148,18 +148,18 @@ static const FNAME_PARTIALMAP Fname_Map[] =
   {OPC_U8F4RND, "KNINT"},
   {OPC_U8FQRND, "KIQNNT"},
   {OPC_U8F8RND, "KIDNNT"},
-  {OPC_I4F4TRUNC, "JINT"},
-  {OPC_I4FQTRUNC, "JIQINT"},
-  {OPC_I4F8TRUNC, "JIDINT"},
-  {OPC_U4F4TRUNC, "JINT"},
-  {OPC_U4FQTRUNC, "JIQINT"},
-  {OPC_U4F8TRUNC, "JIDINT"},
-  {OPC_I8F4TRUNC, "KINT"},
-  {OPC_I8FQTRUNC, "KIQINT"},
-  {OPC_I8F8TRUNC, "KIDINT"},
-  {OPC_U8F4TRUNC, "KINT"},
-  {OPC_U8FQTRUNC, "KIQINT"},
-  {OPC_U8F8TRUNC, "KIDINT"},
+  {OPC_I4F4TRUNC, "INT"},
+  {OPC_I4FQTRUNC, "INT"},
+  {OPC_I4F8TRUNC, "INT"},
+  {OPC_U4F4TRUNC, "INT"},
+  {OPC_U4FQTRUNC, "INT"},
+  {OPC_U4F8TRUNC, "INT"},
+  {OPC_I8F4TRUNC, "INT"},
+  {OPC_I8FQTRUNC, "INT"},
+  {OPC_I8F8TRUNC, "INT"},
+  {OPC_U8F4TRUNC, "INT"},
+  {OPC_U8FQTRUNC, "INT"},
+  {OPC_U8F8TRUNC, "INT"},
   {OPC_I4F4CEIL, "CEILING"},
   {OPC_I4FQCEIL, "CEILING"},
   {OPC_I4F8CEIL, "CEILING"},
@@ -600,10 +600,10 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
    /* Infix Fortran operator.  Only string argument are passed by
     * reference; all other argument types are passed by value.
     */
-   const BOOL   parenthesize = !(WN2F_CONTEXT_no_parenthesis(context) ||
-                                WN2F_CONTEXT_subexp_no_parenthesis(context));
-
-   const BOOL   binary_op = (wn0 != NULL);
+   const BOOL parenthesize = !(WN2F_CONTEXT_no_parenthesis(context) ||
+			       WN2F_CONTEXT_subexp_no_parenthesis(context));
+			       
+   const BOOL binary_op = (wn0 != NULL);
 
    TY_IDX      wn0_ty;       /* Expected type of wn0 */
    TY_IDX      wn1_ty;       /* Expected type of wn1 */
@@ -1820,65 +1820,47 @@ WN2F_nmsub(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 WN2F_STATUS 
 WN2F_const(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
-  const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
-  BOOL neg_num = 0;
+   const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+   BOOL add_paren = false;
   
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_CONST, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_const"));
 
-
-   if (parenthesize && !WN2F_CONTEXT_is_logical_arg(context))
-      {
-        switch (TCON_ty(STC_val(WN_st(wn))))
-         {
-            case MTYPE_F4:
-                 neg_num = (TCON_fval(STC_val(WN_st(wn)))<0);
-                 break;
-            case MTYPE_F8:
-                 neg_num = (TCON_dval(STC_val(WN_st(wn)))<0);
-		 break;
-            case MTYPE_FQ:
-                 neg_num = (TCON_qval(STC_val(WN_st(wn)))<0);
-		 break;
-
-         }
-
-        switch (TCON_ty(STC_val(WN_st(wn))))
-          {
-            case MTYPE_F4:
-            case MTYPE_F8:
-            case MTYPE_FQ:
-
-              if (neg_num)  {
-                  Append_Token_Special(tokens, '(');
-                  TCON2F_translate(tokens,
-		                   STC_val(WN_st(wn)),
-		                   (TY_is_logical(ST_type(WN_st(wn))) ||
-		                     WN2F_CONTEXT_is_logical_arg(context)));
-                   Append_Token_Special(tokens, ')');
-                 }
-               else 
-                   TCON2F_translate(tokens,
-                                   STC_val(WN_st(wn)),
-                                   (TY_is_logical(ST_type(WN_st(wn))) ||
-                                     WN2F_CONTEXT_is_logical_arg(context)));
-
-               break;
-             default:
-                  TCON2F_translate(tokens,
-                                   STC_val(WN_st(wn)),
-                                   (TY_is_logical(ST_type(WN_st(wn))) ||
-                                     WN2F_CONTEXT_is_logical_arg(context)));
-                   break;
-             } /*switch*/
-        } 
-      else
-        TCON2F_translate(tokens,
-                          STC_val(WN_st(wn)),
-                          (TY_is_logical(ST_type(WN_st(wn))) ||
-                           WN2F_CONTEXT_is_logical_arg(context)));
-
-
+   /* eraxxon: always parenthesize negative constants to prevent generation of
+      code like "x + -73" */
+   TCON& tcon = STC_val(WN_st(wn));
+   if (parenthesize && !WN2F_CONTEXT_is_logical_arg(context)) {
+      BOOL neg_num = 0;
+      switch (TCON_ty(tcon))
+	{
+	case MTYPE_F4:
+	  neg_num = (TCON_fval(tcon) < 0);
+	  break;
+	case MTYPE_F8:
+	  neg_num = (TCON_dval(tcon) < 0);
+	  break;
+	case MTYPE_FQ:
+	  neg_num = (TCON_qval(tcon) < 0);
+	  break;
+	case MTYPE_I1:
+	case MTYPE_I2:
+	case MTYPE_I4:
+	case MTYPE_I8:
+	  neg_num = (TCON_ival(tcon) < 0);
+	  break;
+	}
+      add_paren = (neg_num);
+   }
+   
+   if (add_paren) {
+     Append_Token_Special(tokens, '(');
+   }
+   TCON2F_translate(tokens, tcon, (TY_is_logical(ST_type(WN_st(wn))) ||
+				   WN2F_CONTEXT_is_logical_arg(context)));
+   if (add_paren) {
+     Append_Token_Special(tokens, ')');
+   }
+   
    if (parenthesize)
        reset_WN2F_CONTEXT_no_parenthesis(context);
 
