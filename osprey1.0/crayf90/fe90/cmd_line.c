@@ -36,6 +36,11 @@
 
 static char USMID[] = "\n@(#)5.0_pl/sources/cmd_line.c	5.16	10/20/99 17:17:46\n";
 
+#include <unistd.h> /* for getopt(), optarg, optind, opterr, optopt */
+#if defined(__linux__) 
+# include <getopt.h> /* for optind, opterr, optopt */
+#endif
+
 # include "defines.h"		/* Machine dependent ifdefs */
 
 # include "host.m"		/* Host machine dependent macros.*/
@@ -129,10 +134,6 @@ int process_cmd_line(int   argc,
 {
    char		err_char;
    int		err_ind;
-   extern char *optarg;					/* defined in getopt  */
-   extern int	opterr;					/* defined in getopt  */
-   extern int	optind;					/* defined in getopt  */
-   extern int	optopt;					/* defined in getopt  */
    int		option;
    int		i;
 
@@ -159,7 +160,7 @@ int process_cmd_line(int   argc,
 
    save_argc = argc;
 
-   opterr = 0;						/* disable lib msgs   */
+   opterr = 0;						/* disable lib msgs  */
 
    init_cmd_line ();
 
