@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.6 $
- * $Date: 2002-09-18 17:51:41 $
+ * $Revision: 1.7 $
+ * $Date: 2002-10-09 18:40:02 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.7 $";
 #endif
 
 #include <ctype.h>
@@ -495,7 +495,7 @@ ST2F_use_var(TOKEN_BUFFER tokens, ST *st)
    return_ty = PUINFO_RETURN_TY;
    if ((return_ty != (TY_IDX) 0 && 
 	TY_kind(return_ty) == KIND_SCALAR && 
-	ST_is_return_var(st)) ||
+	ST_is_return_var(st)) ||    
        (PUINFO_RETURN_TO_PARAM && st == PUINFO_RETURN_PARAM))
    {
       /* If we have a reference to the implicit return-variable, then
@@ -742,7 +742,9 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       Append_Token_Special(header_tokens, '(');
       Append_Token_Special(header_tokens, ')');
    }
-
+/* need to see if the result variable has same name with the function's 
+ * name,if it does,don't declare the result variable
+ */
     if (rslt !=NULL) {
       for (int i=0;i<strlen(func_name);i++) 
          cptl_func_name[i] = toupper(func_name[i]);
@@ -782,8 +784,12 @@ ST2F_func_header(TOKEN_BUFFER tokens,
        if (TY_Is_Pointer(return_ty))
 	 TY2F_translate(header_tokens, 
 			Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-       else
-	 TY2F_translate(header_tokens, return_ty);
+       else {
+              if (TY_kind(return_ty)==KIND_ARRAY)
+                   TY2F_translate(header_tokens,TY_AR_etype(return_ty));
+                 else
+	           TY2F_translate(header_tokens, return_ty);
+            }
      }
    }
    else /* subroutine */
@@ -853,7 +859,8 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       for (param = first_param; param < num_params -implicit_parms; param++)
       {
 	 Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-	 if (params[param] != NULL && !ST_is_return_var(params[param])) {
+//	 if (params[param] != NULL && !ST_is_return_var(params[param])) {
+	 if (params[param] != NULL ) {
 
 	     ST2F_decl_translate(header_tokens, params[param]);
              if (ST_is_optional_argument( params[param])) {
