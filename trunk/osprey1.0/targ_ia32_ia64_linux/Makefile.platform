@@ -21,8 +21,8 @@ BUILD_VARIANT  = DEFAULT
 BUILD_SB       = NO
 
 
-CFLAGS += -D_POSIX_SOURCE -D_BSD_SOURCE
-CXXFLAGS += -D_POSIX_SOURCE -D_BSD_SOURCE
+#CFLAGS += -D_POSIX_SOURCE -D_BSD_SOURCE
+#CXXFLAGS += -D_POSIX_SOURCE -D_BSD_SOURCE
 
 #-----------------------------------------------------------------------
 #  If C++ Standard Template Library Extension (slist, hashtable, etc)
