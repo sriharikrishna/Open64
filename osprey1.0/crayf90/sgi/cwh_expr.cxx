@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_expr
- * $Revision: 1.6 $
- * $Date: 2003-04-09 20:30:51 $
+ * $Revision: 1.7 $
+ * $Date: 2003-05-23 16:05:38 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -583,6 +583,79 @@ cwh_expr_compare(OPERATOR op,TY_IDX  ty)
   cwh_stk_push_typed(wn,WN_item,ty);
 }
 
+/*===================================================
+ */
+extern void
+fei_leqv(TYPE type)
+ {
+/* generate whirl node with OPR=EQ,but set flag is "logical"*/
+  WN *rhs ;
+  WN *lhs ;
+  WN *wn  ;
+  WN *ae=NULL;
+  TY_IDX ty = cast_to_TY(t_TY(type));
+  TYPE_ID bt  ;
+  OPCODE  opc ;
+  
+
+    rhs = cwh_expr_operand(&ae);
+    lhs = cwh_expr_operand(&ae);
+
+    bt  = cwh_get_highest_type(rhs,lhs);
+    opc = cwh_make_typed_opcode(OPR_EQ, MTYPE_I4, Mtype_comparison(bt));
+    lhs = cwh_convert_to_ty(lhs,bt);
+    rhs = cwh_convert_to_ty(rhs,bt);
+
+    wn  = WN_CreateExp2 ( opc, lhs, rhs) ;
+
+    WN_set_ty(wn,ty);
+
+    wn  = cwh_expr_restore_arrayexp(wn,ae);
+
+/* set eq_logical_flag is LOGICAL */
+
+   WN_Set_Eq_Is_Logical(wn);
+
+    cwh_stk_push_typed(wn,WN_item,ty);
+
+
+ }
+
+extern void
+fei_lxor(TYPE type)
+{
+/*generate whirl node with OPR=NEQ,but set flag is "logical" */
+  WN *rhs ;
+  WN *lhs ;
+  WN *wn  ;
+  WN *ae=NULL;
+  TY_IDX ty = cast_to_TY(t_TY(type));
+
+  TYPE_ID bt  ;
+  OPCODE  opc ;
+
+    rhs = cwh_expr_operand(&ae);
+    lhs = cwh_expr_operand(&ae);
+
+    bt  = cwh_get_highest_type(rhs,lhs);
+    opc = cwh_make_typed_opcode(OPR_NE, MTYPE_I4, Mtype_comparison(bt));
+    lhs = cwh_convert_to_ty(lhs,bt);
+    rhs = cwh_convert_to_ty(rhs,bt);
+
+    wn  = WN_CreateExp2 ( opc, lhs, rhs) ;
+
+    WN_set_ty(wn,ty);
+
+    wn  = cwh_expr_restore_arrayexp(wn,ae);
+
+/* set eq_logical_flag is LOGICAL */
+
+    WN_Set_Eq_Is_Logical(wn);
+
+    cwh_stk_push_typed(wn,WN_item,ty);
+}
+
+
 /*===============================================
  *
  * cwh_expr_compare_char
@@ -1047,12 +1120,12 @@ compare_routine(fei_ne,OPR_NE)
 compare_bitwise(fei_and,OPR_BAND)
 compare_bitwise(fei_xor,OPR_BXOR)
 compare_logical(fei_land ,OPC_I4LAND, OPC_I4CAND)
-compare_routine(fei_leqv ,OPR_EQ)
+// compare_routine(fei_leqv ,OPR_EQ)
 compare_logical(fei_lor ,OPC_I4LIOR, OPC_I4CIOR)
 binop_shift_routine(fei_lshift ,OPR_SHL)
 binop_shift_routine(fei_rshift ,OPR_LSHR)
 binop_shift_routine(fei_ashift ,OPR_ASHR)
-compare_routine(fei_lxor ,OPR_NE)
+// compare_routine(fei_lxor ,OPR_NE)
 compare_bitwise(fei_or ,OPR_BIOR)
 
 
@@ -1226,7 +1299,7 @@ unop_routine(fei_uminus,OPR_NEG)
  *===============================================
  */ 
 extern void
-fei_paren(TYPE type)
+fei_paren(TYPE type,INT processing_call)
 {
 
   TY_IDX  ty ;
@@ -1236,9 +1309,10 @@ fei_paren(TYPE type)
   ty = cwh_types_scalar_TY(ty);
   t = TY_mtype(ty);
   
-//  if (MTYPE_is_float(t) || MTYPE_is_complex(t)) { 
+  if (MTYPE_is_float(t) || MTYPE_is_complex(t) || 
+       processing_call) { 
      cwh_expr_unop(OPR_PAREN,ty);
-//  }
+  }
 }
 
 /*===============================================
