@@ -12114,7 +12114,6 @@ static void  send_procedure(int			attr_idx,
       }
 
       proc = ATP_PROC(attr_idx);
-
       if (SCP_PARENT_IDX(curr_scp_idx) != NULL_IDX  &&
           (ATP_PGM_UNIT(SCP_ATTR_IDX(SCP_PARENT_IDX(curr_scp_idx))) != Module
             || TRUE)) { 
@@ -13010,10 +13009,8 @@ static void  send_namelist_group(int	ng_attr_idx,int in_model)
 static void send_interface_list(int ng_attr_idx)
 
 {
-   int          attr_idx;
    int          sn_idx;
    int          kind_interface = 0;
-   int          pu_in_interface=curr_scp_idx+1;
    boolean      is_imported;
    int i;
    int kids_count;
@@ -13022,19 +13019,18 @@ static void send_interface_list(int ng_attr_idx)
    TRACE (Func_Entry, "send_interface_list", NULL);
 
 
-
-/*      if (ATP_PGM_UNIT(SCP_ATTR_IDX(curr_scp_idx)) != Module  ) { */
-
          /* This is an interface block that has the same name as one of */
          /* its program units.  The program unit has to go through the  */
          /* interface.                                                  */
 
          if (ATI_PROC_IDX(ng_attr_idx) != NULL_IDX &&
-             PDG_AT_IDX(ATI_PROC_IDX(ng_attr_idx)) == NULL_IDX) {
+             PDG_AT_IDX(ATI_PROC_IDX(ng_attr_idx)) == NULL_IDX ) {
             send_procedure(ATI_PROC_IDX(ng_attr_idx),
                            NULL_IDX,
-                           Imported);
+                           In_Interface);
+
          }
+
 
          /* Need to send generic - explicit names if generating debug tbls */
 
@@ -13063,7 +13059,11 @@ static void send_interface_list(int ng_attr_idx)
                 kind_interface = 3;
            } 
  
-     is_imported = AT_MODULE_IDX(ng_attr_idx);
+/*      is_imported = AT_MODULE_IDX(ng_attr_idx); */
+       if (AT_MODULE_IDX(ng_attr_idx) !=NULL)
+          is_imported = 1;
+       else
+          is_imported =0;
 
 # ifdef _ENABLE_FEI
 # if defined(GENERATE_WHIRL)

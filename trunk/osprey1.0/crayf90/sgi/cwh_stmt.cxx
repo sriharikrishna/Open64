@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.5 $
- * $Date: 2002-08-16 19:30:28 $
+ * $Revision: 1.6 $
+ * $Date: 2002-09-05 21:42:18 $
  * $Author: open64 $
  *
  * Revision history:
@@ -4728,6 +4728,17 @@ fei_array_construct(INT32 nlist,TYPE ty)
 
       lists[i]= cwh_stk_pop_WN();
       break ;
+
+    case ST_item:
+    case ST_item_whole_array:
+    case FLD_item:
+      lists[i] = cwh_expr_operand(NULL);
+      break;
+
+    case DEREF_item:
+      lists[i] = cwh_stk_pop_DEREF();
+      break;
+
     default:
       DevAssert((0),("Odd call actual")) ;
     }
