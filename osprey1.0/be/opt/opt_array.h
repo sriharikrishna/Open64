@@ -2,9 +2,9 @@
 //=====================================================================
 //
 // Module: opt_array.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:46 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2004-12-01 16:43:05 $
+// $Author: eraxxon $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_array.h,v $
 //
 // Revision history:
@@ -54,7 +54,7 @@
 #ifndef opt_array_INCLUDED
 #define opt_array_INCLUDED "opt_array.h"
 #ifdef _KEEP_RCS_ID
-static char *opt_arrayrcs_id = opt_array_INCLUDED"$ $Revision: 1.1.1.1 $";
+static char *opt_arrayrcs_id = opt_array_INCLUDED"$ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -64,7 +64,7 @@ typedef struct mem_pool MEM_POOL;
 #include "defs.h"
 #include "opt_defs.h"
 #include "opt_sys.h"
-
+#include "erglob.h"
 
 //----------------------------------------------------------------------------
 // fixed size array template
