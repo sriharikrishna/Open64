@@ -619,13 +619,13 @@ BE_DSO = $(addsuffix $(DSOext), be)
 ifeq ($(BUILD_VARIANT), BEDRIVER)
   TARGETS = $(BE_EXE)
 else
-  ifeq ($(BUILD_OS), IRIX)
-    TARGETS = $(BE_DSO)
-  else
-    TARGETS = $(BE_DSO)
-  endif
+##FMZ  ifeq ($(BUILD_OS), IRIX)
+#    TARGETS = $(BE_DSO)
+#  else
+#    TARGETS = $(BE_DSO) 
+#  endif
+  TARGETS = $(BE_DSO) $(BE_EXE) ##FMZ
 endif
-
 #----------------------------------------------------------------------
 #  Variables describing additional sources, objects, and libraries
 #----------------------------------------------------------------------
@@ -848,11 +848,12 @@ endif
 # VENDOR
 #-------------------------------------------------
 $(BE_EXE):  $(BE_DSO) $(BE_DRIVER_OBJS) $(LINK_DSO) $(EXPORT_FILE_BE)
-	if test ! -r $(WHIRL2F_DSO); then \
-	  ln -f -s $(TARGDIR)/whirl2f/$(WHIRL2F_DSO) $(WHIRL2F_DSO); \
-	fi
+##FMZ	if test ! -r $(WHIRL2F_DSO); then \
+#	  ln -f -s $(TARGDIR)/whirl2f/$(WHIRL2F_DSO) $(WHIRL2F_DSO); \
+#	fi
 	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) $(BE_SPECIAL_OPT) \
-	  $(BE_DSO) $(WHIRL2F_DSO) $(LDFLAGS) $(LINK_DSO_OPTS) \
+###FMZH	  $(BE_DSO) $(WHIRL2F_DSO) $(LDFLAGS) $(LINK_DSO_OPTS) \
+	  $(BE_DSO)  $(LDFLAGS) $(LINK_DSO_OPTS) \
 	  $(LINK_DSO) $(BE_SYS_LIBS)
 	-rm -f bedriver
 #	if [ ! -l wopt.so ]; then ln -sf $(TARG_WOPT_DIR)/wopt.so .; fi
@@ -886,9 +887,9 @@ else
 # non VENDOR
 #-------------------------------------------------
 $(BE_EXE): $(BE_DRIVER_OBJS) $(LINK_DSO) $(EXPORT_FILE_BE)
-	if test ! -r $(WHIRL2F_DSO); then \
-	  ln -f -s $(TARGDIR)/whirl2f/$(WHIRL2F_DSO) $(WHIRL2F_DSO); \
-	fi
+#FMZ	if test ! -r $(WHIRL2F_DSO); then \
+#	  ln -f -s $(TARGDIR)/whirl2f/$(WHIRL2F_DSO) $(WHIRL2F_DSO); \
+#	fi
 #	if ! test -f cg.so; then ln -sf $(TARG_CG_DIR)/cg.so .; fi
 #	if ! test -f wopt.so; then ln -sf $(TARG_WOPT_DIR)/wopt.so .; fi
 #	if ! test -f lno.so; then ln -sf ../lno/lno.so .; fi
@@ -904,7 +905,9 @@ $(BE_EXE): $(BE_DRIVER_OBJS) $(LINK_DSO) $(EXPORT_FILE_BE)
 #	  ln -sf $(TARG_TARG_INFO_DIR)/pentium.so .; \
 #	fi
 # endif
-	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) $(BE_DSO) $(WHIRL2F_DSO) \
+#FMZ	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) $(BE_DSO) $(WHIRL2F_DSO) \
+#
+	$(C++F) -o $(BE_EXE) $(BE_DRIVER_OBJS) $(BE_DSO) \
 	  $(LDFLAGS) $(LINK_DSO_OPTS) $(LINK_DSO) $(BE_SYS_LIBS)
 endif
 
