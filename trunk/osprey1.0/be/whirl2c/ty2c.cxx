@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2c.c
- * $Revision: 1.6 $
- * $Date: 2003-10-21 17:38:04 $
- * $Author: fzhao $
+ * $Revision: 1.7 $
+ * $Date: 2003-12-09 19:22:27 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $
  *
  * Revision history:
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -64,12 +64,14 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "unparse_target.h"
 
 #if defined(__GNUC__) && (__GNUC__ == 3) 
-#include <ext/hash_set>
-using namespace __gnu_cxx;
-#elif defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-#include <set>
+# define USING_HASH_SET 1
+# include <ext/hash_set>
+  using namespace __gnu_cxx;
+#elif defined(__sgi) && !defined(__GNUC__)
+# define USING_HASH_SET 1
+# include <hash_set>
 #else
-#include <hash_set>
+# include <set>
 #endif
 
 /*------------------ macros, types, and local state -------------------*/

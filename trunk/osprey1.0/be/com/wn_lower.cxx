@@ -46,12 +46,14 @@
 #include <map>
 
 #if defined(__GNUC__) && (__GNUC__ == 3) 
-#include <ext/hash_set>
-using namespace __gnu_cxx;
-#elif defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-#include <set>
+# define USING_HASH_SET 1
+# include <ext/hash_set>
+  using namespace __gnu_cxx;
+#elif defined(__sgi) && !defined(__GNUC__)
+# define USING_HASH_SET 1
+# include <hash_set>
 #else
-#include <hash_set>
+# include <set>
 #endif
 
 #include "defs.h"
@@ -5846,7 +5848,6 @@ no_shared:
 	  }
 	  break;
 	default:
-	  #pragma mips_frequency_hint NEVER
 	  FmtAssert (FALSE, ("Unexpected division operator"));
 	  /*NOTREACHED*/
 	}
@@ -11741,12 +11742,12 @@ static WN *lower_do_while(WN *block, WN *tree, LOWER_ACTIONS actions)
   return tree;
 }
 
-//map the old label name to the new one
+// map the old label name to the new one
 static map<int, int> label_map;
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-static set<int> labels;
-#else
+#if defined(USING_HASH_SET)
 static hash_set<int> labels;
+#else
+static set<int> labels;
 #endif
 
 static WN *lower_while_do(WN *block, WN *tree, LOWER_ACTIONS actions);
