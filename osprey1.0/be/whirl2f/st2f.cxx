@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.7 $
- * $Date: 2002-10-09 18:40:02 $
+ * $Revision: 1.8 $
+ * $Date: 2002-10-11 21:39:11 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.8 $";
 #endif
 
 #include <ctype.h>
@@ -785,7 +785,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
 	 TY2F_translate(header_tokens, 
 			Stab_Mtype_To_Ty(TY_mtype(return_ty)));
        else {
-              if (TY_kind(return_ty)==KIND_ARRAY)
+              if (TY_kind(return_ty)==KIND_ARRAY && !TY_is_character(return_ty)) /*try Oct*/
                    TY2F_translate(header_tokens,TY_AR_etype(return_ty));
                  else
 	           TY2F_translate(header_tokens, return_ty);

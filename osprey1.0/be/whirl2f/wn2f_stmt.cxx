@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.15 $
- * $Date: 2002-10-09 18:40:02 $
+ * $Revision: 1.16 $
+ * $Date: 2002-10-11 21:42:12 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.15 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.16 $";
 #endif
 
 #include <alloca.h>
@@ -3215,7 +3215,7 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
              TY2F_translate(header_tokens,
                          Stab_Mtype_To_Ty(TY_mtype(return_ty)));
           else {
-                 if (TY_kind(return_ty)==KIND_ARRAY)
+                 if (TY_kind(return_ty)==KIND_ARRAY && !TY_is_character(return_ty))
                    TY2F_translate(header_tokens,TY_AR_etype(return_ty));
                  else
                    TY2F_translate(header_tokens, return_ty);
