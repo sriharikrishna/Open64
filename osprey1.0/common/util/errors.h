@@ -47,9 +47,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: errors.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:08 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-07-16 19:41:34 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/errors.h,v $
  *
  * Revision history:
@@ -392,7 +392,7 @@ extern "C" {
 #endif
 
 extern void Abort_Compiler_Location (
-  char* file_name,
+  const char* file_name,
   INT line_number
 );
 #pragma mips_frequency_hint NEVER Abort_Compiler_Location

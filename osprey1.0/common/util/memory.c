@@ -220,7 +220,7 @@ static INT_LIST *free_int_lists;    /* Free list of INT_LISTs.
  */
 
 struct mem_stat {
-  char *file;                   /* File called from
+  const char *file;             /* File called from
                                  */
   INT32 line;                   /* Line called from
                                  */
@@ -454,10 +454,10 @@ static MEM_STAT *call_site_hash_tab[N_BUCKETS];
 static UINT32
 Hash(
   INT32 line,
-  char *file
+  const char *file
 )
 {
-  char *p;
+  const char *p;
   UINT32 result = line;
 
   /* Somebody once told me this was a good idea.  It probably spreads
@@ -488,7 +488,7 @@ Hash_Get(
   UINT32 hn,
   MEM_POOL *pool,
   INT32  line,
-  char  *file
+  const char  *file
 )
 {
   MEM_STAT *as;
@@ -937,8 +937,8 @@ MEM_Tracing_Enable(void)
 
 
 #if Is_True_On
-char *special_address = NULL;
-char *special_address_owner = "NOBODY";
+const char *special_address = NULL;
+const char *special_address_owner = "NOBODY";
 #endif
 
 /* ====================================================================
@@ -1805,7 +1805,7 @@ void
 MEM_POOL_Initialize_P
 (
   MEM_POOL     *pool,
-  char         *name,
+  const char   *name,
   BOOL          bzero
   MEM_STAT_ARGS(line,file)
 )
@@ -1868,7 +1868,7 @@ MEM_POOL_Initialize_P
 void
 MEM_Initialize(void)
 {
-  char* ppools = getenv ("PURIFY_MEMPOOLS");
+  const char* ppools = getenv ("PURIFY_MEMPOOLS");
   if (ppools) {
     if (((ppools[0] == 'O') || (ppools[0] == 'o')) &&
         ((ppools[1] == 'N') || (ppools[1] == 'n'))) {

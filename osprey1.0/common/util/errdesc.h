@@ -43,9 +43,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: errdesc.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:08 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-07-16 19:41:34 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/errdesc.h,v $
  *
  * This header describes the structure used to create the error message
@@ -105,7 +105,7 @@ typedef struct {
     mINT16	ecode;		/* The error code */
     mINT16	flags;		/* Miscellaneous flags */
     Rag_Err_Num rag_errnum;	/* External error/warning number */
-    char	*emsg;		/* The message format */
+    const char	*emsg;		/* The message format */
     mUINT8	parms;		/* The parameter count */
     mUINT8	kinds[MAX_ERR_PARMS];	/* Parameter types */
 } ERROR_DESC;
@@ -128,7 +128,7 @@ typedef struct {
 typedef struct error_desc_table {
     INT		phase;		/* The phase number of this array */
     ERROR_DESC *descriptors;	/* The list of error descriptors */
-    char       *name;		/* The phase name */
+    const char *name;		/* The phase name */
 } ERROR_DESC_TABLE;
 
 #ifdef __cplusplus
