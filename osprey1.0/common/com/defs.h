@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: defs.h
- * $Revision: 1.6 $
- * $Date: 2003-11-11 20:42:03 $
+ * $Revision: 1.7 $
+ * $Date: 2003-11-21 22:07:31 $
  *
  * Revision history:
  *  21-Aug-89 - Original Version
@@ -81,10 +81,9 @@
 
 /* Solaris workaround
  */
-#if defined(_SOLARIS_SOLARIS)
+#if defined(_SOLARIS_SOLARIS) || defined(_SGI_SGI)
 #include <strings.h>
 #else
-/* #include <bstring.h>	*/  /* for bzero */
 #include <string.h>	/* for bzero */
 #endif
 
