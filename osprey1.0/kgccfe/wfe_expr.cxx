@@ -2683,7 +2683,9 @@ WFE_Expand_Expr (tree exp,
 #else
 			      field_id != 0 ? hi_ty_idx : iload_ty_idx, 
 #endif
-			      Make_Pointer_Type (hi_ty_idx, FALSE),
+//			      Make_Pointer_Type (hi_ty_idx, FALSE),
+//bug code for structure field in iload---FMZ July 1,2004
+     			      Make_Pointer_Type (field_id!=0?ty_idx:hi_ty_idx, FALSE),
 			      wn0, field_id);
 	}
       }
