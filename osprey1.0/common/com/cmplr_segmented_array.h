@@ -365,7 +365,7 @@ public:
 
     // Yuri: 1/24/03
     // for (std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> >::iterator
-    for (std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *, BOOL> > >::iterator
+    for (TYPENAME std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *, BOOL> > >::iterator
 	   entry = map.begin();
 	 entry != map.end();
 	 ++entry) {

@@ -912,7 +912,10 @@ public:
 #endif /* WN_NO_ACCESSOR_FUNCTIONS */
 };
 
-#define WN_OFFSET_IN_STMT_WN (offsetof(STMT_WN,wn))
+/* WEI: Fix around the warning for offsetof */
+#define my_offsetof(type, field) ((int)(UINTPS)&(((type*)(UINTPS)0x10)->field)-0x10)
+
+#define WN_OFFSET_IN_STMT_WN (my_offsetof(STMT_WN,wn))
 
 #define WN_CAST_WN_TO_STMT_WN(x) ((STMT_WN *)((UINTPS)x - WN_OFFSET_IN_STMT_WN))
 

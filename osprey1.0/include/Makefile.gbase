@@ -319,6 +319,7 @@ default:
 	      ln -sf $(BUILD_TOT)/linux/include/$$h $$h; \
 	    fi; \
 	done
+	@mkdir -p sys
 	@for h in $(LINUX_SYS_HFILES); do \
 	    if ! test -a $$h; then \
 	      ln -sf $(BUILD_TOT)/linux/include/sys/$$h sys/$$h; \

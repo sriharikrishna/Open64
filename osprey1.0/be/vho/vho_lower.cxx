@@ -59,6 +59,8 @@
 #include "wb_f90_lower.h"
 #include "wn_lower.h"
 
+#include <map>
+
 typedef enum {
   ADDRESS_USED,
   ADDRESS_PASSED,
@@ -3307,18 +3309,35 @@ vho_lower_expr ( WN * wn, WN * block, BOOL_INFO * bool_info )
       WN_kid1(wn) = vho_lower_expr (WN_kid1(wn), block, NULL);
       break;
 
-    case OPR_LDID:
+  case OPR_LDID:
 
-      break;
-
-    case OPR_LDA:
-    case OPR_CONST:
-    case OPR_INTCONST:
-    case OPR_IDNAME:
-
-      /* No need to lower */
-      break;
-
+    /*
+      WN* call = NULL;
+      //WEI: replace MYTHREAD/THREADS to the appropraite runtime calls
+      if (strcmp(ST_name(WN_st(wn)), "MYTHREAD") == 0) {
+      call = WN_Create(OPR_INTRINSIC_CALL, MTYPE_U4, MTYPE_V, 0);
+      WN_intrinsic(call) = INTRN_MYTHREAD;
+      } 
+      if (strcmp(ST_name(WN_st(wn)), "THREADS") == 0) {
+      call = WN_Create(OPR_INTRINSIC_CALL, MTYPE_U4, MTYPE_V, 0);
+      WN_intrinsic(call) = INTRN_THREADS;
+      }
+      if (call != NULL) {
+      WN* block = WN_CreateBlock();
+      WN_INSERT_BlockLast(block, call);
+      WN* ld = WN_Ldid(MTYPE_U4, -1, Return_Val_Preg, MTYPE_To_TY(MTYPE_U4));
+      wn = WN_CreateComma(OPR_COMMA, MTYPE_U4, MTYPE_V, block, ld);
+      }
+    */
+    break;
+  case OPR_LDA:
+  case OPR_CONST:
+  case OPR_INTCONST:
+  case OPR_IDNAME:
+    
+    /* No need to lower */
+    break;
+    
     case OPR_LOOP_INFO:
 
       FmtAssert ( TRUE, ("unexpected operator encountered in vho_lower") );
@@ -3498,10 +3517,10 @@ vho_lower_mstore ( WN * wn, WN * block )
   return wn;
 } /* vho_lower_mstore */
 
-
 static WN *
 vho_lower_stid ( WN * wn, WN * block )
 {
+  
   WN_kid0(wn) = vho_lower_expr ( WN_kid0(wn), block, NULL );
   return wn;
 } /* vho_lower_stid */
@@ -3655,44 +3674,44 @@ vho_lower_stmt ( WN * wn, WN * block )
   VHO_Srcpos = WN_Get_Linenum(wn);
 
   switch ( WN_operator(wn) ) {
-
-    case OPR_DEALLOCA:
-
-      break;
-
-    case OPR_REGION_EXIT:
-
-      break;
-
-    case OPR_COMPGOTO:
-
-      wn = vho_lower_compgoto ( wn, block );
-      break;
-
-    case OPR_SWITCH:
-
-      wn = vho_lower_switch ( wn, block );
-      break;
-
-    case OPR_CASEGOTO:
-
-      wn = vho_lower_casegoto ( wn, block );
-      break;
-
-    case OPR_XGOTO:
-    case OPR_GOTO:
-    case OPR_AGOTO:
-    case OPR_ALTENTRY:
-
-      break;
-
-    case OPR_TRUEBR:
-
-      wn = vho_lower_truebr ( wn, block );
-      break;
-
-    case OPR_RETURN:
-
+    
+  case OPR_DEALLOCA:
+    
+    break;
+    
+  case OPR_REGION_EXIT:
+    
+    break;
+    
+  case OPR_COMPGOTO:
+    
+    wn = vho_lower_compgoto ( wn, block );
+    break;
+    
+  case OPR_SWITCH:
+    
+    wn = vho_lower_switch ( wn, block );
+    break;
+    
+  case OPR_CASEGOTO:
+    
+    wn = vho_lower_casegoto ( wn, block );
+    break;
+    
+  case OPR_XGOTO:
+  case OPR_GOTO:
+  case OPR_AGOTO:
+  case OPR_ALTENTRY:
+    
+    break;
+    
+  case OPR_TRUEBR:
+    
+    wn = vho_lower_truebr ( wn, block );
+    break;
+    
+  case OPR_RETURN:
+      
       wn = vho_lower_return ( wn, block );
       break;
 
@@ -3755,10 +3774,10 @@ vho_lower_stmt ( WN * wn, WN * block )
 
       break;
 
-    case OPR_MSTORE:
-
-      wn = vho_lower_mstore ( wn, block );
-      break;
+  case OPR_MSTORE:
+    
+    wn = vho_lower_mstore ( wn, block );
+    break;
 
     case OPR_STID:
 
@@ -4771,7 +4790,6 @@ vho_lower_rename_labels_defined ( WN * wn )
 
 // ============================================================================
 
-
 static WN *
 vho_lower_while_do ( WN * wn, WN *block )
 {
@@ -5105,7 +5123,6 @@ vho_lower_while_do ( WN * wn, WN *block )
   return wn;
 } /* vho_lower_while_do */
 
-
 static INT32 vho_if_nest_level = 0;
 
 
@@ -5277,7 +5294,6 @@ vho_lower_block ( WN * old_block )
   return block;
 } /* vho_lower_block */
 
-
 static WN *
 vho_lower_scf ( WN * wn, WN * block )
 {
@@ -5289,16 +5305,17 @@ vho_lower_scf ( WN * wn, WN * block )
 
   switch ( WN_opcode(wn) ) {
 
-    case OPC_DO_WHILE:
-
-      wn = vho_lower_do_while ( wn, block );
-      break;
-
-    case OPC_WHILE_DO:
-
+  case OPC_DO_WHILE:
+    
+    wn = vho_lower_do_while ( wn, block );
+    break;
+    
+  case OPC_WHILE_DO: 
+    {
+      WN* body = WN_while_body(wn);
       wn = vho_lower_while_do ( wn, block );
       break;
-
+    }
     case OPC_DO_LOOP:
 
       wn = vho_lower_do_loop ( wn, block );
@@ -5378,7 +5395,6 @@ WN *
 VHO_Lower ( WN * wn )
 {
   wn = vho_lower ( wn, NULL );
-
   return wn;
 } /* VHO_Lower */
 

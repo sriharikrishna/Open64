@@ -44,6 +44,16 @@
 #include <alloca.h>
 #include <sys/signal.h>
 #include <elf.h>
+#include <map>
+
+#if defined(__GNUC__) && (__GNUC__ == 3) 
+#include <ext/hash_set>
+using namespace __gnu_cxx;
+#elif defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
+#include <set>
+#else
+#include <hash_set>
+#endif
 
 #include "defs.h"
 #include "config.h"
@@ -87,6 +97,8 @@
 #include "opt_cvtl_rule.h"
 #include "fb_whirl.h"
 #include "intrn_info.h"
+#include "upc_symtab_utils.h"
+#include "upc_wn_util.h"
 
 /* My changes are a hack till blessed by Steve. (suneel) */
 #define SHORTCIRCUIT_HACK 1
@@ -196,6 +208,12 @@ static void lower_tree_copy_maps(WN *, WN *, LOWER_ACTIONS);
 
 static INT32 compute_alignment(WN *, INT64);
 static TYPE_ID compute_next_copy_quantum(TYPE_ID , INT32);
+
+static WN* lower_TLD(WN*, WN*, LOWER_ACTIONS);
+static WN* lower_TLD_lda(WN*, WN*, LOWER_ACTIONS);
+
+static TY_IDX struct_addr_ty(WN* tree);
+static int find_field_from_offset(TY_IDX ty, unsigned int offset);
 
 /* ====================================================================
  *			 private variables
@@ -2649,16 +2667,56 @@ static WN *lower_linearize_array_addr(WN *block, WN *tree,
    */
   {
     WN  *elm_size;
-
+    TY_IDX arr_ty = Get_Type_From_ArrayOp(WN_array_base(tree));
     elm_size = WN_Intconst(rtype, element_size);
-    result = WN_Add(rtype,
-		    WN_array_base(tree),
-		    WN_Mpy(rtype, result, elm_size));
+    
+    if (Type_Is_Shared_Ptr(arr_ty)) {
+      SPTR_ACCUMULATION_STATE saved_acc_state = sptr_accumulation_state;
+      SPTR_OFFSET_TERM_STACK *term_stack;
+      if (sptr_accumulation_state !=  ARRAY_ACCUMULATION) {
+	sptr_accumulation_state = ARRAY_ACCUMULATION;
+	sptr_off_accumulation_stack.push(CXX_NEW(SPTR_OFFSET_TERM_STACK,Malloc_Mem_Pool));
+      }
+      
+      term_stack = sptr_off_accumulation_stack.top();
+      WN *base = lower_expr(block, WN_array_base(tree), actions);
+      
+      if (saved_acc_state == ARRAY_ACCUMULATION) {
+	sptr_accumulation_state = NO_ACCUMULATION;
+	result = lower_expr(block, result, actions);
+	term_stack->push(result);
+	// term_stack->push(WN_Mpy(rtype, result, elm_size));
+	WN_Delete (tree);
+	sptr_accumulation_state = saved_acc_state;
+	return base;
+      } else {
+	sptr_accumulation_state = NO_ACCUMULATION;
+	result = lower_expr(block, result, actions);
+	term_stack->push(result);
+	// term_stack->push(WN_Mpy(rtype, result, elm_size));
+	result  = Combine_Offset_Terms(*term_stack);
+	// if(result)
+// 	  fdump_tree(stderr, result);
+	sptr_accumulation_state = saved_acc_state;
+	sptr_off_accumulation_stack.pop();
+	CXX_DELETE(term_stack, Malloc_Mem_Pool);
+      
+	result  = WN_Create_Shared_Ptr_Arithmetic (base, result, OPR_ADD,
+						   Get_Type_Inner_Size(arr_ty),
+						   Get_Type_Block_Size(arr_ty),
+						   Get_Type_Block_Size(arr_ty) <= 1);
+      }
+    } else {
+      //default case
+      result = WN_Add(rtype,
+		      WN_array_base(tree),
+		      WN_Mpy(rtype, result, elm_size));
+      result = lower_expr(block, result, actions);
+      WN_Delete(tree);	    /* ARRAY node not used */
+    }
   }
   
-  result = lower_expr(block, result, actions);
-
-  WN_Delete(tree);	    /* ARRAY node not used */
+ 
 
   return result;
 }
@@ -3856,7 +3914,7 @@ static WN *lower_return_ldid(WN *block, WN *tree, LOWER_ACTIONS actions)
   TYPE_ID  mtype   = TY_mtype (ty);
 
   Is_True((WN_operator(tree) == OPR_LDID),
-	  ("expected LDID node, not %s", OPCODE_name(WN_opcode(tree))));
+	  ("expected LDID node, not %s", OPCODE_name(WN_opcode(tree))));   
 
   switch (mtype) {
 
@@ -3896,6 +3954,7 @@ static WN *lower_return_ldid(WN *block, WN *tree, LOWER_ACTIONS actions)
   }
 }
 
+
 static TY_IDX
 get_field_type (TY_IDX struct_type, UINT field_id)
 {
@@ -3906,6 +3965,7 @@ get_field_type (TY_IDX struct_type, UINT field_id)
 			     field_id, struct_type));
   return FLD_type (fld);
 }
+
 
 /* ====================================================================
  *
@@ -3920,10 +3980,15 @@ get_field_type (TY_IDX struct_type, UINT field_id)
 static WN *lower_mldid(WN *block, WN *tree, LOWER_ACTIONS actions)
 {
   TY_IDX ty_idx  = WN_ty(tree);
+  TY_IDX fld_idx = WN_field_id(tree) == 0 ? 0 : 
+    get_field_type (ty_idx, WN_field_id (tree));
   TY_IDX pty_idx;
-  UINT64 size    = WN_field_id(tree) == 0 ?
-      TY_size(ty_idx) :
-      TY_size(get_field_type (ty_idx, WN_field_id (tree)));
+
+  UINT64 size    = fld_idx == 0 ? TY_size(ty_idx) : TY_size(fld_idx);
+  
+  if(Action(LOWER_UPC_MFIELD) && WN_field_id(tree) && Type_Is_Shared_Ptr(fld_idx))
+    size = TY_size(TY_To_Sptr_Idx(fld_idx));
+
   WN*    wn;
   WN*    awn;
   WN*    swn;
@@ -3960,6 +4025,10 @@ static WN *lower_miload(WN *block, WN *tree, LOWER_ACTIONS actions)
     get_field_type (WN_ty (tree), WN_field_id (tree));
   TY_IDX pty_idx = WN_load_addr_ty(tree);
   UINT64 size    = TY_size(Ty_Table[ty_idx]);
+  if(Action(LOWER_UPC_MFIELD) && WN_field_id(tree) && Type_Is_Shared_Ptr(ty_idx)) {
+    pty_idx = Make_Pointer_Type(WN_ty(tree));
+    size = TY_size(TY_To_Sptr_Idx(ty_idx));
+  }
   WN*    wn;
   WN*    swn;
 
@@ -3969,6 +4038,8 @@ static WN *lower_miload(WN *block, WN *tree, LOWER_ACTIONS actions)
   swn = WN_CreateIntconst (OPC_U4INTCONST, size);
   wn  = WN_CreateMload (WN_offset(tree), pty_idx, WN_kid0(tree), swn);
   WN_set_field_id(wn, WN_field_id(tree));
+  // if(Action(LOWER_UPC_MFIELD))
+//     return wn;
   wn  = lower_expr (block, wn, actions);
 
   WN_Delete (tree);
@@ -4332,6 +4403,200 @@ static BOOL Is_Fast_Divide(WN *wn)
   return FALSE;
 }
 
+
+
+static WN *lower_parm(WN *block, WN *tree, LOWER_ACTIONS actions){
+  
+
+  Is_True(Action(LOWER_UPC_TO_INTR) && WN_operator(tree) == OPR_PARM,
+	  ("Incorrect call to lower parm",""));
+  
+  WN *kid = WN_kid0(tree);
+  TY_IDX actual_ty;
+  TY_IDX formal_ty = WN_ty(tree);
+  TY_IDX access_ty;
+  INT field_id;
+  WN_OFFSET offset;
+  WN *result;
+  INTRINSIC iop;
+
+ 
+    
+  SPTR_ACCUMULATION_STATE saved_acc_state = sptr_accumulation_state;
+  sptr_accumulation_state = NO_ACCUMULATION;
+  
+  field_id = WN_field_id(kid);
+  offset = WN_offset(kid);
+  
+  switch (WN_operator(kid)) {
+  case OPR_LDID: {
+    BOOL cvt = FALSE;
+    INTRINSIC iop;
+    if(field_id) {
+      actual_ty = WN_object_ty(kid);
+      access_ty = WN_ty(kid);
+    } else
+      actual_ty = ST_type(WN_st(kid));
+    
+    if(Type_Is_Shared_Ptr(formal_ty)) {
+      if(!Type_Is_Shared_Ptr(actual_ty) || 
+	 ( field_id && !Type_Is_Shared_Ptr(access_ty)) ) {
+	Is_True(0, ("Local to shared cast in function param!","")); 
+      } else {
+	//formal is shared ptr	
+	kid = lower_expr(block, kid, actions);
+	if(Need_StoP_Cvt(actual_ty, formal_ty, &iop)) {
+	  kid = WN_Create_StoP_Cvt(kid, iop);	
+	  actual_ty = formal_ty;
+	}
+	if(TY_kind(formal_ty) == KIND_SCALAR && TY_kind(actual_ty) == KIND_SCALAR)
+	  result =  WN_CreateParm(TY_mtype(actual_ty), kid, actual_ty, WN_PARM_BY_VALUE);
+	else
+	  result =  WN_CreateParm(TY_mtype(TY_To_Sptr_Idx(actual_ty)), kid,
+				TY_To_Sptr_Idx(actual_ty), WN_PARM_BY_VALUE);
+      }
+    } else {
+      // formal is not shared 
+      Is_True(Type_Is_Shared_Ptr(actual_ty) || Type_Is_Shared_Ptr(access_ty),
+	      ("",""));
+      if(WN_rtype(tree) != MTYPE_M) {
+	kid = lower_expr(block, kid, actions);
+	kid = Spill_Shared_Load(kid);
+	result =   WN_CreateParm(TY_mtype(formal_ty), kid,
+				 formal_ty, WN_PARM_BY_VALUE);
+      } else {
+	//load of struct
+      }
+      
+    }
+  }
+    break;
+  case OPR_ILOAD:  
+    actual_ty = WN_ty(kid);
+    
+    if (TY_mtype(actual_ty) != MTYPE_M ||  
+	(field_id && WN_object_ty(kid) != MTYPE_M))
+      {
+	INTRINSIC iop;
+	kid = lower_expr(block, kid, actions); 
+	if(WN_operator(WN_kid0(tree)) == OPR_TAS)
+	  kid = Strip_TAS(kid);
+	TY_IDX src = actual_ty;
+	TY_IDX dest = formal_ty;
+	
+	if(field_id) {
+
+	}
+	
+	if(Type_Is_Shared_Ptr(actual_ty, TRUE) && Type_Is_Shared_Ptr(formal_ty, TRUE) &&
+	   Need_StoP_Cvt(actual_ty, formal_ty, &iop)) {
+	  kid = WN_Create_StoP_Cvt(kid, iop);	
+	  actual_ty = formal_ty;
+	}
+	
+	if(TY_kind(formal_ty) != KIND_SCALAR && Type_Is_Shared_Ptr(formal_ty)) {
+	  formal_ty = TY_To_Sptr_Idx(formal_ty);
+	}
+	result =   WN_CreateParm(TY_mtype(formal_ty), kid,
+				 formal_ty, WN_PARM_BY_VALUE);
+    } else {
+      access_ty = WN_load_addr_ty(kid);
+      if (Type_Is_Shared_Ptr(access_ty)) {
+	WN_kid0(tree) = lower_expr(block, WN_kid0(tree), actions);
+	if(WN_operator(WN_kid0(tree)) == OPR_TAS)
+	  WN_kid0(tree) = WN_kid0(WN_kid0(tree));
+	
+	ST *spill_st = Gen_Temp_Symbol(actual_ty, (char*) ".Mspill");
+	WN *dest = WN_Lda(Pointer_Mtype, 0, spill_st, 0);
+	kid  = WN_Create_Shared_Load(kid, dest, TRUE, 0, actual_ty);
+	WN *blk = WN_CreateBlock();
+	WN_INSERT_BlockLast(blk, kid);
+	WN *ld = WN_Ldid(MTYPE_M, 0, spill_st, access_ty);
+	kid = WN_CreateComma(OPR_COMMA, MTYPE_M, MTYPE_V, blk, ld);
+	WN_kid0(tree) = kid;
+	result =  tree;
+      } else 
+	Is_True(0,("",""));
+    }
+    break;
+  case OPR_MLOAD:
+    {
+      //WEI: for some reason ty is not set here
+      actual_ty = WN_ty(tree);
+      access_ty = WN_ty(kid);
+
+      WN_OFFSET offt = WN_offset(WN_kid0(kid));
+      WN_kid0(kid) = lower_expr(block, WN_kid0(kid), actions);
+      WN_kid1(kid) = lower_expr(block, WN_kid1(kid), actions);
+        
+      ST *spill_st = Gen_Temp_Symbol(actual_ty, (char*) ".Mspill");
+      WN *dest = WN_Lda(Pointer_Mtype, 0, spill_st, 0);
+      kid  = WN_Create_Shared_Load(kid, dest, TRUE, offt, actual_ty);
+      WN *blk = WN_CreateBlock();
+      WN_INSERT_BlockLast(blk, kid);
+      //WN *ld = WN_Ldid(MTYPE_M, 0, spill_st, access_ty);
+      WN *ld = WN_Ldid(MTYPE_M, 0, spill_st, actual_ty);
+      kid = WN_CreateComma(OPR_COMMA, MTYPE_M, MTYPE_V, blk, ld);
+      WN_kid0(tree) = kid;
+      result = tree;
+    }
+    break;
+    
+  case OPR_TAS: 
+    {
+      BOOL cvt = TRUE;
+      actual_ty = WN_ty(kid);
+      if (WN_Type_Is_Shared_Ptr(WN_kid0(kid), TRUE) && 
+	  Type_Is_Shared_Ptr(actual_ty, TRUE)) {
+	// shared to shared is converted by the TAS lowering
+	cvt = FALSE;
+      }
+	
+      kid = lower_expr(block, kid, actions);
+      kid = Strip_TAS(kid);
+      
+      if (!Type_Is_Shared_Ptr(formal_ty, TRUE)) {
+	if(Type_Is_Shared_Ptr(actual_ty, TRUE)) {
+	  kid = WN_Convert_Shared_To_Local(kid);
+	}
+      } else {
+	if (cvt && Type_Is_Shared_Ptr(actual_ty, TRUE) && 
+	    Need_StoP_Cvt(actual_ty, formal_ty, &iop))
+	  {
+	    kid = WN_Create_StoP_Cvt(kid, iop);	    
+	  }
+      }
+      
+      WN_kid0(tree) = kid;
+      result = tree;
+    }
+    break;
+  case OPR_LDA:
+    {
+      actual_ty = WN_ty(kid);
+      
+      if(Type_Is_Shared_Ptr(actual_ty) && Type_Is_Shared_Ptr(formal_ty) &&
+	 Need_StoP_Cvt(actual_ty, formal_ty, &iop)) {
+	kid = lower_expr(block, kid, actions);
+	kid =  WN_Create_StoP_Cvt(kid, iop);	
+      } else 
+	kid = lower_expr(block, kid, actions);
+      WN_kid0(tree) = kid;
+      result = tree;
+    }
+    break;
+  default:
+    WN_kid0(tree) = lower_expr(block, WN_kid0(tree), actions);
+    result = tree;
+  }
+  
+  sptr_accumulation_state = saved_acc_state;
+  return result;
+} 
+
+
+
+
 /* ====================================================================
  *
  * WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
@@ -4375,9 +4640,82 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
   * and splitting symbol addresses since these may create new offsets
   * that need to be split.
   */
-  switch (WN_operator(tree))
-  {
+  switch (WN_operator(tree)) {
+
+  case OPR_SUB:
+    {
+      if(Action(LOWER_UPC_TO_INTR)) {
+	if(WN_Type_Is_Shared_Ptr(WN_kid0(tree), TRUE) &&  
+	   WN_Type_Is_Shared_Ptr(WN_kid1(tree), TRUE)) {
+	  // shared ptr difference
+	  TY_IDX eltype = WN_ty(WN_kid0(tree));
+	  TY_IDX eltype2 = WN_ty(WN_kid1(tree));
+	  return WN_Create_Shared_Ptr_Diff(lower_expr(block, WN_kid0(tree), actions),
+					   lower_expr(block, WN_kid1(tree), actions),
+					   eltype,
+					   eltype2);
+	}
+      }
+    }
+    break;
+  case OPR_PARM:
+    {
+      if(Action(LOWER_UPC_TO_INTR)) {
+	TY_IDX formal_idx = WN_ty(tree);
+	TY_IDX actual_idx = WN_object_ty(WN_kid0(tree));
+	if (Type_Is_Shared_Ptr(formal_idx) || 
+	    WN_Type_Is_Shared_Ptr(WN_kid0(tree)) ||
+	    (WN_operator(WN_kid0(tree)) == OPR_ILOAD && 
+	     Type_Is_Shared_Ptr(WN_load_addr_ty(WN_kid0(tree))))) {
+	  
+	  return  lower_parm(block, tree, actions);
+	 
+	  // fdump_tree(stderr, WN_kid0(tree));
+	   
+// 	  if(Type_Is_Shared_Ptr(formal_idx))
+// 	    tree = WN_CreateParm(TY_mtype(shared_ptr_idx), WN_COPY_Tree(WN_kid0(tree)),
+// 				 shared_ptr_idx, WN_PARM_BY_VALUE);
+// 	  else {
+// 	    if (TY_kind(formal_idx) == KIND_POINTER)
+// 	      tree =  WN_CreateParm(TY_mtype(shared_ptr_idx), 
+// 				    WN_Convert_Shared_To_Local(WN_kid0(tree), 
+// 							       WN_ty(tree), 0),
+// 				    shared_ptr_idx, WN_PARM_BY_VALUE);
+// 	    else {
+// 	      Is_True(TY_mtype(actual_idx) != MTYPE_M, ("",""));
+// 	      tree = WN_CreateParm(TY_mtype(shared_ptr_idx), 
+// 				   Spill_Shared_Load(WN_kid0(tree)),
+// 				    shared_ptr_idx, WN_PARM_BY_VALUE);
+// 	    }
+// 	  }
+// 	  fdump_tree(stderr, tree);
+// 	  return tree;
+	} else if (WN_operator(WN_kid0(tree)) == OPR_ADD) {
+	  //WEI: a special case for when exprs like foo->x[i] is passed to a function,
+	  //and we need to adjust the field offset
+	  WN* kid = WN_kid0(tree);
+	  WN* offset = WN_kid1(kid);
+	  if (WN_operator(offset) == OPR_INTCONST) {
+	    TY_IDX obj_ty = struct_addr_ty(WN_kid0(kid));
+	    if (obj_ty != 0) {
+	      int field_id = find_field_from_offset(obj_ty, WN_const_val(offset));
+	      int real_ofst =  Adjust_Field_Offset(obj_ty, field_id);
+	      WN_kid1(kid) = WN_CreateIntconst(OPR_INTCONST, Pointer_Mtype, MTYPE_V, real_ofst); 
+	      //cout << "PARM OFFSET: " << real_ofst << endl;
+	    }
+	  }
+	}
+      }
+    }
+    break; /* PARM */
+    
   case OPR_INTRINSIC_OP:
+    //FIX:
+    if (WN_intrinsic(tree) == INTRN_TLD_ADDR) {
+      //prevent the lowering of TLD_ADDR from happening twice
+      kids_lowered = TRUE;
+    }
+    
     if (INTRN_is_nary(WN_intrinsic(tree)))
       break;
 
@@ -4405,8 +4743,10 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
   case OPR_ARRAY:
     if (Action(LOWER_ARRAY))
     {
+      
       tree = lower_linearize_array_addr(block, tree, actions);
       kids_lowered = TRUE;
+    
     }
     break;
 
@@ -4451,6 +4791,180 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
       WN *lda = WN_kid0(tree);
       WN *con = WN_kid1(tree);
 
+      if (Action(LOWER_UPC_TO_INTR)) {
+      
+	TY_IDX idx_ptr, idx_off;
+	idx_ptr = WN_ty(lda);
+	idx_off = WN_ty(con);
+	int esize = 0;
+	int bsize = 0;
+	WN *ptr, *off;
+	BOOL ptr_ptr = FALSE;
+
+
+
+// 	fprintf(stderr, "++++++++++++++++++++++++++\n");
+// 	fprintf(stderr, "ADD kid0\n");
+// 	fdump_tree(stderr, WN_kid0(tree));
+// 	fprintf(stderr, "ADD kid1\n");
+// 	fdump_tree(stderr, WN_kid1(tree));
+// 	fprintf(stderr, "++++++++++++++++++++++++++\n");
+	
+	
+	if (WN_operator(lda) == OPR_CONST) {
+	  idx_ptr = 0;
+	}  else if(OPERATOR_is_load(WN_operator(lda)) && WN_field_id(lda)) {
+	  idx_ptr = Get_Field_Type(WN_ty(lda), WN_field_id(lda));
+	}
+ 
+	if (WN_operator(con) == OPR_CONST) {
+	  idx_off = 0;
+	} else if(OPERATOR_is_load(WN_operator(con)) && WN_field_id(con)) {
+	    idx_off = Get_Field_Type(WN_ty(con), WN_field_id(con));
+	} 
+
+	/* if idx_ptr == idx_off == 0, i.e. we should have a regular
+	   scalar add. However, the optimizer folds cts to right hand side
+	   of the tree. While doing this it loses type information.
+	   Ex: compile  a[j+100][i+100]
+	   Try recapture that info here. The right way would be of course to fix
+	   the optimizer (This happens after a call to SSA::Create_CODEMAP -> Value_number) */
+
+	if (!idx_ptr && !idx_off) {
+	  TY_IDX op_ty;
+	  
+
+	  if (WN_operator(lda) == OPR_ADD) {
+	    op_ty = WN_ty(WN_kid0(lda));
+	    if(Type_Is_Shared_Ptr(op_ty) && TY_kind(op_ty) != KIND_SCALAR)
+	      idx_ptr = op_ty;
+	    op_ty = WN_ty(WN_kid1(lda));
+	    if(Type_Is_Shared_Ptr(op_ty) && TY_kind(op_ty) != KIND_SCALAR)
+	      idx_ptr = op_ty;
+	  }
+	  else if (WN_operator(con) == OPR_ADD) {
+	    op_ty = WN_ty(WN_kid0(con));
+	    if(Type_Is_Shared_Ptr(op_ty) && TY_kind(op_ty) != KIND_SCALAR)
+	      idx_off = op_ty;
+	    op_ty = WN_ty(WN_kid1(con));
+	    if(Type_Is_Shared_Ptr(op_ty) && TY_kind(op_ty) != KIND_SCALAR)
+	      idx_off = op_ty;
+	  } 
+	}
+	
+
+	/* lower shared ptr arithmetic - check for the base case where 
+	   one of the operands is shared */
+	/* apparently when ptr = LDA, the operand is a pointer to the shared ptr.
+	   elem size is given by TY_size(TY_pointed(TY_etype/pointed ())) */
+	if (idx_ptr || idx_off  ) {
+	  
+	  ptr = lda;
+	  off = con;
+
+	  if ( TY_kind(idx_ptr) == KIND_POINTER && TY_is_shared(TY_pointed(idx_ptr)) ) {
+	    idx_off = TY_pointed(idx_ptr);
+	    esize = Get_Type_Inner_Size(idx_off);
+	    bsize = Get_Type_Block_Size(idx_off);
+	  } else if ( TY_kind(idx_off) == KIND_POINTER && TY_is_shared(TY_pointed(idx_off)) ) {
+	    ptr = con;
+	    off = lda;
+	    idx_ptr = idx_off;
+	    idx_off = TY_pointed(idx_off);
+	    esize = Get_Type_Inner_Size(idx_off);
+	    bsize = Get_Type_Block_Size(idx_off);
+	  } else if ( TY_kind(idx_ptr) == KIND_ARRAY && TY_is_shared(TY_etype(idx_ptr)) ) {
+	    Is_True(0,("",""));
+	    esize = TY_size(TY_etype(idx_ptr));
+	    bsize = TY_block_size(TY_etype(idx_ptr));
+	  } else if ( TY_kind(idx_off) == KIND_ARRAY && TY_is_shared(TY_etype(idx_off)) ) {
+	    Is_True(0,("",""));
+	    ptr = con;
+	    off = lda;
+	    esize = TY_size(TY_etype (idx_off));
+	    bsize = TY_block_size(TY_etype(idx_off));
+	  } else {
+	    
+	    ptr_ptr = TRUE; 
+	  }	  
+
+	 //  int offset = WN_offset(ptr);
+	 
+// 	  ptr = lower_expr(block, ptr, actions);
+// 	  off = lower_expr(block, off, actions);
+	  
+// 	  if(sptr_accumulation_state == ACCUMULATION) {
+// 	    if(!ptr_ptr) {
+// 	      if(offset) {
+// 		sptr_off_accumulation_stack.top()->push(WN_Intconst(Integer_type, offset));
+// 		//WN_offset(ptr) = 0;
+// 	      }
+// 	    }
+// 	  }
+	  
+	  if(sptr_accumulation_state == ACCUMULATION) {
+	    if(!ptr_ptr) {
+	      if(WN_offset(ptr)) {
+		if(OPERATOR_is_load(WN_operator(ptr)) && WN_field_id(ptr) && 
+		   Type_Is_Shared_Ptr(WN_ty(ptr)))
+		  ;
+		else
+		  sptr_off_accumulation_stack.top()->push(WN_Intconst(Integer_type, WN_offset(ptr)));
+		WN_offset(ptr) = 0;
+	      }
+	    }
+	  }
+
+	  ptr = lower_expr(block, ptr, actions);
+	  off = lower_expr(block, off, actions);
+	  
+	  
+
+	  if(ptr_ptr) {
+	    //talentless hack
+	    // this is for multidimensional array indexing expressions
+	    if (WN_operator(ptr) == OPR_COMMA && 
+		(WN_ty(WN_kid1(ptr)) == shared_ptr_idx || WN_ty(WN_kid1(ptr)) == pshared_ptr_idx))
+	      goto do_arith;
+	    else if (WN_operator(off) == OPR_COMMA && 
+		     (WN_ty(WN_kid1(off)) == shared_ptr_idx || WN_ty(WN_kid1(off)) == pshared_ptr_idx)){
+	      lda = ptr;
+	      ptr = off;
+	      off = lda;
+	      goto do_arith;
+	    }   
+	    
+	    WN_kid0(tree) = ptr;
+	    WN_kid1(tree) = off;
+	    return tree;
+	  }
+
+do_arith:
+	  
+	  if (sptr_accumulation_state == NO_ACCUMULATION) {
+	    // here idx_ptr should hold the pointer type
+	    Is_True(TY_kind(idx_ptr) == KIND_POINTER && Type_Is_Shared_Ptr(idx_ptr) // ||
+// 		    TY_kind(idx_off) == KIND_POINTER && Type_Is_Shared_Ptr(idx_off)
+		    , ("",""));
+	    if(Type_Is_Shared_Ptr(TY_pointed(idx_ptr)))
+	       ptr  = WN_Create_Shared_Ptr_Arithmetic (ptr, off, OPR_ADD,  esize, bsize);
+	    else {
+	      WN_kid0(tree) = ptr;
+	      WN_kid1(tree) = off;
+	      return tree;
+	    }
+	  } else {
+	    sptr_off_accumulation_stack.top()->push(off);
+	  }
+	  WN_Delete (tree);
+
+	  tree = ptr;
+	  kids_lowered = TRUE;
+	  // fdump_tree(stderr, tree);
+	}
+      } 
+      
+no_shared:
       if (WN_operator_is(con, OPR_INTCONST) &&
 	  foldLdaOffset(lda, WN_const_val(con)))
       {
@@ -4462,16 +4976,55 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
     }
     break;
 
-  case OPR_MLOAD:
-    if (Align_Object)
-    {
-      WN_kid0(tree)=	lower_expr(block, WN_kid0(tree), actions);
-      kids_lowered = 	TRUE;
+  case OPR_MLOAD:  
+    if (Action(LOWER_UPC_TO_INTR)) {
+      TY_IDX idx = WN_ty(tree);
+      WN *ild;
+      if (Type_Is_Shared_Ptr(idx)) {
+	SPTR_ACCUMULATION_STATE saved_acc_state = sptr_accumulation_state;
+	sptr_accumulation_state = ACCUMULATION;
+	sptr_off_accumulation_stack.push(CXX_NEW(SPTR_OFFSET_TERM_STACK, Malloc_Mem_Pool));
+	SPTR_OFFSET_TERM_STACK *term_stack = sptr_off_accumulation_stack.top();
+	if(WN_offset(tree)) {
+	  term_stack->push(WN_Intconst(Integer_type, WN_offset(tree)));
+	  WN_offset(tree) = 0;			   
+	}
+		
+	WN_kid0(tree) = lower_expr(block, WN_kid0(tree), actions);
+	WN_kid1(tree) = lower_expr(block, WN_kid1(tree), actions);
 
-      tree = improve_Malignment(tree, WN_kid0(tree), WN_kid1(tree),
-				WN_load_offset(tree));
-      break;
-    }  /* fall thru */
+	if(WN_operator(WN_kid0(tree)) == OPR_TAS)
+	  WN_kid0(tree) = Strip_TAS(WN_kid0(tree));
+	
+	ild = Combine_Offset_Terms(*term_stack);
+// 	if(ild)
+// 	  fdump_tree(stderr, ild);
+	
+	sptr_accumulation_state = saved_acc_state;
+	sptr_off_accumulation_stack.pop();
+	CXX_DELETE(term_stack, Malloc_Mem_Pool);
+	//need to reset the offset of the ld;
+// 	WN_kid0(tree)  = WN_Create_Shared_Ptr_Arithmetic (WN_kid0(tree), ild, OPR_ADD,
+// 							  Get_Type_Inner_Size(idx),
+// 							  Get_Type_Block_Size(idx),
+// 							  Get_Type_Block_Size(idx) <= 1);
+	return WN_Create_Shared_Load(tree, 0, FALSE, 0, 0,/*has off*/  TRUE, ild);
+      }
+    } else
+      if (Align_Object)
+	{
+	  WN_kid0(tree)=	lower_expr(block, WN_kid0(tree), actions);
+	 //  fdump_tree(stderr, WN_kid0(tree));
+	  kids_lowered = 	TRUE;
+	  if(Action(LOWER_UPC_MFIELD) && 
+	     WN_operator(WN_kid1(tree)) == OPR_INTCONST) {
+	    WN_const_val(WN_kid1(tree)) = 
+	      Adjusted_Type_Size(WN_field_id(tree) == 0 ? TY_pointed(WN_ty(tree)) : Get_Field_Type(TY_pointed(WN_ty(tree)), WN_field_id(tree)));
+	  }
+	  tree = improve_Malignment(tree, WN_kid0(tree), WN_kid1(tree),
+				    WN_load_offset(tree));
+	  break;
+	}  /* fall thru */
 
   case OPR_ILOAD:
     if (Action(LOWER_MLDID_MSTID) && WN_opcode(tree) == OPC_MMILOAD)
@@ -4537,25 +5090,198 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
       {
 	WN_load_offset(tree) += WN_const_val(WN_kid1(kid));
 	WN_kid0(tree) = WN_kid0(kid);
+	//WEI: again, need to adjust field sizes here
+	TY_IDX obj_ty = struct_addr_ty(WN_kid0(tree));
+	if (obj_ty != 0) {
+	  //WEI: let's fix the offset here
+	  int field_id = find_field_from_offset(obj_ty, WN_load_offset(tree));
+	  WN_store_offset(tree) = Adjust_Field_Offset(obj_ty, field_id);
+	  //cout << "LOAD OFFSET: " <<  WN_load_offset(tree) << endl;
+	}	
+
 	WN_Delete(WN_kid1(kid));
 	WN_Delete(kid);
       }
     }
-    break;
 
-  case OPR_LDID:
+    if(Action(LOWER_UPC_TO_INTR) ) {
+      TY_IDX idx = WN_ty(tree);
+      WN *ild = 0;
+      BOOL has_off = TRUE;
+      BOOL local_off = FALSE;
+      WN *offt = 0;
+      TY_IDX src_idx;
+      if (Type_Is_Shared_Ptr(WN_load_addr_ty(tree))) {
+	TY_IDX ptr_idx = WN_load_addr_ty(tree);
+	Is_True(TY_kind(ptr_idx) == KIND_POINTER, ("",""));
+	
+	SPTR_ACCUMULATION_STATE saved_acc_state = sptr_accumulation_state;
+	sptr_accumulation_state = ACCUMULATION;
+	sptr_off_accumulation_stack.push(CXX_NEW(SPTR_OFFSET_TERM_STACK, Malloc_Mem_Pool));
+	SPTR_OFFSET_TERM_STACK *term_stack = sptr_off_accumulation_stack.top();
+	
+	WN *kid0 = WN_kid0(tree);
+
+	if((WN_operator(kid0) == OPR_LDID && !WN_offset(tree)) ||
+	   WN_operator(kid0) == OPR_ARRAY ||
+	   // the optimizer creates LDA(off, array) and the pointer arith
+	   // is performed when lowering the LDA
+	  ( WN_operator(kid0) == OPR_TAS && WN_operator(WN_kid0(kid0)) == OPR_LDA &&
+	    TY_kind(TY_pointed(WN_ty(WN_kid0(kid0)))) == KIND_ARRAY) )
+	  has_off = FALSE;
+	
+	if(WN_offset(tree) || WN_field_id(tree)) {
+	  // term_stack->push(WN_Intconst(Integer_type, WN_offset(tree)));
+	  offt = WN_Intconst(Integer_type,  WN_field_id(tree) > 1 ? Adjust_Field_Offset(WN_ty(tree), WN_field_id(tree)) : WN_offset(tree));
+	  WN_offset(tree) = 0;
+	  local_off = TRUE;
+	}
+	
+	if(WN_operator(WN_kid0(tree)) == OPR_TAS)  
+	  WN_set_load_addr_ty(tree, WN_ty(WN_kid0(tree)));
+
+  
+	switch (WN_operator(WN_kid0(tree))) {
+	case OPR_LDID:
+	   idx = ST_type(WN_st(WN_kid0(tree)));
+	   break;
+	case OPR_TAS:
+	  idx = WN_ty(WN_kid0(tree));
+	  break;
+	default:
+	  break;
+	}
+		    
+	WN_kid0(tree) = lower_expr(block, WN_kid0(tree), actions);
+
+	if(WN_operator(WN_kid0(tree)) == OPR_TAS) { 
+	  src_idx = WN_ty(WN_kid0(tree));
+	  WN_kid0(tree) = Strip_TAS(WN_kid0(tree));
+	} else
+	  src_idx = idx;
+	
+	if(has_off) {
+	 
+	  ild = Combine_Offset_Terms(*term_stack);
+	  // 	if(ild)
+	  // 	  fdump_tree(stderr, ild);
+
+	  //don't even ask why
+	  if(( TY_kind(idx) == KIND_POINTER && TY_kind(TY_pointed(idx)) != KIND_STRUCT)
+	     ||
+	     ( TY_kind(idx) == KIND_POINTER && TY_kind(TY_pointed(idx)) == KIND_STRUCT && ild)
+	     ||
+	     (TY_kind(idx) == KIND_ARRAY && TY_kind(Get_Inner_Array_Type(idx)) != KIND_STRUCT)
+	     ||
+	     (TY_kind(idx) == KIND_ARRAY && TY_kind(Get_Inner_Array_Type(idx)) == KIND_STRUCT && ild)
+	     ) {
+	    if (TY_kind(src_idx) == KIND_POINTER && 
+		(WN_operator(WN_kid0(tree)) == OPR_LDID &&
+		 Types_Are_Equiv(/*TY_pointed(src_idx)*/src_idx, ST_type(WN_st(WN_kid0(tree))))
+		 || !local_off)) {
+	      UINT esize = Get_Type_Inner_Size(idx);
+	      if(TY_kind(idx) == KIND_POINTER && TY_is_shared(TY_pointed(idx)) && 
+		 TY_kind(TY_pointed(idx)) == KIND_POINTER)
+		esize = TY_size(TY_To_Sptr_Idx(idx));
+	      if(ild)
+	      WN_kid0(tree)  = WN_Create_Shared_Ptr_Arithmetic (WN_kid0(tree), ild, OPR_ADD,
+								esize,
+								Get_Type_Block_Size(idx),
+								Get_Type_Block_Size(idx) <= 1);
+	      if(offt) 
+		ild = offt;
+	      else
+		has_off = FALSE;
+	    }	    
+	  }
+	  
+	  if(!ild && offt)
+	    ild = offt;
+	  else if(!ild)
+	    has_off = FALSE;
+	}
+	
+	sptr_accumulation_state = saved_acc_state;
+	sptr_off_accumulation_stack.pop();
+	CXX_DELETE(term_stack, Malloc_Mem_Pool);
+	return WN_Create_Shared_Load(tree, 0, FALSE, 0, 0, has_off, ild);
+      } else  if(TY_kind(idx) == KIND_STRUCT && !TY_is_shared(idx) && 
+		 Type_Is_Shared_Ptr(TY_pointed(WN_load_addr_ty(tree)), TRUE)) {
+	//this is the case where we load a field of a local struct, the type of
+	//of the field being a sptr
+ 	// Ty_Table[WN_ty(tree)].Print(stderr);
+// 	Ty_Table[WN_load_addr_ty(tree)].Print(stderr);
+// 	fdump_tree(stderr, tree);
+	idx = TY_To_Sptr_Idx(TY_pointed(WN_load_addr_ty(tree)));
+	if(TY_mtype(idx) == MTYPE_M) {
+	  WN_set_rtype(tree, MTYPE_M);
+	  WN_set_desc(tree, MTYPE_M);
+	  WN_set_load_addr_ty(tree,  Make_Pointer_Type(idx));
+	  WN_load_offset(tree) = Adjust_Field_Offset(WN_ty(tree),WN_field_id(tree));
+	  // Ty_Table[WN_ty(tree)].Print(stderr);
+// 	  Ty_Table[WN_load_addr_ty(tree)].Print(stderr);
+// 	  fdump_tree(stderr, tree);
+	  return tree;			
+	}	     
+      } else if(Type_Is_Shared_Ptr(WN_ty(tree), TRUE)) {
+	idx = TY_To_Sptr_Idx(WN_ty(tree));
+	WN_set_rtype(tree, TY_mtype(idx));
+	WN_set_desc(tree,TY_mtype(idx)); 
+      } else  if(WN_field_id(tree) > 1)
+	WN_load_offset(tree) = Adjust_Field_Offset(TY_kind(WN_ty(tree)) == KIND_STRUCT ? WN_ty(tree) :TY_pointed(WN_ty(tree)),WN_field_id(tree));
+    }
+    break; /* ILOAD */
+
+  case OPR_LDID: {
+   //  WN* res = lower_TLD(block, tree, actions);
+//     if (res != tree) {
+//       return res;
+//     }
+
     if (Action(LOWER_RETURN_VAL) && WN_st(tree) == Return_Val_Preg)
       return lower_return_ldid(block, tree, actions);
-
+    
     if (Action(LOWER_MLDID_MSTID) && WN_opcode(tree) == OPC_MMLDID)
       return lower_mldid(block, tree, actions);
-
+    
     if (Action(LOWER_BIT_FIELD_ID) && WN_desc(tree) == MTYPE_BS) {
       lower_bit_field_id(tree);
       if (Action(LOWER_BITS_OP) && WN_operator(tree) == OPR_LDBITS)
 	return lower_load_bits (block, tree, actions);
     }
 
+    if(Action(LOWER_UPC_TO_INTR) ) {
+      WN *ical;
+      TY_IDX idx, src_idx;
+      if ( TY_is_shared(ST_type(WN_st(tree)))) { //shared scalar
+	ical = WN_Create_Shared_Load(tree);
+      } else if (TY_kind(ST_type(WN_st(tree))) == KIND_POINTER && 
+		 TY_is_shared(TY_pointed(ST_type(WN_st(tree)))) ) {
+	// local ptr to shared
+	// change the descriptors to LDID
+	ical = WN_COPY_Tree(tree);
+	idx = TY_To_Sptr_Idx(ST_type(WN_st(tree)));
+	WN_set_rtype(ical, TY_mtype(idx));
+	WN_set_desc (ical, TY_mtype(idx));
+	WN_set_ty(ical, idx);
+      } else {
+	idx = WN_field_id(tree) ? get_field_type(WN_ty(tree), WN_field_id(tree)) : WN_ty(tree);
+	if(WN_field_id(tree) && Type_Is_Shared_Ptr(idx, TRUE)) {
+	  ical = WN_COPY_Tree(tree);
+	  src_idx = TY_To_Sptr_Idx(idx);
+	  WN_set_rtype(ical, TY_mtype(src_idx));
+	  WN_set_desc (ical, TY_mtype(src_idx));
+	 //  WN_set_ty(ical, src_idx);
+	  WN_load_offset(ical) = Adjust_Field_Offset(WN_ty(tree) , WN_field_id(tree));
+	} else if(WN_field_id(tree) > 1) { 
+	  WN_load_offset(tree) = Adjust_Field_Offset(WN_ty(tree) , WN_field_id(tree));
+	  goto skip;
+	} else
+	  goto skip;
+      }
+      return ical;
+    }
+  skip:
     if ((WN_class(tree) == CLASS_CONST)	&& (WN_load_offset(tree) == 0))
     {
       TCON	val = WN_val(tree);
@@ -4616,20 +5342,20 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
       }
     }
     if ( Action(LOWER_UPLEVEL))
-    {
-      ST *sym = WN_st(tree);
-
-      if (ST_is_uplevelTemp(sym))
       {
-        WN	   *iload;
-
-        iload = lower_uplevel_reference(tree, WN_load_offset(tree), actions);
-	tree = lower_expr(block, iload, actions);
-	return tree;
+	ST *sym = WN_st(tree);
+	
+	if (ST_is_uplevelTemp(sym))
+	  {
+	    WN	   *iload;
+	    
+	    iload = lower_uplevel_reference(tree, WN_load_offset(tree), actions);
+	    tree = lower_expr(block, iload, actions);
+	    return tree;
+	  }
       }
-    }
     break;
-
+  }
   case OPR_ILDBITS:
   case OPR_LDBITS:
     if (Action(LOWER_BITS_OP))
@@ -4637,12 +5363,20 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
     break;
     
   case OPR_LDA:
-   /*
+   /* 
     *  use of LDA should mark STFL_ADDR_USED_LOCALLY
-    */
+    */ 
     {
-      ST *sym = WN_st(tree);
-
+      // WN* res = lower_TLD_lda(block, tree, actions);
+//       if (res != tree) {
+// 	tree = res;
+// 	kids_lowered = true;
+// 	break;
+//       }
+      
+      
+      ST *sym = WN_st(tree); 
+ 
       // if ((ST_class(sym) == CLASS_VAR) ||
       //     (ST_class(sym) == CLASS_FUNC)) {
       //   Do nothing here. ADDR flags should only grow more
@@ -4690,6 +5424,35 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
 	return tree;
       }
     }
+
+    if ( Action(LOWER_UPC_TO_INTR) ) {
+      TY_IDX tidx = WN_ty(tree);
+      
+      if ( (TY_kind(tidx) == KIND_POINTER && TY_is_shared(TY_pointed(tidx))) ||
+	   (TY_kind(tidx) == KIND_ARRAY && TY_is_shared(TY_etype(tidx))) ){
+	WN *ld; 
+	TY_IDX idx1 = TY_To_Sptr_Idx(TY_pointed(tidx));
+	ld  = WN_Ldid(TY_mtype(idx1), 0, WN_st(tree), idx1);
+	if (WN_offset(tree) && TY_kind(TY_pointed(tidx))  != KIND_STRUCT)
+	{
+	  
+	  ld = WN_Create_Shared_Ptr_Arithmetic(ld, 
+					       WN_Intconst(Integer_type,
+							   WN_offset(tree)),
+					       OPR_ADD,
+					       Get_Type_Inner_Size(tidx),
+					       Get_Type_Block_Size(tidx)); 
+	} 
+	return ld;
+      } else {
+	tidx = TY_pointed(tidx);
+	if(WN_offset(tree) && TY_kind(tidx) == KIND_STRUCT) {
+	  WN_load_offset(tree) = 0;
+	}
+	
+      }
+    }
+    
     break;
 
   case OPR_CVT:
@@ -4699,6 +5462,21 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
     {
       tree = lower_cvt(block, tree, actions);
       kids_lowered = TRUE;
+    } else if(Action(LOWER_UPC_TO_INTR)) {
+      TY_IDX ty_idx = 0;
+      switch (WN_operator(WN_kid0(tree))) {
+      case OPR_LDID:
+      case OPR_TAS:
+	ty_idx = WN_ty(WN_kid0(tree));
+	break;
+      case OPR_COMMA:
+      
+      default:
+// 	Is_True(0,("",""));
+	break;
+      }
+      if(Type_Is_Shared_Ptr(ty_idx, TRUE)) 
+	return WN_Convert_Shared_To_Local(lower_expr(block, WN_kid0(tree), actions));
     }
     break;
 
@@ -4723,6 +5501,60 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
 	}
       }
     }
+    
+    // for TAS of shared ptr - need to do the lowering here.
+    //Otherwise the regular code calls the whirl simplifyer that
+    //deletes TAS when rtypes match.
+    if (WN_Type_Is_Shared_Ptr(tree)) {
+      if(Action(LOWER_UPC_TO_INTR)) {
+	// the optimizer creates TAS(TAS ...
+	// when doing copy propagation . Strip all inner TASes,
+	// but save the outermost one for StoP conversion
+	//
+	WN *kid0 = WN_kid0(tree);
+	TY_IDX kid_idx = WN_ty(kid0);
+	kid0 = Strip_TAS(kid0);
+	UINT field_id;
+	if(WN_operator(WN_kid0(tree)) != OPR_TAS || WN_ty(kid0) != 0) { 
+	  kid_idx = WN_ty(kid0);
+	  if(OPERATOR_is_load(WN_operator(kid0)) && WN_field_id(kid0)) {
+	    switch(WN_operator(kid0)) {
+	    case OPR_LDID:
+	    case OPR_ILOAD:
+	      kid_idx = Get_Field_Type(kid_idx, WN_field_id(kid0));
+	      break;
+	    default:
+	      Is_True(0,("",""));
+	    }
+	  }
+	}
+	WN_kid0(tree) = kid0;
+
+
+	TY_IDX tas_idx = WN_ty(tree);
+	INTRINSIC iop;
+	BOOL spill = (WN_operator(kid0) == OPR_LDID &&  ST_class(WN_st(kid0)) == CLASS_PREG);
+ // 	fdump_tree(stderr, tree);
+	
+	if(Type_Is_Shared_Ptr(kid_idx, TRUE) && Need_StoP_Cvt(kid_idx, tas_idx, &iop)) 
+	  {	
+	   //  Ty_Table[kid_idx].Print(stderr);
+// 	    Ty_Table[tas_idx].Print(stderr);
+	    WN *res = lower_expr(block, kid0, actions);
+	    if(WN_operator(res) == OPR_COMMA || spill)
+	      res = Spill_Shared_Load(res);
+	    return  WN_Create_StoP_Cvt(res, iop);
+	  } 
+      }
+      //WEI: don't think we need the TAS anymore 
+      //return lower_expr(block, WN_kid0(tree), actions);
+      WN_kid0(tree) = lower_expr(block, WN_kid0(tree), actions);
+     //  if(WN_rtype(tree) != WN_rtype(WN_kid0(tree)))
+// 	return WN_kid0(tree);
+//       else 
+	return tree;
+    }
+      
     break;
 
   case OPR_IMAGPART:
@@ -4747,7 +5579,7 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
     break;
     
   case OPR_EQ:
-    if (Action(LOWER_COMPLEX) && MTYPE_is_complex(WN_desc(tree)))
+      if (Action(LOWER_COMPLEX) && MTYPE_is_complex(WN_desc(tree)))
     {
       /*
        *  x == y
@@ -4764,25 +5596,75 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
 
       return lower_expr(block, tree, actions);
     }
+    if(Action(LOWER_UPC_TO_INTR)) {
+      if(WN_Type_Is_Shared_Ptr(WN_kid0(tree)) || 
+	 WN_Type_Is_Shared_Ptr(WN_kid1(tree))) {
+	
+	TY_IDX idx0 = WN_ty(WN_kid0(tree));
+	TY_IDX idx1 = WN_ty(WN_kid1(tree));
+	WN *kid0 = lower_expr(block, WN_kid0(tree), actions);
+	WN *kid1 = lower_expr(block, WN_kid1(tree), actions);
+	if(Type_Is_Shared_Ptr(idx0, TRUE) && Type_Is_Shared_Ptr(idx1, TRUE)) {
+	  tree = WN_Create_PtrEq_Test(OPR_EQ, kid0, kid1, idx0, idx1);
+	} else if(Type_Is_Shared_Ptr(idx1, TRUE) || Type_Is_Shared_Ptr(idx0, TRUE)) {
+	  Is_True(WN_operator(kid0) == OPR_INTCONST ||
+		  WN_operator(kid1) == OPR_INTCONST || 
+		  WN_operator(kid0) == OPR_LDID ||
+		  WN_operator(kid1) == OPR_LDID,
+		  ("Mismatching operators for shared pointer operation",""));
+	  tree = WN_Create_PtrEq_Test(OPR_EQ, kid0, kid1, idx0, idx1);
+	} else {
+	    WN_kid0(tree) = kid0;
+	    WN_kid1(tree) = kid1;
+	    kids_lowered = TRUE;
+	  }  
+	return tree;
+      }
+    }
     break;
 
   case OPR_NE:
-    if (Action(LOWER_COMPLEX) && MTYPE_is_complex(WN_desc(tree)))
-    {
-      /*
-       *  x != y
-       *    ! ( R(x)==R(y)  &&  I(x)==I(y) )
-       */
-      WN	*rx, *ry, *ix, *iy;
-      TYPE_ID	realTY = Mtype_complex_to_real( WN_desc(tree));
-
-      lower_complex_expr(block, WN_kid0(tree), actions, &rx, &ix);
-      lower_complex_expr(block, WN_kid1(tree), actions, &ry, &iy);
- 
-      tree = WN_LNOT(WN_LAND(WN_EQ(realTY, rx, ry),
-			     WN_EQ(realTY, ix, iy)));
-
-      return lower_expr(block, tree, actions);
+      if (Action(LOWER_COMPLEX) && MTYPE_is_complex(WN_desc(tree)))
+	{
+	  /*
+	   *  x != y
+	   *    ! ( R(x)==R(y)  &&  I(x)==I(y) )
+	   */
+	  WN	*rx, *ry, *ix, *iy;
+	  TYPE_ID	realTY = Mtype_complex_to_real( WN_desc(tree));
+	  
+	  lower_complex_expr(block, WN_kid0(tree), actions, &rx, &ix);
+	  lower_complex_expr(block, WN_kid1(tree), actions, &ry, &iy);
+	  
+	  tree = WN_LNOT(WN_LAND(WN_EQ(realTY, rx, ry),
+				 WN_EQ(realTY, ix, iy)));
+	  
+	  return lower_expr(block, tree, actions);
+	}
+      if(Action(LOWER_UPC_TO_INTR)) {
+	if(WN_Type_Is_Shared_Ptr(WN_kid0(tree)) || 
+	   WN_Type_Is_Shared_Ptr(WN_kid1(tree))) {
+	  
+	  TY_IDX idx0 = WN_ty(WN_kid0(tree));
+	  TY_IDX idx1 = WN_ty(WN_kid1(tree));
+	  WN *kid0 = lower_expr(block, WN_kid0(tree), actions);
+	  WN *kid1 = lower_expr(block, WN_kid1(tree), actions);
+	  if(Type_Is_Shared_Ptr(idx0, TRUE) && Type_Is_Shared_Ptr(idx1, TRUE)) {
+	    tree = WN_Create_PtrEq_Test(OPR_NE, kid0, kid1, idx0, idx1);
+	  } else if(Type_Is_Shared_Ptr(idx1, TRUE) || Type_Is_Shared_Ptr(idx0, TRUE)) {
+	    Is_True( (WN_operator(kid0) == OPR_INTCONST && WN_const_val(kid0) == 0)  ||
+		     (WN_operator(kid1) == OPR_INTCONST &&  WN_const_val(kid1) == 0) ||
+		     WN_operator(kid0) == OPR_LDID ||
+		     WN_operator(kid1) == OPR_LDID,
+		     ("Mismatching operators for shared pointer operation",""));
+	    tree = WN_Create_PtrEq_Test(OPR_NE, kid0, kid1, idx0, idx1);
+	  } else {
+	    WN_kid0(tree) = kid0;
+	    WN_kid1(tree) = kid1;
+	    kids_lowered = TRUE;
+	  }  
+	  return tree;
+	}
     }
     break;
 
@@ -5024,9 +5906,13 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
     {
       WN *commaBlock;
       commaBlock = lower_block(WN_kid0(tree), actions);
-
-      DevWarn("lower_expr(): comma operator seen, line %d",
-	      Srcpos_To_Line(current_srcpos));
+      
+      //during UPC lowering we create comma operators that
+      // are otherwise illegal when compiling a regular file
+      // through the code gen
+      if (!Action(LOWER_UPC_TO_INTR) && !Action(LOWER_UPC_INTRINSIC))
+	DevWarn("lower_expr(): comma operator seen, line %d",
+		Srcpos_To_Line(current_srcpos));
 
       WN_INSERT_BlockLast(block, commaBlock);
     }
@@ -5345,7 +6231,11 @@ static WN *lower_return_mstid(WN *block, WN *tree, LOWER_ACTIONS actions)
 			    RETURN_INFO_preg(return_info, i), preg_st,
 			    Be_Type_Tbl(mtype));
       if (TY_align(ST_type(WN_st(tree))) < MTYPE_alignment(mtype)) {
-	DevWarn("return_info struct alignment is smaller than register size, may produce wrong results");
+	// shared_ptr_idx and pshared_ptr_idx are opaque types
+	// when the type does not fit in a register we are conservative
+	// and asume an alignment of 1
+	if(ST_type(WN_st(tree)) != shared_ptr_idx && ST_type(WN_st(tree)) != pshared_ptr_idx)
+	  DevWarn("return_info struct alignment is smaller than register size, may produce wrong results");
       }
       wn = WN_CreateStid(OPR_STID, MTYPE_V, mtype, 
 		         WN_store_offset(tree)+i*MTYPE_byte_size(mtype),
@@ -5430,20 +6320,41 @@ static WN *lower_return_mistore(WN *block, WN *tree, LOWER_ACTIONS actions)
 static WN *lower_mstid(WN *block, WN *tree, LOWER_ACTIONS actions)
 {
   TY_IDX ty_idx  = WN_ty(tree);
-  TY_IDX pty_idx;
-  UINT64 size    = WN_field_id(tree) == 0 ?
-      TY_size(ty_idx):
-      TY_size(get_field_type (ty_idx, WN_field_id(tree)));
+  TY_IDX pty_idx = WN_field_id(tree) == 0 ? 0 : get_field_type (ty_idx, WN_field_id(tree));
+  UINT64 size    = pty_idx  == 0 ?  TY_size(ty_idx):  TY_size(pty_idx );
+
+  
+  if(Action(LOWER_UPC_MFIELD) && pty_idx && Type_Is_Shared_Ptr(pty_idx))
+    size = TY_size(TY_To_Sptr_Idx(pty_idx));
+  
   WN*    wn;
   WN*    awn;
   WN*    swn;
+  WN *rhs = WN_kid0(tree);
+
+
+
+  // if it is ptr to shared patch both the STID and the LDID to 
+  // have the mtype corresponding to the shared_ptr_type 
+  if(Type_Is_Shared_Ptr(ty_idx) && WN_operator(rhs) == OPR_LDID &&
+     WN_st(rhs) == Return_Val_Preg ) {
+    ty_idx = TY_To_Sptr_Idx(ty_idx);
+    TYPE_ID rtype = TY_mtype(ty_idx);
+    WN_set_desc(tree, rtype);
+   //  WN_set_rtype(tree, rtype);
+    WN_set_ty(tree, ty_idx);
+    
+    WN_set_desc(rhs, rtype);
+    WN_set_rtype(rhs, rtype);
+    WN_set_ty(rhs, TY_To_Sptr_Idx(WN_ty(rhs)));
+  }  
+
 
   Is_True((WN_operator(tree) == OPR_STID && WN_desc(tree) == MTYPE_M),
 	  ("expected mstid node, not %s", OPCODE_name(WN_opcode(tree))));
 
   pty_idx = Make_Pointer_Type (ty_idx, FALSE);
 
-  WN *rhs = WN_kid0(tree);
   if (WN_opcode(rhs) == OPC_MMLDID && WN_st(rhs) == Return_Val_Preg) {
     // handle lowering of MLDID of Return_Val_Preg followed by MSTID
     Is_True(Action(LOWER_RETURN_VAL),
@@ -5451,12 +6362,16 @@ static WN *lower_mstid(WN *block, WN *tree, LOWER_ACTIONS actions)
     return lower_return_mstid(block, tree, actions);
   }
 
-  awn = WN_CreateLda (OPR_LDA, Pointer_Mtype, MTYPE_V, WN_store_offset(tree),
+  awn = WN_CreateLda (OPR_LDA, Pointer_Mtype, MTYPE_V, 0// WN_store_offset(tree)
+,
 		      pty_idx, WN_st(tree));
   swn = WN_CreateIntconst (OPC_U4INTCONST, size);
-  wn  = WN_CreateMstore (0, pty_idx, WN_kid0(tree), awn, swn);
+  wn  = WN_CreateMstore (WN_store_offset(tree)// 0
+			 , pty_idx, WN_kid0(tree), awn, swn);
   WN_set_field_id(wn, WN_field_id(tree));
-  wn  = lower_store (block, wn, actions);
+  // if(Action(LOWER_UPC_MFIELD))
+//     return wn;
+ wn  = lower_store (block, wn, actions);
 
   WN_Delete(tree);
   return wn;
@@ -5481,6 +6396,8 @@ static WN *lower_mistore(WN *block, WN *tree, LOWER_ACTIONS actions)
     ty_idx = get_field_type (ty_idx, WN_field_id (tree));
   
   UINT64 size    = TY_size(Ty_Table[ty_idx]);
+  if(Action(LOWER_UPC_MFIELD) && WN_field_id(tree) && Type_Is_Shared_Ptr(ty_idx))
+    size = TY_size(TY_To_Sptr_Idx(ty_idx));
   WN*    wn;
   WN*    swn;
 
@@ -5509,6 +6426,54 @@ static WN *lower_mistore(WN *block, WN *tree, LOWER_ACTIONS actions)
   WN_DELETE_Tree (tree);
   return wn;
 }
+
+/*
+ * See if the given expr is of the form
+ *   
+ *   LDID struct
+ *   EXPR
+ * ADD
+ * (this happens for expr like foo->x[i])
+ *
+ *  If so, return the type of the struct, ow return 0
+ */
+static TY_IDX struct_addr_ty(WN* tree) {
+
+  if (WN_operator(tree) == OPR_ADD &&
+      WN_operator(WN_kid0(tree)) == OPR_LDID) {
+    TY_IDX addr_ty = WN_ty(WN_kid0(tree));
+    if (TY_kind(addr_ty) == KIND_POINTER &&
+	TY_kind(TY_pointed(addr_ty)) == KIND_STRUCT) {
+      return TY_pointed(addr_ty);
+    }
+  }
+  return 0;
+}
+
+static int find_field_from_offset(TY_IDX ty, unsigned int offset) { 
+  
+  Is_True(TY_kind(ty) == KIND_STRUCT, ("TY is not a struct", ""));
+  int cur_field = 1;
+  FLD_ITER fld_iter = Make_fld_iter(TY_fld(ty));
+  do {
+    FLD_HANDLE fld(fld_iter);
+    if (FLD_ofst(fld) == offset) {
+      return cur_field;
+    } 
+    if (FLD_ofst(fld) > offset) {
+      fprintf(stderr, "can't find field with exact same offset in find_field_from_offset\n");
+      return cur_field - 1;
+    }
+    TY_IDX fld_ty = FLD_type(fld);
+    if (TY_kind(fld_ty) == KIND_STRUCT && !is_upcr_ptr(fld_ty) &&
+	TY_fld(fld_ty) != FLD_HANDLE() && offset < (FLD_ofst(fld) + TY_size(fld_ty)) ) {
+      return cur_field + find_field_from_offset(fld_ty, offset - FLD_ofst(fld));
+    }
+    cur_field++;
+  } while (!FLD_last_field(fld_iter++));
+  return -1;
+}
+
 
 /* ====================================================================
  *
@@ -5559,7 +6524,7 @@ static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
   
   switch (WN_operator(tree))
   {
-  case OPR_ISTORE:
+  case OPR_ISTORE: {
     if (WN_StoreIsUnused(WN_kid1(tree)))
     {
       WN	*eval;
@@ -5752,8 +6717,7 @@ static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
 	WN_store_offset(tree) = mem_offset_lo(offset);
       }
     }
-    else
-    {
+    else {
      /*
       * Split
       *       LDA  (c1) <sym> 
@@ -5786,12 +6750,179 @@ static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
       {
 	WN_store_offset(tree) += WN_const_val(WN_kid1(addr_kid));
 	WN_kid1(tree) = WN_kid0(addr_kid);
+	TY_IDX obj_ty = struct_addr_ty(WN_kid1(tree));
+	if (obj_ty != 0) {
+	  //WEI: let's fix the offset here
+	  int field_id = find_field_from_offset(obj_ty, WN_store_offset(tree));
+	  WN_store_offset(tree) = Adjust_Field_Offset(obj_ty, field_id);
+	  //cout << "STORE OFFSET: " <<  WN_store_offset(tree) << endl;
+	}
 	WN_Delete(WN_kid1(addr_kid));
 	WN_Delete(addr_kid);
       }
+    } 
+    if ( Action(LOWER_UPC_TO_INTR) ) {
+ 
+      TY_IDX idx = WN_ty(tree);
+      TY_IDX dst_idx = 0;
+      if(Type_Is_Shared_Ptr(idx)) {
+	TY_IDX src_idx = WN_ty(WN_kid1(tree));
+	WN *ist;
+	BOOL do_arith = TRUE;
+	BOOL is_field = FALSE;
+	WN *offt = 0;
+
+	SPTR_ACCUMULATION_STATE saved_acc_state = sptr_accumulation_state;
+        sptr_accumulation_state = ACCUMULATION;
+        sptr_off_accumulation_stack.push(CXX_NEW(SPTR_OFFSET_TERM_STACK, Malloc_Mem_Pool));
+        SPTR_OFFSET_TERM_STACK *term_stack = sptr_off_accumulation_stack.top();
+	WN *kid1 = WN_kid1(tree);
+	
+	if((WN_operator(kid1) == OPR_LDID && !WN_offset(tree)) ||
+	   WN_operator(kid1) == OPR_ARRAY ||
+	   // the optimizer creates LDA(off, array) and the pointer arith
+	   // is performed when lowering the LDA
+	  ( WN_operator(kid1) == OPR_TAS && WN_operator(WN_kid0(kid1)) == OPR_LDA &&
+	   TY_kind(TY_pointed(WN_ty(WN_kid0(kid1)))) == KIND_ARRAY) )
+	  do_arith = FALSE;
+	
+        if(WN_offset(tree)) {
+	  offt = WN_Intconst(Integer_type, 
+			     WN_field_id(tree) > 1 ? Adjust_Field_Offset(TY_pointed(WN_ty(tree)), WN_field_id(tree)) : WN_offset(tree));
+          WN_offset(tree) = 0;
+        }
+
+	dst_idx = (OPERATOR_is_load(WN_operator(WN_kid0(tree)))  || 
+		   WN_operator(WN_kid0(tree)) == OPR_TAS) ? 
+		   WN_ty(WN_kid0(tree)) : dst_idx;
+	sptr_accumulation_state = NO_ACCUMULATION;
+	WN_kid0(tree) = lower_expr(block, WN_kid0(tree), actions);
+	
+	sptr_accumulation_state = ACCUMULATION;
+	WN_kid1(tree) = lower_expr(block, WN_kid1(tree), actions);	
+	
+
+	INTRINSIC iop;
+	if(src_idx && dst_idx &&
+	   Type_Is_Shared_Ptr(src_idx, TRUE) && 
+	   Type_Is_Shared_Ptr(dst_idx, TRUE) &&
+	   Need_StoP_Cvt(dst_idx, src_idx, &iop)) {
+	  WN_kid0(tree) = WN_Create_StoP_Cvt(WN_kid0(tree), iop);
+	}
+	
+	if(WN_operator(WN_kid1(tree)) == OPR_TAS) {
+	  dst_idx =  WN_ty(WN_kid1(tree));
+	  WN_set_ty(tree, dst_idx);
+	  WN_kid1(tree) = Strip_TAS(WN_kid1(tree));
+	} else 
+	  dst_idx = WN_ty(tree);
+	
+	//fprintf(stderr, "Store after lowering : kid0\n");
+ 	//fdump_tree(stderr,WN_kid0(tree));
+  	//fprintf(stderr, "Store after lowering : kid1\n");
+ 	//fdump_tree(stderr,WN_kid1(tree));	
+
+	if (do_arith) {
+	  ist = Combine_Offset_Terms(*term_stack);
+	  if (WN_operator(WN_kid1(tree)) == OPR_LDID) {
+	    src_idx = ST_type(WN_st(WN_kid1(tree)));
+	    is_field = WN_field_id(tree)-1;
+	  } else if (WN_operator(WN_kid1(tree)) == OPR_COMMA) {
+	    Is_True(src_idx, ("",""));
+	  } else 
+	    Is_True(src_idx,("",""));
+	    
+	  UINT esize = Get_Type_Inner_Size(idx);
+	  //for accesses to fields of shared structs, dst_idx = shared [] char
+	  // and the ptr arithmetic needs to have the elem size 1;
+	  if(dst_idx && Type_Is_Shared_Ptr(dst_idx, TRUE) && 
+	     TY_size(TY_pointed(dst_idx)) == 1 && Get_Type_Block_Size(dst_idx) == 0) {
+	    Is_True(Get_Type_Block_Size(idx) == 0, ("",""));
+	    esize = 1;
+	  } //how the heck can I tell the difference between shared struct { shared int *p ..}
+	    // and shared struct { int *p ..}
+	  if(TY_kind(idx) == KIND_POINTER && TY_is_shared(TY_pointed(idx)) && 
+	     TY_kind(TY_pointed(idx)) == KIND_POINTER)
+	    esize = TY_size(TY_To_Sptr_Idx(idx));
+
+	  if(ist && TY_kind(dst_idx) == KIND_POINTER  &&
+	     Types_Are_Equiv(/*TY_pointed(dst_idx)*/ dst_idx, src_idx) /*&& !is_field */) {
+	    WN_kid1(tree)  = WN_Create_Shared_Ptr_Arithmetic (WN_kid1(tree), ist, OPR_ADD,
+							      esize,
+							      Get_Type_Block_Size(idx),
+							      Get_Type_Block_Size(idx) <= 1);
+	    
+	    if(offt) {
+	      ist = offt;
+	    } else 
+	      do_arith = FALSE;
+	    
+	  } else if(offt)
+	    ist = offt;
+	} 
+
+	sptr_accumulation_state = saved_acc_state;
+        sptr_off_accumulation_stack.pop();
+        CXX_DELETE(term_stack, Malloc_Mem_Pool);
+	
+	if(!ist)
+	  do_arith = FALSE;
+	ist = WN_Create_Shared_Store (tree, FALSE, 0, do_arith /*True*/, ist);
+	WN_Delete(tree);
+	return ist;
+      } else if (WN_Type_Is_Shared_Ptr(WN_kid0(tree)) || WN_operator(WN_kid0(tree)) == OPR_TAS)
+	{
+	  
+	  WN *kid0 = lower_expr(block,
+				WN_operator(WN_kid0(tree)) == OPR_TAS ? WN_kid0(WN_kid0(tree)) :
+				WN_kid0(tree),
+				actions);
+	  if (TY_kind(WN_object_ty(WN_kid0(tree))) == KIND_SCALAR)
+	    WN_kid0(tree) = kid0;
+	  else {
+	    if(OPERATOR_is_load(WN_operator(WN_kid0(tree))) && WN_field_id(WN_kid0(tree)))
+	      WN_kid0(tree) = kid0;
+	    else {
+	      idx = WN_field_id(tree) ?  
+		get_field_type(TY_pointed(WN_ty(tree)), WN_field_id(tree)) :
+		WN_ty(tree) ;
+	      if(!Type_Is_Shared_Ptr(idx)) {
+		if(!(TY_kind(idx) == KIND_POINTER && Type_Is_Shared_Ptr(TY_pointed(idx), TRUE)))
+		  //test to see that we do not assign a shared ptr into a deref of a
+		  //local ptr to shared ptr
+		  WN_kid0(tree) = WN_Convert_Shared_To_Local(kid0, WN_ty(tree), 0);
+		else WN_kid0(tree) = kid0;
+	      } else  if(WN_field_id(tree) && !Type_Is_Shared_Ptr(WN_ty(tree)) &&  
+		       Type_Is_Shared_Ptr(idx, TRUE)){
+		//this is the case where we store into a field of a local struct, the type of
+		//of the field being a sptr
+		dst_idx = TY_To_Sptr_Idx(idx);
+		INTRINSIC iop = INTRINSIC_LAST;
+		if((Type_Is_Shared_Ptr(WN_ty(kid0)) &&
+		    Need_StoP_Cvt(WN_ty(kid0), idx, &iop) ) ||
+		   Need_StoP_Cvt(WN_ty(WN_kid0(tree)), idx, &iop))
+		  kid0 = WN_Create_StoP_Cvt(Strip_TAS(kid0), iop);
+		
+		if(TY_mtype(dst_idx) == MTYPE_M) {
+		  WN_set_rtype(tree, MTYPE_V);
+		  WN_set_desc(tree, MTYPE_M);
+		  WN_store_offset(tree) = Adjust_Field_Offset(TY_pointed(WN_ty(tree)),
+							       WN_field_id(tree));
+		  // WN_set_ty(tree, Make_Pointer_Type(dst_idx));
+		 
+		  WN_kid0(tree) = kid0;
+		}	     
+	      } 
+	    }
+	  }
+	  WN_kid1(tree) = lower_expr(block, WN_kid1(tree), actions);
+	  return tree;
+	} else if(WN_field_id(tree) > 1) 
+	  WN_store_offset(tree) = Adjust_Field_Offset(TY_pointed(WN_ty(tree)),
+							       WN_field_id(tree));
     }
     break;
-
+  } 
   case OPR_STID:
     {
       PREG_NUM last_preg = Get_Preg_Num (PREG_Table_Size(CURRENT_SYMTAB));
@@ -5818,6 +6949,11 @@ static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
     if (Action(LOWER_MLDID_MSTID) && WN_desc(tree) == MTYPE_M)
       return lower_mstid(block, tree, actions);
 
+    if (Action(LOWER_MLDID_MSTID) && WN_Type_Is_Shared_Ptr(tree) && 
+	TY_mtype(TY_To_Sptr_Idx(WN_ty(tree))) == MTYPE_M && 
+	WN_operator(WN_kid0(tree)) == OPR_LDID && WN_st(WN_kid0(tree)) == Return_Val_Preg) 
+      return lower_mstid(block, tree, actions);
+    
     if (Action(LOWER_BIT_FIELD_ID) && WN_desc(tree) == MTYPE_BS) {
       lower_bit_field_id(tree);
       if (Action(LOWER_BITS_OP) && WN_operator (tree) == OPR_STBITS)
@@ -5956,8 +7092,113 @@ static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
 	return lower_store(block, istore, actions);
       }
     }
+    
+    if(Action(LOWER_UPC_TO_INTR)){
+      INTRINSIC iop = INTRINSIC_LAST;
+      if( TY_is_shared(ST_type(WN_st(tree)))) {
+	WN_kid0(tree)  = lower_expr(block, WN_kid0(tree), actions);
+	if(WN_operator(WN_kid0(tree)) == OPR_COMMA)
+	  WN_kid0(tree) = Spill_Shared_Load(WN_kid0(tree));
+	TY_IDX rhs_idx = WN_ty(WN_kid0(tree));
+	bool both_shared = false;
+	// 	if (rhs_idx == shared_ptr_idx || rhs_idx == pshared_ptr_idx) {
+	//WEI: in this case both sides are shared, and we want to do a memcpy
+	// 	 both_shared = true;
+	// 	}
+	WN *ical = WN_Create_Shared_Store(tree, both_shared);
+	WN_Delete(tree);
+	kids_lowered = TRUE;
+	return ical;
+      } else if (TY_kind(WN_ty(tree)) == KIND_POINTER && TY_is_shared(TY_pointed(WN_ty(tree))) ||
+		 TY_kind(WN_ty(tree)) == KIND_ARRAY && TY_is_shared(TY_etype(WN_ty(tree))) ) {
+	//WEI: set to correct type
+	TY_IDX base_idx = TY_kind(WN_ty(tree)) == KIND_POINTER ? TY_pointed(WN_ty(tree)) : TY_etype(WN_ty(tree));
+	TY_IDX real_ty = TY_is_pshared(base_idx) ? pshared_ptr_idx : shared_ptr_idx;
+	
+	WN *kid0 = WN_kid0(tree);
+	//check here for the case where NULL is assigned to a shared pointer.
+	if(TY_kind(WN_ty(tree)) == KIND_POINTER && WN_operator(kid0) == OPR_TAS &&
+	   WN_operator(WN_kid0(kid0)) == OPR_INTCONST) {
+	  WN_kid0(tree) = kid0 = Strip_TAS(kid0);
+	  Is_True(WN_const_val(kid0) == 0, ("Setting a shared ptr to a constant different from NULL",""));
+	  return WN_SetNull_Sptr(tree);
+	} else if(Type_Is_Shared_Ptr(WN_ty(kid0)) && Need_StoP_Cvt(WN_ty(kid0), WN_ty(tree), &iop)) {
+	  kids_lowered = TRUE;
+	  WN_kid0(tree)  = WN_Create_StoP_Cvt(lower_expr(block, kid0,actions), iop);
+	} 
 
-    break;
+	WN_set_ty(tree, real_ty);
+	WN_set_desc (tree, TY_mtype(real_ty));
+	
+      } else if (WN_Type_Is_Shared_Ptr(WN_kid0(tree)) || WN_operator(WN_kid0(tree)) == OPR_TAS)
+	{
+	  TY_IDX src_idx = 0;
+	  WN *kid0 = WN_kid0(tree);
+	  if(WN_operator(kid0) == OPR_TAS || OPERATOR_is_load(WN_operator(kid0))) {
+	    src_idx = WN_ty(kid0);
+	    if(OPERATOR_is_load(WN_operator(kid0)) && WN_field_id(kid0)) {
+	      src_idx = Get_Field_Type(src_idx, WN_field_id(kid0));
+	    } 
+	  }
+	  kid0 = lower_expr(block,
+			    WN_operator(WN_kid0(tree)) == OPR_TAS ? WN_kid0(WN_kid0(tree)) :
+			    WN_kid0(tree),
+			    actions);
+	  if (TY_kind(WN_object_ty(WN_kid0(tree))) == KIND_SCALAR)
+	    WN_kid0(tree) = kid0;
+	  else {
+	    if(OPERATOR_is_load(WN_operator(WN_kid0(tree))) && WN_field_id(WN_kid0(tree)))
+	      WN_kid0(tree) = kid0;
+	    else {
+	     //  fdump_tree(stderr, tree);
+	      TY_IDX  idx = WN_field_id(tree) ?  
+		get_field_type(WN_ty(tree), WN_field_id(tree)) :
+		WN_ty(tree) ;
+	      if(!Type_Is_Shared_Ptr(idx)) {
+		if(src_idx && !TY_is_shared(src_idx))
+		  WN_kid0(tree) = WN_Convert_Shared_To_Local(kid0, WN_ty(tree), 0);
+		else
+		  WN_kid0(tree) = kid0;
+	      }
+	      else  if(WN_field_id(tree) && !Type_Is_Shared_Ptr(WN_ty(tree)) &&  
+		       Type_Is_Shared_Ptr(idx, TRUE)){
+		//this is the case where we store into a field of a local struct, the type of
+		//of the field being a sptr
+		// 	Ty_Table[WN_ty(tree)].Print(stderr);
+		// 	Ty_Table[WN_load_addr_ty(tree)].Print(stderr);
+		TY_IDX dst_idx = TY_To_Sptr_Idx(idx);
+		if(TY_mtype(dst_idx) == MTYPE_M) {
+		  WN_set_rtype(tree, MTYPE_V);
+		  WN_set_desc(tree, MTYPE_M);
+		  WN_store_offset(tree) = Adjust_Field_Offset(WN_ty(tree),
+							       WN_field_id(tree));
+		 //  WN_set_ty(tree, dst_idx);
+		  WN_kid0(tree) = kid0;
+		}	     
+	      }
+	    }
+
+	      // WN_kid0(tree) = WN_Convert_Shared_To_Local(kid0, WN_ty(tree), 0);
+	  }
+	  return tree;
+	} else if(WN_field_id(tree) > 1) {
+	  WN_store_offset(tree) = Adjust_Field_Offset(WN_ty(tree), WN_field_id(tree));
+	} else if (WN_operator(WN_kid0(tree)) == OPR_ADD) {
+	  //WEI: We may need to fix up the offset 
+	  WN* offset = WN_kid1(WN_kid0(tree));
+	  if (WN_operator(offset) == OPR_INTCONST) {
+	    TY_IDX obj_ty = struct_addr_ty(WN_kid0(WN_kid0(tree)));
+	    if (obj_ty != 0) {
+	      int field_id = find_field_from_offset(obj_ty, WN_const_val(offset));
+	      int real_ofst =  Adjust_Field_Offset(obj_ty, field_id);
+	      WN_kid1(WN_kid0(tree)) = WN_CreateIntconst(OPR_INTCONST, Pointer_Mtype, MTYPE_V, real_ofst); 
+	      //cout << "STID OFFSET: " << real_ofst << endl;
+	    }
+	  }
+	}
+    }
+    
+    break; // OPR_STID
 
   case OPR_ISTBITS:
   case OPR_STBITS:
@@ -5970,6 +7211,78 @@ static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
       WN *rhs = WN_kid0(tree);
       Is_True(!(WN_opcode(rhs) == OPC_MMLDID && WN_st(rhs) == Return_Val_Preg),
 	      ("MMLDID of Return_Val_Preg cannot be rhs of MSTORE"));
+    }
+    
+    if (Action(LOWER_UPC_TO_INTR)) {
+      if((WN_ty(WN_kid1(tree)) && TY_is_shared(TY_pointed(WN_ty(WN_kid1(tree))))) ||  
+	 (WN_ty(WN_kid0(tree)) && TY_is_shared(TY_pointed(WN_ty(WN_kid0(tree))))) ) {
+	// fprintf(stderr, "MSTORE KID0 ");
+// 	fdump_tree(stderr, WN_kid0(tree));
+// 	fprintf(stderr, "MSTORE KID1 ");
+// 	fdump_tree(stderr, WN_kid1(tree));
+// 	fprintf(stderr, "MSTORE KID2 ");
+// 	fdump_tree(stderr, WN_kid2(tree));
+// 	fprintf(stderr, "=================\n");
+	
+	
+	BOOL src_shared = FALSE;
+	if (TY_kind(WN_ty(WN_kid0(tree))) == KIND_POINTER && 
+	    TY_is_shared(TY_pointed(WN_ty(WN_kid0(tree)))))
+	  src_shared = TRUE;
+	WN_OFFSET ld_xtra_oft = 0;
+	WN_OFFSET st_xtra_oft = 0;
+	TY_IDX dest_ty = 0;
+	TY_IDX orig_ty = WN_ty(WN_kid1(tree));
+	//short circuit structure copies
+	// s1 = s2;
+	if (WN_operator(WN_kid0(tree)) == OPR_MLOAD ) {
+	  WN *kid0 = WN_kid0(tree);
+	  if(OPCODE_is_load(WN_opcode(WN_kid0(kid0))) || 
+	     OPCODE_is_store(WN_opcode(WN_kid0(kid0))))
+	    ld_xtra_oft = WN_offset(WN_kid0(kid0));
+	  // extract the type of the field, if any
+	  if (WN_field_id(kid0)) {
+	    UINT tmp_field_id = 0;
+	    dest_ty = FLD_type(FLD_get_to_field(TY_pointed(WN_object_ty(kid0)), 
+						WN_field_id(kid0), tmp_field_id));
+	  } else
+	    dest_ty = TY_pointed(WN_ty(kid0));
+	  WN_kid0(tree) = lower_expr(block, WN_kid0(WN_kid0(tree)), actions);
+	} else
+	  WN_kid0(tree) = lower_expr(block, WN_kid0(tree), actions);
+	
+	st_xtra_oft = WN_offset(WN_kid1(tree));
+	WN_kid1(tree) = lower_expr(block, WN_kid1(tree), actions);
+	WN_kid2(tree) = lower_expr(block, WN_kid2(tree), actions);
+	if (src_shared && !Type_Is_Shared_Ptr(orig_ty)) {
+	  //non-shared = shared;
+	  return WN_Create_Shared_Load(WN_kid0(tree), WN_kid1(tree), 
+				       TRUE, ld_xtra_oft);
+	} else  if (!src_shared) {
+	  return WN_Create_Shared_Store(tree, src_shared, st_xtra_oft);
+	} else {
+	  // shared struct = shared struct
+	  // fdump_tree(stderr,WN_kid0(tree));
+	  ST *spill_st = Gen_Temp_Symbol(dest_ty, (char*) ".Mspill");
+	  WN *dest = WN_Lda(Pointer_Mtype, 0, spill_st, 0);
+	  dest  = WN_Create_Shared_Load(WN_kid0(tree), dest, TRUE, 0, dest_ty);
+	  WN *wn0 = WN_CreateBlock();
+	  WN_INSERT_BlockLast(wn0, dest);
+	  wn0 = WN_CreateComma(OPR_COMMA, MTYPE_M, MTYPE_V, wn0, 
+			       WN_Ldid(MTYPE_M, 0, spill_st, ST_type(spill_st)));
+	  WN_kid0(tree) = wn0;
+	  return WN_Create_Shared_Store(tree, FALSE, st_xtra_oft);
+					  
+	}
+      }
+    } else if(Action(LOWER_UPC_MFIELD)) {
+      TY_IDX idx = TY_pointed(WN_ty(tree));
+      WN *kid = WN_kid2(tree);
+      if(WN_operator(kid) == OPR_INTCONST)
+	WN_const_val(kid) = 
+	  Adjusted_Type_Size(WN_field_id(tree) == 0 ? idx : Get_Field_Type(idx, WN_field_id(tree)));
+      if(WN_field_id(tree) && WN_offset(tree))
+	WN_offset(tree) = Adjust_Field_Offset(idx, WN_field_id(tree));
     }
 
     if (Align_Object)
@@ -6022,11 +7335,13 @@ static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
       tree = lower_mstore(block, tree, actions);
       kids_lowered = TRUE;
     }
-
-    break;
+    
+    
+    
+    break; /* MSTORE */
 
   }
-
+  
   /* Lower kids if not done already. */
   if (! kids_lowered)
   {
@@ -7221,6 +8536,7 @@ static WN *lower_mstore(WN * /*block*/, WN *mstore, LOWER_ACTIONS actions)
   Is_True((WN_opcode(mstore) == OPC_MSTORE),
 	  ("expected MSTORE node, not %s", OPCODE_name(WN_opcode(mstore))));
 
+
   if (WN_field_id (mstore) != 0)
       lower_field_id (mstore);
 
@@ -7887,6 +9203,12 @@ static WN *lower_emulation(WN *block, WN *tree, LOWER_ACTIONS actions,
     }
     else
     {
+      //FIX:
+      if (WN_intrinsic(tree) == INTRN_TLD_ADDR) {
+	//prevent the lowering of TLD_ADDR from happening twice
+	return tree;
+      }
+
       wn = lower_intrinsic_op(block, tree, actions);
     }
   }
@@ -9184,6 +10506,122 @@ static WN *lower_return_val(WN *block, WN *tree, LOWER_ACTIONS actions)
 }
 
 
+//Since Parm node allows only integer type, we need to 
+//promote char and short to int 
+static TYPE_ID get_parm_type(int rtype) {
+
+  if (rtype == MTYPE_I1 || rtype == MTYPE_I2) {
+    return MTYPE_I4;
+  }
+  if (rtype == MTYPE_U1 || rtype == MTYPE_U2) {
+    return MTYPE_U4;
+  }
+  return rtype;
+}
+
+/*
+  static TY_IDX Get_Field_Type(TY_IDX base, int field_id) {
+  
+  if (!(TY_kind(base) == KIND_STRUCT)) {
+  cerr << "CALLING GET_FIELD_TYPE with a non struct type" << endl;
+  return base;
+  }
+  FLD_HANDLE fh = TY_fld(base);
+  for (int i = 1; i < field_id; i++, fh = FLD_next(fh));
+  return FLD_type(fh);
+  }
+*/
+
+static WN* get_TLD_call(TYPE_ID rtype, WN* param, TY_IDX ty_idx) {
+  
+  WN* kids[1];
+  WN* var = WN_CreateParm(rtype, param, ty_idx, WN_PARM_BY_VALUE);
+  kids[0] = var;
+  return WN_Create_Intrinsic(OPR_INTRINSIC_OP, TY_mtype(Make_Pointer_Type(ty_idx)), MTYPE_V, INTRN_TLD_ADDR, 1, kids);
+}
+
+static bool TY_not_shared(TY_IDX idx) {
+  
+  return !(TY_is_shared(idx) || idx == shared_ptr_idx || idx == pshared_ptr_idx);
+}
+
+/*
+ * Perform lowering for TLD variables, which must be converted to TLD_ADDR(...) in the output C file
+ */
+static WN* lower_TLD(WN* block, WN* wn, LOWER_ACTIONS actions) {
+
+  if (!Action(LOWER_UPC_TO_INTR)) {
+    return wn;
+  }
+
+  ST_IDX idx = WN_st_idx(wn);
+  ST st = St_Table[idx];
+  TY_IDX ty_idx = ST_type(idx);
+  TYPE_ID rtype = TY_mtype(ty_idx);
+
+  int sclass = ST_sclass(st);
+  if (TY_not_shared(ty_idx) && 
+      ST_class(st) != CLASS_CONST &&
+      (sclass == SCLASS_PSTATIC || sclass == SCLASS_FSTATIC || 
+       sclass == SCLASS_COMMON || sclass == SCLASS_EXTERN ||
+       sclass == SCLASS_UGLOBAL || sclass == SCLASS_DGLOBAL)) {
+    //variable is TLD
+    
+
+    TY_IDX ptr_ty = Make_Pointer_Type(ty_idx);
+    if (WN_field_id(wn) != 0) {
+      //storing into a field, set type appropriately
+      TY_IDX fld_idx = get_field_type(ty_idx, WN_field_id(wn));
+      ptr_ty = Make_Pointer_Type(fld_idx);
+      rtype = TY_mtype(fld_idx);
+    }
+
+    rtype = get_parm_type(rtype);
+    WN* res;
+    WN* ld = WN_Ldid(rtype, WN_offset(wn), idx, ty_idx, WN_field_id(wn)); 
+    res = get_TLD_call(rtype, ld, ty_idx);
+    switch (WN_operator(wn)) {
+    case OPR_STID: {
+      WN* val = lower_expr(block, WN_kid(wn, 0), actions); 
+      //cout << "DONE TLD STORE: " << ST_name(st) << endl;  
+      return WN_CreateIstore(OPR_ISTORE, MTYPE_V, WN_rtype(val), 0, ptr_ty, val, res, 0); 
+    }
+    case OPR_LDID:
+      //cout << "DONE TLD LOAD" << endl;
+      return WN_CreateIload(OPR_ILOAD, rtype, rtype, 0, TY_pointed(ptr_ty), ptr_ty, res, 0); 
+    default:
+      Is_True(0, ("Unexpected Operator in lower_TLD: %d", WN_operator(wn)));
+    }
+  }
+  return wn;
+}
+
+static WN* lower_TLD_lda(WN* block, WN* wn, LOWER_ACTIONS actions) {
+
+  if (!Action(LOWER_UPC_TO_INTR)) {
+    return wn;
+  }
+
+  ST_IDX idx = WN_st_idx(wn);
+  ST st = St_Table[idx];
+  TY_IDX ty_idx = ST_type(idx);
+  TYPE_ID rtype = TY_mtype(ty_idx);
+  int sclass = ST_sclass(st);
+  if (TY_not_shared(ty_idx) && 
+      ST_class(st) != CLASS_CONST &&
+      (sclass == SCLASS_PSTATIC || sclass == SCLASS_FSTATIC || 
+       sclass == SCLASS_COMMON || sclass == SCLASS_EXTERN ||
+       sclass == SCLASS_UGLOBAL || sclass == SCLASS_DGLOBAL)) {
+    WN* res;
+    WN* ld = WN_Ldid(rtype, WN_offset(wn), idx, ST_type(st));
+    res = get_TLD_call(rtype, ld, ty_idx); 
+    //cout << "DONE TLD LDA" << endl;
+    return res;
+  }
+  return wn;
+}
+
+
 /* ====================================================================
  *
  * WN *lower_stmt(WN *block, WN *tree, LOWER_ACTIONS actions)
@@ -9201,9 +10639,26 @@ static WN *lower_stmt(WN *block, WN *tree, LOWER_ACTIONS actions)
 
   Is_True(OPCODE_is_stmt(WN_opcode(tree)),
 	  ("expected statement node, not %s", OPCODE_name(WN_opcode(tree))));
-
   switch(WN_operator(tree))
   {
+
+  case OPR_PRAGMA:
+    if (Action(LOWER_UPC_TO_INTR)) {
+      switch(WN_pragma(tree)) {
+      case WN_PRAGMA_UPC_STRICT_CONSISTENCY_START:
+	consistency_stack.push(STRICT_CONSISTENCY);
+	break;
+      case WN_PRAGMA_UPC_RELAXED_CONSISTENCY_START:
+	consistency_stack.push(RELAXED_CONSISTENCY);
+	break;
+      case WN_PRAGMA_UPC_STRICT_CONSISTENCY_STOP:
+      case WN_PRAGMA_UPC_RELAXED_CONSISTENCY_STOP:
+	consistency_stack.pop();
+	break;
+      }
+      return tree;
+    }
+    break;
   case OPR_CALL:
   case OPR_ICALL:
   case OPR_PICCALL:
@@ -9213,12 +10668,21 @@ static WN *lower_stmt(WN *block, WN *tree, LOWER_ACTIONS actions)
   case OPR_INTRINSIC_CALL:
     tree = lower_intrinsic_call(block, tree, actions);
     break;
-    
+
   case OPR_ISTORE:
   case OPR_STID:
-  case OPR_MSTORE:
+  case OPR_MSTORE: {
+    if (WN_operator(tree) == OPR_STID) {
+     //  WN* res = lower_TLD(block, tree, actions);
+//       if (res != tree) {
+// 	tree = res;
+// 	break;
+//       }
+    }
+
     tree = lower_store(block, tree, actions);
     break;
+  }
 
   case OPR_COMPGOTO:
     tree = lower_compgoto(block, tree, actions);
@@ -10280,6 +11744,219 @@ static WN *lower_do_while(WN *block, WN *tree, LOWER_ACTIONS actions)
   return tree;
 }
 
+//map the old label name to the new one
+static map<int, int> label_map;
+static hash_set<int> labels;
+
+static WN *lower_while_do(WN *block, WN *tree, LOWER_ACTIONS actions);
+
+/**
+ *
+ * rename recursively all labels in the wn 
+ *
+ * Questionable ones: REGION, REGION_EXIT, AGOTO, COMMA
+ */
+static WN* rename_labels(WN* wn) {
+
+  WN* result;
+  switch ( WN_operator(wn) ) {
+    
+  case OPR_BLOCK: {
+    result = WN_CreateBlock();
+    WN* next = WN_first(wn);
+    while (next != NULL) {
+      WN_INSERT_BlockLast(result, rename_labels(next));
+      next = WN_next(next);
+    }
+    break;
+  }
+
+  case OPR_DO_WHILE:
+    result = WN_CreateDoWhile(WN_COPY_Tree(WN_while_test(wn)), rename_labels(WN_while_body(wn)));
+    break;
+
+  case OPR_WHILE_DO:
+    result = WN_CreateWhileDo(WN_COPY_Tree(WN_while_test(wn)), rename_labels(WN_while_body(wn)));
+    break;
+
+  case OPR_IF:
+    result = WN_CreateIf(WN_COPY_Tree(WN_if_test(wn)), rename_labels(WN_then(wn)), rename_labels(WN_else(wn)));
+    break;
+
+  case OPR_CASEGOTO:
+  case OPR_TRUEBR:
+  case OPR_FALSEBR:
+  case OPR_GOTO:
+  case OPR_LABEL: {
+    result = WN_COPY_Tree(wn);
+    int label = WN_label_number(wn);
+    if (WN_operator(wn) == OPR_GOTO) {
+      //catch the break out of affinity loop case
+      if (labels.find(label) == labels.end()) {
+	//cout << "label not present: " << label << endl;
+	break;
+	//this is a goto to the end of loop, so we don't rename it
+      }
+    }
+
+    if (label_map[label] == 0) {
+      LABEL_IDX new_label; 
+      LABEL_Init (New_LABEL (CURRENT_SYMTAB, new_label), 0, LKIND_DEFAULT);
+      label_map[label] = new_label;
+    }
+    //update the label number
+    WN_label_number(result) = label_map[label];
+    break;
+  }
+
+  case OPR_SWITCH: 
+    result = WN_COPY_Tree(wn);
+    for (int i = 0; i < WN_kid_count(result); i++) {
+      WN_kid(result, i) = rename_labels(WN_kid(result, i));
+    }
+    break;
+
+  default:
+    result = WN_COPY_Tree(wn);
+  }
+
+  return result;
+}
+
+/**
+ *
+ * find all labels the wn tree
+ */
+static void find_labels(WN* wn) {
+ 
+  switch ( WN_operator(wn) ) {
+    
+  case OPR_BLOCK: {
+    WN* next = WN_first(wn);
+    while (next != NULL) {
+      find_labels(next);
+      next = WN_next(next);
+    }
+    break;
+  }
+
+  case OPR_DO_WHILE:
+    find_labels(WN_while_body(wn));
+    break;
+
+  case OPR_WHILE_DO:
+    find_labels(WN_while_body(wn));
+    break;
+
+  case OPR_IF:
+    find_labels(WN_then(wn));
+    find_labels(WN_else(wn));
+    break;
+
+  case OPR_SWITCH: 
+    for (int i = 0; i < WN_kid_count(wn); i++) {
+      find_labels(WN_kid(wn, i));
+    }
+    break;
+
+  case OPR_LABEL: 
+    labels.insert(WN_label_number(wn));
+    break;
+  default:
+    break;
+  }
+}
+
+/**
+ *
+ * wn is a while_do loop of the form
+ * while (test) {
+ *   aff_exp
+ *   if (aff) {
+ *      loop_body
+ *   }
+ *   #pragma
+ *   cont_label:
+ *   loop_incr
+ * }
+ *
+ * Which we tranform to
+ * if (forall_ctrl) {
+ *    while (test) {
+ *      loop_body_1
+ *    }
+ *    c_label1:
+ *    loop_incr
+ * } else {
+ *    while (test) {
+ *      aff_exp
+ *      if (aff) {
+ *         loop_body
+ *      }
+ *      c_label:
+ *      loop_incr
+ *    }
+ * }
+ *
+ * Where body_1 and body are identical except the labels in 1 are renamed to avoid duplicate labels
+ */
+
+static WN* lower_forall_ctrl(WN* block, WN* tree, WN* prag, LOWER_ACTIONS actions) {
+
+   //reinit the data structures
+  label_map.clear();
+  labels.clear();
+
+  WN* test = WN_while_test(tree);
+  //WN* aff_body = WN_first(WN_while_body(tree));
+  //WN* loop_body = WN_then(aff_body);  
+  //This relies on the front end always inserting the pragma right after the affinity test
+  WN* aff_body = WN_prev(prag);
+  Is_True(WN_opcode(aff_body) == OPC_IF,
+	  ("expected IF node for affinity test, not %s", OPCODE_name(WN_opcode(tree))));
+  WN* loop_body = WN_then(aff_body);  
+  WN* label = WN_next(WN_next(aff_body));  
+  WN* incr = WN_next(label);
+
+  WN* if_expr = WN_Ldid(MTYPE_I4, 0, upc_forall_control_st, ST_type(upc_forall_control_st));
+  //WN* if_expr = WN_CreateExp2(OPC_I4I4EQ, WN_Intconst(MTYPE_I4, 0), WN_Intconst(MTYPE_I4, 1));
+
+  find_labels(tree);
+  loop_body = rename_labels(loop_body);
+
+  label = WN_COPY_Tree(label);
+  int label_num = WN_label_number(label);
+  if (label_map[label_num] == 0) {
+    LABEL_IDX new_label; 
+    LABEL_Init (New_LABEL (CURRENT_SYMTAB, new_label), 0, LKIND_DEFAULT);
+    label_map[label_num] = new_label;
+  }
+  //update the label number
+  WN_label_number(label) = label_map[label_num];  
+  
+  WN_INSERT_BlockLast(loop_body, label);
+  for (; incr != NULL; incr = WN_next(incr)) {
+    WN_INSERT_BlockLast(loop_body, WN_COPY_Tree(incr));
+  }
+
+  WN* new_loop = WN_CreateWhileDo(WN_COPY_Tree(test), loop_body);
+  new_loop = lower_while_do(block, new_loop, actions);
+  WN* then_body = WN_CreateBlock();
+  WN_INSERT_BlockLast(then_body, new_loop);
+  
+  WN* else_body = WN_CreateBlock();
+  WN* control_val = WN_CreateIntconst(OPR_INTCONST, MTYPE_I4, MTYPE_V, 1); 
+  WN* set_control = WN_Stid(MTYPE_I4, 0, upc_forall_control_st, TY_align(ST_type(upc_forall_control_st)), control_val);
+  WN_INSERT_BlockLast(else_body, set_control);
+  WN_INSERT_BlockLast(else_body, tree);
+  control_val = WN_CreateIntconst(OPR_INTCONST, MTYPE_I4, MTYPE_V, 0);
+  set_control = WN_Stid(MTYPE_I4, 0, upc_forall_control_st, TY_align(ST_type(upc_forall_control_st)), control_val);
+  WN_INSERT_BlockLast(else_body, set_control);
+
+  return WN_CreateIf(if_expr, then_body, else_body);
+
+} 
+
 
 /* ====================================================================
  *
@@ -10305,6 +11982,19 @@ static WN *lower_while_do(WN *block, WN *tree, LOWER_ACTIONS actions)
 	  ("expected WHILE_DO node, not %s", OPCODE_name(WN_opcode(tree))));
 
   ++loop_nest_depth;
+
+  //WEI: see if we have a forall_ctrl loop
+  if (Action(LOWER_UPC_FORALL)) {
+    WN* body = WN_while_body(tree);
+    for (WN* prag = WN_last(body); prag != NULL; prag = WN_prev(prag)) {
+      if (WN_opcode(prag) == OPC_PRAGMA && 
+	  WN_pragma(prag) == WN_PRAGMA_UPC_FORALL_AFFINITY) {
+	tree = lower_forall_ctrl(block, tree, prag, actions);
+	break;
+      }
+    }
+  }
+
 #ifndef SHORTCIRCUIT_HACK
   if (Action(LOWER_WHILE_DO))
 #else
@@ -11392,6 +13082,10 @@ WN *WN_Lower(WN *tree, LOWER_ACTIONS actions, struct ALIAS_MANAGER *alias,
     LowerMP_PU_Init ();
   }
 
+  if (Action(LOWER_UPC_CONSISTENCY)) {
+    LowerUPC_Init_Consistency();
+  }
+
   WN_Lower_Checkdump(msg, tree, actions);
 
   if (WN_opcode(tree) == OPC_FUNC_ENTRY)
@@ -11418,8 +13112,9 @@ WN *WN_Lower(WN *tree, LOWER_ACTIONS actions, struct ALIAS_MANAGER *alias,
 #ifdef BACK_END
   Stop_Timer(T_Lower_CU);
 #endif
- 
-  WN_verifier(tree);
+  
+  if(!Action(LOWER_UPC_TO_INTR) && !Action(LOWER_UPC_MFIELD))
+    WN_verifier(tree);
 
   return tree;
 }

@@ -44,7 +44,6 @@ Boston, MA 02111-1307, USA.  */
 #include "ggc.h"
 #include "wfe_misc.h"
 
-
 /* Nonzero if we've already printed a "missing braces around initializer"
    message within this initializer.  */
 static int missing_braces_mentioned;
@@ -691,6 +690,7 @@ type_lists_compatible_p (args1, args2)
     }
 }
 
+
 /* Compute the value of the `sizeof' operator.  */
 
 tree
@@ -722,13 +722,30 @@ c_sizeof (type)
       return size_zero_node;
     }
 
-  /* Convert in case a char is more than one unit.  */
-  t = size_binop (CEIL_DIV_EXPR, TYPE_SIZE_UNIT (type),
+  if (code == RECORD_TYPE || code == UNION_TYPE) {
+     t = size_binop (CEIL_DIV_EXPR, TYPE_SIZE_UNIT (type),
 		     size_int (TYPE_PRECISION (char_type_node)
-			       / BITS_PER_UNIT));
+			       / BITS_PER_UNIT)); 
+  } else if (TYPE_SHARED(type)) {
+    t = size_int (get_real_size(TYPE_TY_IDX(type)));
+  } else if (code == POINTER_TYPE) {
+    if (TYPE_SHARED(TREE_TYPE(type))) {
+      unsigned int bsize =  TYPE_BLOCK_SIZE(type) ? TREE_INT_CST_LOW(TYPE_BLOCK_SIZE(TREE_TYPE(type))) : 1;
+      t = (bsize == 1 || bsize == 0) && TREE_CODE(type) != VOID_TYPE ? 
+	size_int(pshared_size) : size_int(shared_size);
+    } else {
+      t = size_int(is_ia32 ? 4 : 8);
+    }
+  } else {
+    /* Convert in case a char is more than one unit.  */
+    t = size_binop (CEIL_DIV_EXPR, TYPE_SIZE_UNIT (type),
+		    size_int (TYPE_PRECISION (char_type_node)
+			      / BITS_PER_UNIT));
+  }
 
   if (UPC_TYPE_USES_THREADS (type))
     t = size_binop (MULT_EXPR, t, lookup_name (get_identifier ("THREADS")));
+
   return t;
   
 }
@@ -2629,9 +2646,6 @@ build_binary_op (code, orig_op0, orig_op1, convert_p)
 /* Return a tree for the sum or difference (RESULTCODE says which)
    of pointer PTROP and integer INTOP.  */
 
-static tree pshared_size = NULL;
-static tree shared_size = NULL;
-
 static tree
 pointer_int_sum (resultcode, ptrop, intop)
      enum tree_code resultcode;
@@ -2665,19 +2679,10 @@ pointer_int_sum (resultcode, ptrop, intop)
   else if (TREE_CODE(child_type) == POINTER_TYPE && TYPE_SHARED(TREE_TYPE(child_type))) {
       int bsize =  TREE_INT_CST_LOW(TYPE_BLOCK_SIZE(TREE_TYPE(child_type)));
       if ((bsize == 1 || bsize == 0) && TREE_CODE(TREE_TYPE(child_type)) != VOID_TYPE) {
-	if (pshared_size == NULL) {
-	  pshared_size =  build_decl(VAR_DECL, get_identifier("UPCR_PSHARED_SIZE_"), integer_type_node);
-	}
-	size_exp = pshared_size;
+	size_exp = size_int(pshared_size);
       } else {
-	if (shared_size == NULL) {
-	  shared_size =  build_decl(VAR_DECL, get_identifier("UPCR_SHARED_SIZE_"), integer_type_node);
-	}
-	size_exp = shared_size;
+	size_exp = size_int(shared_size);
       }
-      TREE_PUBLIC(size_exp) = 1;
-      finish_decl(size_exp, 0, 0);
-      make_decl_rtl(size_exp, NULL, 1); 
   } 
   else
     size_exp = c_size_in_bytes (TREE_TYPE (result_type));

@@ -3,8 +3,8 @@
 // ====================================================================
 //
 // Module: opt_vn_ivc.h
-// $Revision: 1.3 $
-// $Date: 2003-02-19 22:10:35 $
+// $Revision: 1.3.4.1 $
+// $Date: 2003-04-11 00:31:53 $
 // $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn_ivc.h,v $
 //
@@ -106,7 +106,8 @@
 #include "opt_vn_expr.h"    // For VN_VALNUM, VN_EXPR, and VN_EXPR_MAP
 #include "opt_vn.h"         // For VN
 
-#ifdef __STL_USE_NAMESPACES
+#if defined (__GNUC__)
+//#ifdef __STL_USE_NAMESPACES
 using std::vector;
 #endif
 
@@ -276,7 +277,7 @@ protected:
 
    bool _is_dereferencable() const {return _idx >= 0 && _idx < _obj->size();}
 
-   reference _deref() const 
+   TYPENAME forward_to_next_iterator<Category, Container, Next>::reference _deref() const 
    {
       Is_True(_is_dereferencable(), 
 	      ("forward_to_next_iterator out of bounds %d", _idx));
@@ -294,7 +295,7 @@ public:
    Container *container() const {return _obj;}   // For "==" operator
    INT32      current_idx() const {return _idx;} // For "==" operator
    
-   reference operator*() const 
+   TYPENAME forward_to_next_iterator<Category, Container, Next>::reference operator*() const 
    {
       return _deref();
    }

@@ -115,7 +115,8 @@ expand_upc_shared_ptr_cvt (exp, target, modifier)
     rtx target;
     enum expand_modifier modifier;
 {
-  fatal("expand_upc_shared_ptr_cvt not implemented yet\n");
+ 
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -238,7 +239,7 @@ expand_upc_shared_assignment (to, from, want_value, suggest_reg)
      int want_value;
      int suggest_reg;
 {
-  fatal("expand_upc_shared_assignment not implemented yet\n");  
+  fatal("%s  not implemented yet\n", __FUNCTION__);  
   return NULL_RTX;
 }
 
@@ -253,7 +254,7 @@ expand_upc_shared_bit_field_assign (to, from, field_ref, bitpos, offset,
      int want_value;
      int suggest_reg;
 {
-  fatal("expand_upc_shared_bit_field_assign not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -263,7 +264,7 @@ expand_upc_fetch_shared_scalar (exp, target, mode)
     rtx target;
     enum machine_mode mode;
 {
-  fatal("expand_upc_fetch_shared_scalar not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
  
 }
@@ -295,7 +296,7 @@ expand_upc_get_indirect (exp, target, mode)
     rtx target;
     enum machine_mode mode;
 {
-  fatal("expand_upc_get_indirect not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -307,7 +308,7 @@ expand_upc_shared_bit_field_ref (field_ref, bitpos, offset, target, mode)
     rtx target;
     enum machine_mode mode;
 {
-  fatal("expand_upc_shared_bit_field_ref not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -316,7 +317,7 @@ expand_upc_shared_ptr_sum (exp, modifier)
     tree exp;
     enum expand_modifier modifier;
 {
-  fatal("expand_upc_shared_ptr_sum not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -325,7 +326,7 @@ expand_upc_shared_ptr_diff (exp, modifier)
     tree exp;
     enum expand_modifier modifier;
 {
-  fatal("expand_upc_shared_ptr_diff not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -393,7 +394,7 @@ expand_cond (exp, target, mode)
      rtx target;
      enum machine_mode mode;
 {
-  fatal("expand_cond not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -423,7 +424,7 @@ expand_get (mode, target, get_loc, exp)
     rtx get_loc;
     tree exp;
 {
-  fatal("expand_get not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -434,7 +435,7 @@ expand_put (mode, put_loc, src, exp)
      rtx src;
      tree exp;
 {
-  fatal("expand_put not implemented yet\n");
+  fatal("%s  not implemented yet\n", __FUNCTION__);
   return NULL_RTX;
 }
 
@@ -680,15 +681,8 @@ set_upc_blocksize (type, layout_specifier)
 
   tree elt_type = (TREE_CODE (type) == ARRAY_TYPE)
     ? get_inner_array_type (type) : type;
-  tree elt_size = TYPE_SIZE (elt_type);
   tree layout_value;
   tree blocksize;
-
-  if (!elt_size && TREE_CODE(type) != VOID_TYPE) {
-    error("Incomplete base type in declaration");
-    abort();
-  }
-  
 
   if (!layout_specifier)
     return type;
@@ -702,37 +696,23 @@ set_upc_blocksize (type, layout_specifier)
 
   layout_value = TREE_VALUE (layout_specifier);
 
-  /*
-  
-    if (layout_value) {
-    if (TREE_CODE(type) == VOID_TYPE)
-    blocksize = layout_value;
-    else
-    blocksize =  build_binary_op(MULT_EXPR, layout_value, elt_size, 1); 
-    } else {
-  */
   if (layout_value) {
+    STRIP_NOPS(layout_value);
     if ((TREE_INT_CST_LOW(layout_value) ^ -1) == 0) {
       /* WEI: Since we use -1 to represent [*] and it's stored as unsigned in tree,
 	 just leave block size as is */
       blocksize = layout_value;
     } else { 
-      blocksize =  build_binary_op(MULT_EXPR, layout_value, elt_size, 1); 
-      if (TREE_INT_CST_LOW (blocksize) > (UPC_MAX_BLOCK_SIZE * TREE_INT_CST_LOW (elt_size)))
-	error ("Maximum block size in this implementation is %d",
-	       UPC_MAX_BLOCK_SIZE);
+      /* don't mult blocksize by elt size, since it may break recursive types */
+      //blocksize =  build_binary_op(MULT_EXPR, layout_value, elt_size, 1); 
+      blocksize =  layout_value; 
+      if (TREE_INT_CST_LOW (layout_value) > max_bsize)
+	error ("Maximum block size in this implementation is %d", max_bsize);
     }
   } else {
     blocksize = integer_zero_node;
   }
 
-  /*
-    if (TREE_CODE(type) != VOID_TYPE && 
-    TREE_INT_CST_LOW (blocksize)
-    > (UPC_MAX_BLOCK_SIZE * TREE_INT_CST_LOW (elt_size)))
-    error ("Maximum block size in this implementation is %d",
-    UPC_MAX_BLOCK_SIZE);
-  */
   type = build_type_copy (type);
   TYPE_BLOCK_SIZE (type) = blocksize;
   if (TREE_CODE(blocksize) != INTEGER_CST) {

@@ -46,8 +46,9 @@
 #undef long
 #endif // defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
 
-using namespace std;
 #include <vector>
+using namespace std;
+
 
 #endif // __SGI_STL_VECTOR_H
 
@@ -62,6 +63,19 @@ using namespace std;
 #ifndef mempool_allocator_INCLUDED
 #include "mempool_allocator.h"
 #endif
+
+#ifndef TYPENAME
+#if defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ > 0
+  /* g++ 3.1 requires "typename" to appear according to C++ spec,
+     anywhere within a template declaration where templatename::membername
+     is used as a type (no implicit typenames) */
+  #define TYPENAME typename
+#else
+  #define TYPENAME
+#endif
+#endif //ndef TYPENAME
+
+
 
 // ARRAY_Ptr is pointer to SEG_ARRAY,
 // _PTR is pointer to SEG_ARRAY::value_type,
@@ -234,7 +248,7 @@ public:
 
     // Yuri: 1/24/03
     // for (std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> >::iterator
-    for (std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *, BOOL> > >::iterator
+    for (TYPENAME std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *, BOOL> > >::iterator
 	   entry = map.begin();
 	 entry != map.end();
 	 ++entry) {

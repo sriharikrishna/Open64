@@ -284,9 +284,9 @@ ifneq ($(STL_EXT_PATH),)
 LC++INCS += -I$(STL_EXT_PATH)
 endif
 
-ifeq ($(BUILD_OS), LINUX)
-LC++INCS += -D__STL_USE_NAMESPACES -D__STL_FUNCTION_TMPL_PARTIAL_ORDER
-endif
+#ifeq ($(BUILD_OS), LINUX)
+#LC++INCS += -D__STL_USE_NAMESPACES -D__STL_FUNCTION_TMPL_PARTIAL_ORDER
+#endif
 
 # allows unused parameters
 ifeq ($(BUILD_COMPILER), EDG)
@@ -466,6 +466,10 @@ endif
 ifeq ($(BUILD_OS), LINUX)
 CFLAGS  += -D_LINUX_LINUX
 CXXFLAGS += -D_LINUX_LINUX 
+endif
+
+ifeq ($(BUILD_COMPILER), GNU)
+CXXFLAGS += -Wno-deprecated
 endif
 
 ifeq ($(BUILD_OS), SOLARIS) 

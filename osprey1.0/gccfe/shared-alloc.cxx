@@ -1,9 +1,7 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include <values.h>
 #include "defs.h"
@@ -27,6 +25,9 @@ extern "C" {
 #include "wfe_dst.h"
 #include "ir_reader.h"
 #include <cmplrs/rcodes.h>
+
+//frorm toplev.c
+extern unsigned int pshared_size, shared_size;
 
 #include "cxx_memory.h"
 
@@ -208,6 +209,8 @@ void process_shared(const char* file_name) {
 
   //output the internally used symbol "upc_forall_control"
   decls += "extern int upcr_forall_control;\n";
+  decls += "#define UPCR_SHARED_SIZE_ " + utoa(shared_size) + "\n";
+  decls += "#define UPCR_PSHARED_SIZE_ " + utoa(pshared_size) + "\n";
 
   if (strlen(file_name) == 0) {
     return; //no shared global variable in the program
@@ -224,7 +227,7 @@ void process_shared(const char* file_name) {
     */
 
     if (sscanf(line, "%s\t%ul\t%u\t%ul\t%c\t%s\t%s\t%s\n", name, &size, &bsize, &esize, &kind, init, orig_type, dim) != 8) {
-      cerr << "invaliad line format:<" << line << ">" << endl;
+      fprintf(stderr, "invaliad line format:<%s>\n", line);
     } else {
       Decl* decl = CXX_NEW(Decl(name, (UINT64) size, bsize, (UINT64) esize, kind, init, orig_type, dim), &MEM_src_pool);
       file_vars.push_back(decl);
@@ -356,7 +359,6 @@ void process_shared(const char* file_name) {
   decls += "\n";
 }
 
-
 /**
  *
  * Handles TLD variables
@@ -381,6 +383,7 @@ void process_nonshared(ST_IDX st, tld_pair_p info) {
    *  for function pointers: ret_type (*)(arg_type_list)
    */
   if (ST_sclass(st) == SCLASS_EXTERN) {
+    return;
     decls += "extern ";
     if (kind == KIND_ARRAY) {
       decls += type.substr(idx+1, type.size() - idx - 1) + " ";
@@ -430,13 +433,6 @@ void process_nonshared(ST_IDX st, tld_pair_p info) {
     if (ST_sclass(st) == SCLASS_FSTATIC || ST_sclass(st) == SCLASS_PSTATIC) {
       decls += "static ";
     }
-    if (TY_is_volatile(ST_type(st))) {
-      decls += "volatile ";
-    }
-    if (TY_is_const(ST_type(st))) {
-      decls += "const ";
-    }
-
     
     if (kind == KIND_ARRAY || (kind == KIND_POINTER && p_idx > 0)) {
       decls += "_type_" + name + " ";
@@ -627,13 +623,15 @@ string Decl::get_next_dimlen() {
 
 void Decl::print() {
 
-  cout << "Declaration: " << endl;
-  cout << "\t name: " << name << endl;
-  cout << "\t kind: " << kind << endl;
-  cout << "\t total size: " << size << endl;
-  cout << "\t block size(# elts): " << blkSize << endl;
-  cout << "\t elt size: " << esize << endl;
-  if (hasInit()) {
+  /*
+    printf("Declaration: \n");
+    printf("\t name: %s\n", (char *) name);
+    cout << "\t kind: " << kind << endl;
+    cout << "\t total size: " << size << endl;
+    cout << "\t block size(# elts): " << blkSize << endl;
+    cout << "\t elt size: " << esize << endl;
+    if (hasInit()) {
     cout << "\t initial value: " << initExp << endl;
-  }
+    }
+  */
 }

@@ -32,7 +32,6 @@
 
 */
 
-#include <iostream>
 #include <values.h>
 #include <sys/types.h>
 #include <elf.h>
@@ -83,12 +82,8 @@ int      wfe_invoke_inliner = FALSE;
 
 extern void Initialize_IRB (void);	/* In lieu of irbutil.h */
 extern char *asm_file_name;		/* from toplev.c */
-
-//extern int real_pointer_size;           /* from toplev.h */
-//extern int real_bits_per_word;          /* ditto */
-//extern int real_units_per_word;         /* ditto */  
-//extern char* real_size_type;
-//extern char* real_ptrdiff_type;
+extern unsigned int shared_size, pshared_size; /* from toplev.c */
+extern unsigned long max_bsize;
 
 int trace_verbose = FALSE;
 // an_error_severity error_threshold = es_warning;
@@ -156,9 +151,6 @@ static char Dash [] = "-";
 /* Internal flags: */
 static BOOL Echo_Flag =	FALSE;	/* Echo command	lines */
 static BOOL Delete_IR_File = FALSE;	/* Delete SGIR file when done */
-
-static int pshared_size = 16, shared_size = 16;
-
 
 /* ====================================================================
  *
@@ -374,25 +366,28 @@ static void Read_Config_File(int argc, char** argv) {
 
   for (int i = 0; i < argc; i++) {
     char* arg = argv[i];
+    printf("arg is: %s\n", arg); 
     if (strncmp(arg, "-fconfig-", 9) == 0) {
       char* Config_File_Name = arg + 9;
       FILE* config_file = fopen(Config_File_Name, "r");
       if (config_file == NULL) {
-	fprintf(stderr, "CANNOT OPEN CONFIGURATION FILE: %s\n", Config_File_Name);
+	fprintf(stderr, "INTERNAL ERROR: CANNOT OPEN CONFIGURATION FILE: %s\n", Config_File_Name);
 	exit(1);
       }
       char line[100];
-      int size;
+      unsigned int size;
       char param[100];
       while (fgets(line, 100, config_file) != NULL) {
-	if (sscanf(line, "%s\t%d", param, &size) != 2) {
-	  cerr << "Malformed Line in config file: " << line << endl;
+	if (sscanf(line, "%s\t%u", param, &size) != 2) {
+	  fprintf(stderr, "Malformed Line in config file: %s\n", line);
 	  continue;
 	}
 	if (strcmp(param, "shared_ptr") == 0) {
 	  shared_size = size;
 	} else if (strcmp(param, "pshared_ptr") == 0) {
 	  pshared_size = size;
+	} else if (strcmp(param, "maxblocksz") == 0) {
+	  max_bsize = size;
 	}
       }
       return;
@@ -415,21 +410,9 @@ static void Test_ia32(int argc, char** argv) {
     if (strcmp(arg, "-ia32") == 0) {
       ABI_Name = "ia32";
       is_ia32 = 1;
-      //real_pointer_size = 32;
-      /* FIXME: currently the following two are not used, 
-	 because the code assumes that BITS_PER_WORD and UNITS_PER_WORD are constants and use them in static arrays
-	 may need to change the code if this becomes a problem for 32-bit platforms...
-      */
-      //real_bits_per_word = 32;
-      //real_units_per_word = 4;
-      //strcpy(real_size_type, "long unsigned int");
-      //strcpy(real_ptrdiff_type, "long int");      
       return;
     }
   }
-  //real_pointer_size = 64;
-  //strcpy(real_size_type, "long unsigned int");
-  //strcpy(real_ptrdiff_type, "long int");      
 }
 
 void
@@ -521,21 +504,21 @@ char* get_type(int mtype) {
   
   switch (mtype) {
   case MTYPE_I1:
-    return "char";
+    return "int8_t";
   case MTYPE_I2:
-    return "short";
+    return "int16_t";
   case MTYPE_I4:
-    return "int";
+    return "int32_t";
   case MTYPE_U1:
-    return "unsigned char";
+    return "uint8_t";
   case MTYPE_U2:
-    return "unsigned short";
+    return "uint16_t";
   case MTYPE_U4:
-    return "unsigned int";
+    return "uint32_t";
   case MTYPE_I8:
-    return "long";
+    return "int64_t";
   case MTYPE_U8:
-    return "unsigned long";
+    return "uint64_t";
   case MTYPE_F4:
     return "float";
   case MTYPE_F8:
@@ -543,7 +526,7 @@ char* get_type(int mtype) {
   case MTYPE_FQ:
     return "long double";
   default:
-    cerr << "COULDN'T FIND CORRECT TYPE IN get_type(): " << mtype << endl;
+    fprintf(stderr, "COULDN'T FIND CORRECT TYPE IN get_type() for mtype: %d\n", mtype);
     return "NONE";
   }
 }
@@ -590,10 +573,11 @@ static void output_Init_Val(char* s, INITV_IDX idx, TY_IDX ty = 0) {
     case MTYPE_FQ:
       sprintf(s, "%Lf", TCON_qval(tc));
       break;
+    case MTYPE_STR:
+      sprintf(s, "\"%s\"", Targ_String_Address(tc));
+      break;
     default:
-      //don't think other types matter
-      cerr << "Unexpected type for init value: " << TCON_ty(tc) << endl;
-      sprintf(s, "0\n");
+      Is_True(false, ("Unexpected type for init value"));
      } //inner switch
     break;
   case INITVKIND_SYMOFF:
@@ -602,7 +586,7 @@ static void output_Init_Val(char* s, INITV_IDX idx, TY_IDX ty = 0) {
       TY_IDX rhs_ty = ST_type(rhs_st);
       if (!TY_is_shared(rhs_ty)) {
 	//should be caught elsewhere, just in case...
-	cerr << "ASSIGNING a non-shared value to a pointer to shared data: " << ST_name(rhs_st) << endl;
+	Is_True(0, "ASSIGNING a non-shared value to a pointer to shared data: ");
       }
       bool lhs_pshared = TY_is_shared(ty) ? TY_is_pshared(ty) : TY_is_pshared(TY_pointed(ty));
       if (lhs_pshared && !TY_is_pshared(rhs_ty)) {
@@ -613,8 +597,15 @@ static void output_Init_Val(char* s, INITV_IDX idx, TY_IDX ty = 0) {
 	sprintf(s, "%s", ST_name(rhs_st));
       }
     } else {
-      //initialization for regular pointers, need a "&"
-      sprintf(s, "&%s", ST_name(rhs_st));
+      if (ST_class(rhs_st) == CLASS_CONST) {
+	//case for string constants
+	tc = STC_val(ST_ptr(rhs_st));
+	Is_True(TCON_ty(tc) == MTYPE_STR, ("initial expression is not a string constant"));
+	sprintf(s, "\"%s\"", Targ_String_Address(tc));
+      } else {
+	//initialization for regular pointers, need a "&"
+	sprintf(s, "&%s", ST_name(rhs_st));
+      }
     }
     break;
   default:
@@ -655,31 +646,39 @@ static string get_init_exp(ST_IDX st) {
   }  
 
   if (kind == KIND_ARRAY) {
-    char dimlen[dim];
-    for (int i = 0; i < dim; i++) {
-      init_exp += "{";
-      dimlen[i] = 0;
-    }
-    int len = 0;
-    for (int next_idx = idx, prev = -1; next_idx != 0; next_idx = INITV_next(next_idx)) {
-      if (INITV_kind(next_idx) == INITVKIND_PAD) {
-	init_exp += "}";
-	if (INITV_next(next_idx) != 0) {
+    if (INITV_kind(idx) == INITVKIND_VAL && 
+	TCON_ty(INITV_tc_val(idx)) == MTYPE_STR) {
+      //init exp is a string constant
+      output_Init_Val(buf, idx);
+      init_exp += buf;
+    } else {
+      //try to create an array initializer expression
+      char dimlen[dim];
+      for (int i = 0; i < dim; i++) {
+	init_exp += "{";
+	dimlen[i] = 0;
+      }
+      int len = 0;
+      for (int next_idx = idx, prev = -1; next_idx != 0; next_idx = INITV_next(next_idx)) {
+	if (INITV_kind(next_idx) == INITVKIND_PAD) {
+	  init_exp += "}";
+	  if (INITV_next(next_idx) != 0) {
+	    init_exp += ",";
+	  }
+	} else {		
+	  if (prev != -1 && INITV_kind(prev) == INITVKIND_PAD) {
+	    //we're at a new dimension, print {
+	    init_exp += "{";
+	  }
+	  //cout << " val ";
+	  output_Init_Val(buf, next_idx);
+	  init_exp += buf;
 	  init_exp += ",";
 	}
-      } else {		
-	if (prev != -1 && INITV_kind(prev) == INITVKIND_PAD) {
-	  //we're at a new dimension, print {
-	  init_exp += "{";
-	}
-	//cout << " val ";
-	output_Init_Val(buf, next_idx);
-	init_exp += buf;
-	init_exp += ",";
+	prev = next_idx;
       }
-      prev = next_idx;
+      //cout << endl;
     }
-    //cout << endl;
   } else if (kind == KIND_STRUCT) {
     init_exp += "{";
     for (int next_idx = idx; next_idx != 0; next_idx = INITV_next(next_idx)) {
@@ -734,7 +733,7 @@ static FILE* out_file = NULL;
 
 extern int compiling_upc;
 
-static UINT64 get_real_size(TY_IDX t_idx) {
+UINT64 get_real_size(int t_idx) {
 
   switch (TY_kind(t_idx)) {
   case KIND_SCALAR:
@@ -747,24 +746,34 @@ static UINT64 get_real_size(TY_IDX t_idx) {
     }
     return TY_size(t_idx);
   case KIND_ARRAY: {
-    UINT64 orig_size = Get_Type_Inner_Size(t_idx);
-    return TY_size(t_idx) * (get_real_size(Get_Inner_Array_Type(t_idx)) / orig_size);
+    TY_IDX elt = TY_etype(t_idx);
+    while (TY_kind(elt) == KIND_ARRAY) {
+      elt = TY_etype(elt);
+    }
+    UINT64 num_elts = TY_size(t_idx) / TY_size(elt); 
+    return num_elts * get_real_size(elt);
   }
-  case KIND_STRUCT: {
-    //FIXME:  not done with fixing the size of structs yet
+  case KIND_STRUCT: 
+    return Adjusted_Type_Size(t_idx, pshared_size, shared_size);
     /*
-      int size = 0;
+      unsigned int size = 0, elt_size = 0, align = 0;
       FLD_HANDLE fh = TY_fld(t_idx);
       while (true) {
       TY_IDX fld_ty = FLD_type(fh);
-      size += get_real_size(fld_ty);
-      if (FLD_last_field(fh)) {
-      break;
-      }
+      align = TY_align(fld_ty);
+      elt_size = get_real_size(fld_ty);
+      if (size % align != 0) {
+	size += align - size % align;
+	}
+	size += elt_size;
+	if (FLD_last_field(fh)) {
+	break;
+	}
       fh = FLD_next(fh);
-      } */
-    return TY_size(t_idx);
-  }
+      }
+      return size;
+      }
+    */
   default:
     Is_True(false, ("Invalid kind of types in WFE_File_Finish"));
   }  
