@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_intrin
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:08 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-08-23 22:00:40 $
+ * $Author: open64 $
  * $Source: 
  *
  * Revision history:
@@ -56,7 +56,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_intrin.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_intrin.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -1258,7 +1258,8 @@ fei_count(TYPE type)
    args[0] = cwh_intrin_wrap_value_parm(args[0]);
 
    op = cwh_make_typed_opcode(OPR_INTRINSIC_OP, Pointer_Size==8 ? MTYPE_I8 : MTYPE_I4, MTYPE_V);
-   wn = WN_Create_Intrinsic(op,INTRN_SUM,3,args);
+//   wn = WN_Create_Intrinsic(op,INTRN_SUM,3,args);
+   wn = WN_Create_Intrinsic(op,INTRN_COUNT,3,args);
    
    wn = F90_Wrap_ARREXP(wn);
    cwh_stk_push(wn,WN_item);

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:46 $
+ * $Revision: 1.4 $
+ * $Date: 2002-08-23 21:58:49 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.4 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -160,12 +160,12 @@ static const FNAME_PARTIALMAP Fname_Map[] =
   {OPC_U8F4TRUNC, "KINT"},
   {OPC_U8FQTRUNC, "KIQINT"},
   {OPC_U8F8TRUNC, "KIDINT"},
-  {OPC_I4F4CEIL, "CEIL"},
-  {OPC_I4FQCEIL, "CEIL"},
-  {OPC_I4F8CEIL, "CEIL"},
-  {OPC_I8F4CEIL, "CEIL"},
-  {OPC_I8FQCEIL, "CEIL"},
-  {OPC_I8F8CEIL, "CEIL"},
+  {OPC_I4F4CEIL, "CEILING"},
+  {OPC_I4FQCEIL, "CEILING"},
+  {OPC_I4F8CEIL, "CEILING"},
+  {OPC_I8F4CEIL, "CEILING"},
+  {OPC_I8FQCEIL, "CEILING"},
+  {OPC_I8F8CEIL, "CEILING"},
   {OPC_I4F4FLOOR, "FLOOR"},
   {OPC_I4FQFLOOR, "FLOOR"},
   {OPC_I4F8FLOOR, "FLOOR"},
@@ -666,7 +666,7 @@ WN2F_Funcall_Op(TOKEN_BUFFER tokens,
     */
    if (TY_kind(dty) == KIND_VOID)
       dty = rty;
-   
+
    Append_Token_String(tokens, Opc_Fname[opcode]);
    Append_Token_Special(tokens, '(');
    
@@ -714,6 +714,9 @@ WN2F_Intr_Funcall(TOKEN_BUFFER tokens,
    /* Determine the number of implicit arguments appended to the end
     * of the argument list (i.e. string lengths).
     */
+   if  (WN_intrinsic(wn)==INTRN_COUNT)
+         last_arg_idx--;
+
    for (arg_idx = first_arg_idx, total_implicit_args = 0; 
 	arg_idx <= last_arg_idx - total_implicit_args; 
 	arg_idx++)
@@ -756,7 +759,7 @@ WN2F_Intr_Funcall(TOKEN_BUFFER tokens,
 				      implicit_args)), /* string length */
 			      context);
          if ((arg_idx+implicit_args) < WN_kid_count(wn) - 1)
-         Append_Token_Special(tokens, ',');
+                Append_Token_Special(tokens, ',');
       }
       else
  
@@ -774,7 +777,8 @@ WN2F_Intr_Funcall(TOKEN_BUFFER tokens,
 					   call_by_value,
 					   context);
 
-          if ((arg_idx+implicit_args) < WN_kid_count(wn) - 1) 
+//          if ((arg_idx+implicit_args) < WN_kid_count(wn) - 1) 
+          if ((arg_idx+implicit_args) < last_arg_idx) 
                if ((WN_intrinsic(wn)==INTRN_SUM ||
                     INTRN_MAXVAL||
                     INTRN_PRODUCT) &&
@@ -1683,6 +1687,7 @@ WN2F_intconst(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    if (parenthesize && !WN2F_CONTEXT_is_logical_arg(context))
       {
+
         switch (TCON_ty(Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn))))
           {
             case MTYPE_I1:
@@ -1701,14 +1706,15 @@ WN2F_intconst(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
                   TCON2F_translate(tokens,
                                    Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn)),
                                    WN2F_CONTEXT_is_logical_arg(context));
-
                break;
-             default:
+
+              default:
                   TCON2F_translate(tokens,
-                                   STC_val(WN_st(wn)),
-                                   (TY_is_logical(ST_type(WN_st(wn))) ||
-                                     WN2F_CONTEXT_is_logical_arg(context)));
+                                   Host_To_Targ(WN_opc_rtype(wn), WN_const_val(wn)),
+                                   WN2F_CONTEXT_is_logical_arg(context));
+
                    break;
+
              } /*switch*/
         }
       else

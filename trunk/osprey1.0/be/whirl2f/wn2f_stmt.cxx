@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.7 $
- * $Date: 2002-08-22 21:44:33 $
+ * $Revision: 1.8 $
+ * $Date: 2002-08-23 21:58:49 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.8 $";
 #endif
 
 #include <alloca.h>
@@ -2503,7 +2503,9 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    TY_IDX       arg_ty;
    BOOL         return_to_param;
    BOOL         is_user_call = FALSE;
-
+   OPCODE    tempopc;
+   WN *kidofparm;
+   TY_IDX kid_ty;
 
    /* Emit any relevant call-site directives
     */
@@ -2637,14 +2639,31 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	arg_idx <= last_arg_idx - total_implicit_args; 
 	arg_idx++)
    {
-
-      arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
-
-      if (TY_Is_Character_Reference(arg_ty) ||
-	  TY_Is_Chararray_Reference(arg_ty))
+    if (WN_kid(wn,arg_idx)==NULL)
+          ;
+    else
+    {
+     tempopc = WN_opcode(WN_kid(wn,arg_idx));
+     kidofparm = WN_kid0(WN_kid(wn, arg_idx));
+     if (WN_operator(kidofparm) !=OPR_CALL) 
       {
-	 total_implicit_args++;
-      }
+          arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
+
+          if (TY_Is_Character_Reference(arg_ty) ||
+	      TY_Is_Chararray_Reference(arg_ty))
+             {
+	         total_implicit_args++;
+             }
+       }
+      else  /*the argument is function call
+             * if the return value is Chararray or Character Reference:
+             */
+       {
+          kid_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
+          if (Func_Return_Character (kid_ty))
+              total_implicit_args++;
+        }
+     }
    }
    
    /* Append the argument list to the function reference, skipping
@@ -2667,7 +2686,15 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	arg_idx <= last_arg_idx - implicit_args; 
 	arg_idx++)
    {
-      arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
+     if (WN_kid(wn, arg_idx) == NULL)
+           ;
+     else
+     {
+      kidofparm = WN_kid0(WN_kid(wn, arg_idx));
+       if (WN_operator(kidofparm) !=OPR_CALL)
+             arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
+       else
+          arg_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
 
       if (WN_operator(wn) == OPR_INTRINSIC_CALL &&
 	  INTRN_by_value(WN_intrinsic(wn)))
@@ -2678,7 +2705,8 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
          if (WN_kid(wn, arg_idx)!=NULL)
 	      WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
       } 
-      else if (TY_Is_Character_Reference(arg_ty))
+      else if (WN_operator(kidofparm) !=OPR_CALL &&TY_Is_Character_Reference(arg_ty)||
+               WN_operator(kidofparm)==OPR_CALL &&Func_Return_Character(arg_ty) )
       {
 	 /* Handle substring arguments here.  These are always assumed
 	  * to be passed by reference. For a function result, the length
@@ -2758,6 +2786,7 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
            /* argument could be "optional" argument,so there could be NULL wn */
               Append_Token_Special(call_tokens, ',');
       }
+    }
    }
  
    reset_WN2F_CONTEXT_no_parenthesis(context);

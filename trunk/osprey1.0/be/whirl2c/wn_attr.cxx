@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn_attr.c
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:46 $
+ * $Revision: 1.4 $
+ * $Date: 2002-08-23 21:59:12 $
  *
  * Revision history:
  *  07-Mar-95 - Original Version
@@ -340,8 +340,8 @@ WN_Tree_Type(const WN *wn)
     *
     * Pointer types may be created as a result of a call to this routine.
     */
+
    TY_IDX ty = Stab_Mtype_To_Ty(MTYPE_V); /* return value, default = void */
-  
 if (wn == NULL)
      return ty;
  
