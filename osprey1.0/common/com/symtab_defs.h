@@ -55,8 +55,8 @@ enum ST_CLASS
     CLASS_BLOCK	= 5,			// base to a block of data
     CLASS_NAME  = 6,			// just hold an ST name
     CLASS_MODULE = 7,                   
-
-    CLASS_COUNT = 8			// total number of classes
+    CLASS_TYPE   =8,                    //this ST holds an user defined type's name
+    CLASS_COUNT = 9			// total number of classes
 }; // ST_CLASS
 
 
@@ -156,19 +156,18 @@ enum ST_FLAGS
     // new flags must go into flags_ext field.
 }; // ST_FLAGS
 
-# if 0
 enum ST_EXT_FLAGS
  {
-    ST_IS_POINTER       = 0x00000001,  
-    ST_IS_ALLOCATABLE   = 0x00000002,
-    ST_IS_IN_MODULE     = 0x00000004,
-    ST_IS_EXTERNAL      = 0x00000008,
-    ST_IS_BLOCK_DATA    = 0x00000010, 
-    ST_IS_INTENT_IN_ARGUMENT = 0x00000020,
-    ST_IS_INTENT_OUT_ARGUMENT = 0x00000040 
+    ST_IS_POINTER            = 0x0000000000000001,  
+    ST_IS_ALLOCATABLE        = 0x0000000000000002,
+    ST_IS_IN_MODULE          = 0x0000000000000004,
+    ST_IS_EXTERNAL           = 0x0000000000000008,
+    ST_IS_BLOCK_DATA         = 0x0000000000000010, 
+    ST_IS_INTENT_IN_ARGUMENT = 0x0000000000000020,
+    ST_IS_INTENT_OUT_ARGUMENT= 0x0000000000000040 
  }; // ST_EXT_FLAGS
-# endif
 
+#if 0
 enum ST_EXT_FLAGS
  {
     ST_IS_POINTER       = 0x01,
@@ -177,6 +176,7 @@ enum ST_EXT_FLAGS
     ST_IS_EXTERNAL      = 0x08,
     ST_IS_BLOCK_DATA    = 0x10
  }; // ST_EXT_FLAGS
+# endif
 
 // symbol table element
 class ST
@@ -189,10 +189,8 @@ public:
 
     mUINT32 flags;			// misc. attributes
 
-//    mUINT32 flags_ext;			// more attributes
-
-
-    mUINT8 flags_ext;			// more attributes
+//  mUINT8 flags_ext;			// more attributes
+    mUINT8 unused;			
 
     ST_CLASS sym_class : 8;		// class info
     ST_SCLASS storage_class : 8;	// storage info
@@ -210,8 +208,7 @@ public:
 
     ST_IDX st_idx;			// my own st_idx
 
-//    mUINT32 flags_ext;			// more attributes
-//    mUINT32 more_flags_ext;			//need 64bits for one word? 
+    mUINT64 flags_ext;			//need 64bits for one word? 
 
     // operations
     
@@ -484,7 +481,8 @@ enum TY_FLAGS
     TY_IS_NON_POD	= 0x0400,	// type is non pod (for C++ classes)
     TY_IS_F90_ASSUMED_SHAPE  = 0x0800,  
     TY_IS_F90_ASSUMED_SIZE   = 0x1000,
-    TY_IS_F90_DEFERRED_SHAPE = 0x2000
+    TY_IS_F90_DEFERRED_SHAPE = 0x2000,
+    TY_IS_EXTERNAL           = 0x4000
 };
 
 

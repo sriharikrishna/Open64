@@ -387,7 +387,7 @@ union	attr_tbl_entry	{
 				 Uint			orig_module_idx	: 20;
 				 boolean		module_object	:  1;
 				 Uint			unused		: 11;
-				 Uint			unused1		:  8;
+				 Uint			unused1		:  8; 
 				 Uint			field7		: 24;
 
 				 Uint			secondary_info	:  3;
@@ -462,6 +462,9 @@ union	attr_tbl_entry	{
 				 boolean	 	flag48		:  1;
 				 Uint			field16		: 20;
 
+                                 Uint                   field_m         :32 ;
+                                 Uint                   unused_m         :32 ;
+
 				} fld;
 
                          /* This is used to specify a 32 bit alternative for */
@@ -481,6 +484,9 @@ union	attr_tbl_entry	{
 			         Uint			field32_12	: 32;
 			         Uint			field32_13	: 32;
 			         Uint			field32_14	: 32;
+/*added by fzhao*/
+			         Uint			field32_15	: 32;
+			         Uint			field32_16	: 32;
                                 } fldd;
 
                          /* This is used to specify fld_type, so that we can */
@@ -505,6 +511,9 @@ union	attr_tbl_entry	{
 			         Uint			alignment	:  4;
 			         Uint			field32_13_2	:  8;
 			         Uint			field32_14	: 32;
+/*add by fzhao*/
+			         Uint			field32_15	: 32;
+			         Uint			field32_16	: 32;
                                 } fld2;
 
 
@@ -599,6 +608,9 @@ union	attr_tbl_entry	{
 				 boolean	 	flag47		:  1;
 				 boolean	 	flag48		:  1;
 				 Uint			field16		: 20;
+/*added by fzhao*/
+				 Uint			field17		: 32;
+				 Uint			field18		: 32;
 				} old;
 
 			 long			wd[NUM_AT_WDS];

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.5 $
- * $Date: 2002-08-16 19:30:47 $
+ * $Revision: 1.6 $
+ * $Date: 2002-08-22 15:48:38 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.6 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -655,6 +655,7 @@ WN2F_pstore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    if (TY_Is_Character_String(W2F_TY_pointed(WN_ty(wn), "PSTORE lhs")) &&
        TY_Is_Integral(WN_Tree_Type(WN_kid0(wn))))
    {
+     
       Prepend_Token_Special(rhs_tokens, '(');
       Prepend_Token_String(rhs_tokens, "char");
       Append_Token_Special(rhs_tokens, ')');
@@ -730,9 +731,11 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    if (TY_Is_Character_String(W2F_TY_pointed(WN_ty(wn), "ISTORE lhs")) &&
        TY_Is_Integral(WN_Tree_Type(WN_kid0(wn))))
    {
+#if 0 /*fzhao August 2002*/
       Prepend_Token_Special(rhs_tokens, '(');
       Prepend_Token_String(rhs_tokens, "char");
       Append_Token_Special(rhs_tokens, ')');
+#endif
    }
 
    /* Assign the rhs to the lhs.
@@ -1649,7 +1652,6 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    TY_IDX ptr_ty;
    TY_IDX array_ty;
 
-
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_ARRAY, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_array"));
 
@@ -1672,13 +1674,11 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    {
        /* a preg or sym has been used as an address, usually after optimization      */
        /* don't know base type, or anything else so use OPR_ARRAY to generate bounds */
-
      WN2F_translate(tokens, kid, context);
      WN2F_Array_Slots(tokens,wn,context,TRUE);     
    } 
    else 
    {
-
      array_ty = W2F_TY_pointed(ptr_ty, "base of OPC_ARRAY");
 
      if (WN_opc_operator(kid) == OPR_LDID       &&
@@ -1695,7 +1695,6 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	 /* This array access is just a weird representation for an implicit
 	  * reference parameter dereference.  Ignore the array indexing.
 	  */
-
        WN2F_translate(tokens, kid, context);
      }
      else if (!TY_ptr_as_array(Ty_Table[ptr_ty]) && TY_Is_Character_String(array_ty))
@@ -1721,7 +1720,6 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	    */
        WN2F_translate(tokens, kid, context);
        reset_WN2F_CONTEXT_deref_addr(context);
-
        WN2F_array_bounds(tokens,wn,array_ty,context);
      }
 
@@ -2161,7 +2159,6 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 
 	/* call memref for FLD offset, otherwise the ADD is */
 	/* just another binary op                           */
-
 	WN2F_Offset_Memref(tokens, 
 			   WN_kid0(base),
 			   WN_Tree_Type(base),
@@ -2182,12 +2179,10 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 
 
 	/* Get the string base and substring notation for the argument.  */
-
 	set_WN2F_CONTEXT_deref_addr(context);
 	WN2F_translate(tokens, base, context);
 	reset_WN2F_CONTEXT_deref_addr(context);
       }
-
  if (WN_operator(base) != OPR_CALL &&
      WN_operator(base) != OPR_LDA )
       WN2F_Substring(tokens, 

@@ -928,7 +928,8 @@ extern void  fei_user_type                ( char  *name_string,
                                             INT64 size,
                                             INT32 sequence,
                                             INT32 st_idx,
-                                            INT32 alignment );
+                                            INT32 alignment,
+                                            INT32 external );
 extern TYPE  fei_descriptor               ( INT32 flag_matrix,
                                             INT32 table_type,
                                             INTPTR table_index,
@@ -1061,6 +1062,10 @@ extern INTPTR fei_object          	  ( char  *name_string,
                                  	    INT32 node_1,
                                  	    INT32 node_2,
                                  	    INT32 line_num );
+
+extern INTPTR fei_derived_type_name       (char *name_string,
+                                           INT32 external);
+
 extern INTPTR fei_array_dimen     	  ( INT32 flag_bits,
                                  	    INT64 low_bound,
                                  	    INT64 extent,

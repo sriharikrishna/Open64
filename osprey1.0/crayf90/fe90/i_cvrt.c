@@ -12430,9 +12430,10 @@ static TYPE	send_derived_type(int	type_idx)
       pdg_type_tbl[type_idx] = pdg_type_idx;
       goto EXIT;
    }
-
+# if 0 /*August 2002*/
    flag = ((long) (ATT_SCP_IDX(dt_attr_idx) != curr_scp_idx) 
                                            << FEI_NEXT_TYPE_IDX_HOSTED_TYPE);
+#endif
 
    PDG_DBG_PRINT_START    
    PDG_DBG_PRINT_C("fei_next_name");
@@ -12484,13 +12485,25 @@ static TYPE	send_derived_type(int	type_idx)
    PDG_DBG_PRINT_END    
 
 # ifdef _ENABLE_FEI
-   fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
-                 ATT_NUM_CPNTS(dt_attr_idx),
-                 cpnt_idx,
-                 size,
-                 sequence,
-                 dt_idx,
-                 pdg_align[ATT_ALIGNMENT(dt_attr_idx)]);
+  if (AT_ORIG_MODULE_IDX(dt_attr_idx)!=NULL_IDX)
+      fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
+                    ATT_NUM_CPNTS(dt_attr_idx),
+                    cpnt_idx,
+                    size,
+                    sequence,
+                    dt_idx,
+                    pdg_align[ATT_ALIGNMENT(dt_attr_idx)],
+                    TRUE);
+ else
+           fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
+                    ATT_NUM_CPNTS(dt_attr_idx),
+                    cpnt_idx,
+                    size,
+                    sequence,
+                    dt_idx,
+                    pdg_align[ATT_ALIGNMENT(dt_attr_idx)],
+                    FALSE);
+
 # endif
 
 
@@ -13322,12 +13335,15 @@ static void send_attr_ntry(int		attr_idx)
             send_attr_ntry(ATD_AUTO_BASE_IDX(attr_idx));
             offset = (long64) PDG_AT_IDX(ATD_AUTO_BASE_IDX(attr_idx));
          }
+# if 0 /*August*/
 # if ! (defined(_TARGET_OS_IRIX) || defined(_TARGET_OS_LINUX)) && ! defined(_TARGET_OS_MAX)
          if (ATD_DEFINING_ATTR_IDX(attr_idx) != NULL_IDX) {
             send_attr_ntry(ATD_DEFINING_ATTR_IDX(attr_idx));
             defining_attr = PDG_AT_IDX(ATD_DEFINING_ATTR_IDX(attr_idx));
          }
 # endif
+# endif
+
          break;
 
       case Constant:
@@ -13735,11 +13751,15 @@ static void send_attr_ntry(int		attr_idx)
                      "send_attr_ntry");
          }
 # endif
+
+# if 0 /*August*/
 # if ! (defined(_TARGET_OS_IRIX) || defined(_TARGET_OS_LINUX)) && ! defined(_TARGET_OS_MAX)
          if (dv_alias == NULL_IDX) {
             dv_alias = defining_attr;  /* These two are overlayed */
          }
 # endif
+# endif
+
 
          /* Null terminate the CDIR$ ID string */
          if (class == Name && ATD_TMP_IDX(attr_idx) != NULL_IDX) {
@@ -13885,7 +13905,19 @@ static void send_attr_ntry(int		attr_idx)
 
    case Derived_Type:
       /* These will be sent across when they are referenced. */
-      goto EXIT;
+
+      /*Think about use_stmt could "only" use this type name
+       *or,rename this type name,we have to send at least "name"
+       *to PDG....TODO:add some processing for special case like:
+       *USE mod,only:newnameoftype=>oldnameoftypeinmodule
+       *August,2002
+       */
+
+/*    send_derived_type(ATD_TYPE_IDX(attr_idx)); */
+
+//   PDG_AT_IDX(attr_idx) = fei_derived_type_name(AT_OBJ_NAME_PTR(attr_idx),
+//August                                                   TRUE);
+      goto EXIT; 
                
    case Namelist_Grp:
      if (ATP_PGM_UNIT(SCP_ATTR_IDX(curr_scp_idx)) != Module ) { 

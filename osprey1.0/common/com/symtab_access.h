@@ -471,7 +471,6 @@ Set_ST_is_optional_argument (ST& s)	{ s.flags |= ST_IS_OPTIONAL_ARGUMENT; }
 inline void
 Clear_ST_is_optional_argument (ST& s)	{ s.flags &= ~ST_IS_OPTIONAL_ARGUMENT; }
 
-# if 0
 inline BOOL
 ST_is_intent_in_argument (const ST& s)   { return s.flags_ext & ST_IS_INTENT_IN_ARGUMENT;}
 inline void
@@ -485,7 +484,6 @@ inline void
 Set_ST_is_intent_out_argument (ST& s)     { s.flags_ext |= ST_IS_INTENT_OUT_ARGUMENT; }
 inline void
 Clear_ST_is_intent_out_argument (ST& s)   { s.flags_ext &= ~ST_IS_INTENT_OUT_ARGUMENT; }
-# endif
 
 inline BOOL
 ST_is_temp_var (const ST& s)		{ return s.flags & ST_IS_TEMP_VAR;}
@@ -1143,6 +1141,20 @@ inline void
 Set_TY_is_f90_deferred_shape(TY_IDX tyi)  { Set_TY_is_f90_deferred_shape(Ty_Table[tyi]); }
 inline void
 Clear_TY_is_f90_deferred_shape(TY_IDX tyi){ Clear_TY_is_f90_deferred_shape(Ty_Table[tyi]);}
+
+
+inline BOOL
+TY_is_external(const TY& ty)   { return ty.flags & TY_IS_EXTERNAL; }
+inline void
+Set_TY_is_external(TY& ty)     { ty.flags |= TY_IS_EXTERNAL; }
+inline void
+Clear_TY_is_external(TY& ty)   { ty.flags &= ~TY_IS_EXTERNAL; }
+inline BOOL
+TY_is_external(const TY_IDX tyi){ return TY_is_external(Ty_Table[tyi]);}
+inline void
+Set_TY_is_external(TY_IDX tyi)  { Set_TY_is_external(Ty_Table[tyi]); }
+inline void
+Clear_TY_is_external(TY_IDX tyi){ Clear_TY_is_external(Ty_Table[tyi]);}
 
 
 inline BOOL
