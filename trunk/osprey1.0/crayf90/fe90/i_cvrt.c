@@ -102,6 +102,7 @@ static	boolean	symbolic_constant_expr;
 static	int    	processing_call;
 static	int    	io_ctl_list; 
 static	int    	is_subscript; 
+static  int     nested_array;
 static	int    	curr_sh;
 static	int	io_type;
 static  int     case_cmic_vpr_idx;
@@ -6171,7 +6172,14 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
    case Whole_Subscript_Opr :
    case Section_Subscript_Opr:
    case Subscript_Opr :
-	is_subscript = TRUE;
+        if (is_subscript)
+               nested_array=TRUE;
+        else
+          {
+	   is_subscript = TRUE;
+	   nested_array = FALSE;
+           }
+
         whole_subscript = IR_WHOLE_ARRAY(ir_idx);
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                         IR_FLD_L(ir_idx));
@@ -6199,6 +6207,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
        if (IR_OPR(ir_idx) == Whole_Subscript_Opr) {
              is_subscript = FALSE; 
+             nested_array = FALSE;
              break;  /* fzhao Oct*/
         }
 
@@ -6615,7 +6624,10 @@ CONTINUE:
            fei_static_subscripts(static_subscripts);
 # endif
         }
-	is_subscript = FALSE;
+        if (nested_array)
+             nested_array = FALSE;
+        else
+	     is_subscript = FALSE;
         break;
 
 
