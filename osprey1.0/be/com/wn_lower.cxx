@@ -39,7 +39,6 @@
 #include "be_com_pch.h"
 #endif /* USE_PCH */
 #pragma hdrstop
-#include <values.h>
 #include <isam.h>
 #include <alloca.h>
 #include <sys/signal.h>
@@ -10226,9 +10225,8 @@ static WN *lower_assert(WN *block, WN *tree, LOWER_ACTIONS actions)
 	/* __C_runtime_error ( BRK_RANGE, PU_name, line_no, fmt, ...);
 	 */
 
-// Solaris workaround
-// not only linux, Solaris doesn't have this BRK_RANGE thing either
-#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
+	// 'BRK_RANGE' is SGI specific meaning 'range error check'
+#if defined(__sgi)
 	kids[0] = WN_Intconst ( MTYPE_I4, BRK_RANGE );
 #else
 	fprintf(stderr, "Don't know how to do BRK_RANGE\n");
@@ -10254,9 +10252,8 @@ static WN *lower_assert(WN *block, WN *tree, LOWER_ACTIONS actions)
 				     INTRN_RT_ERR, 4, kids );
       } else {
 
-// Solaris workaround
-// not only linux, Solaris doesn't have this BRK_RANGE thing either
-#if !defined(linux) && !defined(_SOLARIS_SOLARIS)
+	// 'BRK_RANGE' is SGI specific meaning 'range error check'
+#if defined(__sgi)
 	trap = WN_CreateTrap ( BRK_RANGE );
 #else   
 	fprintf(stderr, "Don't know how to do BRK_RANGE\n");
