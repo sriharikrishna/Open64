@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.c
- * $Revision: 1.5 $
- * $Date: 2003-06-13 23:05:29 $
+ * $Revision: 1.6 $
+ * $Date: 2003-06-19 19:43:30 $
  * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
@@ -76,13 +76,13 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
 #include <string.h>
 
-#include "unparse_common.h"
+#include "common_include.h"
 
 #include "mempool.h"
 #include "unparse_target.h"
