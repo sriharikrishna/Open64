@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.13 $
- * $Date: 2003-06-19 19:22:36 $
- * $Author: broom $
+ * $Revision: 1.14 $
+ * $Date: 2003-07-24 18:36:27 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.14 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1967,6 +1967,12 @@ WN2F_parm(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     */
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_PARM, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_parm"));
+
+   if (WN_Parm_Copy_In(wn) && 
+       WN_kid0(wn)         && 
+       WN_operator(WN_kid0(wn)) !=OPR_PAREN)
+          Append_Token_Special(tokens,'(');
+
    if ( TY_is_logical(Ty_Table[WN_ty(wn)]) || 
             WN2F_CONTEXT_is_logical_arg(context)) //fzhao Jan
       {
@@ -1976,6 +1982,12 @@ WN2F_parm(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
        }
     else
          WN2F_translate(tokens, WN_kid0(wn), context);
+
+   if (WN_Parm_Copy_In(wn) && 
+       WN_kid0(wn)         && 
+       WN_operator(WN_kid0(wn)) !=OPR_PAREN)
+         Append_Token_Special(tokens,')');
+
    return EMPTY_WN2F_STATUS;
 
 } /* WN2F_parm */
