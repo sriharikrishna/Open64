@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2c.c
- * $Revision: 1.4 $
- * $Date: 2003-04-22 19:15:16 $
- * $Author: jle $
+ * $Revision: 1.5 $
+ * $Date: 2003-05-29 17:39:39 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $
  *
  * Revision history:
@@ -72,7 +72,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -799,9 +799,10 @@ ST2C_func_header(TOKEN_BUFFER  tokens,
    TY_IDX       funtype = ST_pu_type(st);
    BOOL         has_prototype = TY_has_prototype(funtype);
    
-   Is_True((ST_sclass(st) == SCLASS_TEXT  
-     || ST_sclass(st) == SCLASS_EXTERN) && TY_Is_Function(funtype),
-     ("Illegal ST_sclass for function"));
+   Is_True(TY_Is_Function(funtype),
+           ("Non-function passed to ST2C_func_header"));
+   Is_True((ST_sclass(st) == SCLASS_TEXT || ST_sclass(st) == SCLASS_EXTERN),
+           ("Illegal ST_sclass for function"));
 
    /* NOTE: We assume that when we return a value through a parameter,
     * the parameter will invariably be the first one.
