@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.22 $
- * $Date: 2004-02-09 16:55:44 $
- * $Author: fzhao $
+ * $Revision: 1.23 $
+ * $Date: 2004-04-30 15:27:23 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -141,37 +141,58 @@ WN2F_tempvar_rhs(TOKEN_BUFFER tokens,
    TOKEN_BUFFER rhs_tokens;
 
    /* The rhs */
-      if (tokens){
-         rhs_tokens = New_Token_Buffer();
-          WN2F_translate(rhs_tokens, WN_kid0(wn), context);
-          Append_And_Reclaim_Token_List(tokens, &rhs_tokens);
-       }
+   if (tokens) {
+      rhs_tokens = New_Token_Buffer();
+      WN2F_translate(rhs_tokens, WN_kid0(wn), context);
+      Append_And_Reclaim_Token_List(tokens, &rhs_tokens);
+   }
 }
 
-
+// GetTmpVarTransInfo: mfef90 may define array bound extents using
+// temporaries that cannot be directly translated into fortran. E.g:
+// 't__1' below
+//    REAL(w2f__8) XXX(1 : t__1)
+// should be the formal parameter 'N'
+//    REAL(w2f__8) XXX(1 : N)
+// This routine finds the definition of 't__1'
+//    t__1 = N
+// so that it can be replaced witih 'N'.
 static BOOL
 GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
                    ST_IDX         arbnd,
                    WN*            wn)
 {
-   WN * stmt;
-   WN *first_stmt;
+   // Note: wn must be an OPR_BLOCK
 
-   first_stmt = WN_first(wn);
-   stmt = first_stmt;
-   while ((stmt !=NULL)&&((WN_operator(stmt)!=OPR_STID)
-                           ||(WN_operator(stmt) ==OPR_STID)
-			   &&strcmp(ST_name(WN_st(stmt)),ST_name(ST_ptr(arbnd)))))
-
-       stmt = WN_next(stmt);
- 
-
-   if ( stmt){
-        WN2F_tempvar_rhs(decl_tokens,stmt);
-         return TRUE;
+   // Search through all the statements in 'wn' trying to find the
+   // definition of the tempvar in 'arbnd'.
+   const char* bndSymNm = ST_name(ST_ptr(arbnd));
+  
+   WN* foundStmt = NULL;
+   for (WN* stmt = WN_first(wn); (stmt); stmt = WN_next(stmt)) {
+      // mfef90 typically generates statements like this
+      bool isDefinedInSTID = 
+	((WN_operator(stmt) == OPR_STID) && 
+	 (strcmp(ST_name(WN_st(stmt)), bndSymNm) == 0));
+      // whirl2xaif will generate statements like this
+      bool isDefinedInISTORE =
+	((WN_operator(stmt) == OPR_ISTORE) && 
+	 (WN_operator(WN_kid1(stmt)) == OPR_LDA) &&
+	 (strcmp(ST_name(WN_st(WN_kid1(stmt))), bndSymNm) == 0));
+      
+      if (isDefinedInSTID || isDefinedInISTORE) {
+	 foundStmt = stmt;
+	 break;
       }
-   else return FALSE;
-
+   }
+   
+   if (foundStmt) {
+      WN2F_tempvar_rhs(decl_tokens, foundStmt);
+      return TRUE;
+   }
+   else {
+      return FALSE;
+   }
 }
 
 static WN *
@@ -1843,14 +1864,15 @@ TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
   /* Emit specification statements for every element of the
    * common block, including equivalences.
    */
+  TOKEN_BUFFER decl_tokens = New_Token_Buffer();
 
-  Append_Token_String(tokens, "COMMON");
+  Append_Token_String(decl_tokens, "COMMON");
   if (name != NULL && *name != '\0')
-    Append_Token_String(tokens, Concat3_Strings("/", name, "/"));
-  TY2F_List_Common_Flds(tokens, TY_flist(ty));
+    Append_Token_String(decl_tokens, Concat3_Strings("/", name, "/"));
+  TY2F_List_Common_Flds(decl_tokens, TY_flist(ty));
   
 
-  TY2F_Declare_Common_Flds(tokens,   // variables in common block type declaration
+  TY2F_Declare_Common_Flds(decl_tokens, // vars in common block type decl
 			   TY_flist(ty),
 			   FALSE, /*alt_return*/
 			   &is_equiv);
@@ -1861,17 +1883,19 @@ TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
 
 # if 0 //June
 
-  Append_Token_String(tokens, "COMMON");
+  Append_Token_String(decl_tokens, "COMMON");
   if (name != NULL && *name != '\0')
-    Append_Token_String(tokens, Concat3_Strings("/", name, "/"));
-  TY2F_List_Common_Flds(tokens, TY_flist(ty));
+    Append_Token_String(decl_tokens, Concat3_Strings("/", name, "/"));
+  TY2F_List_Common_Flds(decl_tokens, TY_flist(ty));
 
 #endif
 
   /* Emit equivalences, if there are any */
 
   if (is_equiv)
-    TY2F_Equivalence_List(tokens, ty_idx /*struct_ty*/);
+    TY2F_Equivalence_List(decl_tokens, ty_idx /*struct_ty*/);
+
+  Append_And_Reclaim_Token_List(tokens, &decl_tokens);
 
 } /* TY2F_Translate_Common */
 
