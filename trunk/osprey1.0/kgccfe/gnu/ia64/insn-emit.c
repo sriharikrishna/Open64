@@ -5959,18 +5959,22 @@ gen_ashrsi3 (operand0, operand1, operand2)
     operands[1] = operand1;
     operands[2] = operand2;
 {
-  rtx subtarget = gen_reg_rtx (DImode);
+/*FMZH  rtx subtarget = gen_reg_rtx (DImode);*/
+  rtx subtarget = gen_reg_rtx (SImode);
   if (GET_CODE (operands[2]) == CONST_INT)
-    emit_insn (gen_extv (subtarget, gen_lowpart (DImode, operands[1]),
+/*FMZH    emit_insn (gen_extv (subtarget, gen_lowpart (DImode, operands[1]),*/
+    emit_insn (gen_extv (subtarget, gen_lowpart (SImode, operands[1]),
 			 GEN_INT (32 - INTVAL (operands[2])), operands[2]));
   else
     {
-      rtx subshift = gen_reg_rtx (DImode);
+/*FMZH      rtx subshift = gen_reg_rtx (DImode);*/
+      rtx subshift = gen_reg_rtx (SImode);
       emit_insn (gen_extendsidi2 (subtarget, operands[1]));
       emit_insn (gen_zero_extendsidi2 (subshift, operands[2]));
       emit_insn (gen_ashrdi3 (subtarget, subtarget, subshift));
     }
-  emit_move_insn (gen_lowpart (DImode, operands[0]), subtarget);
+/*FMZH  emit_move_insn (gen_lowpart (DImode, operands[0]), subtarget);*/
+  emit_move_insn (gen_lowpart (SImode, operands[0]), subtarget);
   DONE;
 }
     operand0 = operands[0];
