@@ -841,11 +841,11 @@ Create_ST_For_Tree (tree decl_node)
 	Save_Upc_Rts_Calls((char *) name.c_str(), st);
 	an = IDENTIFIER_POINTER (DECL_ASSEMBLER_NAME (decl_node));
 	Upc_Translate_Name((char *) name.c_str(), &an);
+        if (strcmp(an, "main") == 0) {
+	  an = "user_main";
+        }
       }  else {
 	an = IDENTIFIER_POINTER (DECL_ASSEMBLER_NAME (decl_node));
-      }
-      if (strcmp(an, "main") == 0) {
-	an = "user_main";
       }
       
       ST_Init (st,
