@@ -1,7 +1,0 @@
-# dependences for compilation
-../include/bstring.h
-../include/stddef.h
-../include/stdio.h
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/ir_tools/../../common/com/defs.h
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/ir_tools/../../common/com/mtypes.cxx
-/local/fzhao/pro64/osprey1.0/targ_ia32_ia64_linux/ir_tools/../../common/com/mtypes.h

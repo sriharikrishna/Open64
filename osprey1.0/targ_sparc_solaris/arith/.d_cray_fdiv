@@ -1,5 +1,0 @@
-# dependences for compilation
-/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/arith/../../arith/arith.h
-/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/arith/../../arith/arith.internal.h
-/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/arith/../../arith/cray_fdiv.c
-/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/arith/../../arith/int64.h

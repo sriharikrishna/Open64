@@ -1,5 +1,0 @@
-# dependences for compilation
-/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../include/cmplrs/host.h
-/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../libF77/cmplx.h
-/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../libF77/moremath.h
-/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/crayf90/libf90sgi/../../../libF77/pow_zz.c

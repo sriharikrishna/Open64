@@ -1,8 +1,0 @@
-# dependences for compilation
-/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../clibinc/cray/format.h
-/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../clibinc/cray/nassert.h
-/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../clibinc/cray/portdefs.h
-/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../clibinc/cray/solaris.h
-/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../libf/fio/fmtparse.c
-/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../libf/fio/parsfmt.c
-/scratch/fzhao/pro64/osprey1.0/targ_mips_irix/crayf90/libf90sgi/../../../libf/include/lio.h
