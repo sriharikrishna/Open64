@@ -152,7 +152,9 @@ COMMON_COM_CXX_SRC =	\
 	wn_simp.cxx	\
 	wn_util.cxx	\
 	wutil.cxx	\
-	xstats.cxx	
+	xstats.cxx	\
+	upc_symtab_utils.cxx	\
+	upc_wn_util.cxx
 
 
 
