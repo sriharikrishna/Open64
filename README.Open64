@@ -1,4 +1,4 @@
-$Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/README.Open64,v 1.1 2004-11-23 20:25:53 eraxxon Exp $
+$Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/README.Open64,v 1.2 2004-11-23 20:41:58 eraxxon Exp $
 
 =============================================================================
 ==
@@ -68,11 +68,11 @@ leaves quite a lot to be desired.
 
 1. Choose an appropriate target directory depending on your platform
 
-  targ_alpha_tru64/
-  targ_ia32_ia64_linux/  (32-bit Linux and 32-bit Cygwin)
-  targ_ia64_ia64_linux/  (64-bit Linux)
-  targ_mips_irix/
-  targ_sparc_solaris/
+  osprey1.0/targ_alpha_tru64/
+  osprey1.0/targ_ia32_ia64_linux/  (32-bit Linux and 32-bit Cygwin)
+  osprey1.0/targ_ia64_ia64_linux/  (64-bit Linux)
+  osprey1.0/targ_mips_irix/
+  osprey1.0/targ_sparc_solaris/
 
 (N.B.: We do not support the other target directories!)
 
@@ -87,6 +87,9 @@ individual compile components:
   F90 front end (mfef90):
     cd crayf90/sgi && make
 
+  GNU C/C++ front end (gfec):
+    cd gccfe && make
+
   WHIRL IR tools (e.g., ir_b2a):
     cd ir_tools && make
 
@@ -97,12 +100,29 @@ individual compile components:
     cd whirl2c && make
 
 
-1.3. Installation Instructions.
+1.3. Installation Instructions
 ----
 
 There is currently no packaged installation procedure.  Running 'make
 install' is not supported.  You should generally treat the top-level
 INSTALL script the same as you would a lie.
+
+1.4. Using
+----
+
+We do not yet support using Open64's driver.  
+
+A sample pipeline might include:
+ 
+  mfef90 foo1.f90     --> creates foo1.B (a WHIRL file)
+  gfec   foo2.c       --> creates foo2.B (a WHIRL file)
+
+  [ir_b2a -pre foo1.B       --> dumps ASCII WHIRL to stdout]
+
+  [my_transformation foo1.B --> transform WHIRL into WHIRL]
+
+  whirl2f foo1.B      --> creates foo1.w2f.f
+  whirl2c foo2.B      --> creates foo2.w2c.c
 
 
 =============================================================================
