@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.6 $
- * $Date: 2003-06-23 20:21:55 $
+ * $Revision: 1.7 $
+ * $Date: 2003-09-18 16:48:46 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.7 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -1193,8 +1193,14 @@ W2F_Outfile_Init(void)
  *      selected_int_kind
  *      selected_real_kind
  * to set the kind values
- *------fzhao
  */
+
+#if 0
+//made a included file .../Open64/osprey1.0/include/whirl2f_predef_types.f
+//before re-parser the generated file "*.w2f.f",you have to compile 
+//this file first to get a module info file to be included in your 
+//unparser code---fzhao
+
    Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
                 "	module w2f__types\n\n");
    Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
@@ -1219,6 +1225,8 @@ W2F_Outfile_Init(void)
 
    Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
                 "	end module w2f__types\n");
+#endif
+
    Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
                 "C **********************************************"
                 "*************\n");
