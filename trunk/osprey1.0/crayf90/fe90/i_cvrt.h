@@ -1467,7 +1467,8 @@ extern INTPTR fei_namelist         	  ( char   *name_string,
                                             INT32  in_model);
 
 extern INTPTR fei_interface               ( char   *name_string,
-                                            INT32   nitems);
+                                            INT32   nitems,
+                                            INT32    kind_interface);
 extern void  fei_gen_func_entry           (INTPTR   idx);
 
 extern void  fei_fcd             	  ( TYPE type );

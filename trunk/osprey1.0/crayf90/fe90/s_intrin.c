@@ -18965,8 +18965,8 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
 
 #endif
 
-   IR_TYPE_IDX(ir_idx) = type_idx;
-   IR_RANK(ir_idx) = res_exp_desc->rank;
+  IR_TYPE_IDX(ir_idx) = type_idx;
+  IR_RANK(ir_idx) = res_exp_desc->rank;
 
    if (res_exp_desc->type == Character) {
       res_exp_desc->char_len.fld = TYP_FLD(type_idx);

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.5 $
- * $Date: 2002-08-22 15:48:38 $
+ * $Revision: 1.6 $
+ * $Date: 2002-08-22 20:41:25 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.6 $";
 #endif
 
 #include <alloca.h>
@@ -2324,8 +2324,11 @@ WN2F_return(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	  * the register-values to the components of this equivalent
 	  * return value.  For now, do nothing but warn about this case!
 	  */
+# if 0 //Maybe it's all right---fzhao
 	 ASSERT_WARN(FALSE,
 		     (DIAG_UNIMPLEMENTED, "WN2F_return from two registers"));
+#endif
+
       } /* if */
    } /* if (need to store return value) */
 	   
@@ -3066,7 +3069,7 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
  {
    int           k ;
    ST            **param_st;
-   ST            *st;
+   ST            *st = WN_st(wn);
    ST            *rslt = NULL;
    INT           param,num_params;
    INT           first_param;
@@ -3075,7 +3078,11 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    INT           implicit = 0 ;
 
 
-   const char *st_name =  W2CF_Symtab_Nameof_St(WN_st(wn));
+
+//   const char *st_name =  W2CF_Symtab_Nameof_St(WN_st(wn));
+    
+    const char *st_name = ST_name(st);
+
     ASSERT_DBG_FATAL(WN_operator(wn) == OPR_INTERFACE,
                      (DIAG_W2F_UNEXPECTED_OPC, "WN2F_interface_blk"));
    if (ST_is_external(WN_st(wn)))
@@ -3085,8 +3092,32 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
      Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(tokens, "interface ");
+     
+     if (ST_is_assign_interface(st))
+       {
+         Append_Token_String(tokens,"assignment ");
+         Append_Token_Special(tokens,'(');
+       }
+
+     if (ST_is_operator_interface(st) || ST_is_u_operator_interface(st)){
+        Append_Token_String(tokens,"operator");
+        Append_Token_Special(tokens,'(');
+      }
+
+     if (ST_is_u_operator_interface(st)) 
+        Append_Token_Special(tokens,'.');
+
      if (strcmp(st_name,unnamed_interface)) 
          Append_Token_String(tokens, st_name);
+
+     if (ST_is_u_operator_interface(st))
+         Append_Token_Special(tokens,'.');
+ 
+     if (ST_is_assign_interface(st) ||
+         ST_is_operator_interface(st) ||
+         ST_is_u_operator_interface(st))
+         Append_Token_Special(tokens,')');
+ 
      Append_Token_Special(tokens, '\n');
  
      Increment_Indentation();
