@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_io.c
- * $Revision: 1.4 $
- * $Date: 2003-01-10 02:47:29 $
+ * $Revision: 1.5 $
+ * $Date: 2003-02-26 16:47:29 $
  *
  * Revision history:
  *  5-June-95 - Original Version
@@ -197,20 +197,27 @@ WN2F_io_unit(TOKEN_BUFFER tokens,
    switch (WN_io_item(item))
    {
    case IOU_NONE: 
+
+#if 0 /*if it's NONE,don't declare UNIT--fzhao*/
      if (WN2F_CONTEXT_cray_io(context))
      {
        WN2F_emit_ctrl(tokens,p,context);
        Append_Token_Special(tokens, '*');
      } else
+#endif
+
        emitted = FALSE;  /* eg: inquire by file */
       break;
       
    case IOU_DEFAULT: /* asterisk or double astrisk */
+#if 0 /*if it's default,keep it default*/
       WN2F_emit_ctrl(tokens,p,context);
       if (WN_const_val(WN_kid0(item)) == 0)
 	Append_Token_String(tokens, "**");
       else
 	Append_Token_Special(tokens, '*');
+#endif
+     emitted =FALSE;
       break;
 
    case IOU_EXTERNAL:    /* unit number */
