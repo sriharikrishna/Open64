@@ -185,8 +185,8 @@ TY_are_equivalent (TY_IDX ty_id1,
  * calls to this function.  I.e. it serves both to test for uniqueness,
  * and to create a dataset of unique types.
 */
-TY_IDX
-TY_is_unique (TY_IDX);
+extern TY_IDX
+TY_is_unique (const TY_IDX ty_idx);
 
 //----------------------------------------------------------------------
 // PREG-related utilities

@@ -1316,7 +1316,7 @@ TY_is_unique_op (const TY_IDX ty_idx, HASH_TY_TABLE& hash_ty_table)
 }
 
 
-TY_IDX
+extern TY_IDX
 TY_is_unique (const TY_IDX ty_idx) 
 {
   TY    &ty = Ty_Table[ty_idx];

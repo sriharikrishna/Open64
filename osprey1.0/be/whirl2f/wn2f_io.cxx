@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_io.c
- * $Revision: 1.6 $
- * $Date: 2003-02-28 22:54:55 $
+ * $Revision: 1.7 $
+ * $Date: 2003-12-09 19:25:35 $
  *
  * Revision history:
  *  5-June-95 - Original Version
@@ -476,18 +476,8 @@ WN2F_io_control(TOKEN_BUFFER tokens,
 
 
 
-// Solaris CC workaround
-// WN2F_implied_do() is declared in wn2f_stmt.h and defined in wn2f_stmt.cxx
-// as WN2F_STATUS WN2F_implied_do(), not void.
-//
-
-#ifdef _SOLARIS_SOLARIS
 extern WN2F_STATUS
    WN2F_implied_do(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
-#else
-extern void
-   WN2F_implied_do(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
-#endif
 
 static BOOL
 WN2F_io_list(TOKEN_BUFFER tokens, 
