@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_io.c
- * $Revision: 1.5 $
- * $Date: 2003-02-20 01:51:32 $
+ * $Revision: 1.6 $
+ * $Date: 2003-02-26 16:49:44 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_io.cxx,v $
  *
@@ -57,7 +57,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-  static char *rcs_id = " $Id: cwh_io.cxx,v 1.5 2003-02-20 01:51:32 fzhao Exp $ ";
+  static char *rcs_id = " $Id: cwh_io.cxx,v 1.6 2003-02-26 16:49:44 fzhao Exp $ ";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -1406,6 +1406,7 @@ fei_inquire(void)
   INT32 num_items = 0;
   INT32 i,j;
   TY_IDX ts = NIL;
+  ST *st;
 
   inq_list = (WN **) malloc(sizeof (WN *) * 27);
 
@@ -1480,6 +1481,45 @@ fei_inquire(void)
 
 		  inq_list[num_items++] = wn;
 		  break;
+            /*we need add ST_item here fzhao*/
+                 case ST_item:
+                  st = cwh_stk_pop_ST();
+	   	  wn = cwh_addr_address_ST(st);
+                  if (item == INQ_PAD)
+                    wn = WN_CreateIoItem1 (IOC_PAD, wn, NIL);
+                  else if (item == INQ_DELIM)
+                    wn = WN_CreateIoItem1 (IOC_DELIM, wn,  NIL);
+                  else if (item == INQ_READWRITE)
+                    wn = WN_CreateIoItem1 (IOC_READWRITE, wn,  NIL);
+                  else if (item == INQ_WRITE)
+                    wn = WN_CreateIoItem1 (IOC_WRITE, wn,  NIL);
+                  else if (item == INQ_READ)
+                    wn = WN_CreateIoItem1 (IOC_READ, wn,  NIL);
+                  else if (item == INQ_ACTION)
+                    wn = WN_CreateIoItem1 (IOC_ACTION, wn,  NIL);
+                  else if (item == INQ_POSITION)
+                    wn = WN_CreateIoItem1 (IOC_POSITION, wn,  NIL);
+                  else if (item == INQ_BLANK)
+                    wn = WN_CreateIoItem1 (IOC_BLANK, wn,  NIL);
+                  else if (item == INQ_UNFORMATTED)
+                    wn = WN_CreateIoItem1 (IOC_UNFORMATTED, wn,  NIL);
+                  else if (item == INQ_FORMATTED)
+                    wn = WN_CreateIoItem1 (IOC_FORMATTED, wn,  NIL);
+                  else if (item == INQ_FORM)
+                    wn = WN_CreateIoItem1 (IOC_FORM, wn,  NIL);
+                  else if (item == INQ_DIRECT)
+                    wn = WN_CreateIoItem1 (IOC_DIRECT, wn,  NIL);
+                  else if (item == INQ_SEQUENTIAL)
+                    wn = WN_CreateIoItem1 (IOC_SEQUENTIAL, wn,  NIL);
+                  else if (item == INQ_ACCESS)
+                    wn = WN_CreateIoItem1 (IOC_ACCESS, wn,  NIL);
+                  else if (item == INQ_NAME)
+                    wn = WN_CreateIoItem1 (IOC_NAME, wn,  NIL);
+                  else if (item == INQ_FILE)
+                    wn = WN_CreateIoItem1(IOC_FILE, wn,  NIL);
+
+                  inq_list[num_items++] = wn;
+
               default:
 		  cwh_stk_pop_whatever();
 		  break;
@@ -1530,6 +1570,42 @@ fei_inquire(void)
                if (item != INQ_UNIT)
 	         inq_list[num_items++] = wn;
 	       break;
+             case ST_item:
+               wn = cwh_addr_address_ST(cwh_stk_pop_ST());
+               if (item == INQ_NEXTREC)
+                 wn = WN_CreateIoItem1(IOC_NEXTREC, wn, NIL);
+               else if (item == INQ_RECL)
+                 wn = WN_CreateIoItem1(IOC_RECL, wn, NIL);
+               else if (item == INQ_NAMED)
+                 wn = WN_CreateIoItem1(IOC_NAMED, wn, NIL);
+               else if (item == INQ_NUMBER)
+                 wn = WN_CreateIoItem1(IOC_NUMBER, wn, NIL);
+               else if (item == INQ_OPENED)
+                 wn = WN_CreateIoItem1(IOC_OPENED, wn, NIL);
+               else if (item == INQ_EXIST)
+                 wn = WN_CreateIoItem1(IOC_EXIST, wn, NIL);
+               else if (item == INQ_IOSTAT)
+                 wn = WN_CreateIoItem1(IOC_IOSTAT, wn, NIL);
+               else if (item == INQ_UNIT)
+                 unit = WN_CreateIoItem1(IOU_EXTERNAL, wn, NIL);
+
+               if (item != INQ_UNIT)
+                 inq_list[num_items++] = wn;
+               break;
+
+              case WN_item:
+/*since we keep the constant UNIT to be integer 
+  *constant,here could be WN_item   fzhao */
+              if (item==INQ_UNIT){
+                  wn = cwh_expr_operand(NULL);
+                  if (wn!=NULL)
+                     unit = WN_CreateIoItem1(IOU_EXTERNAL,wn,NIL);
+               }
+             else
+               cwh_stk_pop_whatever();
+
+		break;
+
              default:
 	       cwh_stk_pop_whatever(); 
 	       break;
@@ -1788,6 +1864,34 @@ cwh_io_no_desc(IOSTATEMENT statement)
                if (item != NODESC_UNIT)
 	         nodesc_list[num_items++] = wn;
 	       break;
+
+               case WN_item:
+                  wn = cwh_expr_operand(NULL);
+                  if (wn!=NULL){
+                     if (item == NODESC_IOSTAT)
+                         wn = WN_CreateIoItem1(IOC_IOSTAT, wn, NIL);
+                     else if (item == NODESC_UNIT)
+                         unit = WN_CreateIoItem1(IOU_EXTERNAL, wn, NIL);
+               if (item != NODESC_UNIT)
+                 nodesc_list[num_items++] = wn;
+
+              }
+               break;
+
+               case ST_item:
+               wn = cwh_addr_address_ST(cwh_stk_pop_ST());
+              if (wn!=NULL){
+                  if (item == NODESC_IOSTAT)
+                      wn = WN_CreateIoItem1(IOC_IOSTAT, wn, NIL);
+                  else if (item == NODESC_UNIT)
+                      unit = WN_CreateIoItem1(IOU_EXTERNAL, wn, NIL);
+               if (item != NODESC_UNIT)
+                 nodesc_list[num_items++] = wn;
+
+              }
+
+               break;
+
              default:
 	       cwh_stk_pop_whatever(); 
 	       break;
