@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.22 $
- * $Date: 2003-02-26 16:47:29 $
- * $Author: fzhao $
+ * $Revision: 1.23 $
+ * $Date: 2003-06-19 19:22:36 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.22 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.23 $";
 #endif
 
 #include <alloca.h>
@@ -85,7 +85,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "init2f.h"
 #include "be_symtab.h"
 #include "intrn_info.h"              /* INTR macros */     
-
+#include "unparse_target.h"
+#include "ty_ftn.h"
 
 extern WN_MAP  W2F_Frequency_Map;   /* Defined in w2f_driver.c */
 extern WN_MAP *W2F_Construct_Map;   /* Defined in w2f_driver.c */
@@ -2649,8 +2650,8 @@ TYPE_ID fmtry;
 	 last_arg_idx = WN_kid_count(wn) - 2;
       } /* if OPR_CALL */
 
-      return_ty = Func_Return_Type(func_ty);
-      return_to_param = Func_Return_To_Param(func_ty);
+      return_ty = W2X_Unparse_Target->Func_Return_Type(func_ty);
+      return_to_param = W2X_Unparse_Target->Func_Return_To_Param(func_ty);
       first_arg_idx = ST2F_FIRST_PARAM_IDX(func_ty);
    } /* if OPR_INTRINSIC_CALL */
    
@@ -2701,7 +2702,7 @@ else
           if (WN_operator(kidofparm) == OPR_CALL)
            {
               kid_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
-             if (Func_Return_Character (kid_ty))
+             if (W2X_Unparse_Target->Func_Return_Character (kid_ty))
  		  total_implicit_args++; 
 
 	    }
@@ -2770,7 +2771,7 @@ else
                      (TY_Is_Character_Reference(parm_ty) ||
                        TY_Is_Chararray_Reference(parm_ty)))) ||
                WN_operator(kidofparm)==OPR_CALL &&
-                   Func_Return_Character(arg_ty) )            &&
+                   W2X_Unparse_Target->Func_Return_Character(arg_ty) )            &&
                !is_allocate_stmt)
       {
 	 /* Handle substring arguments here.  These are always assumed
@@ -3297,7 +3298,7 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
         st = &St_Table[WN_entry_name(WN_kid(wn,k))];
         TY_IDX       funtype = ST_pu_type(st);
 
-        return_ty = Func_Return_Type(funtype);
+        return_ty = W2X_Unparse_Target->Func_Return_Type(funtype);
 
      if (ST_is_in_module(st) ) {
           Append_Token_String(header_tokens,"module procedure ");

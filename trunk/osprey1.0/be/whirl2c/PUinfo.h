@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: PUinfo.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:15 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-06-19 19:22:34 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.h,v $
  *
  * Revision history:
@@ -245,10 +245,10 @@ extern UINT               PUinfo_local_decls_indent;
 #define PUINFO_FUNC_TY     ST_pu_type(PUINFO_FUNC_ST)
 #define PUINFO_FUNC_NAME   W2CF_Symtab_Nameof_St(PUINFO_FUNC_ST)
 
-#define PUINFO_RETURN_TY        Func_Return_Type(PUINFO_FUNC_TY)
+#define PUINFO_RETURN_TY        W2X_Unparse_Target->Func_Return_Type(PUINFO_FUNC_TY)
 #define PUINFO_RETURN_PARAM     WN_st(WN_formal(PUinfo_current_func, 0))
-#define PUINFO_RETURN_TO_PARAM  Func_Return_To_Param(PUINFO_FUNC_TY)
-#define PUINFO_RETURN_CHARACTER Func_Return_Character(PUINFO_FUNC_TY)
+#define PUINFO_RETURN_TO_PARAM  W2X_Unparse_Target->Func_Return_To_Param(PUINFO_FUNC_TY)
+#define PUINFO_RETURN_CHARACTER W2X_Unparse_Target->Func_Return_Character(PUINFO_FUNC_TY)
 
 
         /*----- Interface routines -----*/

@@ -28,8 +28,8 @@
 /* ====================================================================
  *
  * Module: unparse_target.h
- * $Revision: 1.3 $
- * $Date: 2003-06-13 23:05:30 $
+ * $Revision: 1.4 $
+ * $Date: 2003-06-19 19:22:35 $
  * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/unparse_target_ftn.h,v $
  *
@@ -99,8 +99,29 @@ W2CF_Get_Ftn_St_Name(const ST *st, const char *original_name)
    
 } /* W2CF_Get_Ftn_St_Name */
 
+static const char *Ftn_Reserved_Ty_Name[] =
+{
+   "split_st",                /* compiler generated */
+   "__$w2c_predef_ld_union",  /* compiler generated */
+   "__$w2c_predef_ldv_union"  /* compiler generated */
+}; /* Ftn_Reserved_Ty_Name */
+
+static const char *Ftn_Reserved_St_Name[] =
+{
+   "TO DO"
+}; /* Ftn_Reserved_St_Names */
+
+#define NUM_FTN_TY_RNAMES (sizeof(Ftn_Reserved_Ty_Name)/sizeof(char *))
+#define NUM_FTN_ST_RNAMES (sizeof(Ftn_Reserved_St_Name)/sizeof(char *))
+
 class Unparse_Target_FTN : public Unparse_Target {
 public:
+	Unparse_Target_FTN ()
+	{
+		reserved_ty_names = new Reserved_Name_Set (NUM_FTN_TY_RNAMES, Ftn_Reserved_Ty_Name);
+		reserved_st_names = new Reserved_Name_Set (NUM_FTN_ST_RNAMES, Ftn_Reserved_St_Name);
+	}
+
 	~Unparse_Target_FTN () {};
 
 	const char *Make_Valid_Name(const char *name, BOOL allow_dot)
@@ -147,6 +168,16 @@ public:
 	  return TRUE;
 	}
 
+	BOOL Redeclare_File_Types (void)
+	{
+	  return TRUE;
+	}
+
+	BOOL Builtin_Type (TY_IDX ty)
+	{
+	  return FALSE;  /* Mimicking behavior of WHIRL2F. */
+	}
+
 	BOOL Is_Binary_Or_Tertiary_Op (char c)
 	{
           return (c==PLUS          || \
@@ -162,6 +193,26 @@ public:
                   c==LESS_THAN     || \
                   c==LARGER_THAN);
 	}
+
+	/*------ Function type attributes ------*/
+	/*--------------------------------------*/
+
+	BOOL Func_Return_Character(TY_IDX func_ty)
+	{
+		return TY_is_character(Ty_Table[TY_ret_type(func_ty)]);
+	} /* Func_Return_Character */
+
+	TY_IDX Func_Return_Type(TY_IDX func_ty)
+	{
+		return TY_ret_type(func_ty);
+	} /* Func_Return_Type */
+
+	BOOL Func_Return_To_Param(TY_IDX func_ty)
+	{
+		return TY_return_to_param(Ty_Table[func_ty]);
+	} /* Func_Return_To_Param */
+
+
 };
 
 #endif /* unparse_target_ftn_INCLUDED */

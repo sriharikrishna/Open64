@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2c.c
- * $Revision: 1.5 $
- * $Date: 2003-05-29 17:39:39 $
+ * $Revision: 1.6 $
+ * $Date: 2003-06-19 19:22:34 $
  * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $
  *
@@ -72,7 +72,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -81,6 +81,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "st2c.h"
 #include "ty2c.h"
 #include "init2c.h"
+#include "unparse_target.h"
 
 
 /*--------- General purpose macros to get ST attributes ---------------*/
@@ -508,7 +509,7 @@ ST2C_basic_decl(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
    if (Compile_Upc) {
      if (TY_kind(ty) == KIND_STRUCT ||
 	 (TY_kind(ty) == KIND_FUNCTION && 
-	  TY_kind(Func_Return_Type(ty)) == KIND_STRUCT)) {
+	  TY_kind(W2X_Unparse_Target->Func_Return_Type(ty)) == KIND_STRUCT)) {
        CONTEXT_set_incomplete_ty2c(context);
      }
    }
@@ -834,7 +835,7 @@ ST2C_func_header(TOKEN_BUFFER  tokens,
       if (Compile_Upc) {
 	CONTEXT_set_incomplete_ty2c(context);
       }
-      TY2C_translate(header_tokens, Func_Return_Type(funtype), context);
+      TY2C_translate(header_tokens, W2X_Unparse_Target->Func_Return_Type(funtype), context);
 
       /* Emit parameter declarations, indented and on a new line */
       Increment_Indentation();
@@ -881,7 +882,7 @@ ST2C_func_header(TOKEN_BUFFER  tokens,
       }
       Append_Token_Special(header_tokens, ')');
       Decrement_Indentation();
-      TY2C_translate(header_tokens, Func_Return_Type(funtype), context);
+      TY2C_translate(header_tokens, W2X_Unparse_Target->Func_Return_Type(funtype), context);
    }
    
    if (PU_is_inline_function(Pu_Table[ST_pu(st)]))

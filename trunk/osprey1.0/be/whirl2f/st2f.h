@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: st2f.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:33 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-06-19 19:22:35 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.h,v $
  *
  * Revision history:
@@ -116,8 +116,8 @@ extern void ST2F_Declare_Tempvar(TY_IDX ty, UINT idx);
 //-------------------------------------
 
 #define ST2F_FIRST_PARAM_IDX(funtype) \
-   (Func_Return_To_Param(funtype)? \
-    (Func_Return_Character(funtype)? 2 : 1) : 0)
+   (W2X_Unparse_Target->Func_Return_To_Param(funtype)? \
+    (W2X_Unparse_Target->Func_Return_Character(funtype)? 2 : 1) : 0)
 
 #endif /* st2f_INCLUDED */
 

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.12 $
- * $Date: 2003-03-28 21:33:47 $
- * $Author: fzhao $
+ * $Revision: 1.13 $
+ * $Date: 2003-06-19 19:22:36 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.12 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.13 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -69,6 +69,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "st2f.h"
 #include "wn2f_load_store.h"
 #include "intrn_info.h"          /* INTR macros */
+#include "ty_ftn.h"
 
 /*---- Fortran names for binary and unary arithmetic operations -------*/
 /*---------------------------------------------------------------------*/

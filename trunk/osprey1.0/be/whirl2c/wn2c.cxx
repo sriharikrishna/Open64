@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.5 $
- * $Date: 2003-04-22 19:15:16 $
- * $Author: jle $
+ * $Revision: 1.6 $
+ * $Date: 2003-06-19 19:22:35 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -76,6 +76,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "ty2c.h"
 #include "tcon2c.h"
 #include "wn2c_pragma.h"
+#include "unparse_target.h"
 
 #if defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 2)))
 #include <ext/hash_set>
@@ -4367,8 +4368,8 @@ WN2C_call(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
    {
       ST2C_use_translate(call_tokens, &St_Table[WN_entry_name(wn)], context);
       func_ty = ST_pu_type(&St_Table[WN_entry_name(wn)]);
-      return_to_param = Func_Return_To_Param(func_ty);
-      return_ty = Func_Return_Type(func_ty);
+      return_to_param = W2X_Unparse_Target->Func_Return_To_Param(func_ty);
+      return_ty = W2X_Unparse_Target->Func_Return_Type(func_ty);
       first_arg_idx = (return_to_param? 1 : 0);
       last_arg_idx = WN_kid_count(wn) - 1;
    }
@@ -4391,8 +4392,8 @@ WN2C_call(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
        * but is now directly available as the WN_ty attribute.
        */
       func_ty = WN_ty(wn);
-      return_to_param = Func_Return_To_Param(func_ty);
-      return_ty = Func_Return_Type(func_ty);
+      return_to_param = W2X_Unparse_Target->Func_Return_To_Param(func_ty);
+      return_ty = W2X_Unparse_Target->Func_Return_Type(func_ty);
       first_arg_idx = (return_to_param? 1 : 0);
       last_arg_idx = WN_kid_count(wn) - 2;
    }
@@ -4402,8 +4403,8 @@ WN2C_call(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
 	      ("Expected non-null WN_entry_name for PICCALL in WN_call()"));
       ST2C_use_translate(call_tokens, &St_Table[WN_entry_name(wn)], context);
       func_ty = ST_pu_type(&St_Table[WN_entry_name(wn)]);
-      return_to_param = Func_Return_To_Param(func_ty);
-      return_ty = Func_Return_Type(func_ty);
+      return_to_param = W2X_Unparse_Target->Func_Return_To_Param(func_ty);
+      return_ty = W2X_Unparse_Target->Func_Return_Type(func_ty);
       first_arg_idx = (return_to_param? 1 : 0);
       last_arg_idx = WN_kid_count(wn) - 2;
    }

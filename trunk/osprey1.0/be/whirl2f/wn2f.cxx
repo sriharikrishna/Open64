@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.14 $
- * $Date: 2003-02-19 20:15:35 $
- * $Author: fzhao $
+ * $Revision: 1.15 $
+ * $Date: 2003-06-19 19:22:36 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
  *
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.14 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.15 $";
 #endif
 
 #include <alloca.h>
@@ -82,7 +82,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "st2f.h"
 #include "ty2f.h"
 #include "tcon2f.h"
-
+#include "unparse_target.h"
+#include "ty_ftn.h"
 
 extern WN_MAP *W2F_Construct_Map;   /* Defined in w2f_driver.c */
 extern BOOL    W2F_Prompf_Emission; /* Defined in w2f_driver.c */
@@ -1204,7 +1205,7 @@ WN2F_translate_purple_main(TOKEN_BUFFER tokens,
     * here, with a default name.  We also insert a declaration of the
     * purple_region.
     */
-   return_ty = Func_Return_Type(ST_type(WN_entry_name(pu)));
+   return_ty = W2X_Unparse_Target->Func_Return_Type(ST_type(WN_entry_name(pu)));
    if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
    {
       TOKEN_BUFFER return_tokens = New_Token_Buffer();

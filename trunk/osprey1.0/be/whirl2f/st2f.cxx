@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.13 $
- * $Date: 2003-03-06 16:29:31 $
- * $Author: fzhao $
+ * $Revision: 1.14 $
+ * $Date: 2003-06-19 19:22:35 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.14 $";
 #endif
 
 #include <ctype.h>
@@ -99,6 +99,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "init2f.h"
 #include "cxx_memory.h"
 #include "be_symtab.h"
+#include "unparse_target.h"
+#include "ty_ftn.h"
 
  /* Defined in ty2f.c; signifies special translation of adjustable and
   * assumed sized arrays.
@@ -455,7 +457,7 @@ ST2F_decl_func(TOKEN_BUFFER tokens, ST *st)
 
    /* Specify the function return type, unless it is void */
 
-   return_ty = Func_Return_Type(ST_pu_type(st));
+   return_ty = W2X_Unparse_Target->Func_Return_Type(ST_pu_type(st));
   if (strncmp("_",func_name,1)!=0)
        ST2F_Declare_Return_Type(tokens,return_ty,func_name);
 
@@ -682,7 +684,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    ASSERT_DBG_FATAL(TY_kind(funtype) == KIND_FUNCTION,
 		    (DIAG_W2F_UNEXPECTED_SYMBOL, "ST2F_func_header"));
 
-   return_ty = Func_Return_Type(funtype);
+   return_ty = W2X_Unparse_Target->Func_Return_Type(funtype);
 
    /* Append the function name */
 
