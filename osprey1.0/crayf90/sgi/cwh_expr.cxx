@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_expr
- * $Revision: 1.3 $
- * $Date: 2002-10-09 16:04:14 $
- * $Author: open64 $
+ * $Revision: 1.4 $
+ * $Date: 2003-03-04 20:08:53 $
+ * $Author: fzhao $
  * $Source: 
  *
  * Revision history:
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -574,6 +574,9 @@ cwh_expr_compare(OPERATOR op,TY_IDX  ty)
     rhs = cwh_convert_to_ty(rhs,bt);
     
     wn  = WN_CreateExp2 ( opc, lhs, rhs) ;
+
+    WN_set_ty(wn,ty);
+
     wn  = cwh_expr_restore_arrayexp(wn,ae);
   }
 
@@ -667,6 +670,8 @@ cwh_expr_compare_logical(OPCODE opc,TY_IDX ty)
   rhs = cwh_expr_operand(&ae);
   lhs = cwh_expr_operand(&ae);
   wn  = WN_CreateExp2 ( opc, lhs, rhs) ;
+
+  WN_set_ty(wn,ty);
   wn  = cwh_expr_restore_arrayexp(wn,ae);
 
   cwh_stk_push_typed(wn,WN_item,ty);
@@ -719,6 +724,8 @@ cwh_expr_compare_bitwise(OPERATOR op,TY_IDX  ty)
   opc = cwh_make_typed_opcode(op,br,MTYPE_V);
   wn  = WN_CreateExp2 ( opc, lhs, rhs) ;
 
+  WN_set_ty(wn,ty);
+
   wn = cwh_expr_restore_arrayexp(wn,ae);
   cwh_stk_push(wn,WN_item);
 }
@@ -738,10 +745,15 @@ fei_lneg(TYPE result)
   WN * lhs;
   WN * wn ;
   WN *ae=NULL;
+  TY_IDX ts;
+  
+  ts = cast_to_TY(t_TY(result));
 
   lhs = cwh_expr_operand(&ae);
   wn  = WN_CreateExp1(OPC_I4LNOT, lhs) ;
 
+  WN_set_ty(wn,ts);
+    
   wn = cwh_expr_restore_arrayexp(wn,ae);
   cwh_stk_push_typed(wn,WN_item,cast_to_TY(t_TY(result)));
 }
@@ -773,6 +785,8 @@ cwh_expr_unop(OPERATOR op,TY_IDX  result_ty)
   lhs = cwh_get_typed_operand(bt,&ae);
 
   wn = WN_CreateExp1 ( opc, lhs) ;
+  WN_set_ty(wn,result_ty);
+
   wn = cwh_wrap_cvtl(wn,bt);
   
   wn = cwh_expr_restore_arrayexp(wn,ae);
@@ -802,6 +816,7 @@ cwh_expr_bincalc(OPERATOR op, WN * wn1, WN * wn2)
   return WN_CreateExp2 (OPCODE_make_op(op,bt,MTYPE_V),
 			wn1, 
 			wn2) ;
+  
 }
 
 /*===============================================
@@ -1191,6 +1206,7 @@ fei_bneg(TYPE type)
   opc = cwh_make_typed_opcode(OPR_BNOT, bt, MTYPE_V);
 
   wn = WN_CreateExp1 ( opc, lhs) ;
+
   wn = cwh_wrap_cvtl(wn,bt);
   
   wn = cwh_expr_restore_arrayexp(wn,ae);
