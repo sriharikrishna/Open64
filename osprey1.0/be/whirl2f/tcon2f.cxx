@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: tcon2f.c
- * $Revision: 1.5 $
- * $Date: 2003-01-10 02:47:29 $
+ * $Revision: 1.6 $
+ * $Date: 2003-02-19 20:15:35 $
  *
  * Revision history:
  *  27-Apr-95 - Original Version
@@ -225,6 +225,8 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object
    const char  *strbase;
    char        *str;
    INT32        max_strlen, strlen, stridx;
+   INT32        seg_length;
+   INT32        non_empty_length;
    
    if (is_logical &&
        MTYPE_type_class(TCON_ty(tvalue)) & MTYPE_CLASS_INTEGER)
@@ -251,39 +253,60 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object
 	 max_strlen = (Get_Maximum_Linelength()*2)/3;
 	 strlen = Targ_String_Length(tvalue);
 	 strbase = Targ_String_Address(tvalue);
+         if (object_ty!=NULL)
+             seg_length =  TY_size(object_ty);
+         else
+             seg_length = max_strlen;
 
-int seg_length;
-if (object_ty!=NULL)
-     seg_length =  TY_size(object_ty);
-else
-     seg_length = max_strlen;
+         str = (char *) alloca(seg_length + 1);
 
-         
-//	 if (max_strlen > 0 && max_strlen < strlen)
-	 if (max_strlen > 0 && seg_length < strlen)
-	 {
-	    /* We need to split the string constant into substrings */
-//	    str = (char *) alloca(max_strlen + 1);
-	    str = (char *) alloca(seg_length + 1);
-//	    while (strlen > max_strlen)
-	    while (strlen > seg_length)
-	    {
-//fzhao Dec	       for (stridx = 0; stridx < max_strlen; stridx++)
-	       for (stridx = 0; stridx < seg_length; stridx++)
-		  str[stridx] = strbase[stridx];
-	       str[stridx] = '\0';
-	       strbase = &strbase[stridx];
-//	       strlen -= max_strlen;
-	       strlen -= seg_length;
-//	       TCON2F_Append_String_Const(tokens, str, max_strlen);
-	       TCON2F_Append_String_Const(tokens, str, seg_length);
-if (object_ty==NULL)
-	       Append_Token_String(tokens, "//"); /* Concatenation */
-else
-	       Append_Token_Special(tokens, ','); 
-	    }
-	 }
-	 TCON2F_Append_String_Const(tokens, strbase, strlen);
+         if (object_ty!=NULL ) {         
+	         if (max_strlen > 0 && seg_length < strlen)
+	            {
+	               /* We need to split the string constant into substrings */
+//	              str = (char *) alloca(seg_length + 1);
+	              while (strlen > seg_length)
+	                 {
+	       		    for (stridx = 0; stridx < seg_length; stridx++)
+		                  str[stridx] = strbase[stridx];
+	                    str[stridx] = '\0';
+	                    strbase = &strbase[stridx];
+	                    strlen -= seg_length;
+                            non_empty_length=seg_length-1;
+                             while (str[non_empty_length]==' ')
+                                    --non_empty_length;
+                             ++non_empty_length;
+                             str[non_empty_length] ='\0';
+                             TCON2F_Append_String_Const(tokens, str,non_empty_length);
+                             Append_Token_Special(tokens, ','); 
+	                   }
+
+                           non_empty_length=strlen-1;
+                           while (str[non_empty_length]==' ')
+                               --non_empty_length;
+                           ++non_empty_length;
+                           str[non_empty_length] ='\0';
+                           TCON2F_Append_String_Const(tokens, strbase,non_empty_length);
+                  }
+ 
+           }
+          else {
+             if (max_strlen > 0 && seg_length < strlen)
+                {
+                   /* We need to split the string constant into substrings */
+                   while (strlen > seg_length)
+                   {
+                      for (stridx = 0; stridx < seg_length; stridx++)
+                         str[stridx] = strbase[stridx];
+                      str[stridx] = '\0';
+                      strbase = &strbase[stridx];
+                      strlen -= seg_length;
+                      TCON2F_Append_String_Const(tokens, str, seg_length);
+                      Append_Token_String(tokens, "//"); /* Concatenation */
+                   }
+                }
+                TCON2F_Append_String_Const(tokens, strbase, strlen);
+             }
 	 break;
 
       case MTYPE_I1:
@@ -295,7 +318,14 @@ else
 
 
       case MTYPE_I8:
-         Append_Token_String(tokens, Targ_Print("%1lld_8", tvalue));
+
+/* here should see if the value is big enough to add "_8" *
+ * otherwise should not add it,
+ * will figure out a range later
+ */
+/*         Append_Token_String(tokens, Targ_Print("%1lld_8", tvalue));*/
+         Append_Token_String(tokens, Targ_Print("%1lld", tvalue));
+
 	 break;
       
       case MTYPE_U1:
@@ -305,7 +335,9 @@ else
 	 break;
 
       case MTYPE_U8:
-	 Append_Token_String(tokens, Targ_Print("%1llu_8", tvalue));
+/* same thing to do with "MTYPE_I8 */
+/*	 Append_Token_String(tokens, Targ_Print("%1llu_8", tvalue));*/
+	 Append_Token_String(tokens, Targ_Print("%1llu", tvalue));
 	 break;
 
       case MTYPE_F4:

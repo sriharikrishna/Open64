@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.17 $
- * $Date: 2003-01-10 02:47:29 $
+ * $Revision: 1.18 $
+ * $Date: 2003-02-19 20:15:35 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.17 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.18 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -263,6 +263,140 @@ WN2F_Expr_Plus_Literal(TOKEN_BUFFER tokens,
 } /* WN2F_Expr_Plus_Literal */
 
 
+
+static WN2F_STATUS
+WN2F_OLD_Den_Arr_Idx(TOKEN_BUFFER tokens, 
+			   WN          *idx_expr, 
+			   WN2F_CONTEXT context)
+{
+   const BOOL   parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+   TOKEN_BUFFER tmp_tokens;
+   BOOL         non_zero, cexpr_is_lhs;
+   WN          *nexpr, *cexpr;
+   INT64        plus_value;
+   
+   /* Given an index expression, translate it to Fortran and append
+    * the tokens to the given token-buffer.  If the value of the idx
+    * expression is "v", then the appended tokens should represent
+    * the value "v+1".  This denormalization moves the base of the
+    * array from index zero to index one.
+    */
+   if (WN_opc_operator(idx_expr) == OPR_ADD && 
+       (WN_is_constant_expr(WN_kid1(idx_expr)) || 
+	WN_is_constant_expr(WN_kid0(idx_expr))))
+   {
+      /* Do the "e+c" ==> "e+(c+1)" translation, using the property
+       * that addition is commutative.
+       */
+      if (WN_is_constant_expr(WN_kid1(idx_expr)))
+      {
+	 cexpr = WN_kid1(idx_expr);
+	 nexpr = WN_kid0(idx_expr);
+      }
+      else /* if (WN_is_constant_expr(WN_kid0(idx_expr))) */
+      {
+	 cexpr = WN_kid0(idx_expr);
+	 nexpr = WN_kid1(idx_expr);
+      }
+      tmp_tokens = New_Token_Buffer();
+      non_zero = WN2F_Expr_Plus_Literal(tmp_tokens, cexpr, 1LL, context);
+      if (non_zero)
+      {
+	 if (parenthesize)
+	 {
+	    reset_WN2F_CONTEXT_no_parenthesis(context);
+	    Append_Token_Special(tokens, '(');
+	 }
+	 WN2F_translate(tokens, nexpr, context);
+	 Append_Token_Special(tokens, '+');
+	 Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
+	 if (parenthesize)
+	    Append_Token_Special(tokens, ')');
+      }
+      else
+      {
+	 Reclaim_Token_Buffer(&tmp_tokens);
+	 WN2F_translate(tokens, nexpr, context);
+      }
+   }
+   else if (WN_opc_operator(idx_expr) == OPR_SUB && 
+	    (WN_is_constant_expr(WN_kid1(idx_expr)) || 
+	     WN_is_constant_expr(WN_kid0(idx_expr))))
+   {
+      /* Do the "e-c" ==> "e-(c-1)" or the  "c-e" ==> "(c+1)-e"
+       * translation.
+       */
+      cexpr_is_lhs = WN_is_constant_expr(WN_kid0(idx_expr));
+      if (!cexpr_is_lhs)
+      {
+	 cexpr = WN_kid1(idx_expr);
+	 nexpr = WN_kid0(idx_expr);
+	 plus_value = -1LL;
+      }
+      else
+      {
+	 cexpr = WN_kid0(idx_expr);
+	 nexpr = WN_kid1(idx_expr);
+	 plus_value = 1LL;
+      }
+	
+      /* Do the "e-c" ==> "e-(c-1)" or the  "c-e" ==> "(c+1)-e"
+       * translation.
+       */
+      tmp_tokens = New_Token_Buffer();
+      non_zero = 
+	 WN2F_Expr_Plus_Literal(tmp_tokens, cexpr, plus_value, context);
+      if (non_zero)
+      {
+	 if (parenthesize)
+	 {
+	    reset_WN2F_CONTEXT_no_parenthesis(context);
+	    Append_Token_Special(tokens, '(');
+	 }
+	 if (!cexpr_is_lhs)
+	 {
+	    WN2F_translate(tokens, nexpr, context);
+	    Append_Token_Special(tokens, '-');
+	    Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
+	 }
+	 else
+	 {
+	    Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
+	    Append_Token_Special(tokens, '-');
+	    WN2F_translate(tokens, nexpr, context);
+	 }
+	 if (parenthesize)
+	    Append_Token_Special(tokens, ')');
+      }
+      else
+      {
+	 Reclaim_Token_Buffer(&tmp_tokens); 
+	 if (cexpr_is_lhs)
+	 {
+	    if (parenthesize)
+	    {
+	       reset_WN2F_CONTEXT_no_parenthesis(context);
+	       Append_Token_Special(tokens, '(');
+	    }
+	    Append_Token_Special(tokens, '-');
+	    WN2F_translate(tokens, nexpr, context);
+	    if (parenthesize)
+	       Append_Token_Special(tokens, ')');
+	 }
+	 else
+	 {
+	    WN2F_translate(tokens, nexpr, context);
+	 }
+      }
+   }
+   else
+   {
+      WN2F_Expr_Plus_Literal(tokens, idx_expr, 1LL, context);
+   }
+   return EMPTY_WN2F_STATUS;
+} /* WN2F_OLD_Den_Arr_Idx */
+
+
 static WN2F_STATUS
 WN2F_Denormalize_Array_Idx(TOKEN_BUFFER tokens, 
 			   WN          *idx_expr, 
@@ -450,7 +584,10 @@ WN2F_Substring(TOKEN_BUFFER tokens,
       /* Need to generate substring expression "(l+1:l+size)" */
       Append_Token_Special(tokens, '(');
       set_WN2F_CONTEXT_no_parenthesis(context);
-      WN2F_Denormalize_Array_Idx(tokens, lower_bnd, context);
+/*      WN2F_Denormalize_Array_Idx(tokens, lower_bnd, context);*/
+
+      WN2F_OLD_Den_Arr_Idx(tokens, lower_bnd, context);
+
       reset_WN2F_CONTEXT_no_parenthesis(context);
       Append_Token_Special(tokens, ':');
       if (WN_opc_operator(lower_bnd) != OPR_INTCONST ||
@@ -468,7 +605,8 @@ WN2F_Substring(TOKEN_BUFFER tokens,
 static void
 WN2F_Get_Substring_Info(WN **base,         /* Possibly OPR_ARRAY node (in/out) */
 			TY_IDX *string_ty, /* The string type (out) */
-			WN **lower_bnd)    /* The lower bound index (out) */
+			WN **lower_bnd,    /* The lower bound index (out) */
+		        WN **length )
 {
    /* There are two possibilities concerning the array base expressions.
     * It can be a pointer to a complete character-string (array) or it
@@ -490,6 +628,7 @@ WN2F_Get_Substring_Info(WN **base,         /* Possibly OPR_ARRAY node (in/out) *
        */
       *string_ty = TY_pointed(WN_Tree_Type(WN_kid0(*base)));
       *lower_bnd = WN_array_index(*base, 0);
+      *length    = WN_kid1(*base);
       *base = WN_kid0(*base);
    }
    else if (WN_opc_operator(*base) == OPR_ARRAY &&
@@ -501,11 +640,13 @@ WN2F_Get_Substring_Info(WN **base,         /* Possibly OPR_ARRAY node (in/out) *
       /* Presumably, the lower bound is given by the array operator
        */
       *lower_bnd = WN_array_index(*base, 0);
+      *length    = WN_kid1(*base);
       *base = WN_kid0(*base);
    }
    else
    {
       *lower_bnd = WN2F_INTCONST_ZERO;
+      *length    = WN2F_INTCONST_ZERO;
    }
 } /* WN2F_Get_Substring_Info */
 
@@ -2153,6 +2294,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
    WN   *base = WN_Skip_Parm(base_parm);
    WN   *base1 = WN_Skip_Parm(base_parm);
    WN   *lower_bnd;
+   WN   *length_new;
    WN   *arg_expr;
    TY_IDX str_ty;
    INT64 str_length;
@@ -2207,7 +2349,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
    {
      /* A regular address expression as base */
 
-      WN2F_Get_Substring_Info(&base, &str_ty, &lower_bnd);
+      WN2F_Get_Substring_Info(&base, &str_ty, &lower_bnd,&length_new);
 
       /* Was this a character component of an array of derived type? */
       /* eg: vvv(2)%ccc(:)(1:5) - offset to ccc is added above base, */
@@ -2266,12 +2408,15 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
       (WN_operator(base1) != OPR_ARRAY ||
         WN_operator(base1)==OPR_ARRAY &&
         WN_operator(base)==OPR_ARRAY ))
+# endif
+if (length_new != WN2F_INTCONST_ZERO && !WN2F_CONTEXT_has_no_arr_elmt(context))
       WN2F_Substring(tokens, 
 		     str_length,
 		     lower_bnd,
-		     WN_Skip_Parm(length),
+//		     WN_Skip_Parm(length),
+		     length_new,
 		     context);
-#endif
+// fzhao Feb#endif
       return ;
    }
 } /* WN2F_String_Argument */

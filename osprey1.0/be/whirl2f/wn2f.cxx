@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.13 $
- * $Date: 2003-01-21 22:55:45 $
+ * $Revision: 1.14 $
+ * $Date: 2003-02-19 20:15:35 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.14 $";
 #endif
 
 #include <alloca.h>
@@ -772,7 +772,9 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 # endif
 
 	    (void)WN2F_translate(tokens, addr, context); /* String lvalue */
-	    TY2F_Translate_ArrayElt(tokens, base_ty, offset);
+
+           if (!WN2F_CONTEXT_has_no_arr_elmt(context))
+	          TY2F_Translate_ArrayElt(tokens, base_ty, offset);
 # if 0
 	    Append_Token_Special(tokens, ')');
 # endif
