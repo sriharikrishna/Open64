@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: init2f.c
- * $Revision: 1.4 $
- * $Date: 2003-01-10 02:47:29 $
+ * $Revision: 1.5 $
+ * $Date: 2003-09-25 02:22:58 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $
  *
@@ -75,7 +75,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.5 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1440,3 +1440,69 @@ INITO2F_translate(TOKEN_BUFFER tokens, INITO_IDX inito)
    Append_And_Reclaim_Token_List(tokens, &rhs_tokens);
    Append_Token_Special(tokens, '/');
 } /* INITO2F_translate */
+
+
+void
+PARAMETER2F_translate(TOKEN_BUFFER tokens, INITO_IDX inito)
+{
+   /* Create a DATA statement, followed by a newline character,
+    * provided the object initialized is not a RECORD type (for
+    * which the initializer should be noted on the type, not on
+    * the object).
+    */
+   TOKEN_BUFFER lhs_tokens = New_Token_Buffer(); /* memloc initialized */
+   TOKEN_BUFFER rhs_tokens = New_Token_Buffer(); /* initializer values */
+   UINT         initv_idx = 0;
+   UINT         initv_times = 0;
+   TY_IDX       object_ty = ST_type(INITO_st(inito));
+   STAB_OFFSET  object_ofst = 0;
+   INITV_IDX    *initv_array;
+
+   ASSERT_DBG_FATAL(!TY_Is_Structured(object_ty)          ||
+                    Stab_Is_Common_Block(INITO_st(inito)) ||
+                    Stab_Is_Equivalence_Block(INITO_st(inito)),
+                    (DIAG_W2F_UNEXPECTED_SYMBOL, "INITO2F_translate"));
+  
+   /* There may be a list of INITO's initializing the same object, so
+    * accumulate the INITV's immediately under this list of INITOs into
+    * a single array of INITV's to aid the following computation.  All
+    * INITVKIND_BLOCK initvs will have been flattened out, so we only
+    * have INITVKIND_VAL, INITVKIND_SYMOFF, and INITVKIND_PAD in this
+    * array.
+    */
+   initv_array = INIT2F_Get_Initv_Array(INITO_st(inito), inito);
+
+   /* Activate an initialization based on the kind of object to be
+    * initialized.  We expect the INITO list for this object to cover
+    * the entire extent of the object.
+    */
+   INIT2F_translate(lhs_tokens,
+                    rhs_tokens,
+                    INITO_st(inito), /* Top level object */
+                    0,               /* Offset from top level base */
+                    &object_ofst,    /* Offset within object type */
+                    object_ty,       /* Sub-object type at base-offset */
+                    initv_array,     /* The initv array */
+                    &initv_idx,      /* first initv for sub-object */
+                    &initv_times);   /* times initv already repeated */
+
+   /* Combine the lhs and the rhs and free up the initv array.
+    */
+   FREE(initv_array);
+   Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
+   Append_Token_String(tokens, "PARAMETER (");
+   Append_Token_String(tokens, ST_name(INITO_st(inito)));
+   Append_Token_Special(tokens, '=');
+   if (TY_Is_Structured(object_ty)) {
+       Append_Token_String(tokens,W2CF_Symtab_Nameof_Ty(object_ty));
+       Append_Token_Special(tokens,'(');
+   }
+   else
+       Append_Token_String(tokens, "(/");
+   Append_And_Reclaim_Token_List(tokens, &rhs_tokens);
+   if (!TY_Is_Structured(object_ty)) 
+        Append_Token_Special(tokens,'/');
+   Append_Token_String(tokens, "))");
+} /* INITO2F_translate */
+
+

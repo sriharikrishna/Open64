@@ -13419,6 +13419,7 @@ static void send_attr_ntry(int		attr_idx)
    boolean		sym_offset		= FALSE;
    boolean		nested_attr		= FALSE;
    TYPE			type_idx;
+   static boolean              procs_parameter               =FALSE;
 
 # ifdef _TARGET_OS_MAX
    long_type    	ii;
@@ -13480,6 +13481,10 @@ static void send_attr_ntry(int		attr_idx)
                }
             }
          }
+         if (procs_parameter){
+              flag = flag | ((long64) 1 << FEI_OBJECT_PARAMETER) ;
+              procs_parameter = FALSE;
+           }
 
          /* Intentional fall through */
 
@@ -13562,6 +13567,7 @@ static void send_attr_ntry(int		attr_idx)
             PDG_DBG_PRINT_END    
 
             symbolic_constant_expr = save_sym_constant_expr;
+
             goto EXIT;
          }
 
@@ -13585,14 +13591,20 @@ static void send_attr_ntry(int		attr_idx)
       case Constant:
          if (ATD_FLD(attr_idx) == AT_Tbl_Idx ) { 
             /* Aggregate Constant */
-            /* change the tmp to a variable */
+            /* change the tmp to a variable */ 
 
-            ATD_CLASS(ATD_CONST_IDX(attr_idx)) = Variable;
+         insert_init_stmt_for_tmp(ATD_CONST_IDX(attr_idx));
 
-            AT_MODULE_OBJECT(ATD_CONST_IDX(attr_idx)) = AT_MODULE_OBJECT(attr_idx);
-            send_attr_ntry(ATD_CONST_IDX(attr_idx));
-            ATD_CLASS(ATD_CONST_IDX(attr_idx)) = Compiler_Tmp;
-            goto EXIT;
+         ATD_CLASS(ATD_CONST_IDX(attr_idx)) = Variable;
+
+         AT_MODULE_OBJECT(ATD_CONST_IDX(attr_idx)) = AT_MODULE_OBJECT(attr_idx);
+         procs_parameter = TRUE;
+         send_attr_ntry(ATD_CONST_IDX(attr_idx));
+         procs_parameter = FALSE;
+
+         ATD_CLASS(ATD_CONST_IDX(attr_idx)) = Compiler_Tmp;
+         goto EXIT;
+
          }
 
 #if 0
@@ -14463,218 +14475,218 @@ static void  send_darg_list(int		pgm_attr_idx,
 
       if (PDG_AT_IDX(attr_idx) == NULL_IDX) {
          if (AT_OBJ_CLASS(attr_idx) == Data_Obj) {
-            send_attr_ntry(attr_idx);
-         }
-         else {
-            send_dummy_procedure(attr_idx);
-         }
-      }
+		    send_attr_ntry(attr_idx);
+		 }
+		 else {
+		    send_dummy_procedure(attr_idx);
+		 }
+	      }
 
-      PDG_DBG_PRINT_START    
-      PDG_DBG_PRINT_C("fei_name");
-      PDG_DBG_PRINT_S("(1) AT_OBJ_NAME", AT_OBJ_NAME_PTR(attr_idx));
-      PDG_DBG_PRINT_S("(2) table", "PDGCS_Object");
-      PDG_DBG_PRINT_LD("(3) PDG_AT_IDX", PDG_AT_IDX(attr_idx));
-      PDG_DBG_PRINT_D("(4) prev_idx", prev_idx);
-      PDG_DBG_PRINT_D("(5) darg_idx", darg_idx);
-      PDG_DBG_PRINT_END
+	      PDG_DBG_PRINT_START    
+	      PDG_DBG_PRINT_C("fei_name");
+	      PDG_DBG_PRINT_S("(1) AT_OBJ_NAME", AT_OBJ_NAME_PTR(attr_idx));
+	      PDG_DBG_PRINT_S("(2) table", "PDGCS_Object");
+	      PDG_DBG_PRINT_LD("(3) PDG_AT_IDX", PDG_AT_IDX(attr_idx));
+	      PDG_DBG_PRINT_D("(4) prev_idx", prev_idx);
+	      PDG_DBG_PRINT_D("(5) darg_idx", darg_idx);
+	      PDG_DBG_PRINT_END
 
-      /* This sets prev_idx to the index being used on this call */
+	      /* This sets prev_idx to the index being used on this call */
 
-# ifdef _ENABLE_FEI
-      prev_idx = fei_name(AT_OBJ_NAME_PTR(attr_idx),
-                          Sym_Object,
-                          PDG_AT_IDX(attr_idx),
-                          prev_idx,
-                          darg_idx);
-# endif
-
-
-      if (++sn_idx < end_idx)  {
-         PDG_DBG_PRINT_START    
-         PDG_DBG_PRINT_C("fei_next_name");
-         PDG_DBG_PRINT_D("(1) logical", TRUE);
-         PDG_DBG_PRINT_END
-
-# ifdef _ENABLE_FEI
-         darg_idx = fei_next_name(TRUE);
-# endif
-      }
-   }
-   while (sn_idx != end_idx);
-
-   TRACE (Func_Exit, "send_darg_list", NULL);
-
-   return;
-
-}   /* send_darg_list */
+	# ifdef _ENABLE_FEI
+	      prev_idx = fei_name(AT_OBJ_NAME_PTR(attr_idx),
+				  Sym_Object,
+				  PDG_AT_IDX(attr_idx),
+				  prev_idx,
+				  darg_idx);
+	# endif
 
 
-/******************************************************************************\
-|*									      *|
-|* Description:								      *|
-|*	On IRIX systems, the alignment can differ for basic types.            *|
-|*	For example if -align32 is specified, some of the real*8 types will   *|
-|*	start on 32 bit boundaries rather than 64 bit boundaries.  When this  *|
-|*	happens, a different type descriptor needs to get send across with    *|
-|*	the alternative alignment.                                            *|
-|*									      *|
-|* Input parameters:							      *|
-|*	NONE								      *|
-|*									      *|
-|* Output parameters:							      *|
-|*	NONE								      *|
-|*									      *|
-|* Returns:								      *|
-|*	NOTHING								      *|
-|*									      *|
-\******************************************************************************/
-static	TYPE	send_non_standard_aligned_type(int		align,
-					       int		type_idx)
-{
-   int		aux_info;
-   int		basic_type;
-   int      	bit_size;
-   int      	flags 		= 0;
-   TYPE		pdg_type_idx;
+	      if (++sn_idx < end_idx)  {
+		 PDG_DBG_PRINT_START    
+		 PDG_DBG_PRINT_C("fei_next_name");
+		 PDG_DBG_PRINT_D("(1) logical", TRUE);
+		 PDG_DBG_PRINT_END
+
+	# ifdef _ENABLE_FEI
+		 darg_idx = fei_next_name(TRUE);
+	# endif
+	      }
+	   }
+	   while (sn_idx != end_idx);
+
+	   TRACE (Func_Exit, "send_darg_list", NULL);
+
+	   return;
+
+	}   /* send_darg_list */
 
 
-   TRACE (Func_Entry, "send_non_standard_aligned_type", NULL);
+	/******************************************************************************\
+	|*									      *|
+	|* Description:								      *|
+	|*	On IRIX systems, the alignment can differ for basic types.            *|
+	|*	For example if -align32 is specified, some of the real*8 types will   *|
+	|*	start on 32 bit boundaries rather than 64 bit boundaries.  When this  *|
+	|*	happens, a different type descriptor needs to get send across with    *|
+	|*	the alternative alignment.                                            *|
+	|*									      *|
+	|* Input parameters:							      *|
+	|*	NONE								      *|
+	|*									      *|
+	|* Output parameters:							      *|
+	|*	NONE								      *|
+	|*									      *|
+	|* Returns:								      *|
+	|*	NOTHING								      *|
+	|*									      *|
+	\******************************************************************************/
+	static	TYPE	send_non_standard_aligned_type(int		align,
+						       int		type_idx)
+	{
+	   int		aux_info;
+	   int		basic_type;
+	   int      	bit_size;
+	   int      	flags 		= 0;
+	   TYPE		pdg_type_idx;
 
-   switch (TYP_LINEAR(type_idx)) {
 
-   case Integer_1:
-      bit_size		= bit_size_tbl[Integer_1];
-      basic_type	= Integral;
-      aux_info		= 1;
-      flags   		= 2;
-      break;
-   
-   case Integer_2:
-      bit_size		= bit_size_tbl[Integer_2];
-      basic_type	= Integral;
-      aux_info		= 2;
-      flags   		= 2;
-      break;
+	   TRACE (Func_Entry, "send_non_standard_aligned_type", NULL);
 
-   case Integer_4:
-      bit_size		= bit_size_tbl[Integer_4];
-      basic_type	= Integral;
-      aux_info		= 4;
-      flags   		= 2;
-      break;
+	   switch (TYP_LINEAR(type_idx)) {
 
-   case Integer_8:
-      bit_size		= bit_size_tbl[Integer_8];
-      basic_type	= Integral;
-      aux_info		= 8;
-      flags   		= 2;
+	   case Integer_1:
+	      bit_size		= bit_size_tbl[Integer_1];
+	      basic_type	= Integral;
+	      aux_info		= 1;
+	      flags   		= 2;
+	      break;
+	   
+	   case Integer_2:
+	      bit_size		= bit_size_tbl[Integer_2];
+	      basic_type	= Integral;
+	      aux_info		= 2;
+	      flags   		= 2;
+	      break;
 
-# ifdef _TARGET_HAS_FAST_INTEGER
-         if (opt_flags.set_allfastint_option ||
-             (opt_flags.set_fastint_option &&
-              TYP_DESC(type_idx) == Default_Typed)) {
-            bit_size 	= 46;
-            aux_info 	= 6;
-         }
-# endif
-      break;
+	   case Integer_4:
+	      bit_size		= bit_size_tbl[Integer_4];
+	      basic_type	= Integral;
+	      aux_info		= 4;
+	      flags   		= 2;
+	      break;
 
-   case Logical_1:
-      bit_size		= bit_size_tbl[Logical_1];
-      basic_type	= L_ogical;
-      aux_info		= 1;
-      break;
+	   case Integer_8:
+	      bit_size		= bit_size_tbl[Integer_8];
+	      basic_type	= Integral;
+	      aux_info		= 8;
+	      flags   		= 2;
 
-   case Logical_2:
-      bit_size		= bit_size_tbl[Logical_2];
-      basic_type	= L_ogical;
-      aux_info		= 2;
-      break;
-   
-   case Logical_4:
-      bit_size		= bit_size_tbl[Logical_4];
-      basic_type	= L_ogical;
-      aux_info		= 4;
-      break;
-   
-   case Logical_8:
-      bit_size		= bit_size_tbl[Logical_8];
-      basic_type	= L_ogical;
-      aux_info		= 8;
-      break;
-   
-   case Real_4:
-      bit_size		= bit_size_tbl[Real_4];
-      basic_type	= Floating_Pt;
-      aux_info		= 4;
-      break;
-   
-   case Real_8:
-      bit_size		= bit_size_tbl[Real_8];
-      basic_type	= Floating_Pt;
-      aux_info		= 8;
-      break;
+	# ifdef _TARGET_HAS_FAST_INTEGER
+		 if (opt_flags.set_allfastint_option ||
+		     (opt_flags.set_fastint_option &&
+		      TYP_DESC(type_idx) == Default_Typed)) {
+		    bit_size 	= 46;
+		    aux_info 	= 6;
+		 }
+	# endif
+	      break;
 
-   case Real_16:
-      bit_size		= bit_size_tbl[Real_16];
-      basic_type	= Floating_Pt;
-      aux_info		= 16;
-      break;
-   
-   case Complex_4:
-      bit_size		= bit_size_tbl[Complex_4];
-      basic_type	= C_omplex;
-      aux_info		= 4;
-      break;
-   
-   case Complex_8:
-      bit_size		= bit_size_tbl[Complex_8];
-      basic_type	= C_omplex;
-      aux_info		= 8;
-      break;
-   
-   case Complex_16:
-      bit_size		= bit_size_tbl[Complex_16];
-      basic_type	= C_omplex;
-      aux_info		= 16;
-      break;
-   
-   case CRI_Ch_Ptr_8:
-      bit_size		= bit_size_tbl[CRI_Ch_Ptr_8];
-      basic_type	= CRI_Pointer_Char;
-      aux_info		= 0;
-      break;
+	   case Logical_1:
+	      bit_size		= bit_size_tbl[Logical_1];
+	      basic_type	= L_ogical;
+	      aux_info		= 1;
+	      break;
 
-   default:
-      PRINTMSG(stmt_start_line, 179, Internal, stmt_start_col,
-               "send_non_standard_aligned_type");
-      break;
-   }
+	   case Logical_2:
+	      bit_size		= bit_size_tbl[Logical_2];
+	      basic_type	= L_ogical;
+	      aux_info		= 2;
+	      break;
+	   
+	   case Logical_4:
+	      bit_size		= bit_size_tbl[Logical_4];
+	      basic_type	= L_ogical;
+	      aux_info		= 4;
+	      break;
+	   
+	   case Logical_8:
+	      bit_size		= bit_size_tbl[Logical_8];
+	      basic_type	= L_ogical;
+	      aux_info		= 8;
+	      break;
+	   
+	   case Real_4:
+	      bit_size		= bit_size_tbl[Real_4];
+	      basic_type	= Floating_Pt;
+	      aux_info		= 4;
+	      break;
+	   
+	   case Real_8:
+	      bit_size		= bit_size_tbl[Real_8];
+	      basic_type	= Floating_Pt;
+	      aux_info		= 8;
+	      break;
 
-   PDG_DBG_PRINT_START
-   PDG_DBG_PRINT_C("fei_descriptor");
-   PDG_DBG_PRINT_O("(1) flags", flags);
-   PDG_DBG_PRINT_S("(2) table type", p_table_type[Basic]);
-   PDG_DBG_PRINT_D("(3) bit_size", bit_size);
-   PDG_DBG_PRINT_S("(4) basic type", p_basic_type[basic_type]);
-   PDG_DBG_PRINT_D("(5) aux info", aux_info);
-   PDG_DBG_PRINT_D("(6) alignment", pdg_align[align]);
-   PDG_DBG_PRINT_END
-# ifdef _ENABLE_FEI
-   pdg_type_idx = fei_descriptor(flags,
-                                 Basic,
-                                 bit_size,
-                                 basic_type,
-                                 aux_info,
-                                 pdg_align[align]);
-# endif
-   PDG_DBG_PRINT_START
-   PDG_DBG_PRINT_T("(r) type", pdg_type_idx);
-   PDG_DBG_PRINT_END
+	   case Real_16:
+	      bit_size		= bit_size_tbl[Real_16];
+	      basic_type	= Floating_Pt;
+	      aux_info		= 16;
+	      break;
+	   
+	   case Complex_4:
+	      bit_size		= bit_size_tbl[Complex_4];
+	      basic_type	= C_omplex;
+	      aux_info		= 4;
+	      break;
+	   
+	   case Complex_8:
+	      bit_size		= bit_size_tbl[Complex_8];
+	      basic_type	= C_omplex;
+	      aux_info		= 8;
+	      break;
+	   
+	   case Complex_16:
+	      bit_size		= bit_size_tbl[Complex_16];
+	      basic_type	= C_omplex;
+	      aux_info		= 16;
+	      break;
+	   
+	   case CRI_Ch_Ptr_8:
+	      bit_size		= bit_size_tbl[CRI_Ch_Ptr_8];
+	      basic_type	= CRI_Pointer_Char;
+	      aux_info		= 0;
+	      break;
 
-   TRACE (Func_Exit, "send_non_standard_aligned_type", NULL);
-   
-   return(pdg_type_idx);
-   
+	   default:
+	      PRINTMSG(stmt_start_line, 179, Internal, stmt_start_col,
+		       "send_non_standard_aligned_type");
+	      break;
+	   }
+
+	   PDG_DBG_PRINT_START
+	   PDG_DBG_PRINT_C("fei_descriptor");
+	   PDG_DBG_PRINT_O("(1) flags", flags);
+	   PDG_DBG_PRINT_S("(2) table type", p_table_type[Basic]);
+	   PDG_DBG_PRINT_D("(3) bit_size", bit_size);
+	   PDG_DBG_PRINT_S("(4) basic type", p_basic_type[basic_type]);
+	   PDG_DBG_PRINT_D("(5) aux info", aux_info);
+	   PDG_DBG_PRINT_D("(6) alignment", pdg_align[align]);
+	   PDG_DBG_PRINT_END
+	# ifdef _ENABLE_FEI
+	   pdg_type_idx = fei_descriptor(flags,
+					 Basic,
+					 bit_size,
+					 basic_type,
+					 aux_info,
+					 pdg_align[align]);
+	# endif
+	   PDG_DBG_PRINT_START
+	   PDG_DBG_PRINT_T("(r) type", pdg_type_idx);
+	   PDG_DBG_PRINT_END
+
+	   TRACE (Func_Exit, "send_non_standard_aligned_type", NULL);
+	   
+	   return(pdg_type_idx);
+	   
 }  /* send_non_standard_aligned_type */
