@@ -43,9 +43,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: wn_pragmas.h
- * $Revision: 1.4 $
- * $Date: 2003-02-21 21:13:43 $
- * $Author: jle $
+ * $Revision: 1.5 $
+ * $Date: 2004-12-14 17:34:11 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $
  *
  * Description:
@@ -115,7 +115,7 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *pragmas_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $ $Revision: 1.4 $";
+static char *pragmas_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Pragma IDs: */
@@ -371,6 +371,13 @@ typedef enum {
   WN_PRAGMA_UPC_RELAXED_CONSISTENCY_STOP,
   WN_PRAGMA_UPC_FORALL,              /* forall loop - marks the whole loop body */
   WN_PRAGMA_UPC_FORALL_AFFINITY,     /* marks the affinity test for a forall loop */
+
+  /* eraxxon: OpenAD specific pragmas */
+  WN_PRAGMA_OPENAD_XXX,              /* pass pragma text to back-end */
+  WN_PRAGMA_OPENAD_DEPENDENT,        /* identify dependent variable */
+  WN_PRAGMA_OPENAD_INDEPENDENT,      /* identify independent variable */
+  WN_PRAGMA_OPENAD_SIMPLE_LOOP,      /* identify simple DO loop */
+
   MAX_WN_PRAGMA			/* last one in enum			*/
 } WN_PRAGMA_ID;
 
