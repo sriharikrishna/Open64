@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.12 $
- * $Date: 2002-09-20 20:49:26 $
+ * $Revision: 1.13 $
+ * $Date: 2002-09-20 22:00:09 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.12 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.13 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1909,6 +1909,7 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
   INT32 array_dim;
   ST * st;
   ARB_HANDLE arb_base;
+  TY_IDX ttyy;
 
 
   /* get array's rank and co_rank information from kid0 of wn
@@ -1923,10 +1924,14 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
 if (WN_operator(kid)==OPR_LDA)
  {
   st  =  WN_st(kid);
-  if (TY_Is_Pointer(ST_type(st)))
-      arb_base = TY_arb(TY_pointed(ST_type(st)));
-   else
-      arb_base = TY_arb(ST_type(st));
+  ttyy = ST_type(st);
+
+  if (TY_Is_Pointer(ttyy))
+     ttyy =TY_pointed(ttyy);
+  if (TY_is_f90_pointer(ttyy))
+     ttyy = TY_pointed(ttyy);
+
+  arb_base = TY_arb(ttyy);
 
   dim =  ARB_dimension(arb_base);
   co_dim = ARB_co_dimension(arb_base);
@@ -2061,6 +2066,8 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
 //   Append_Token_Special(tokens, '(');
 //  set_WN2F_CONTEXT_no_parenthesis(context);
 
+   if (TY_is_f90_pointer(array_ty))
+        array_ty = TY_pointed(array_ty); //Sept
 
   if (TY_Is_Array(array_ty) && TY_AR_ndims(array_ty) >= WN_num_dim(wn))
     {
