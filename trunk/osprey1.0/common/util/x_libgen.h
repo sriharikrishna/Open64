@@ -1,4 +1,4 @@
-/* $Id: x_libgen.h,v 1.1 2003-12-10 16:05:18 eraxxon Exp $ */
+/* $Id: x_libgen.h,v 1.2 2004-02-28 21:05:05 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -8,8 +8,8 @@
  * ====================================================================
  *
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_libgen.h,v $
- * $Revision: 1.1 $
- * $Date: 2003-12-10 16:05:18 $
+ * $Revision: 1.2 $
+ * $Date: 2004-02-28 21:05:05 $
  *
  * Nathan Tallent.
  *
@@ -49,10 +49,10 @@ extern "C" {
   /* NOTE: We provide our own implementations of these functions. */
 
   /* Unix */
-  char* ux_basename(char *path);
+  extern char* ux_basename(char *path);
   
   /* Unix */
-  char* ux_dirname(char *path);
+  extern char* ux_dirname(char *path);
 
 #if defined(__cplusplus)
 } /* extern "C" */
