@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.32 $
- * $Date: 2004-02-13 21:23:54 $
- * $Author: eraxxon $
+ * $Revision: 1.33 $
+ * $Date: 2004-06-28 21:02:39 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.32 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.33 $";
 #endif
 
 #include <alloca.h>
@@ -3300,6 +3300,7 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
      Increment_Indentation();
      for(k=0;k< WN_kid_count(wn);k++ )  // each kid is OPR_FUNC_ENTRY wn
       {
+        add_rsl_decl = 0;
         header_tokens =  New_Token_Buffer();
         num_params = WN_kid_count(WN_kid(wn,k));
         param_st = (ST **)alloca((num_params + 1) * sizeof(ST *));
