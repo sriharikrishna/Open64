@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.19 $
- * $Date: 2003-09-18 15:55:08 $
+ * $Revision: 1.20 $
+ * $Date: 2003-09-18 17:41:17 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.20 $";
 #endif
 
 #include <ctype.h>
@@ -876,6 +876,8 @@ ST2F_func_header(TOKEN_BUFFER tokens,
      }
       stmt = WN_next(stmt);
     }  /*while*/
+
+    param_tokens = New_Token_Buffer();
 
    if (!is_altentry)
    {
