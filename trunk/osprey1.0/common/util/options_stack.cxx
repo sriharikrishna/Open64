@@ -37,9 +37,9 @@
 //============================================================================
 //
 // Module: options_stack.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:07:09 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2003-11-04 16:07:35 $
+// $Author: eraxxon $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/options_stack.cxx,v $
 //
 // Revision history:
@@ -61,7 +61,12 @@
 #include "flags.h"		// Common_Option_Group
 #include "options_stack.h"	// options stack
 
-#pragma weak Process_Command_Line
+
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
+  extern "C" void Process_Command_Line (INT, char **) { }
+#else 
+# pragma weak Process_Command_Line
+#endif
 
 //============================================================================
 // Push_Current_Options

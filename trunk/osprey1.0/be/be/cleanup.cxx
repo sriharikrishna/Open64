@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cleanup.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:20 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-11-04 16:07:34 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/cleanup.cxx,v $
  *
  * Revision history:
@@ -87,7 +87,7 @@ BOOL Whirl2c_loaded = FALSE;
 #include "w2c_weak.h"
 #include "w2f_weak.h"
 
-#ifndef __linux__
+#if !(defined(__linux__) || defined(__CYGWIN__))
 #pragma weak Anl_Cleanup
 #endif
 
@@ -155,7 +155,7 @@ Cleanup_Files (BOOL report,         /* Report errors during cleanup? */
        W2C_Cleanup();
     if (Whirl2f_loaded)
        W2F_Cleanup();
-#ifndef __linux__
+#if !(defined(__linux__) || defined(__CYGWIN__))
     if (Prompf_anl_loaded)
        Anl_Cleanup();
 #endif

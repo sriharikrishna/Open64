@@ -47,12 +47,12 @@
 #include "opt_sym.h"
 #include "opt_util.h"
 
-#if defined(_GCC_NO_PRAGMAWEAK)
-AUX_ID WN_aux(const WN*) { return (AUX_ID)0; }
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
+  AUX_ID WN_aux(const WN*) { return (AUX_ID)0; }
 #endif
 
-#ifdef __linux__
-extern AUX_ID (*WN_aux_p) (const WN*);
+#if defined(__linux__) || defined(__CYGWIN__)
+  extern AUX_ID (*WN_aux_p) (const WN*);
 #define WN_aux (*WN_aux_p)
 
 // Solaris CC workaround

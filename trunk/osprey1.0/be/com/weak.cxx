@@ -36,7 +36,7 @@
 // This file contains only Linux-specific code and should be entirely
 // #ifdef'd out for Irix.
 
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 // Work around the "undefined weak symbol" bug in Linux.
 //
@@ -160,6 +160,7 @@ void (*ipl_main_p) (INT, char **);
 void (*Perform_Procedure_Summary_Phase_p) (WN*, DU_MANAGER*, ALIAS_MANAGER*,
 					   void*);
 
+// ----------------------------------------------------------------------
 // symbols from whirl2c.so 
 
 void (*W2C_Cleanup_p)(void);
@@ -194,6 +195,8 @@ void (*W2C_Translate_Wn_p)(FILE *outfile, const WN *wn);
 void (*W2C_Translate_Wn_Str_p)(char *strbuf, UINT bufsize, const
   WN *wn);
 
+
+// ----------------------------------------------------------------------
 // symbols from whirl2f.so  
 
 void (*W2F_Cleanup_p)(void);

@@ -71,11 +71,12 @@
 
 #include "dra_internal.h"       // Internal DRA interface
 
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
-extern void (*CG_Change_Elf_Symbol_To_Undefined_p) (ST*);
-#define CG_Change_Elf_Symbol_To_Undefined (*CG_Change_Elf_Symbol_To_Undefined_p)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
+  extern void (*CG_Change_Elf_Symbol_To_Undefined_p) (ST*);
+# define CG_Change_Elf_Symbol_To_Undefined \
+    (*CG_Change_Elf_Symbol_To_Undefined_p)
 #else
-#pragma weak CG_Change_Elf_Symbol_To_Undefined
+# pragma weak CG_Change_Elf_Symbol_To_Undefined
 #endif // __linux__
 
 // =====================================================================

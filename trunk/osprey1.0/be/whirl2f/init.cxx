@@ -43,7 +43,7 @@
 // This file define initialization of pointer variables to symbols defined
 // in lno.so but referenced in be/be.so.
 
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 #include "defs.h"
 #include "wn.h"

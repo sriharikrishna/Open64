@@ -60,7 +60,7 @@
 #include "whirl2src.h"
 
 
-#if defined(_GCC_NO_PRAGMAWEAK)
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 void WB_BROWSER::Summary(FILE *fp) { }
 void ACCESS_ARRAY::Print(FILE *, int) const { }
@@ -101,7 +101,8 @@ void IF_INFO::Print(FILE *fp) { }
 #pragma weak Summary__10WB_BROWSERP4FILE
 
 /* FIXME */
-#if defined(_LINUX_LINUX) && defined(__GNUC__) && (__GNUC__ >= 3)
+#if defined(_LINUX_LINUX) && !defined(__CYGWIN__) \
+    && defined(__GNUC__) && (__GNUC__ >= 3)
 void WB_BROWSER::Summary(FILE *fp) { }
 void ACCESS_ARRAY::Print(FILE *, int) const { }
 void DO_LOOP_INFO_BASE::Print(FILE *, INT) { }
