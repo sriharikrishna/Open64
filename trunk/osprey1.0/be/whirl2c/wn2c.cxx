@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.14 $
- * $Date: 2003-10-21 17:38:04 $
+ * $Revision: 1.15 $
+ * $Date: 2003-10-24 17:52:58 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.14 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.15 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -2375,11 +2375,16 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
     * them to the given token-list.
     */
    const ST    *st;
+   TOKEN_BUFFER var_tokens;
+   TOKEN_BUFFER func_tokens;
    TOKEN_BUFFER tmp_tokens;
    ST_IDX       st_idx;
 
    init_map();
    
+   var_tokens = New_Token_Buffer();
+   func_tokens = New_Token_Buffer();
+
    /* Declare identifiers from the new symbol table, provided they
     * represent functions or variables that are either defining
     * global definition or that have been referenced in this 
@@ -2429,16 +2434,42 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
 	    ST2C_decl_translate(tmp_tokens, st, context);
 	    Append_Token_Special(tmp_tokens, ';');
 	 }
+
 	 Append_Indented_Newline(tmp_tokens, lines_between_decls);
+
+         if (ST_sym_class(st) == CLASS_FUNC)
+               Append_And_Reclaim_Token_List(func_tokens, &tmp_tokens);
+         else
+               Append_And_Reclaim_Token_List(var_tokens, &tmp_tokens);
+#if 0
 	 if (tokens != NULL)
-	    Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
-	 else {
-	   Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE], 
-				    NULL, /* No srcpos map */
-				    &tmp_tokens);
+	     Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
+	 else 
+             Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE], 
+				          NULL, /* No srcpos map */
+				          &tmp_tokens);
+#endif
 	 }
-       } 
-   }
+       
+       }  /*FOREACH */
+
+        if (tokens != NULL){
+            if (func_tokens != NULL)
+                  Append_And_Reclaim_Token_List(tokens, &func_tokens);
+            if (var_tokens != NULL)
+                  Append_And_Reclaim_Token_List(tokens, &var_tokens);
+          }
+         else {
+            if (func_tokens != NULL)
+                Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE],
+                                          NULL, /* No srcpos map */
+                                          &func_tokens);
+             if (var_tokens != NULL)
+                 Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE],
+                                          NULL, /* No srcpos map */
+                                          &var_tokens);
+            }
+
 } /* WN2C_Append_Symtab_Vars */
 
 
