@@ -5676,8 +5676,11 @@ boolean	validate_kind(basic_type_type	 type,
 # if defined(_TARGET_OS_MAX)
             PRINTMSG(line, 543, Warning, column, 16, 8);
             *linear_type = Complex_8;
+#if 0
 # elif defined(_TARGET_OS_LINUX)
             PRINTMSG(line, 541, Error, column);
+#endif
+
 # endif
             break;
 
