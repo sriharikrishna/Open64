@@ -99,7 +99,7 @@
 #if defined(BACK_END)
 #include "xstats.h"
 #endif
-#if defined(BACK_END) || defined(BUILD_WHIRL2C) || defined(BUILD_WHIRL2F)
+#if defined(BACK_END) || defined(BUILD_WNPREFETCH)
 #include "pf_cg.h"
 #endif
 
@@ -1071,7 +1071,7 @@ WN_get_depgraph (void *handle, PU_Info *pu)
 #endif /* BACK_END */
 
 
-#if defined(BACK_END) || defined(BUILD_WHIRL2C) || defined(BUILD_WHIRL2F)
+#if defined(BACK_END) || defined(BUILD_WNPREFETCH)
 /* Read the prefetch pointer mapping */
 INT
 WN_get_prefetch (void *handle, PU_Info *pu)
@@ -1156,7 +1156,7 @@ WN_get_prefetch (void *handle, PU_Info *pu)
     return 0;
 } /* WN_get_prefetch */
 
-#endif /* BACK_END || BUILD_WHIRL2C || BUILD_WHIRL2F */
+#endif /* BACK_END || BUILD_WNPREFETCH */
 
 static inline void
 WN_MAP_put(WN_MAP wn_map, WN *wn, INT32 value)
@@ -1428,7 +1428,7 @@ Read_Local_Info (MEM_POOL *pool, PU_Info *pu)
     }
 #endif
 
-#if defined(BACK_END) || defined(BUILD_WHIRL2C) || defined(BUILD_WHIRL2F)
+#if defined(BACK_END) || defined(BUILD_WNPREFETCH)
     if (WN_get_prefetch (local_fhandle, pu) == -1) {
 	ErrMsg ( EC_IR_Scn_Read, "prefetch map", local_ir_file);
     }

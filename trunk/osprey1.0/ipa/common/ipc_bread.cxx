@@ -702,7 +702,7 @@ IP_READ_pu (IPA_NODE* node, IP_FILE_HDR& s, INT p_index, MEM_POOL *pool)
     }
 #endif
 
-#if defined(BACK_END) || defined(BUILD_WHIRL2C) || defined(BUILD_WHIRL2F)
+#if defined(BACK_END) || defined(BUILD_WNPREFETCH)
     if (WN_get_prefetch (fhandle, pu) == -1) {
       ErrMsg ( EC_IR_Scn_Read, "prefetch map", IP_FILE_HDR_file_name(s));
     }
