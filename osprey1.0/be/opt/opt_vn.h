@@ -3,9 +3,9 @@
 // ====================================================================
 //
 // Module: opt_vn.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:51 $
-// $Author: dsystem $
+// $Revision: 1.2 $
+// $Date: 2003-02-19 22:05:11 $
+// $Author: jle $
 // $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/opt/opt_vn.h,v $
 //
 // ====================================================================
@@ -254,14 +254,14 @@
 #ifndef opt_vn_INCLUDED
 #define opt_vn_INCLUDED "opt_vn.h"
 
-#include <slist>
+#include <list>
 #include <vector>
 #include "segmented_array.h"
 #include "opt_vn_expr.h"    // For VN_VALNUM, VN_EXPR, and VN_EXPR_MAP
 #include "opt_vn_hashtab.h" // For VN_HASHTAB
 
 #ifdef __STL_USE_NAMESPACES
-using std::slist;
+using std::list;
 using std::vector;
 #endif
 
@@ -281,7 +281,7 @@ public:
    enum VN_ALGORITHM {SINGLE_PASS, ITERATIVE};
 
    typedef mempool_allocator<STMTREP*>    STMT_ALLOCATOR;
-   typedef slist<STMTREP*, STMT_ALLOCATOR> STMT_LIST; // linked list
+   typedef list<STMTREP*, STMT_ALLOCATOR> STMT_LIST; // linked list
 
    typedef mempool_allocator<VN_VALNUM>        VALNUM_ALLOCATOR;
    typedef vector<VN_VALNUM, VALNUM_ALLOCATOR> VALNUM_VECTOR;
@@ -530,7 +530,7 @@ class VALNUM_TO_EXPR_LIST
 public:
 
    typedef mempool_allocator<VN::EXPRID> EXPRID_ALLOCATOR;
-   typedef slist<VN::EXPRID, EXPRID_ALLOCATOR> EXPR_LIST; // linked list
+   typedef list<VN::EXPRID, EXPRID_ALLOCATOR> EXPR_LIST; // linked list
    typedef EXPR_LIST::const_iterator EXPR_ITERATOR;
 
 private:
