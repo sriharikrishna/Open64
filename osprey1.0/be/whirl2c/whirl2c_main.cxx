@@ -280,8 +280,13 @@ main (INT argc,                   /* Number of command line arguments */
     strcat (path, "/whirl2c_be");
 
     execv (path, new_argv);
+#ifdef _SOLARIS_SOLARIS
+    error("%s: fail to execute %s: \n", argv[0], path);
+    perror(NULL);
+#else
     error("%s: fail to execute %s: %s.\n", argv[0], path,
 	  sys_errlist[errno]);
+#endif
     exit(RC_SYSTEM_ERROR);
 } /* main */
 
