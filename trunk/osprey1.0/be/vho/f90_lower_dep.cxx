@@ -47,9 +47,8 @@
 #if !defined(__GNUC__) && defined(__sgi)
   template<> MEM_POOL* MAT<mINT32>::_default_pool = NULL; 
 #else
-  MEM_POOL* MAT<mINT32>::_default_pool = NULL; 
+  template<class T> MEM_POOL* MAT<T>::_default_pool = NULL; 
 #endif
-
 
 
 //----------------------------------------------------------------------------------
