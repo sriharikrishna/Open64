@@ -41,9 +41,9 @@
 #include <stdio.h>		    /* for fprintf () */
 #include <stdlib.h>		    /* for getenv() */
 #include <unistd.h>		    /* for execv() */
-#include <string.h>		    /* for strcpy(),etc. */
+#include <string.h>		    /* for strcpy(), strerror() */
 #include <limits.h>		    /* for PATH_MAX */
-#include <errno.h>		    /* for errno, sys_errlist[] */
+#include <errno.h>		    /* for errno */
 #include <stdarg.h>
 #include <cmplrs/rcodes.h>
 #include "defs.h"
@@ -280,13 +280,7 @@ main (INT argc,                   /* Number of command line arguments */
     strcat (path, "/whirl2c_be");
 
     execv (path, new_argv);
-#ifdef _SOLARIS_SOLARIS
-    error("%s: fail to execute %s: \n", argv[0], path);
-    perror(NULL);
-#else
-    error("%s: fail to execute %s: %s.\n", argv[0], path,
-	  sys_errlist[errno]);
-#endif
+    error("%s: fail to execute %s: %s.\n", argv[0], path, strerror(errno));
     exit(RC_SYSTEM_ERROR);
 } /* main */
 

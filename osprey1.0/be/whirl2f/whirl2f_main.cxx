@@ -38,12 +38,6 @@
  * proper.
  */
 
-// Solaris workaround
-#ifdef _SOLARIS_SOLARIS
-extern char  *sys_errlist[];
-extern void  W2F_Process_Command_Line(int, char**, int, char**);
-#endif
-
 #include <stdio.h>		    /* for fprintf () */
 #include <stdlib.h>		    /* for getenv() */
 #include <unistd.h>		    /* for execv() */
