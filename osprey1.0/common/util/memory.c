@@ -36,15 +36,7 @@
 
 #include <sys/types.h>
 #include <malloc.h>
-	
-/* Solaris workaround 
- * for bzero()
- */
-#if defined(_SOLARIS_SOLARIS)
-#include <strings.h>
-#else
-#include <bstring.h>
-#endif
+#include <string.h> /* for memset() and memmove() */
   
 #include "defs.h"
 #include "mempool.h"
@@ -962,7 +954,7 @@ Allocate_Block (MEM_POOL *pool)
     ErrMsg (EC_No_Mem, "Allocate_Block");
 
   if ( MEM_POOL_bz(pool) )
-    bzero (block, BLOCK_SIZE + PAD_TO_ALIGN(sizeof(MEM_BLOCK)));
+    memset (block, '\0', BLOCK_SIZE + PAD_TO_ALIGN(sizeof(MEM_BLOCK)));
   
 #ifdef ZAP_ON_FREE
   else
@@ -1013,7 +1005,7 @@ Allocate_Large_Block (MEM_POOL *pool, INT32 size)
     ErrMsg (EC_No_Mem, "Allocate_Large_Block");
 
   if ( MEM_POOL_bz(pool) ) {
-    bzero (block, size);
+    memset (block, '\0', size);
   }
   
 #ifdef ZAP_ON_FREE
@@ -1182,7 +1174,7 @@ MEM_POOL_Realloc_P
 #ifdef JUST_USE_MALLOC
   result = realloc(old_block,new_size);
   if ( old_size < new_size )
-    bzero((char*)result + old_size,new_size - old_size);
+    memset((char*)result + old_size, '\0', new_size - old_size);
   return result;
 #endif
 
@@ -1226,7 +1218,7 @@ MEM_POOL_Realloc_P
                MEM_POOL_name(pool), old_block);
       /* Do a malloc and copy */
       ret_val = (MEM_PTR) malloc (new_size+8);
-      bcopy(old_block, (MEM_PTR) (((size_t) ret_val)+8), old_size);
+      memmove((MEM_PTR) (((size_t) ret_val)+8), old_block, old_size);
     }
     else {
       /* either found it or old_block was null, so do a real realloc */
@@ -1241,7 +1233,7 @@ MEM_POOL_Realloc_P
       MEM_POOL_last_alloc(pool) = ret_val;
       ret_val = (MEM_PTR) ((size_t) ret_val + 8);
       if ( old_size < new_size )
-        bzero((char*)ret_val + old_size,new_size - old_size);
+        memset((char*)ret_val + old_size, '\0', new_size - old_size);
     }
     if (purify_pools_trace)
       printf ("pool %s, realloc 0x%p, new size %llu, (0x%p - 0x%p)\n",
@@ -1283,7 +1275,7 @@ MEM_POOL_Realloc_P
       return old_block;
     else {
       result = Raw_Allocate (pool, new_size);
-      bcopy (old_block, result, old_size);
+      memmove (result, old_block, old_size);
       return result;
     }
   } else {
@@ -1294,7 +1286,7 @@ MEM_POOL_Realloc_P
       /* this is a valid large block that we can reallocate */
       if (new_size <= MIN_LARGE_BLOCK_SIZE) {
 	result = Raw_Allocate (pool, new_size);
-	bcopy (old_block, result, new_size);
+	memmove (result, old_block, new_size);
 	MEM_POOL_FREE (pool, old_block);
 	return result;
       } else {
@@ -1309,8 +1301,8 @@ MEM_POOL_Realloc_P
 	MEM_LARGE_BLOCK_ptr(large_block) = (MEM_PTR)
 	  (((char *)large_block) + MEM_LARGE_BLOCK_OVERHEAD);
 	if (MEM_POOL_bz(pool)) {
-	  bzero (((char *) MEM_LARGE_BLOCK_ptr(large_block)) + old_size,
-		 new_size - old_size);
+	  memset (((char *) MEM_LARGE_BLOCK_ptr(large_block)) + old_size,
+		 '\0', new_size - old_size);
 	}
 	p = MEM_LARGE_BLOCK_prev(large_block);
 	if (p == NULL)
@@ -1325,9 +1317,9 @@ MEM_POOL_Realloc_P
     } else {
       result = Raw_Allocate (pool, new_size);
       if (new_size > old_size)
-	bcopy (old_block, result, old_size);
+	memmove (result, old_block, old_size);
       else
-	bcopy (old_block, result, new_size);
+	memmove (result, old_block, new_size);
       return result;
     }
   }
@@ -1547,7 +1539,7 @@ MEM_POOL_Pop_P
       MEM_BLOCK_ptr(bp) = MEM_POOL_BLOCKS_base_ptr(bsp);
       MEM_BLOCK_avail(bp) = MEM_POOL_BLOCKS_base_avail(bsp);
       if (MEM_POOL_bz(pool))
-	bzero (MEM_BLOCK_ptr(bp), MEM_BLOCK_avail(bp));
+	memset (MEM_BLOCK_ptr(bp), '\0', MEM_BLOCK_avail(bp));
       break;
     }
     free (bp);
@@ -1570,7 +1562,7 @@ MEM_POOL_Pop_P
     MEM_POOL_BLOCKS_rest(bsp) = free_mem_pool_blocks_list;
     free_mem_pool_blocks_list = bsp;
   } else {
-    bzero (bsp, sizeof(MEM_POOL_BLOCKS));
+    memset (bsp, '\0', sizeof(MEM_POOL_BLOCKS));
   }
 }
 
@@ -1781,7 +1773,7 @@ void MEM_POOL_Delete(MEM_POOL *pool)
   MEM_POOL_BLOCKS_rest(bsp) = free_mem_pool_blocks_list;
   free_mem_pool_blocks_list = bsp;
 
-  bzero (pool, sizeof(MEM_POOL));
+  memset (pool, '\0', sizeof(MEM_POOL));
   MEM_POOL_magic_num(pool) = 0;
 }
 
@@ -1795,7 +1787,7 @@ void MEM_POOL_Delete(MEM_POOL *pool)
  *  'pool'  - is the pool to initialize
  *  'name'  - a name to associate with the pool for debugging purposes
  *            (NOT copied.)
- *  'bzero' - if true, memory allocate from the pool will always be
+ *  'memzero' - if true, memory allocate from the pool will always be
  *            zeroed, otherwise no guarantee.
  *
  * ====================================================================
@@ -1806,7 +1798,7 @@ MEM_POOL_Initialize_P
 (
   MEM_POOL     *pool,
   const char   *name,
-  BOOL          bzero
+  BOOL          memzero
   MEM_STAT_ARGS(line,file)
 )
 {
@@ -1814,7 +1806,7 @@ MEM_POOL_Initialize_P
   if (pool == Malloc_Mem_Pool) return;
 
   MEM_POOL_name(pool) = name;
-  MEM_POOL_bz(pool) = bzero;
+  MEM_POOL_bz(pool) = memzero;
   MEM_POOL_blocks(pool) = NULL;
   MEM_POOL_frozen(pool) = FALSE;
   MEM_POOL_pure_stack(pool) = NULL;
@@ -1971,7 +1963,7 @@ Realloc_Clear ( MEM_PTR ptr, INT32 new_size, INT32 old_size )
   if ( new_size > old_size ) {
     MEM_PTR start_of_new = (MEM_PTR) ( ((char *) result) + old_size );
     INT32 num_added_bytes = new_size - old_size;
-    bzero ( start_of_new, num_added_bytes );
+    memset ( start_of_new, '\0', num_added_bytes );
   }
 
   return result;

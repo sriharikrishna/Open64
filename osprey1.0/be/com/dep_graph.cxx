@@ -44,8 +44,8 @@
  * ====================================================================
  *
  * Module: dep_graph.cxx  
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:30 $
+ * $Revision: 1.2 $
+ * $Date: 2003-12-09 19:20:22 $
  *
  * Revision history:
  *  dd-mmm-94 - Original Version
@@ -66,12 +66,6 @@
 
 #define USE_STANDARD_TYPES	    /* override unwanted defines in "defs.h" */
 
-
-#ifdef _SOLARIS_SOLARIS
-#include <strings.h>
-#else
-#include <bstring.h>
-#endif
 
 #include "wn.h"
 #include "erglob.h"

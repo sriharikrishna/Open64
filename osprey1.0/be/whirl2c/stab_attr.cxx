@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: stab_attr.c
- * $Revision: 1.4 $
- * $Date: 2003-06-19 19:22:34 $
- * $Author: broom $
+ * $Revision: 1.5 $
+ * $Date: 2003-12-09 19:20:23 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $
  *
  * Revision history:
@@ -55,7 +55,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -180,7 +180,7 @@ public:
   void Clear_w2fc_flags(void) 
   {
     if (_flags != NULL) {
-      bzero(_flags,_size*sizeof(mUINT8)) ;
+      memset(_flags, '\0', _size*sizeof(mUINT8)) ;
     }
   }
 };
