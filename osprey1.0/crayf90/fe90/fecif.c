@@ -36,58 +36,57 @@
 
 static char USMID[] = "\n@(#)5.0_pl/sources/fecif.c	5.9	10/14/99 12:53:57\n";
 
-# include "defines.h"		/* Machine dependent ifdefs */
+#include "defines.h"		/* Machine dependent ifdefs */
 
 
-# define __NLS_INTERNALS 1  /* Obtain internal <nl_types.h> definitions.      */
-			    /* (Required to get at prototype for              */
-			    /* __cat_path_name.)			      */
-# include <nl_types.h>      /* Contains typedef for nl_catd and prototype for */
-			    /* __cat_path_name.				      */
+#define __NLS_INTERNALS 1  /* Obtain internal <nl_types.h> definitions.      */
+			   /* (Required to get at prototype for              */
+			   /* __cat_path_name.)			      */
+#include <nl_types.h>      /* Contains typedef for nl_catd and prototype for */
+			   /* __cat_path_name.				     */
 
-# if defined(_HOST_OS_LINUX)
+#if defined(_HOST_OS_LINUX)
 # include <nlcatmsg.h>
-# endif
+#endif
 
 
 
-# include <time.h>
+#include <time.h>
 
 
-# define CIF_VERSION     3
+#define CIF_VERSION     3
 
-# include "cif.h"
+#include "cif.h"
 
-# include "cifprocs.h"
+#include "cifprocs.h"
 
 
-# include "host.m"		/* Host machine dependent macros.*/
-# include "host.h"		/* Host machine dependent header.*/
-# include "target.m"		/* Target machine dependent macros.*/
-# include "target.h"		/* Target machine dependent header.*/
+#include "host.m"		/* Host machine dependent macros.*/
+#include "host.h"		/* Host machine dependent header.*/
+#include "target.m"		/* Target machine dependent macros.*/
+#include "target.h"		/* Target machine dependent header.*/
 
-# include "globals.m"
-# include "tokens.m"
-# include "sytb.m"
-# include "p_globals.m"
-# include "s_globals.m"
-# include "debug.m"
-# include "cif.m"
-# include "fecif.m"
+#include "globals.m"
+#include "tokens.m"
+#include "sytb.m"
+#include "p_globals.m"
+#include "s_globals.m"
+#include "debug.m"
+#include "cif.m"
+#include "fecif.m"
 
-# include "globals.h"
-# include "tokens.h"
-# include "sytb.h"
-# include "p_globals.h"
-# include "s_globals.h"
-# include "fecif.h"
+#include "globals.h"
+#include "tokens.h"
+#include "sytb.h"
+#include "p_globals.h"
+#include "s_globals.h"
+#include "fecif.h"
 
-# if defined(_HOST_OS_LINUX)
-#   include <sys/sysinfo.h>
-# elif defined(_HOST_OS_SOLARIS) || (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
-#   include <sys/systeminfo.h>
-# endif
-
+#if (defined(_HOST_OS_SOLARIS) || defined(_HOST_OS_IRIX))
+# include <sys/systeminfo.h>
+#else
+# include <unistd.h> /* for gethostname() */
+#endif
 
 /*****************************************************************\
 |* Function prototypes of static functions declared in this file *|
@@ -106,21 +105,21 @@ static char	output_buf[2][64];
 # define outbuf2 output_buf[1]
 
 
-/******************************************************************************\
-|*                                                                            *|
-|* Description:                                                               *|
-|*      Open the Compiler Information File and output the header record.      *|
-|*                                                                            *|
-|* Input parameters:                                                          *|
-|*      NONE                                                                  *|
-|*                                                                            *|
-|* Output parameters:                                                         *|
-|*      NONE                                                                  *|
-|*                                                                            *|
-|* Returns:                                                                   *|
-|*      NOTHING                                                               *|
-|*                                                                            *|
-\******************************************************************************/
+/*****************************************************************************\
+|*                                                                           *|
+|* Description:                                                              *|
+|*      Open the Compiler Information File and output the header record.     *|
+|*                                                                           *|
+|* Input parameters:                                                         *|
+|*      NONE                                                                 *|
+|*                                                                           *|
+|* Output parameters:                                                        *|
+|*      NONE                                                                 *|
+|*                                                                           *|
+|* Returns:                                                                  *|
+|*      NOTHING                                                              *|
+|*                                                                           *|
+\*****************************************************************************/
 
 void init_cif(char *comp_date_time, char *release_level)
 {
@@ -132,7 +131,7 @@ void init_cif(char *comp_date_time, char *release_level)
    		char		*msg_cat_name;
 
 # if defined(_GETPMC_AVAILABLE)
-   extern        int      GETPMC(long *, char *);   /* UNICOS library routine */
+   extern        int      GETPMC(long *, char *);   /* UNICOS library routine*/
 
    union  {long   int_form;
            char   char_form[9];
@@ -148,25 +147,25 @@ void init_cif(char *comp_date_time, char *release_level)
 
    host_machine_type	host_machine_info;
 
-# elif defined(_HOST_OS_SOLARIS) || (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
-   char		host_cpu_type[9];              /* Max of 8 chars (plus NULL). */
+# elif (defined(_HOST_OS_SOLARIS) || defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
+   char		host_cpu_type[9];              /* Max of 8 chars (plus NULL).*/
 # endif
 
 
    TRACE (Func_Entry, "init_cif", NULL);
 
    cif_end_unit_column	       = 0;
-   cif_file_id                 = 2;	       /* Reserve 1 for msg cat name. */
+   cif_file_id                 = 2;	       /* Reserve 1 for msg cat name.*/
    cif_first_pgm_unit          = TRUE;
    cif_need_unit_rec           = TRUE;
    cif_pgm_unit_error_recovery = FALSE;
    cif_pgm_unit_start_line     = 1;
 
 
-   /* If the CIF name was provided by the command line processor, open it.    */
-   /* If the user specified -C, set_prog_file_names has already created the   */
-   /* .T name in cif_name. 						      */
-   /* Otherwise, get a temporary file.					      */
+   /* If the CIF name was provided by the command line processor, open it.   */
+   /* If the user specified -C, set_prog_file_names has already created the  */
+   /* .T name in cif_name. 						     */
+   /* Otherwise, get a temporary file.					     */
 
    if ((cif_C_opts & CMD_PROVIDED_CIF)  ||  cif_flags != 0) {
 
@@ -203,10 +202,10 @@ void init_cif(char *comp_date_time, char *release_level)
 
    c_i_f = cif_actual_file;
 
-   /* Create a temporary file to save records that are output while the       */
-   /* first stmt of a program unit is being parsed.  (All records for a       */
-   /* program unit must be between the Unit and End Unit records for the      */
-   /* program unit.)					          	      */
+   /* Create a temporary file to save records that are output while the      */
+   /* first stmt of a program unit is being parsed.  (All records for a      */
+   /* program unit must be between the Unit and End Unit records for the     */
+   /* program unit.)					          	     */
 
    if (! get_temp_file("w+", &cif_tmp_file, cif_tmp_file_name)) {
       PRINTMSG(0, 556, Log_Error, 0);
@@ -234,12 +233,12 @@ void init_cif(char *comp_date_time, char *release_level)
    }
 
 
-   /* ----------------------------------------------------------------------- */
-   /* Output the CIF header record.					      */
-   /*									      */
-   /* First, brute-force the date from the format in comp_date_time to the    */
-   /* format CIF expects:  Ddd Mmm dd, yyyy  ->  mm/dd/yy                     */
-   /* ----------------------------------------------------------------------- */
+   /* -----------------------------------------------------------------------*/
+   /* Output the CIF header record.					     */
+   /*									     */
+   /* First, brute-force the date from the format in comp_date_time to the   */
+   /* format CIF expects:  Ddd Mmm dd, yyyy  ->  mm/dd/yy                    */
+   /* -----------------------------------------------------------------------*/
 
    memcpy(month, comp_date_time+4, 3);
 
@@ -296,28 +295,28 @@ void init_cif(char *comp_date_time, char *release_level)
    msg_cat_name = "shouldnotgethere";
 # else
 
-/*
- * Solaris workaround
- * there is no __cat_path_name() declaration in Solaris nl_types.h
- * for now we just explicitly set up the message catalog file path.
- * it also works for IRIX.
- *
- */
+   /*
+    * Solaris workaround
+    * there is no __cat_path_name() declaration in Solaris nl_types.h
+    * for now we just explicitly set up the message catalog file path.
+    * it also works for IRIX.
+    *
+    */
    msg_cat_name = CF90CATPATHNAME;
 
 # endif
 
-# if defined(_HOST_OS_LINUX)
-   strcpy(cpu_name, "LINUX");
 
-
-# elif defined(_HOST_OS_SOLARIS) || (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
-
+# if (defined(_HOST_OS_SOLARIS) || defined(_HOST_OS_IRIX))
+   
    if (sysinfo(SI_HOSTNAME, cpu_name, ((long int) MAXHOSTNAMELEN)) < 0L) {
-      Cif_Error();
+       Cif_Error();
    }
-
+   
 # else
+
+   /* eraxxon: this used to be used on _HOST_OS_LINUX */
+   /* strcpy(cpu_name, "LINUX"); */
 
    if (gethostname(cpu_name, (MAXHOSTNAMELEN + 1)) < 0) {
       Cif_Error();
@@ -332,9 +331,12 @@ void init_cif(char *comp_date_time, char *release_level)
    host_cpu_type.char_form[8] = NULL_CHAR;
 # elif defined(_HOST_OS_SOLARIS)
    strcpy(host_cpu_type, "SPARC");
-# elif (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
+# elif defined(_HOST_OS_IRIX)
    strcpy(host_cpu_type, "SGI");
+# elif defined(_HOST_OS_LINUX)
+   strcpy(host_cpu_type, "INTEL");
 # endif
+
 
    Cif_Cifhdr_Rec(c_i_f,
                   CIF_LG_F90,
@@ -347,7 +349,7 @@ void init_cif(char *comp_date_time, char *release_level)
 
 # if defined(_GETPMC_AVAILABLE)
                   host_cpu_type.char_form);
-# elif defined(_HOST_OS_SOLARIS) || (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
+# elif (defined(_HOST_OS_SOLARIS) || defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
                   host_cpu_type);
 # endif
 
@@ -2714,7 +2716,7 @@ void cif_summary_rec(char	*release_level,
       hms = elapsed_time;
 
 
-# if defined(_HOST_OS_UNICOS)  ||  (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX)) 
+# if (defined(_HOST_OS_UNICOS) || defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
 
       elapsed_time = elapsed_time - hms;
       milliseconds = (elapsed_time + .0005) * 1000;
