@@ -38,36 +38,40 @@
 #include <liberrno.h>
 #include <errno.h>
 #include <fcntl.h>
+
 #if !defined(_ABSOFT)
-#include <nl_types.h>
+# include <nl_types.h>
 #else
-#include "ac_msg_type.h"
+# include "ac_msg_type.h"
 #endif
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
 #if defined(_ABSOFT) && defined(TARGET_NT)
-#include <siohdr.h>
+# include <siohdr.h>
 #endif
-#if	defined(_LITTLE_ENDIAN)
-#include <cray/nlcatmsg.h>
+
+#if defined(_LITTLE_ENDIAN)
+# include <cray/nlcatmsg.h>
 #endif
 
 #ifdef	_UNICOS
 
-#include <tapereq.h>
+# include <tapereq.h>
 
-extern	char	**_argv;
-#define	CMDNAME	(*_argv)
+ extern	char	**_argv;
+# define CMDNAME (*_argv)
 
 #else
 
-#include <cray/portdefs.h>
-#if	defined(_LITTLE_ENDIAN)
-#include <cray/nlcatmsg.h>
-#endif
+# include <cray/portdefs.h>
+# if defined(_LITTLE_ENDIAN)
+#  include <cray/nlcatmsg.h>
+# endif
 
-#define	CMDNAME	""
+# define CMDNAME ""
 
 #endif
 
@@ -182,7 +186,7 @@ _lmessage(int errn, char *severity, va_list args)
 
 	/* Open the message catalog */
 
-#ifdef	__mips
+#if defined(__sgi)
 	/* if this is the library message catalog, then... */ 
 	if (lib_mcat) {
 		if (lib_mcfd_opnd) {
@@ -202,9 +206,9 @@ _lmessage(int errn, char *severity, va_list args)
 		/* not the lib message catalog, open catalog */
 		mcfd	= catopen(mcnm, 0);
 	}
-#else	/* __mips */
+#else	/* __sgi */
 	mcfd	= catopen(mcnm, 0);
-#endif	/* __mips */
+#endif	/* __sgi */
 
 	/* Retrieve the raw message text */
 
@@ -220,12 +224,7 @@ _lmessage(int errn, char *severity, va_list args)
 			 MAXMLN, NULL, NULL);
 
 	/* Print the formatted message */
-
-#if !defined(_ABSOFT)
-	(void) write(fileno(stderr), mbuf, strlen(mbuf));
-#else
 	fwrite(mbuf, strlen(mbuf), 1, stderr);
-#endif
 
 	return;
 }
