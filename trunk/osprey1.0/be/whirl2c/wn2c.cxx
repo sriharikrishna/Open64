@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.18 $
- * $Date: 2004-06-22 14:42:32 $
+ * $Revision: 1.19 $
+ * $Date: 2004-06-30 20:28:17 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.18 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.19 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -2202,19 +2202,28 @@ WN2C_Append_Symtab_Types(TOKEN_BUFFER tokens, UINT lines_between_decls)
    TY_IDX       ty;
    TOKEN_BUFFER tmp_tokens;
 
-
    //WEI: This code is obviously broken, but should we fix it?
-   /* Declare structure types. */
+   //FMZ: we fix the bug--June 30,2004
+
+   /* Declare structure types. --*/
    for (ty = 1; ty < TY_Table_Size(); ty++)
    {
-   
      if (TY_Is_Structured(ty)       &&
 	 !TY_split(Ty_Table[ty])    &&
 	 !TY_is_translated_to_c(ty)  &&
 	  !Stab_Reserved_Ty(ty))
       {
 	 tmp_tokens = New_Token_Buffer();
-	 TY2C_translate_unqualified(tmp_tokens, ty);
+
+         Set_TY_is_written(ty<<8); 
+         //this should  be done in frontend,will fix later--FMZ
+
+//	 TY2C_translate_unqualified(tmp_tokens, ty);
+         //misuse this ty as TY_IDX--FMZ
+
+	 TY2C_translate_unqualified(tmp_tokens, ty<<8);
+
+#if 0 //not correct code---FMZ
 	 Append_Token_Special(tmp_tokens, ';');
 	 Append_Indented_Newline(tmp_tokens, lines_between_decls);
 	 if (tokens != NULL)
@@ -2224,6 +2233,8 @@ WN2C_Append_Symtab_Types(TOKEN_BUFFER tokens, UINT lines_between_decls)
 				     NULL, /* No srcpos map */
 				     &tmp_tokens);
 	 }
+#endif
+
       }
    }
 }  /* WN2C_Append_Symtab_Types */
@@ -6215,7 +6226,7 @@ WN2C_translate_file_scope_defs(CONTEXT context)
    WN2C_new_symtab();
 
    //WEI: don't see why this needs to be called
-//#if 0 WEI(who is this?) set "#if 0/#endif" cause some static constant
+//#if 0 WEI set "#if 0/#endif" cause some static constant
 // missed output to the corresponding w2c.h file.This cause bug #19 (see bug
 // track website),get back the function call----fzhao
 
