@@ -20,6 +20,10 @@ BUILD_INSTALL  = DEFAULT
 BUILD_VARIANT  = DEFAULT
 BUILD_SB       = NO
 
+
+CFLAGS += -D_POSIX_SOURCE -D_BSD_SOURCE
+CXXFLAGS += -D_POSIX_SOURCE -D_BSD_SOURCE
+
 #-----------------------------------------------------------------------
 #  If C++ Standard Template Library Extension (slist, hashtable, etc)
 #  is not in the default search dirs of the chosen compiler, define it.
