@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.7 $
- * $Date: 2003-01-21 22:55:45 $
+ * $Revision: 1.8 $
+ * $Date: 2003-02-19 20:15:35 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.8 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1682,7 +1682,8 @@ WN2F_STATUS
 WN2F_const(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
   const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
-
+  BOOL neg_num = 0;
+  
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_CONST, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_const"));
 
@@ -1690,11 +1691,26 @@ WN2F_const(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    if (parenthesize && !WN2F_CONTEXT_is_logical_arg(context))
       {
         switch (TCON_ty(STC_val(WN_st(wn))))
+         {
+            case MTYPE_F4:
+                 neg_num = (TCON_fval(STC_val(WN_st(wn)))<0);
+                 break;
+            case MTYPE_F8:
+                 neg_num = (TCON_dval(STC_val(WN_st(wn)))<0);
+		 break;
+            case MTYPE_FQ:
+                 neg_num = (TCON_qval(STC_val(WN_st(wn)))<0);
+		 break;
+
+         }
+
+        switch (TCON_ty(STC_val(WN_st(wn))))
           {
             case MTYPE_F4:
             case MTYPE_F8:
             case MTYPE_FQ:
-              if (TCON_ival(STC_val(WN_st(wn)))<0)  {
+
+              if (neg_num)  {
                   Append_Token_Special(tokens, '(');
                   TCON2F_translate(tokens,
 		                   STC_val(WN_st(wn)),

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.10 $
- * $Date: 2003-01-10 02:47:29 $
+ * $Revision: 1.11 $
+ * $Date: 2003-02-19 20:15:35 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.10 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.11 $";
 #endif
 
 #include <ctype.h>
@@ -735,7 +735,8 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    }
    else if (!PU_is_mainpu(Get_Current_PU()) &&
              !ST_is_in_module(st) &&
-             !ST_is_block_data(st))   // module&&block data cannot have "()" 
+             !ST_is_block_data(st) ||
+             TY_kind(return_ty) != KIND_VOID)   // module&&block data cannot have "()" 
 
    {
       /* Use the "()" notation for "no parameters", except for
@@ -770,7 +771,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
        Prepend_Token_String(header_tokens, "ENTRY");
      else
      {
-       Prepend_Token_String(header_tokens, "FUNCTION");
+       Prepend_Token_String(header_tokens, "function");
 
      if (PU_recursive(Get_Current_PU())) 
        Prepend_Token_String(header_tokens, "RECURSIVE");
@@ -816,10 +817,10 @@ ST2F_func_header(TOKEN_BUFFER tokens,
    if (WN_operator(stmt)==OPR_USE){
      st_name = W2CF_Symtab_Nameof_St(WN_st(stmt));
      Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
-     Append_Token_String(header_tokens, "USE");
+     Append_Token_String(header_tokens, "use");
      Append_Token_String(header_tokens, st_name);
      if (WN_rtype(stmt) == 1)
-        Append_Token_String(header_tokens, ",ONLY:");
+        Append_Token_String(header_tokens, ",only:");
      else
        if (WN_kid_count(stmt)>0)
            Append_Token_String(header_tokens, ",");

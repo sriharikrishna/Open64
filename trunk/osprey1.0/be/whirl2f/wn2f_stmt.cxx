@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.19 $
- * $Date: 2003-01-10 02:47:30 $
+ * $Revision: 1.20 $
+ * $Date: 2003-02-19 20:15:35 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.20 $";
 #endif
 
 #include <alloca.h>
@@ -2469,7 +2469,7 @@ WN2F_intrinsic_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 			    context);
       }
       break;
-      
+     
    default:
       regular_call = TRUE;
       WN2F_Stmt_Newline(tokens, NULL/*label*/, WN_Get_Linenum(wn), context);
@@ -2516,7 +2516,9 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    OPCODE    tempopc;
    WN *kidofparm;
    TY_IDX kid_ty;
+   TY_IDX parm_ty;
    BOOL first_nonemptyarg = FALSE;
+TYPE_ID fmtry;
 
    /* Emit any relevant call-site directives
     */
@@ -2608,8 +2610,12 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
             Append_Token_String(call_tokens,"DEALLOCATE");
             set_WN2F_CONTEXT_has_no_arr_elmt(context);
             is_allocate_stmt = TRUE;
-           }
+           } 
          }
+
+         if (strcmp(ST_name(WN_st(wn)),"PRESENT")== 0)
+                   set_WN2F_CONTEXT_has_no_arr_elmt(context);
+
 
         if (strcmp(ST_name(WN_st(wn)),"ALLOCATED")== 0)
          {
@@ -2661,13 +2667,29 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     {
      tempopc = WN_opcode(WN_kid(wn,arg_idx));
      kidofparm = WN_kid0(WN_kid(wn, arg_idx));
-     if (WN_operator(kidofparm) !=OPR_CALL) 
+     if (WN_operator(kidofparm) !=OPR_CALL && 
+             WN_operator(kidofparm)!= OPR_INTRINSIC_CALL) 
       {
           arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
 
+          parm_ty = WN_ty(WN_kid(wn,arg_idx));
+
+if (TY_Is_Pointer(arg_ty))
+      fmtry = TY_mtype(TY_pointed(arg_ty));
+else
+fmtry =  TY_mtype(arg_ty); // fzhao Jan try
+
+      if (fmtry == MTYPE_M) {
+          fmtry = TY_pointed(parm_ty);
+	  fmtry = TY_mtype(fmtry);
+        }
+
           if ((TY_Is_Character_Reference(arg_ty) ||
-	      TY_Is_Chararray_Reference(arg_ty))
-              && !is_allocate_stmt)
+	         TY_Is_Chararray_Reference(arg_ty) ||
+                  (TY_mtype(TY_pointed(arg_ty))==MTYPE_M &&
+                     (TY_Is_Character_Reference(parm_ty) ||
+                       TY_Is_Chararray_Reference(parm_ty))))
+               && !is_allocate_stmt)
              {
 	         total_implicit_args++;
              }
@@ -2676,9 +2698,17 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
              * if the return value is Chararray or Character Reference:
              */
        {
-          kid_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
-          if (Func_Return_Character (kid_ty))
-              total_implicit_args++;
+          if (WN_operator(kidofparm) == OPR_CALL)
+           {
+              kid_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
+             if (Func_Return_Character (kid_ty))
+ 		  total_implicit_args++; 
+
+	    }
+           else
+              if (WN_operator(kidofparm) == OPR_INTRINSIC_CALL &&
+                    WN_intrinsic(kidofparm) == INTRN_CONCATEXPR)
+                      total_implicit_args++;
         }
      }
    }
@@ -2724,8 +2754,13 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	      WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
          }
       } 
-      else if ((WN_operator(kidofparm) !=OPR_CALL &&TY_Is_Character_Reference(arg_ty)||
-               WN_operator(kidofparm)==OPR_CALL &&Func_Return_Character(arg_ty) ) &&
+      else if ((WN_operator(kidofparm) !=OPR_CALL && 
+                  (TY_Is_Character_Reference(arg_ty)  ||
+                    (TY_mtype(TY_pointed(arg_ty))==MTYPE_M &&
+                     (TY_Is_Character_Reference(parm_ty) ||
+                       TY_Is_Chararray_Reference(parm_ty)))) ||
+               WN_operator(kidofparm)==OPR_CALL &&
+                   Func_Return_Character(arg_ty) )            &&
                !is_allocate_stmt)
       {
 	 /* Handle substring arguments here.  These are always assumed
@@ -2750,10 +2785,10 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
          }
          else                
  	   len_idx = last_arg_idx - (total_implicit_args - implicit_args); 
-if (first_nonemptyarg && !has_stat )
-  Append_Token_Special(call_tokens, ','); //fzhao Nov
-else
-        has_stat = FALSE;
+        if (first_nonemptyarg && !has_stat )
+                 Append_Token_Special(call_tokens, ','); //fzhao Nov
+        else
+                 has_stat = FALSE;
      
         first_nonemptyarg = TRUE;
 	 WN2F_String_Argument(call_tokens,
@@ -2767,6 +2802,13 @@ else
       {
 	 /* Need to explicitly note this as a value parameter.
 	  */
+
+         if (WN_operator(kidofparm) == OPR_INTRINSIC_CALL &&
+               WN_intrinsic(kidofparm)==INTRN_CONCATEXPR)
+
+                 implicit_args++;
+    /*parser always generate an extra arg for concat operator*/
+
          if (WN_kid(wn, arg_idx)!=NULL) {
               if (first_nonemptyarg && !has_stat)
                   Append_Token_Special(call_tokens, ','); //fzhao Nov
@@ -2991,10 +3033,10 @@ WN2F_use_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
                      (DIAG_W2F_UNEXPECTED_OPC, "WN2F_use_stmt"));
 
      Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
-     Append_Token_String(tokens, "USE");
+     Append_Token_String(tokens, "use");
      Append_Token_String(tokens, st_name);
      if (WN_rtype(wn) == 1)
-        Append_Token_String(tokens, ",ONLY:");
+        Append_Token_String(tokens, ",only:");
      else 
         Append_Token_String(tokens, ",");
 
