@@ -5149,8 +5149,10 @@ void    ichar_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
+#if 0
    res_exp_desc->type_idx = type_idx;
    res_exp_desc->linear_type = TYP_LINEAR(type_idx);
+# endif
 
    if ((OPND_FLD(arg_info_list[info_idx1].ed.char_len) == CN_Tbl_Idx) &&
        (CN_INT_TO_C(OPND_IDX(arg_info_list[info_idx1].ed.char_len)) != 1)) {
@@ -5158,6 +5160,7 @@ void    ichar_intrinsic(opnd_type     *result_opnd,
                IR_COL_NUM(ir_idx));
    }
 
+#if 0
 
    if (IL_FLD(list_idx1) == CN_Tbl_Idx && 
        folder_driver((char *)&CN_CONST(IL_IDX(list_idx1)),
@@ -5184,7 +5187,9 @@ void    ichar_intrinsic(opnd_type     *result_opnd,
       COPY_OPND(IR_OPND_L(ir_idx), IR_OPND_R(ir_idx));
       IR_OPND_R(ir_idx) = null_opnd;
    }
-
+#endif
+      res_exp_desc->constant = FALSE;
+      res_exp_desc->foldable = FALSE;
 
    TRACE (Func_Exit, "ichar_intrinsic", NULL);
 
