@@ -102,7 +102,7 @@ static size_t GET_STRIDE_FROM_DESC(DopeVectorType * array, int32_t dim)
 
 #define MK_STRIDE(byte_aligned,typ_sz)  \
      ((byte_aligned || typ_sz == 1) ?   \
-	 (str_sz = typ_sz)          :   \
+	 (typ_sz)                   :   \
            ((typ_sz == 2)           ?   \
   	   (typ_sz/(BYTES_PER_WORD/2)) :\
 	      (typ_sz/BYTES_PER_WORD)))
