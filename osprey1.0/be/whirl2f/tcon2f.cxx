@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: tcon2f.c
- * $Revision: 1.9 $
- * $Date: 2003-07-14 22:04:15 $
+ * $Revision: 1.10 $
+ * $Date: 2003-12-09 16:17:53 $
  *
  * Revision history:
  *  27-Apr-95 - Original Version
@@ -253,14 +253,14 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object
 	 max_strlen = (Get_Maximum_Linelength()*2)/3;
 	 strlen = Targ_String_Length(tvalue);
 	 strbase = Targ_String_Address(tvalue);
-         if (object_ty!=NULL)
+         if (object_ty)
              seg_length =  TY_size(object_ty);
          else
              seg_length = max_strlen;
 
          str = (char *) alloca(seg_length + 1);
 
-         if (object_ty!=NULL ) {         
+         if (object_ty) {         
 	         if (max_strlen > 0 && seg_length < strlen)
 	            {
 	               /* We need to split the string constant into substrings */
@@ -398,5 +398,5 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object
 void
 TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
 {
-   TCON2F_translate(tokens,tvalue,is_logical,NULL);
+   TCON2F_translate(tokens,tvalue,is_logical,0);
 } 

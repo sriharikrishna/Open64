@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.25 $
- * $Date: 2003-12-08 22:00:56 $
+ * $Revision: 1.26 $
+ * $Date: 2003-12-09 16:17:53 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,10 +86,11 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.25 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.26 $";
 #endif
 
 #include <ctype.h>
+#include <set>
 #include "whirl2f_common.h"
 #include "PUinfo.h"
 #include "tcon2f.h"
@@ -101,6 +102,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "be_symtab.h"
 #include "unparse_target.h"
 #include "ty_ftn.h"
+
+typedef std::set<int> PARMSET;
 
  /* Defined in ty2f.c; signifies special translation of adjustable and
   * assumed sized arrays.
@@ -717,6 +720,38 @@ ST2F_decl_translate(TOKEN_BUFFER tokens, const ST *st)
    ST2F_Decl_Handler[ST_sym_class(st)](tokens, (ST *) st);
 } 
 
+static void
+collectst(WN *wn,PARMSET &tempset)
+ {
+
+   if (!wn) return;
+
+   if (WN_opc_operator(wn) == OPR_LDID ||
+       WN_opc_operator(wn) == OPR_LDA)
+      tempset.insert(WN_st_idx(wn));
+   else
+     for (INT32 kidnum = 0; kidnum < WN_kid_count(wn); kidnum++)
+       collectst(WN_kid(wn, kidnum),tempset);
+   return;
+ }
+
+
+static void GetStSet(ST_IDX bnd,PARMSET &tempset)
+{
+   WN * stmt;
+   WN *first_stmt = WN_first(PU_Body);
+   WN kid;
+
+   stmt = first_stmt;
+   while ((stmt !=NULL)&&((WN_operator(stmt)!=OPR_STID)
+                           ||(WN_operator(stmt) ==OPR_STID)
+                           &&strcmp(ST_name(WN_st(stmt)),ST_name(ST_ptr(bnd)))))
+
+       stmt = WN_next(stmt);
+
+  if (stmt && WN_kid(stmt,0))
+     collectst(WN_kid(stmt,0),tempset);
+}
 
 void ReorderParms(ST **parms,INT32 num_params)
 {
@@ -725,10 +760,11 @@ void ReorderParms(ST **parms,INT32 num_params)
   ST_IDX bdindex;
   TY_IDX ty_index;
   ST_IDX real_index;
+  PARMSET::iterator runner;
 
-  std::set<int>dependset[num_params];
+  PARMSET dependset[num_params];
   std::map<ST_IDX,int>  st_idx_to_parms;
-  std::set<int> workset;
+  PARMSET  workset,tempst;
 
   workset.clear();
   reorder_parms = (ST **)alloca((num_params + 1) * sizeof(ST *));
@@ -754,19 +790,26 @@ void ReorderParms(ST **parms,INT32 num_params)
               if (!ARB_const_lbnd(arb)){
                  bdindex = ARB_lbnd_var(arb);
                  if (ST_is_temp_var(St_Table[bdindex])){
-                     ST * tempst =GetTmpVarTransInfo(NULL,bdindex,PU_Body);
-		     real_index = tempst->st_idx;
-                     if (st_idx_to_parms[real_index]!=i)
-                         dependset[i].insert(st_idx_to_parms[real_index]);
+                     GetStSet(bdindex,tempst);
+                     runner = tempst.begin();
+                     while (runner != tempst.end()){
+                     if (st_idx_to_parms[*runner]!=i)
+                         dependset[i].insert(st_idx_to_parms[*runner]);
+                      ++runner;
+                    }
                   }
                  }
+
               if (!ARB_const_ubnd(arb)){
                  bdindex = ARB_ubnd_var(arb);
                  if (ST_is_temp_var(St_Table[bdindex])){
-                     ST * tempst=GetTmpVarTransInfo(NULL,bdindex,PU_Body);
-		     real_index = tempst->st_idx;
-                     if (st_idx_to_parms[real_index]!=i)
-                        dependset[i].insert(st_idx_to_parms[real_index]);
+                     GetStSet(bdindex,tempst);
+                     runner = tempst.begin();
+                     while (runner != tempst.end()){
+                     if (st_idx_to_parms[*runner]!=i)
+                         dependset[i].insert(st_idx_to_parms[*runner]);
+                      ++runner;
+                    }
                   }
                  }
                }
@@ -787,8 +830,7 @@ void ReorderParms(ST **parms,INT32 num_params)
     }
   }
 
-  std::set<int>::iterator runner;
-  std::set<int>::iterator cleaner;
+  PARMSET::iterator cleaner;
  
   INT32 size = workset.size()+1;
   while (!workset.empty() && size )
@@ -809,6 +851,17 @@ void ReorderParms(ST **parms,INT32 num_params)
    }
   size--;
  }
+
+//tempory for interface has temp variable but there is no assginment
+// statement kept in the interface block  
+  if (!workset.empty()){
+   runner = workset.begin();
+   while (runner != workset.end()){
+      reorder_parms[keep] = parms[*runner];
+      runner++;
+      keep++;
+   }
+  }
 
   reorder_parms[keep] = NULL;
   for(INT32 k=0; k<num_params; k++)

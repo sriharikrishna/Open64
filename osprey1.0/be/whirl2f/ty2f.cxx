@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.19 $
- * $Date: 2003-12-08 22:00:56 $
+ * $Revision: 1.20 $
+ * $Date: 2003-12-09 16:17:53 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -131,7 +131,7 @@ WN2F_Append_Purple_Xsym(TOKEN_BUFFER tokens, ST *st)
 
 
 
-static ST *
+static void
 WN2F_tempvar_rhs(TOKEN_BUFFER tokens,
                  WN * wn)
 {
@@ -144,18 +144,16 @@ WN2F_tempvar_rhs(TOKEN_BUFFER tokens,
           WN2F_translate(rhs_tokens, WN_kid0(wn), context);
           Append_And_Reclaim_Token_List(tokens, &rhs_tokens);
        }
-     return WN_st(WN_kid0(wn));
 }
 
 
-ST * 
+static BOOL
 GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
                    ST_IDX         arbnd,
                    WN*            wn)
 {
    WN * stmt;
    WN *first_stmt;
-   ST *rst;
 
    first_stmt = WN_first(wn);
    stmt = first_stmt;
@@ -165,15 +163,12 @@ GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
 
        stmt = WN_next(stmt);
  
-   if(stmt){
-      rst = WN_st(WN_kid0(stmt));
-      if(ST_is_temp_var(rst))
-          stmt = find_stmt(rst,first_stmt);
-     }
 
-   if ( stmt)
-        return WN2F_tempvar_rhs(decl_tokens,stmt);
-   else return ST_ptr(arbnd);
+   if ( stmt){
+        WN2F_tempvar_rhs(decl_tokens,stmt);
+         return TRUE;
+      }
+   else return FALSE;
 
 }
 

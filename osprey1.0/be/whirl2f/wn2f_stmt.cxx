@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.28 $
- * $Date: 2003-12-08 22:00:56 $
+ * $Revision: 1.29 $
+ * $Date: 2003-12-09 16:17:53 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.28 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.29 $";
 #endif
 
 #include <alloca.h>
@@ -1907,7 +1907,7 @@ WN2F_do_loop(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       WHIRL2F_Append_Comment(
          tokens, 
 	 Concat2_Strings("LOOPINFO #",
-			 WHIRL2F_number_as_name((UINT64)loop_info)),
+			 WHIRL2F_number_as_name((UINT32)loop_info)),
 	 1,
 	 1);
 
