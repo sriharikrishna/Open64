@@ -4164,21 +4164,20 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
          case CHECK_CONTIG_FLAG :
 
+# if 0  /* we don't need change the representation about pointer argument 
+           in source lever---fzhao*/
             if (! io_call &&
                 arg_info_list[info_idx].ed.rank != 0) {
                /* Caution about a potential COPY IN situation!! */
 
                PRINTMSG(line, 1438, Caution, col, "possible copy in and out");
             }
-# if 0 /*Oct*/
             if (arg_info_list[info_idx].ed.section) {
                save_array_syntax_subscripts(list_idx);
             }
-# endif /*Oct*/
 
             /* generate address temp */
 
-# if 0
 # if defined(GENERATE_WHIRL)
             NTR_IR_LIST_TBL(false_list_idx);
             NTR_IR_TBL(false_parm_idx);
@@ -4189,7 +4188,6 @@ boolean final_arg_work(opnd_type	*list_opnd,
             COPY_OPND(IR_OPND_L(false_parm_idx), IL_OPND(list_idx));
             IL_FLD(false_list_idx) = IR_Tbl_Idx;
             IL_IDX(false_list_idx) = false_parm_idx;
-# endif
 # endif
             addr_tmp_idx = gen_compiler_tmp(line, col, Priv, TRUE);
 
@@ -4249,14 +4247,12 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
             contig_test_ir_idx    = present_idx;
 
-# if 0
             OPND_FLD(opnd) = CN_Tbl_Idx;
             OPND_IDX(opnd) = CN_INTEGER_ZERO_IDX;
             OPND_LINE_NUM(opnd) = line;
             OPND_COL_NUM(opnd) = col;
 
             gen_internal_call_stmt("DUMP", &opnd, Before);
-# endif
 
             /* set address temp = address from dope vector or */
             /* loc (base subtree).         Before             */
@@ -4299,7 +4295,6 @@ boolean final_arg_work(opnd_type	*list_opnd,
             }
 # endif
 
-/* Can't use this because of pdgcs problems 
                NTR_IR_TBL(ir_idx);
                IR_OPR(ir_idx)   = Dv_Access_Base_Addr;
                IR_TYPE_IDX(ir_idx) = SA_INTEGER_DEFAULT_TYPE;
@@ -4307,7 +4302,6 @@ boolean final_arg_work(opnd_type	*list_opnd,
                IR_COL_NUM(ir_idx)  = col;
 
                COPY_OPND(IR_OPND_L(ir_idx), dv_opnd);
-*/
 
             IR_FLD_R(asg_idx) = IR_Tbl_Idx;
             IR_IDX_R(asg_idx) = ir_idx;
@@ -4324,14 +4318,12 @@ boolean final_arg_work(opnd_type	*list_opnd,
             true_start_sh_idx2 = curr_stmt_sh_idx;
             true_end_sh_idx2 = SH_NEXT_IDX(curr_stmt_sh_idx);
 
-# if 0
             OPND_FLD(opnd) = CN_Tbl_Idx;
             OPND_IDX(opnd) = CN_INTEGER_ONE_IDX;
             OPND_LINE_NUM(opnd) = line;
             OPND_COL_NUM(opnd) = col;
 
             gen_internal_call_stmt("DUMP", &opnd, Before);
-# endif
 
             /* capture bounding stmts before curr_stmt_sh_idx */
             false_start_sh_idx = SH_PREV_IDX(curr_stmt_sh_idx);
@@ -4436,7 +4428,6 @@ boolean final_arg_work(opnd_type	*list_opnd,
                         line,
                         col);
                         
-# if 0
             OPND_FLD(opnd) = CN_Tbl_Idx;
             OPND_IDX(opnd) = CN_INTEGER_ONE_IDX;
             OPND_LINE_NUM(opnd) = line;
@@ -4444,7 +4435,6 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
             gen_internal_call_stmt("DUMP", &opnd, After);
             curr_stmt_sh_idx = SH_PREV_IDX(curr_stmt_sh_idx);
-# endif
 
 
             /* generate if (!contig) test After */
@@ -4478,8 +4468,9 @@ boolean final_arg_work(opnd_type	*list_opnd,
             IL_IDX(list_idx) = addr_tmp_idx;
             IL_LINE_NUM(list_idx) = line;
             IL_COL_NUM(list_idx)  = col;
-
+#endif 
             break;
+
       }
 
       dummy_idx++;
