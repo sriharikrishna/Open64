@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.22 $
- * $Date: 2004-03-03 18:25:49 $
- * $Author: fzhao $
+ * $Revision: 1.23 $
+ * $Date: 2004-05-28 15:16:59 $
+ * $Author: eraxxon $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -886,10 +886,12 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   WN * len;
   INT32 association;
 
+  INT32 num_null_args = 0;
+
   /* figure # of args, including character lengths, clear return temp ST */
 
   nargs  = num_args + cwh_stk_count_STRs(num_args) ; 
-  clen   = nargs ;
+  clen   = nargs;
   rt     = NULL;
 
   args = (WN **) malloc(nargs*sizeof(WN *));
@@ -928,13 +930,22 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
       keepty = ta;   
       wa = cwh_stk_pop_WN();
       if (wa) {
-         if   (WNOPR(wa)==OPR_ARRAYEXP  ||
-                     WNOPR(wa)==OPR_PAREN )
-                wa = cwh_intrin_wrap_value_parm(wa);  
-          else wa = cwh_intrin_wrap_ref_parm(wa,ta);
-
-      if (keepty)
-            WN_set_ty(wa,keepty);
+	if   (WNOPR(wa)==OPR_ARRAYEXP  ||
+	      WNOPR(wa)==OPR_PAREN )
+	  wa = cwh_intrin_wrap_value_parm(wa);  
+	else wa = cwh_intrin_wrap_ref_parm(wa,ta);
+	
+	if (keepty)
+	  WN_set_ty(wa,keepty);
+      } else {
+	/* eraxxon: we have been given a null WN as an argument and it
+	   should _not_ be transmitted to a WHIRL CALL.  It would seem
+	   that we have been given garbage input, but after stepping
+	   through the code and seeing the above guard, such input
+	   seems to be possible.  Therefore, we will need to adjust
+	   the argument count so we do not create a WHIRL call with a
+	   null argument. */
+	num_null_args++;
       }
 
       args[k] = wa;
@@ -963,15 +974,15 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
     default:
       DevAssert((0),("Odd call actual")) ; 
     }
-
-/* set the dummy-actual arguments association flags*/
-
+    
+    
+    /* set the dummy-actual arguments association flags */
     association = arg_association_info.top(); 
     arg_association_info.pop();
 
-   if (args[k])
+    if (args[k]) {
       switch (association) {
- 
+	
  	case PASS_ADDRESS:
              WN_Set_Parm_Pass_Address(args[k]);
             break; 
@@ -1008,9 +1019,29 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
         default:
             break;
       }
-
+    }
   }
-  
+
+
+  /* eraxxon: adjust argument count if we have a NULL WN as an argument */
+  if (num_null_args > 0) {
+    int num_null_args_at_end = 0;
+    for (int i = num_args - 1; i >= 0; --i) {
+      if (!args[i]) {
+	num_null_args_at_end++;
+      } else {
+	break;
+      }
+    }
+    
+    /* we only handle trailing null args */
+    DevAssert((num_null_args_at_end == num_null_args),
+	      ("Non-trailing NULL args for CALL. Yuck!"));
+    nargs -= num_null_args;
+    num_args -= num_null_args;
+  }
+
+
   /* Function returning character? Reorder to get   */
   /* length of function result as 2nd argument.     */
   /* Function returning struct by value? Delete     */
@@ -1021,16 +1052,16 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   st = cwh_stk_pop_ST(); 
   ts = ty ;
   tr = ty ;
- if (st) { 
-  if (ST_class(st) != CLASS_FUNC) {  /* Must be indirect call, so ptr to */
-                                     /* function. Get function type      */
-
-     DevAssert((TY_kind(ST_type(st)) == KIND_POINTER && 
-		TY_kind(TY_pointed(ST_type(st))) == KIND_FUNCTION),
+  if (st) { 
+    if (ST_class(st) != CLASS_FUNC) {  /* Must be indirect call, so ptr to */
+                                       /* function. Get function type      */
+      
+      DevAssert((TY_kind(ST_type(st)) == KIND_POINTER && 
+		 TY_kind(TY_pointed(ST_type(st))) == KIND_FUNCTION),
                 ("Odd ST"));
-
-     tr = TY_ret_type(TY_pointed(ST_type(st)));
-  }
+      
+      tr = TY_ret_type(TY_pointed(ST_type(st)));
+    }
 
 # if 0
   if (ST_auxst_has_rslt_tmp(st) || cwh_types_is_character(tr)) {
@@ -1066,6 +1097,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   }
   
 # endif
+
 
   /* create call (or indirect call if dummy procedure)  */
 
