@@ -1989,9 +1989,9 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
          cvrt_exp_to_pdg(IR_IDX_L(ir_idx), 
                          IR_FLD_L(ir_idx));
 
-         list_idx1 = IR_IDX_R(ir_idx);
-         list_idx2 = IL_NEXT_LIST_IDX(list_idx1);
-         list_idx3 = IL_NEXT_LIST_IDX(list_idx2);
+         list_idx1 = IR_IDX_R(ir_idx);            /* num cases */
+         list_idx2 = IL_NEXT_LIST_IDX(list_idx1); /* branch around label */
+         list_idx3 = IL_NEXT_LIST_IDX(list_idx2); /* default label */
 
          if (IR_LIST_CNT_R(ir_idx) == 2) {
             list_idx3 = list_idx2;
@@ -1999,6 +1999,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
 
          send_attr_ntry(IL_IDX(list_idx3));
          big_int	= CN_INT_TO_C(IL_IDX(list_idx1));
+
 
          PDG_DBG_PRINT_START    
          PDG_DBG_PRINT_C("fei_new_select");
@@ -2008,11 +2009,13 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
          PDG_DBG_PRINT_VD("(1) num cases", big_int);
 #endif
          PDG_DBG_PRINT_LD("(2) default label", PDG_AT_IDX(IL_IDX(list_idx3)));
+         PDG_DBG_PRINT_LD("(3) br around lbl", PDG_AT_IDX(IL_IDX(list_idx2)));
          PDG_DBG_PRINT_END    
 
 # ifdef _ENABLE_FEI
          fei_new_select(big_int,
-                        PDG_AT_IDX(IL_IDX(list_idx3)));
+                        PDG_AT_IDX(IL_IDX(list_idx3)), 
+			PDG_AT_IDX(IL_IDX(list_idx2)));
 # endif
          break;
 
