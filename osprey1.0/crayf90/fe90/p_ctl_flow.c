@@ -5152,10 +5152,6 @@ static boolean change_subscript(opnd_type	*top_opnd)
    }
    else if (OPND_FLD((*top_opnd)) == AT_Tbl_Idx) {
 
-/* need to think about adding Triplet_Opr under 
- * The operator "Alloc_Obj_Opr" then later
- * we can change "Alloc_Obj_Opr" to be "Subscript_Opr" 
- * before go through the CVT_PDG part ---fzhao*/
 
       NTR_IR_TBL(ir_idx);
       IR_OPR(ir_idx)        = (allocate ? Alloc_Obj_Opr : Dealloc_Obj_Opr);
@@ -5167,7 +5163,6 @@ static boolean change_subscript(opnd_type	*top_opnd)
 
       OPND_FLD((*top_opnd)) = IR_Tbl_Idx;
       OPND_IDX((*top_opnd)) = ir_idx;
-/*till here fzhao Dev*/
 
    }
    else if (OPND_FLD((*top_opnd)) == IR_Tbl_Idx) {
@@ -5178,7 +5173,7 @@ static boolean change_subscript(opnd_type	*top_opnd)
          case Subscript_Opr :
 
             if (allocate) {
-              IR_OPR(ir_idx) = Alloc_Obj_Opr; /*get back--fzhao Dec */
+              IR_OPR(ir_idx) = Alloc_Obj_Opr; 
                list_idx = IR_IDX_R(ir_idx);
 
                while (list_idx != NULL_IDX) {
@@ -5187,7 +5182,7 @@ static boolean change_subscript(opnd_type	*top_opnd)
                       IR_OPR(IL_IDX(list_idx)) == Triplet_Opr) {
 
                      ir_idx                = IL_IDX(list_idx);
-#if 0 /*fzhao Jan */
+#if 0 /*fzhao */
                      IL_FLD(list_idx)      = IL_Tbl_Idx;
                      IL_LIST_CNT(list_idx) = 2;
                      IL_IDX(list_idx)      = IR_IDX_L(ir_idx);
@@ -5229,10 +5224,10 @@ static boolean change_subscript(opnd_type	*top_opnd)
                      }
    
 /*                     FREE_IR_NODE(ir_idx); */
-/*                     FREE_IR_NODE(ir_idx); fzhao Dec*/
+/*                     FREE_IR_NODE(ir_idx); fzhao */
       
 /*                     IL_NEXT_LIST_IDX(list2_idx) = NULL_IDX; */
-/*                     IL_NEXT_LIST_IDX(list2_idx) = NULL_IDX; fzhao Dec */
+/*                     IL_NEXT_LIST_IDX(list2_idx) = NULL_IDX; fzhao */
  
                   }
                   list_idx = IL_NEXT_LIST_IDX(list_idx);
@@ -5249,8 +5244,7 @@ static boolean change_subscript(opnd_type	*top_opnd)
          case Struct_Opr    :
 
             /* implies right opnd is AT */
-/* fzhao  Dec            NTR_IR_TBL(ir2_idx); */
-            NTR_IR_TBL(ir2_idx); /*fzhao  Dec */
+            NTR_IR_TBL(ir2_idx); 
 
             IR_OPR(ir2_idx)        = (allocate ? Alloc_Obj_Opr : 
                                                  Dealloc_Obj_Opr);
@@ -5262,7 +5256,7 @@ static boolean change_subscript(opnd_type	*top_opnd)
      
             OPND_FLD((*top_opnd))  = IR_Tbl_Idx;
             OPND_IDX((*top_opnd))  = ir2_idx;
-/* fzhao  Dec */
+
             break;
             
          case Substring_Opr :

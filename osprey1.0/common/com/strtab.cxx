@@ -144,54 +144,46 @@ union UNALIGN_INT32
 
 struct CHARACTER_ARRAY
 {
+  //----------------------------------------------------------------------
+  // IMPORTANT NOTE:
+  //
+  // the character array data structure keeps a length field as its first
+  // byte. this length should be interpreted as an unsigned number.
+  //
+  // some compilers (e.g. Sun's CC) sign extend "char" types so an "unsigned
+  // char" type is needed to ensure that the length is not interpreted 
+  // as a negative number. We defined the UC macro to cast the signed "char"
+  // type to an unsigned char so that it is properly interpreted as a 
+  // 8-bit unsigned number.
+  //
+  // Fengmei Zhao and John Mellor-Crummey, Rice University
+  //----------------------------------------------------------------------
+#define UC(x) ((unsigned char)(x))
+
   // If the character array is less then 0xff bytes, we store the size in
   // The First Byte Followed By The Array.  Otherwise, The First Byte Is Set
   // To 0xff And The Next 4 Bytes Hold The Size Of The Array As An Unsigned
   // Integer, And The Array Follows.
 
   static const char *get_str (const char *buffer) {
-    if (*buffer != 0xff)
+    if (UC(*buffer) != 0xff)
       return buffer + 1;
-    else
+    else 
       return buffer + sizeof(UINT32) + 1;
   }
 
   static char *get_str (char *buffer) {
-    if (*buffer != 0xff)
+    if (UC(*buffer) != 0xff)
       return buffer + 1;
-    else
+    else 
       return buffer + sizeof(UINT32) + 1;
   }
 
   static UINT32 get_length (const char *buffer) {
-    if (*buffer != 0xff)
+    if (UC(*buffer) != 0xff)
 
-      // Solaris workaround
-      // Solaris CC treats "char" and "unsigned char" differently! Actually here
-      // buffer is treated as "signed char", so when buffer >= 128, it treats
-      // buffer as a negative number, and later when it returns buffer to an
-      // "unsigned integer", that integer becomes a HUGE number.
-      // IRIX compiler seems to default "char" as "unsigned char".
-      // This bug only causes problem when length >= 128, for example, when
-      // running "ir_b2a heat.B".
-      //
-      // change char to unsigned char should solve this problem!
-      // Don't know how many other places still have this kind of problem!
-      //
-      // clovis@par.univie.ac.at:
-      // I tested in Sparc+Solaris (cc and gcc) and Pentium+Linux (gcc), and 
-      // the default was always "signed char". Following the recommendation of 
-      // gcc man page, I'm casting *buffer to "unsigned char", independently of
-      // platform and compiler
-      return (unsigned char)*buffer;
-    //#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-    //{           
-    //	    unsigned char c = *buffer;
-    //	    return c;
-    //}
-    //#else
-    //	    return *buffer;
-    //#endif
+
+      return UC(*buffer);
     else {
       UNALIGN_INT32 unalign (buffer + 1);
       return unalign.n;
@@ -202,7 +194,8 @@ struct CHARACTER_ARRAY
     return length < 0xff ? length + 1 : length + 1 + sizeof(UINT32);
   }
 
-  static void copy (const char *str, UINT32 length, char *buffer) {
+  static void copy (const char *str, UINT32 length, char *buffer_) {
+    unsigned char *buffer = (unsigned char *) buffer_;
     if (length < 0xff) {
       *buffer++ = length;
     } else {

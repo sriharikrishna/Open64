@@ -865,8 +865,11 @@ Edition 42:
 
 
 static char USMID [] = "\n%Z%%M%	%I%	%G% %U%\n";
-static char rcsid [] = "$Id: edition.c,v 1.2 2002-07-18 17:31:13 fzhao Exp $";
+static char rcsid [] = "$Id: edition.c,v 1.3 2003-02-20 01:53:11 fzhao Exp $";
 /* $Log: not supported by cvs2svn $
+ * Revision 1.2  2002/07/18 17:31:13  fzhao
+ * nothing important,remove nested common symbol.
+ *
  * Revision 1.1.1.1  2002/05/22 20:06:18  dsystem
  * Initial import
  *

@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.11 $
- * $Date: 2003-01-13 16:11:16 $
+ * $Revision: 1.12 $
+ * $Date: 2003-02-20 01:51:32 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -4376,7 +4376,7 @@ cwh_stmt_conformance_checks_walk (WN *tree, WN *stmt, WN *block, WN ** sizes, IN
 	 cwh_stmt_conformance_checks_walk (WN_kid(tree,i), stmt, block, NULL, NULL);
        }
        if (sizes) {
-//fzhao try????Oct	 F90_Size_Walk(tree,ndim,sizes);
+//fzhao    F90_Size_Walk(tree,ndim,sizes);
        }
        break;
 

@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.14 $
- * $Date: 2003-01-13 16:11:16 $
+ * $Revision: 1.15 $
+ * $Date: 2003-02-20 01:51:32 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.14 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.15 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -380,7 +380,7 @@ fei_proc_def(char         *name_string,
     Set_PU_is_mainpu(pu);
     Set_PU_no_inline(pu);
 
-# if 0 /*fzhao:don't need generate this extra symbal table entry for main pgrogam */
+# if 0 /*fzhao:don't generate this extra symbal table entry for main pgrogam !*/
     Main_ST = NULL;
 
     if (strcmp(crayf90_def_main,ST_name(st)) != 0) {
@@ -447,9 +447,8 @@ fei_proc_def(char         *name_string,
     cwh_stab_pu_has_globals = FALSE;
 
 /* Since we need use this function to get interface block information   */
-/* we have to keep blocks un_initialize when we get PUs in interface,   */
-/* but don't know if there is problem if comment out this function call */
-/* completely,will think about it later ----fzhao                       */
+/* we have to keep blocks un_initialize when we get PUs in interface    */
+/* fzhao@rice.edu							*/
 
     if (!test_flag(flags,FEI_PROC_IN_INTERFACE))
            cwh_block_init_pu();
@@ -613,7 +612,7 @@ fei_proc_imp(INT32 lineno,
   switch (Class) {
   case PDGCS_Proc_Imported:      /* external subroutine */
   case PDGCS_Proc_Intern_Ref:
-  case PDGCS_Proc_SrcIntrin: /* fzhao add June*/
+  case PDGCS_Proc_SrcIntrin:  /*PU is intrinsic function*/
     
     st = cwh_auxst_find_item(Top_Text,name_string);
 
@@ -633,7 +632,6 @@ fei_proc_imp(INT32 lineno,
       if (Class == PDGCS_Proc_Intern_Ref ||
           Class == PDGCS_Proc_SrcIntrin )
      {                              /*add PDGCS_Proc_SrcIntrin for intrinsics*/
-                                    /* June fzhao*/
 	level  = INTERNAL_LEVEL;
 	eclass = EXPORT_LOCAL_INTERNAL;
         
@@ -682,7 +680,7 @@ if (Class ==  PDGCS_Proc_Imported &&
     Set_ST_emit_symbol(st_local_cp);
     Set_ST_is_in_module(st);
     Set_ST_is_in_module(st_local_cp);
-   } //fzhao Nov
+   } 
 
   if (test_flag(flags, FEI_PROC_HASRSLT))
     Set_ST_auxst_has_rslt_tmp(st,TRUE) ;
@@ -1084,8 +1082,9 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   if (in_common || (sym_class == Name)||
                                 (test_flag(flag_bits, FEI_OBJECT_IN_MODULE))) {
 
-// fzhao add test_flag(flag_bits, FEI_OBJECT_IN_MODULE) to keep the initial 
-// variables in module still to be in global ST table --June
+/* add test_flag(flag_bits, FEI_OBJECT_IN_MODULE) to keep the initial  *
+ * variables in module still to be in global ST table --fzhao@rice.edu */
+
      st_level = GLOBAL_SYMTAB ;
 
   } else {
@@ -1111,7 +1110,7 @@ fm2 = test_flag(flag_bits,FEI_OBJECT_INNER_DEF);
   }
 
  if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE) &&
-          !PU_is_nested_func(Pu_Table[ST_pu(Scope_tab[CURRENT_SYMTAB].st)])) //fzhao June
+          !PU_is_nested_func(Pu_Table[ST_pu(Scope_tab[CURRENT_SYMTAB].st)])) 
      st1 = Scope_tab[CURRENT_SYMTAB].st;
  else st1 = st;
     

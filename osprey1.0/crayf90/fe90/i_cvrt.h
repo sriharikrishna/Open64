@@ -137,7 +137,8 @@ typedef unsigned long          INTPTR;
 #define FEI_PROC_DEFINITION       			26
 #define FEI_PROC_PARENT           			27
 #define FEI_PROC_IMPORTED         			28
-/* I need this bit -fzhao #define FEI_PROC_UNUSED_29        			29 */
+
+/* I need this bit -fzhao #define FEI_PROC_UNUSED_29    29 */
 #define FEI_PROC_MODULE                                 29
 
 /* #define FEI_PROC_UNUSED_30        			30 */

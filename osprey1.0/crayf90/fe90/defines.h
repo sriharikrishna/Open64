@@ -396,12 +396,14 @@
 #	define _D_LINES_SUPPORTED		1
 # endif
 
-/* #  fzhao add"_SOLARIS_SOLARIS" here on May ifdef _SGI_SGI  */
+/* Because on source level most things are platform independent*/
+/* add _SOLARIS_SOLARIS here    fzhao@rice.edu      	       */
+
 # if (defined(_SGI_SGI) || defined(_SOLARIS_SOLARIS) ) 
 #       define _ENABLE_FEI                      1
 #	define _HOST32				1
 #	define _TARGET32			1
-#	define _HOST_OS_IRIX			1
+/* #	define _HOST_OS_IRIX			1*/
 #	define _TARGET_OS_IRIX			1
 #	define _TARGET_IEEE			1
 #	define _DOPE_VECTOR_32_OR_64		1
@@ -441,12 +443,21 @@
 #	define GENERATE_WHIRL                   1
 # endif
 
+
+# if (defined(_SGI_SGI))
+#	define _HOST_OS_IRIX                  1
+# endif
+
+# if (defined(_SOLARIS_SOLARIS))
+#       define _HOST_OS_SOLARIS                 1
+# endif
+
 /*
  * Solaris porting of mfef90
  * define _ENABLE_FEI to 1 to allow FE to WHIRL conversion.
  * define COARRAY_FORTRAN to support co-array Fortran.
  */
-# if 0 /* fzhao get rid of it on May */
+# if 0 /* See _SGI_SGI   fzhao		*/
 # ifdef _SOLARIS_SOLARIS
 #       define _ENABLE_FEI                      1
 #       define COARRAY_FORTRAN                   1

@@ -6208,7 +6208,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
        if (IR_OPR(ir_idx) == Whole_Subscript_Opr) {
              is_subscript = FALSE; 
              nested_array = FALSE;
-             break;  /* fzhao Oct*/
+             break;  /* fzhao */
         }
 
      

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.20 $
- * $Date: 2003-02-19 20:15:35 $
+ * $Revision: 1.21 $
+ * $Date: 2003-02-20 01:53:29 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.21 $";
 #endif
 
 #include <alloca.h>
@@ -2729,6 +2729,16 @@ fmtry =  TY_mtype(arg_ty); // fzhao Jan try
          
    Append_Token_Special(call_tokens, '(');
    set_WN2F_CONTEXT_no_parenthesis(context);
+
+//WARNING
+ /* tempoarily add a piece of code for processiong optinal arguments
+  * in intrinsic function "system_clock".
+  * will change later to process all intrinsic functions with optional arguments
+  * fzhao----- Feb19
+  */
+
+ if (strcmp(ST_name(WN_st(wn)),"SYSTEM_CLOCK") != 0) {
+
    for (arg_idx = first_arg_idx, implicit_args = 0; 
 	arg_idx <= last_arg_idx - implicit_args; 
 	arg_idx++)
@@ -2849,7 +2859,7 @@ fmtry =  TY_mtype(arg_ty); // fzhao Jan try
 
      if ((arg_idx+implicit_args) < (last_arg_idx-1) && WN_kid(wn, arg_idx)!=NULL)
           ;
-//Nov          Append_Token_Special(call_tokens, ',');
+//          Append_Token_Special(call_tokens, ',');
      else 
       if ((arg_idx+implicit_args) == (last_arg_idx-1)) { 
         if (WN_operator(wn) == OPR_CALL &&
@@ -2869,10 +2879,38 @@ fmtry =  TY_mtype(arg_ty); // fzhao Jan try
                ;
 
            /* argument could be "optional" argument,so there could be NULL wn */
-//Nov              Append_Token_Special(call_tokens, ',');
+//              Append_Token_Special(call_tokens, ',');
       }
     }
    }
+ } /*not system_clock*/
+  else /* here for system clock*/
+   {
+    arg_idx = 0;  
+    if (WN_kid(wn, arg_idx)!=NULL) {
+    first_nonemptyarg =TRUE;
+    Append_Token_String(call_tokens,"count=");
+    WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+     };
+    arg_idx++;
+    if (WN_kid(wn, arg_idx)!=NULL) {
+    if (first_nonemptyarg)
+        Append_Token_Special(call_tokens, ',');
+    else
+        first_nonemptyarg = TRUE;
+    Append_Token_String(call_tokens,"count_rate=");
+    WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+     };
+    arg_idx++;
+    if (WN_kid(wn, arg_idx)!=NULL) {
+      if (first_nonemptyarg)
+          Append_Token_Special(call_tokens, ',');
+      else first_nonemptyarg =TRUE;
+    Append_Token_String(call_tokens,"count_max=");
+    WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+    }
+
+ }
  
    reset_WN2F_CONTEXT_no_parenthesis(context);
    reset_WN2F_CONTEXT_has_no_arr_elmt(context);

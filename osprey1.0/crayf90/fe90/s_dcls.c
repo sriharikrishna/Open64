@@ -118,7 +118,7 @@ static	void	gen_word_align_byte_length_ir(opnd_type *);
 static	void	gen_multiple_automatic_allocate(int);
 # endif
 
-# if defined(GENERATE_WHIRL)
+# if (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
 # pragma inline create_equiv_stor_blk
 # else
 # pragma _CRI inline create_equiv_stor_blk
@@ -3871,7 +3871,6 @@ void	char_len_resolution(int		attr_idx,
                expr_arg_type	exp_desc;
                fold_clen_opr(&opnd, &exp_desc);
             }
-
             gen_sh(After,
                    Automatic_Base_Size_Stmt,
                    stmt_start_line,
@@ -3890,12 +3889,10 @@ void	char_len_resolution(int		attr_idx,
                                  Priv);
    
             COPY_OPND(IR_OPND_R(ir_idx), opnd);      /* IR_OPND_R = opnd */
-
-            SH_P2_SKIP_ME(curr_stmt_sh_idx)	= TRUE;
+            SH_P2_SKIP_ME(curr_stmt_sh_idx)	= TRUE; 
             SH_IR_IDX(curr_stmt_sh_idx)		= ir_idx;
             ATD_TMP_IDX(tmp_attr_idx)		= ir_idx;
             ATD_FLD(tmp_attr_idx)		= IR_Tbl_Idx;
-
             /* Create new entry, because each assumed sized darg has a     */
             /* different tmp to go with it.                                */
 
@@ -3914,7 +3911,6 @@ void	char_len_resolution(int		attr_idx,
                                     curr_stmt_sh_idx,
                                     FALSE,     /* Don't generate tmp = 0  */
                                     TRUE);     /* Advance ATP_FIRST_SH_IDX */
-
 
             break;
 
@@ -7701,13 +7697,14 @@ static	void	insert_sh_after_entries(int		attr_idx,
 
             SH_PREV_IDX(next_sh_idx)       = entry_sh_idx;
             SH_NEXT_IDX(entry_sh_idx)      = next_sh_idx;
-
+# if 0 /*fzhao Jan*/
             if (AT_OPTIONAL(attr_idx)) {
                gen_present_ir(attr_idx, 
                               SH_NEXT_IDX(ATP_FIRST_SH_IDX(entry_attr_idx)), 
                               entry_sh_idx);
                entry_sh_idx	= SH_NEXT_IDX(entry_sh_idx);
             }
+# endif
 
             if (advance_first_sh) {
                ATP_FIRST_SH_IDX(entry_attr_idx)    = entry_sh_idx;
@@ -7834,10 +7831,14 @@ static	void	insert_sh_after_entries(int		attr_idx,
       }
    }
    else if (AT_OPTIONAL(attr_idx)) {
+# if 0 /*fzhao Jan*/
       gen_present_ir(attr_idx, 
                      SH_NEXT_IDX(start_sh_idx), 
                      curr_stmt_sh_idx);
       curr_stmt_sh_idx	= SH_NEXT_IDX(curr_stmt_sh_idx);
+
+#endif
+;
    }
 
    TRACE (Func_Exit, "insert_sh_after_entries", NULL);
