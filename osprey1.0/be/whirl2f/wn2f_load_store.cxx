@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:56 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:35 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.2 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -220,10 +220,15 @@ WN2F_Expr_Plus_Literal(TOKEN_BUFFER tokens,
 	 Append_Token_Special(tokens, '(');
       }
       WN2F_translate(tokens, wn, context);
+
+# if 0 
+
       Append_Token_Special(tokens, '+');
       TCON2F_translate(tokens,
 		       Host_To_Targ(MTYPE_I4, 1),
 		       FALSE /*is_logical*/);
+# endif
+
       if (parenthesize)
 	 Append_Token_Special(tokens, ')');
    }
@@ -249,6 +254,8 @@ WN2F_Denormalize_Array_Idx(TOKEN_BUFFER tokens,
     * the value "v+1".  This denormalization moves the base of the
     * array from index zero to index one.
     */
+if (idx_expr==NULL) return EMPTY_WN2F_STATUS;
+
    if (WN_opc_operator(idx_expr) == OPR_ADD && 
        (WN_is_constant_expr(WN_kid1(idx_expr)) || 
 	WN_is_constant_expr(WN_kid0(idx_expr))))
@@ -359,7 +366,7 @@ WN2F_Denormalize_Array_Idx(TOKEN_BUFFER tokens,
    }
    else
    {
-      WN2F_Expr_Plus_Literal(tokens, idx_expr, 0LL, context);
+      WN2F_Expr_Plus_Literal(tokens, idx_expr, 0LL, context); 
    }
    return EMPTY_WN2F_STATUS;
 } /* WN2F_Denormalize_Array_Idx */
@@ -878,6 +885,7 @@ WN2F_stid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* See if we need to apply a "char" conversion to the rhs
     */
+
    if (TY_Is_Character_String(WN_ty(wn)) && 
        TY_Is_Integral(WN_Tree_Type(WN_kid0(wn))))
    {
@@ -1490,8 +1498,8 @@ WN2F_src_triplet(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
   WN2F_translate(tokens, kid0, context);
   Append_Token_Special(tokens, ':');
   WN2F_translate(tokens, kid1, context); 
-//  Append_Token_Special(tokens, ':');
-//  WN2F_translate(tokens, kid2, context); 
+  Append_Token_Special(tokens, ':');
+  WN2F_translate(tokens, kid2, context); 
   return EMPTY_WN2F_STATUS;
 
     }
@@ -1711,6 +1719,13 @@ void
 WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
 {
   INT32 dim;
+  WN * kidz;
+  INT32 co_dim;
+  INT32 array_dim;
+  ST * st;
+  ARB_HANDLE arb_base;
+   WN* kid;
+
 
   /* Gets bounds from the slots of an OPC_ARRSECTION node  */
 
@@ -1720,16 +1735,39 @@ WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL pare
    * expression represents array elements laid out in contiguous
    * memory locations.
    */
-   WN* kid;
+
+  kidz = WN_kid0(wn);
+  st  =  WN_st(kidz);
+  if (TY_Is_Pointer(ST_type(st)))
+      arb_base = TY_arb(TY_pointed(ST_type(st)));
+  else
+       arb_base = TY_arb(ST_type(st));
+  dim =  ARB_dimension(arb_base);
+  co_dim = ARB_co_dimension(arb_base);
+  if (co_dim <= 0)
+      co_dim = 0;
+
+  if (dim >  WN_num_dim(wn) ) {
+
+     array_dim = dim-co_dim;
+     co_dim = 0;
+ }
+ else {
+         dim =  WN_num_dim(wn);
+        array_dim = dim;
+       }
+
+
    if (WN_opc_operator(WN_array_index(wn, WN_num_dim(wn)-1))==OPR_SRCTRIPLET) 
       kid = WN_kid2(WN_array_index(wn, WN_num_dim(wn)-1));
 
+if (array_dim>0) {
   if (parens)
   {
     Append_Token_Special(tokens, '(');
     set_WN2F_CONTEXT_no_parenthesis(context);
   }
-
+# if 0 /* original code without thinking about co_array */
   for (dim = WN_num_dim(wn)-1; dim >= 0; dim--)
   {
     if (WN_opc_operator(WN_array_index(wn, dim))==OPR_SRCTRIPLET) {
@@ -1743,15 +1781,87 @@ WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL pare
     if (dim > 0)
       Append_Token_Special(tokens, ',');
   }
-
+# endif
+  for (dim = WN_num_dim(wn)-1; dim >= co_dim; dim--)
+  {
+    if (WN_opc_operator(WN_array_index(wn, dim))==OPR_SRCTRIPLET) {
+          WN2F_translate(tokens, WN_array_index(wn, dim), context);
+      }
+    else {
+    (void)WN2F_Denormalize_Array_Idx(tokens,
+                                     WN_array_index(wn, dim),
+                                     context);
+    }
+    if (dim > co_dim)
+      Append_Token_Special(tokens, ',');
+  }
   if (parens)
     Append_Token_Special(tokens, ')');
+}
+
+if (co_dim > 0) {
+
+    if (parens)
+    Append_Token_Special(tokens, '[');
+
+  for (dim = co_dim-1; dim >= 0; dim--)
+  {
+    if (WN_opc_operator(WN_array_index(wn, dim))==OPR_SRCTRIPLET) {
+          WN2F_translate(tokens, WN_array_index(wn, dim), context);
+      }
+    else {
+    (void)WN2F_Denormalize_Array_Idx(tokens,
+                                     WN_array_index(wn, dim),
+                                     context);
+    }
+    if (dim > 0)
+      Append_Token_Special(tokens, ',');
+  }
+
+
+  if (parens)
+    Append_Token_Special(tokens, ']');
+ }
 }
 
 void
 WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
 {
   INT32 dim;
+  WN * kid;
+  INT32 co_dim;
+  INT32 array_dim;
+  ST * st;
+  ARB_HANDLE arb_base;
+
+
+  /* get array's rank and co_rank information from kid0 of wn
+   * kid0 should be OPR_LDA
+   *coarray reference is legal without co_rank
+   *so we have to use dim plus kid_number to 
+   *see if there is co_rank or not
+   */
+
+  kid = WN_kid0(wn);
+  st  =  WN_st(kid);
+  if (TY_Is_Pointer(ST_type(st)))
+      arb_base = TY_arb(TY_pointed(ST_type(st)));
+   else
+      arb_base = TY_arb(ST_type(st));
+
+  dim =  ARB_dimension(arb_base);
+  co_dim = ARB_co_dimension(arb_base);
+  if (co_dim <= 0)
+      co_dim = 0;
+ if (dim >  WN_num_dim(wn) ) {
+
+     array_dim = dim-co_dim;
+     co_dim = 0;
+ }
+ else {
+         dim =  WN_num_dim(wn);
+       }
+
 
   /* Gets bounds from the slots of an OPC_ARRAY node  */
 
@@ -1762,11 +1872,12 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
    * memory locations.
    */
 
-  if (parens)
-  {
+
+ if (array_dim > 0 ) {
     Append_Token_Special(tokens, '(');
     set_WN2F_CONTEXT_no_parenthesis(context);
-  }
+
+# if 0 //this is original code without think about co_array
 
   for (dim = WN_num_dim(wn)-1; dim >= 0; dim--)
   {
@@ -1777,9 +1888,38 @@ WN2F_Array_Slots(TOKEN_BUFFER tokens, WN *wn,WN2F_CONTEXT context,BOOL parens)
     if (dim > 0)
       Append_Token_Special(tokens, ',');
   }
+# endif
 
-  if (parens)
+  for (dim =  WN_num_dim(wn)-1; dim >= co_dim; dim--)
+  {
+    (void)WN2F_Denormalize_Array_Idx(tokens,
+                                     WN_array_index(wn, dim),
+                                     context);
+       
+    if (dim > co_dim)
+      Append_Token_Special(tokens, ',');
+  }
+
+
     Append_Token_Special(tokens, ')');
+  } 
+  /* for co_rank */
+if (co_dim > 0) {
+
+  Append_Token_Special(tokens, '[');
+  for (dim =  co_dim-1; dim >= 0; dim--)
+  {
+    (void)WN2F_Denormalize_Array_Idx(tokens,
+                                     WN_array_index(wn, dim),
+                                     context);
+       
+    if (dim > 0)
+      Append_Token_Special(tokens, ',');
+  }
+
+    Append_Token_Special(tokens, ']');
+ 
+ }
 }
 
 void
@@ -1810,6 +1950,8 @@ WN2F_arrsection_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT
       /* We handle the case when an array is declared to have more
        * dimensions than that given by this array addressing expression.
        */
+# if 0 //we don't need this think about co_array
+
       if (TY_AR_ndims(array_ty) > WN_num_dim(wn))
         {
           /* Substitute in '1' for the missing dimensions */
@@ -1819,6 +1961,7 @@ WN2F_arrsection_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT
               Append_Token_String(tokens, "1");
             }
         }
+# endif
     }
   else /* Normalize array access to assume a single dimension */
     {
@@ -1840,9 +1983,10 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
    */
  
   INT32 dim;
+  WN  * kid; 
 
-  Append_Token_Special(tokens, '(');
-  set_WN2F_CONTEXT_no_parenthesis(context);
+//   Append_Token_Special(tokens, '(');
+//  set_WN2F_CONTEXT_no_parenthesis(context);
 
   if (TY_Is_Array(array_ty) && TY_AR_ndims(array_ty) >= WN_num_dim(wn))
     {
@@ -1860,9 +2004,14 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
 
       /* We handle the case when an array is declared to have more 
        * dimensions than that given by this array addressing expression.
+       * COMMENT ABOVE IS FROM ORIGINAL VERSION ,belowing added by zhao
+       * this could be happend when co_rank doesn't appear,don't need add
+       * 
        */
+#if 0 
       if (TY_AR_ndims(array_ty) > WN_num_dim(wn))
 	{
+     
 	  /* Substitute in '1' for the missing dimensions */
 	  for (dim = TY_AR_ndims(array_ty) - WN_num_dim(wn); dim > 0; dim--)
 	    {
@@ -1870,6 +2019,8 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
 	      Append_Token_String(tokens, "1");
 	    }
 	}
+#endif
+
     }
   else /* Normalize array access to assume a single dimension */
     {
@@ -1879,7 +2030,7 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
 
       WN2F_Normalize_Idx_To_Onedim(tokens, wn, context);
     }
-  Append_Token_Special(tokens, ')');
+//   Append_Token_Special(tokens, ')');
 }
 
 /*----------- Character String Manipulation Translation ---------------*/
@@ -1920,6 +2071,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
       base = WN_kid0(base);
    }
 
+
    if (WN_operator(base) == OPR_CVTL)  
    {
      /* probably CHAR(INT) within IO stmt. convert via CHAR & process rest elsewhere */
@@ -1930,7 +2082,8 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
       Append_Token_Special(tokens, ')');
       return;
    }
-   
+  
+ 
    /* Handle VCALLs specially, since the string information is given
     * by the first two arguments to the call.  Note that we can 
     * always assume a lower bound of zero for these, as we never 

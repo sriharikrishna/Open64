@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:56 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:33 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.2 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -196,6 +196,7 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
    const char  *st_name = W2CF_Symtab_Nameof_St(st);
    TOKEN_BUFFER decl_tokens = New_Token_Buffer();
    TY_IDX       ty_rt = ST_type(st);
+   ST *base;
 
    ASSERT_DBG_FATAL(ST_sym_class(st)==CLASS_VAR, 
 		    (DIAG_W2F_UNEXPECTED_SYMCLASS, 
@@ -207,8 +208,18 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
 		       (DIAG_W2F_DECLARE_RETURN_PARAM, "ST2F_decl_var"));
    }
 
+  base = ST_base(st);
+
+//  if (ST_sclass(st)==SCLASS_DGLOBAL && Stab_Is_Common_Block(base))
+//	goto INITPRO;
+
    /* Declare the variable */
-   if (Stab_Is_Common_Block(st))
+
+/* don't output ST_sclass(st) == SCLASS_DGLOBAL as common block      */
+/* keep only st sclass is SCLASS_COMMON as common block output June  */
+
+ if (Stab_Is_Common_Block(st))
+//  if (ST_sclass(st) == SCLASS_COMMON) 
    {
       /* Declare a common block */
       TY2F_Translate_Common(decl_tokens, st_name, ST_type(st));
@@ -350,12 +361,13 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
       Append_Token_String(tokens, st_name);
    }
 
+INITPRO:
    /* Generate a DATA statement for initializers */
    if (ST_is_initialized(st) && 
        !Stab_No_Linkage(st)  &&
-       (!TY_Is_Structured(ST_type(st)) ||
-	Stab_Is_Common_Block(st)       ||
-	Stab_Is_Equivalence_Block(st)))
+       (!TY_Is_Structured(ST_type(st)) || 
+	Stab_Is_Common_Block(st)       || 
+	Stab_Is_Equivalence_Block(st))) 
    {
       inito = Find_INITO_For_Symbol(st);
       if (inito != (INITO_IDX) 0)
@@ -456,6 +468,10 @@ ST2F_use_var(TOKEN_BUFFER tokens, ST *st)
        */
       Append_Token_String(tokens, 
 			  WHIRL2F_make_valid_name(ST_name(st),WN2F_F90_pu && !ST_is_temp_var(st)));
+     if  (Stab_Is_Based_At_Common_Or_Equivalence(st))
+           Set_BE_ST_w2fc_referenced((ST *)ST_base(st));
+     else
+           Set_BE_ST_w2fc_referenced(st); //June
    }
    else if (Stab_Is_Based_At_Common_Or_Equivalence(st))
    {
@@ -663,7 +679,8 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       Append_Token_Special(header_tokens, ')');
    }
    else if (!PU_is_mainpu(Get_Current_PU()) &&
-             !ST_is_in_module(st))   // module cannot have "()" 
+             !ST_is_in_module(st) &&
+             !ST_is_block_data(st))   // module&&block data cannot have "()" 
 
    {
       /* Use the "()" notation for "no parameters", except for
@@ -688,6 +705,9 @@ ST2F_func_header(TOKEN_BUFFER tokens,
      else
      {
        Prepend_Token_String(header_tokens, "FUNCTION");
+
+     if (PU_recursive(Get_Current_PU())) //July
+       Prepend_Token_String(header_tokens, "RECURSIVE");
        
        /* Note that we cannot have functions returning pointer types
 	* in Fortran, so we use the corresponding integral type
@@ -708,6 +728,9 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       else
       if (ST_is_in_module(st))
          Prepend_Token_String(header_tokens, "MODULE");  
+      else
+      if (ST_is_block_data(st))
+         Prepend_Token_String(header_tokens, "BLOCK DATA");
       else
 	 Prepend_Token_String(header_tokens, "SUBROUTINE");
    }

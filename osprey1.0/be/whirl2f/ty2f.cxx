@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:56 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:34 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -853,7 +853,9 @@ TY2F_Equivalence(TOKEN_BUFFER tokens,
    Append_Token_Special(tokens, '(');
    Append_Token_String(tokens, equiv_name); /* equiv_name at given offset */
    Append_Token_Special(tokens, '(');
-   Append_Token_String(tokens, Number_as_String(fld_ofst+1, "%lld"));
+//   Append_Token_String(tokens, Number_as_String(fld_ofst+1, "%lld"));
+/*June */
+   Append_Token_String(tokens, Number_as_String(fld_ofst, "%lld"));
    Append_Token_Special(tokens, ')');
    Append_Token_Special(tokens, ',');
    Append_Token_String(tokens, fld_name);   /* fld_name at offset zero */
@@ -1082,6 +1084,8 @@ TY2F_Declare_Common_Flds(TOKEN_BUFFER tokens,
 
   do
     {
+      Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
+
       FLD_HANDLE fld (fld_iter);
       TY_IDX ty = FLD_type(fld);
 
@@ -1115,7 +1119,7 @@ TY2F_Declare_Common_Flds(TOKEN_BUFFER tokens,
 	  TY2F_translate(decl_tokens, FLD_type(fld));
 	  Append_And_Reclaim_Token_List(tokens, &decl_tokens);
 	}
-      Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
+//      Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
 
     } while (!FLD_last_field (fld_iter++)) ;
 } /* TY2F_Declare_Common_Flds */
@@ -1289,9 +1293,10 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
       /* A regular array, so prepend the element type and append
        * the index bounds.
        */
-	
      ARB_HANDLE arb_base = TY_arb(ty);
-     INT32       dim = ARB_dimension(arb_base) - 1  ;
+     INT32       dim = ARB_dimension(arb_base) ;
+     INT32       co_dim = ARB_co_dimension(arb_base);
+     INT32       array_dim = dim-co_dim;
      INT32       revdim = 0;
 
       /* Do not permit pointers as elements of arrays, so just use
@@ -1304,26 +1309,76 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
       else
 	 TY2F_translate(decl_tokens, TY_AR_etype(ty));
 
+ if (ARB_co_dimension(arb_base)<=0){
+     co_dim=0;
+     array_dim = dim;
+  }
+
+
+    if (array_dim>0) {
       Append_Token_Special(decl_tokens, '(');
 
-      while (dim >= 0) 
+      while (array_dim > 0) 
       {
-	ARB_HANDLE arb = arb_base[dim];
+	ARB_HANDLE arb = arb_base[dim-1];
 
+    if (TY_is_f90_deferred_shape(ty_idx))
+         Append_Token_Special(decl_tokens, ':');
+    else
     if (TY_is_f90_assumed_size(ty_idx) &&
              TY_AR_last_dimen(ty_idx,revdim))    
 	TY2F_Append_ARB(decl_tokens, arb , TRUE);
     else
 	TY2F_Append_ARB(decl_tokens, arb , FALSE);
 
-    if (dim-- > 0) 
+
+    if (array_dim--> 1) 
       Append_Token_Special(decl_tokens, ',');
 
+      --dim;
       ++revdim;
 
       } 
 
       Append_Token_Special(decl_tokens, ')');
+ }
+
+   dim = ARB_dimension(arb_base);
+   array_dim = dim - co_dim;
+   --dim;
+
+   if (co_dim >0)
+    {
+      Append_Token_Special(decl_tokens, '[');
+     while (co_dim >0 )
+           {
+        ARB_HANDLE arb = arb_base[dim-array_dim];
+
+//    if (TY_is_f90_assumed_size(ty_idx) &&
+//             TY_AR_last_dimen(ty_idx,revdim))
+//        TY2F_Append_ARB(decl_tokens, arb , TRUE);
+//    else
+//        TY2F_Append_ARB(decl_tokens, arb , FALSE);
+
+
+    if ( co_dim==1 && !TY_is_f90_deferred_shape(ty))
+        TY2F_Append_ARB(decl_tokens, arb , TRUE);
+    else
+        TY2F_Append_ARB(decl_tokens, arb , FALSE);
+
+
+      dim--;
+
+    if (co_dim-- > 1)
+      Append_Token_Special(decl_tokens, ',');
+
+      ++revdim;
+
+      }
+
+      Append_Token_Special(decl_tokens, ']');
+  }
+
    }
 } /* TY2F_array */
 
@@ -1525,21 +1580,31 @@ TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
   /* Emit specification statements for every element of the
    * common block, including equivalences.
    */
-  TY2F_Declare_Common_Flds(tokens,   // variables in common block type declaration
-			   TY_flist(ty),
-			   FALSE, /*alt_return*/
-			   &is_equiv);
-
-  /* Emit the common block specification statement, excluding
-   * equivalences, where the name is already in a valid form and 
-   * can be emitted as is without a call to W2CF_Symtab_Nameof_Ty().
-   */
 
   Append_Token_String(tokens, "COMMON");
   if (name != NULL && *name != '\0')
     Append_Token_String(tokens, Concat3_Strings("/", name, "/"));
   TY2F_List_Common_Flds(tokens, TY_flist(ty));
   
+
+  TY2F_Declare_Common_Flds(tokens,   // variables in common block type declaration
+			   TY_flist(ty),
+			   FALSE, /*alt_return*/
+			   &is_equiv);
+  /* Emit the common block specification statement, excluding
+   * equivalences, where the name is already in a valid form and 
+   * can be emitted as is without a call to W2CF_Symtab_Nameof_Ty().
+   */
+
+# if 0 //June
+
+  Append_Token_String(tokens, "COMMON");
+  if (name != NULL && *name != '\0')
+    Append_Token_String(tokens, Concat3_Strings("/", name, "/"));
+  TY2F_List_Common_Flds(tokens, TY_flist(ty));
+
+#endif
+
   /* Emit equivalences, if there are any */
 
   if (is_equiv)

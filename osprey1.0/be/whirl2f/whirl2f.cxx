@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: whirl2f.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:56 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:58:34 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f.cxx,v $
  *
  * Revision history:
@@ -77,7 +77,7 @@
  * ====================================================================
  */
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f.cxx,v $ $Revision: 1.2 $";
 
 #include <unistd.h>		    /* for close(), etc. */
 #include <elf.h>              /* for wn.h */
