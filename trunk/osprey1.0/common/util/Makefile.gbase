@@ -126,6 +126,7 @@ CFILES	= \
 	tracing.c 	\
 	util.c 		\
 	vstring.c 	\
+	x_libgen.c      \
 	x_math.c        \
 	x_stdlib.c      \
 	x_stdio.c       \
@@ -149,6 +150,7 @@ HFILES	= 		\
 	tracing.h 	\
 	util.h 		\
 	vstring.h       \
+	x_libgen.h      \
 	x_math.h        \
 	x_stdlib.h      \
 	x_stdio.h       \
