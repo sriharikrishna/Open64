@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.23 $
- * $Date: 2003-09-25 02:22:58 $
+ * $Revision: 1.24 $
+ * $Date: 2003-12-08 15:45:41 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.23 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.24 $";
 #endif
 
 #include <ctype.h>
@@ -717,6 +717,107 @@ ST2F_decl_translate(TOKEN_BUFFER tokens, const ST *st)
    ST2F_Decl_Handler[ST_sym_class(st)](tokens, (ST *) st);
 } 
 
+
+void ReorderParms(ST **parms,INT32 num_params)
+{
+  INT32 i = 0;
+  ST **reorder_parms;
+  ST_IDX bdindex;
+  TY_IDX ty_index;
+  ST_IDX real_index;
+
+  std::set<int>dependset[num_params];
+  std::map<ST_IDX,int>  st_idx_to_parms;
+  std::set<int> workset;
+
+  workset.clear();
+  reorder_parms = (ST **)alloca((num_params + 1) * sizeof(ST *));
+  for (i=0; i<num_params; i++){
+      if (dependset[i].empty())
+      st_idx_to_parms[(ST_IDX)(parms[i]->st_idx)] = i;
+  }
+
+  TY_IDX ty_i = ST_type(parms[0]);
+  if (TY_kind(ST_type(parms[0])) == KIND_POINTER )
+
+  for (i=0; i<num_params; i++)
+   if (TY_kind(ST_type(parms[i])) == KIND_POINTER ){
+        ty_index = TY_pointed(ST_type(parms[i]));
+        if ((TY_kind(ty_index) == KIND_ARRAY) &&
+              !TY_is_f90_deferred_shape(ty_index)){
+
+          TY& ty = Ty_Table[ty_index];
+          ARB_HANDLE  arb_base = TY_arb(ty);
+          ARB_HANDLE  arb;
+          INT32       dim = ARB_dimension(arb_base) ;
+          while (dim > 0){
+             arb = arb_base[dim-1];
+             if (ARB_const_lbnd(arb)&& ARB_const_ubnd(arb))
+                     ;
+             else {
+              workset.insert(i);
+              if (!ARB_const_lbnd(arb)){
+                 bdindex = ARB_lbnd_var(arb);
+                 if (ST_is_temp_var(St_Table[bdindex])){
+                     ST * tempst =GetTmpVarTransInfo(NULL,bdindex,PU_Body);
+		     real_index = tempst->st_idx;
+                     dependset[i].insert(st_idx_to_parms[real_index]);
+                  }
+                 }
+              if (!ARB_const_ubnd(arb)){
+                 bdindex = ARB_ubnd_var(arb);
+                 if (ST_is_temp_var(St_Table[bdindex])){
+                     ST * tempst=GetTmpVarTransInfo(NULL,bdindex,PU_Body);
+		     real_index = tempst->st_idx;
+                     dependset[i].insert(st_idx_to_parms[real_index]);
+                  }
+                 }
+               }
+            dim--;
+          }/*while*/
+      }
+   }
+  INT32 keep = 0;
+
+  for (i = 0; i<num_params; i++){
+   if (dependset[i].begin()==dependset[i].end()){
+     workset.erase(i);
+     reorder_parms[keep] = parms[i];
+     keep++;
+     for (INT32 j=0; j<num_params; j++)
+           dependset[j].erase(i);
+    }
+  }
+
+  std::set<int>::iterator runner;
+  std::set<int>::iterator cleaner;
+ 
+  INT32 size = workset.size();
+  while (!workset.empty() && size )
+   {
+    runner = workset.begin();
+    while (runner != workset.end()) {
+     if (dependset[*runner].empty()){
+        reorder_parms[keep] = parms[*runner];
+        keep++;
+        cleaner = workset.begin();
+        while(cleaner !=workset.end()){
+           dependset[*cleaner].erase(*runner);
+           ++cleaner;
+        }
+       workset.erase(*runner);
+     }
+     ++runner;
+   }
+  size--;
+ }
+  reorder_parms[keep] = NULL;
+  for(INT32 k=0; k<num_params; k++)
+      parms[k] = reorder_parms[k];
+   
+   return;
+}
+
 void
 ST2F_func_header(TOKEN_BUFFER tokens,
 		 ST          *st,          /* Function ST entry     */
@@ -756,6 +857,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
     */
 
    first_param = ST2F_FIRST_PARAM_IDX(funtype);
+
    if (params[first_param] != NULL)
    {
       Append_Token_Special(header_tokens, '(');
@@ -935,7 +1037,9 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       stmt = WN_next(stmt);
     }  /*while*/
 
-    param_tokens = New_Token_Buffer();
+   if (num_params)
+       ReorderParms(params,num_params);
+   param_tokens = New_Token_Buffer();
 
    if (!is_altentry)
    {
@@ -946,7 +1050,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       for (param = first_param; param < num_params -implicit_parms; param++) {
 
 	 Append_F77_Indented_Newline(param_tokens, 1, NULL/*label*/);
-	 if (params[param] && TY_kind(ST_type(params[param]))!=KIND_POINTER) 
+	 if (params[param] ) 
    
             if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
 
@@ -979,6 +1083,8 @@ ST2F_func_header(TOKEN_BUFFER tokens,
              if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
                      ST2F_decl_translate(param_tokens, params[param]);
        }
+
+#if 0
 //must issue scalar args first,then issue array args---fzhao
       for (param = first_param; param < num_params -implicit_parms; param++) {
 
@@ -1016,6 +1122,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
              if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
                      ST2F_decl_translate(param_tokens, params[param]);
        }
+#endif
 
     }
     

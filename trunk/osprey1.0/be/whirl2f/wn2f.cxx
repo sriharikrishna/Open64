@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.15 $
- * $Date: 2003-06-19 19:22:36 $
- * $Author: broom $
+ * $Revision: 1.16 $
+ * $Date: 2003-12-08 15:45:41 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
  *
@@ -67,10 +67,11 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.15 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.16 $";
 #endif
 
 #include <alloca.h>
+#include <set>
 #include "whirl2f_common.h"
 #include "PUinfo.h"          /* From be/whirl2c directory */
 #include "wn2f.h"
