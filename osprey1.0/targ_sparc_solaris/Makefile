@@ -56,6 +56,7 @@ LIBRARY_SUBDIRS = \
 	libdwarf \
 	libelf \
 	libelfutil \
+	libiberty \
 	libunwind \
 	libunwindP \
 	libunwind_gdb
