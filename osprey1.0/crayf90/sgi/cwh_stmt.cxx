@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.24 $
- * $Date: 2004-06-21 21:09:18 $
+ * $Revision: 1.25 $
+ * $Date: 2004-07-07 20:19:32 $
  * $Author: eraxxon $
  *
  * Revision history:
@@ -886,7 +886,9 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   WN * len;
   INT32 association;
 
+#if 0 // eraxxon: allow NULL parameter nodes
   INT32 num_null_args = 0;
+#endif
 
   /* figure # of args, including character lengths, clear return temp ST */
 
@@ -937,7 +939,9 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
 	
 	if (keepty)
 	  WN_set_ty(wa,keepty);
-      } else {
+      } 
+#if 0 // eraxxon: allow NULL parameter nodes
+      else {
 	/* eraxxon: we have been given a null WN as an argument and it
 	   should _not_ be transmitted to a WHIRL CALL.  It would seem
 	   that we have been given garbage input, but after stepping
@@ -947,6 +951,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
 	   null argument. */
 	num_null_args++;
       }
+#endif
 
       args[k] = wa;
   
@@ -1023,6 +1028,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   }
 
 
+#if 0 // eraxxon: allow NULL parameter nodes
   /* eraxxon: adjust argument count if we have a NULL WN as an argument */
   if (num_null_args > 0) {
     int num_null_args_at_end = 0;
@@ -1040,6 +1046,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
     nargs -= num_null_args;
     num_args -= num_null_args;
   }
+#endif
 
 
   /* Function returning character? Reorder to get   */
