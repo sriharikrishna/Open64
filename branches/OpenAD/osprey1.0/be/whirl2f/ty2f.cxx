@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.25 $
- * $Date: 2004-07-13 13:36:36 $
+ * $Revision: 1.25.2.1 $
+ * $Date: 2004-07-16 15:26:11 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -63,6 +63,7 @@
 
 extern WN* PU_Body;
 extern BOOL Array_Bnd_Temp_Var;
+extern BOOL W2F_OpenAD; /* w2f_driver.h */
 
 #define NUMBER_OF_OPERATORS (OPERATOR_LAST + 1)
 
@@ -1281,6 +1282,19 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 		    (DIAG_W2F_UNEXPECTED_TYPE_KIND, 
 		     TY_kind(ty), 
 		     "TY2F_scalar"));
+
+   // Special override for OpenAD types
+   if (W2F_OpenAD) {
+     const char* tyname = TY_name(ty);
+     static const char* OpenADTyFlag = "OpenADTy";
+     if (tyname && strncmp(tyname, OpenADTyFlag, strlen(OpenADTyFlag)) == 0) {
+       const char* str = Concat3_Strings("TYPE (", tyname, ")");
+       Prepend_Token_String(decl_tokens, str);
+       return;
+     }
+   }
+   
+   // The general case
    kind_spec = "NULL";
    if (TY_is_character(ty))
    {
