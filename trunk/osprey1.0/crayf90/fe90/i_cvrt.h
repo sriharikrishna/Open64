@@ -834,7 +834,7 @@ extern void  fei_index                    ( void );
 extern void  fei_field_dot                ( TYPE  type );
 extern void  fei_field_arrow              ( TYPE  type );
 extern void  fei_deref                    ( TYPE  type );
-extern void  fei_paren                    ( TYPE  type );
+extern void  fei_paren                    ( TYPE  type ,INT32 processing_call);
 extern void  fei_cvtop                    ( TYPE  type );
 extern void  fei_substr                   ( INT32 bound_chk );
 extern void  fei_seq_subscr               ( TYPE  type,INT32 kidsnum );
@@ -1664,6 +1664,8 @@ extern void PDGCS_mpp_init                ( char        *src_fname,
 extern void fei_nullify (INT32 listnum);
 
 extern void fei_init_global_vars();
+extern void fei_set_in_interface_processing();
+extern void fei_reset_in_interface_processing();
 
 typedef struct		type_descriptor	pdg_type_tbl_type;
 
