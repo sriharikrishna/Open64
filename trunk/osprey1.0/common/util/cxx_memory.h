@@ -116,9 +116,9 @@
 ***
 **/
 
-/** $Revision: 1.1.1.1 $
-*** $Date: 2002-05-22 20:07:08 $
-*** $Author: dsystem $
+/** $Revision: 1.2 $
+*** $Date: 2003-04-18 21:46:28 $
+*** $Author: dotsenko $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/cxx_memory.h,v $
 **/
 
@@ -145,7 +145,7 @@
 
 #else
 
-#include <new.h>
+#include <new>
   extern MEM_POOL* Delete_Mem_Pool;
 
 extern MEM_POOL* _dummy_new_mempool;

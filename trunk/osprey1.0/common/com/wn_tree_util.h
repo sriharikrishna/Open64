@@ -159,6 +159,10 @@ enum TRAV_ORDER {
 // We need this to get partial specialization work
 // ======================================================================
 
+using std::vector;
+using std::pair;
+
+
 template <class WHIRL>
 class WN_TREE_ITER_base
 {
@@ -175,13 +179,13 @@ class WN_TREE_ITER_base
 public:
 
   typedef WN_TREE_ITER_base<WHIRL>  self;
-  typedef std::forward_iterator_tag iterator_category;
+  typedef typename std::forward_iterator_tag iterator_category;
   typedef WHIRL                     value_type;
   typedef ptrdiff_t                 difference_type;
   typedef value_type*               pointer;
   typedef const value_type&         const_reference;
   typedef value_type&               reference;
-  typedef std::vector<std::pair<WHIRL,INT32> > WN_STACK;
+  typedef vector<pair<WHIRL,INT32> > WN_STACK;
 
 protected:
 
@@ -429,9 +433,16 @@ public:
 
   // tree related "iterators"
   
-  WN_TREE_ITER_base<WHIRL> &      operator++()    { WN_TREE_next(); return *this;} // pre
-  WN_TREE_ITER_base<WHIRL> operator++(INT) { self tmp = *this; WN_TREE_next(); return tmp;}
-
+  WN_TREE_ITER_base<WHIRL> & operator++() { 
+    WN_TREE_next(); 
+    return *this;
+  } // pre
+  
+  WN_TREE_ITER_base<WHIRL> operator++(INT) {
+    WN_TREE_ITER_base<WHIRL> tmp = *this;
+    WN_TREE_next();
+    return tmp;
+  }
 }; // WN_TREE_ITER<PRE_ORDER, WHIRL>
 
 
@@ -518,8 +529,16 @@ public:
 
   // tree related "iterators"
   
-  WN_TREE_ITER_base<WHIRL> &      operator++()    { WN_TREE_next(); return *this;} // pre
-  WN_TREE_ITER_base<WHIRL>        operator++(INT) { self tmp = *this; WN_TREE_next(); return tmp;}
+  WN_TREE_ITER_base<WHIRL> & operator++() { 
+    WN_TREE_next();
+    return *this;
+  } // pre
+  
+  WN_TREE_ITER_base<WHIRL> operator++(INT) {
+    WN_TREE_ITER_base<WHIRL> tmp = *this;
+    WN_TREE_next();
+    return tmp;
+  }
 
   // constructors
   

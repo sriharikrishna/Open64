@@ -47,6 +47,7 @@
 #endif // defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
 
 #include <algorithm>
+#include <vector>
 
 using std::find;
 using std::transform;
@@ -58,6 +59,8 @@ using std::set_union;
 using std::set_intersection;
 using std::set_difference;
 using std::min;
+using std::pair;
+using std::vector;
 
 #endif // __SGI_STL_ALGO_H
 
@@ -69,9 +72,8 @@ using std::min;
 #undef long
 #endif // defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
 
-# include <vector>
-
-using std::vector;
+//# include <vector>
+//using std::vector;
 
 #endif // __SGI_STL_VECTOR_H
 
@@ -362,13 +364,8 @@ public:
   ~RELATED_SEGMENTED_ARRAY() {
     // Free memory from blocks. Map memory gets freed when the map
     // vector is destructed.
-
-    // Yuri: 1/24/03
-    // for (std::vector<std::pair<T *, BOOL>, mempool_allocator<T *> >::iterator
-    for (std::vector<std::pair<T *, BOOL>, mempool_allocator<std::pair<T *, BOOL> > >::iterator
-	   entry = map.begin();
-	 entry != map.end();
-	 ++entry) {
+    typedef typename vector<pair<T *, BOOL>, mempool_allocator<pair<T *, BOOL> > >::iterator TempIteratorType;
+    for ( TempIteratorType entry = map.begin(); entry != map.end(); ++entry ) {
       // entry->second <==> this map entry owns the block's memory.
       if (entry->second) {
 	MEM_POOL_FREE(pool, entry->first);

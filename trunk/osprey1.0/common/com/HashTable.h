@@ -83,7 +83,10 @@ public:
 
 private:
   typedef vector<KeyValuePair> KeyValuePairVector;
+  typedef typename KeyValuePairVector::iterator KeyValuePairVectorIterator;
   typedef map<size_t, KeyValuePairVector, less<size_t> > Ht;
+  typedef typename Ht::iterator HtIterator;
+  typedef typename Ht::const_iterator HtConstIterator;
 
   Ht ht; // size_t->KeyValuePairVector
   size_t _size;
@@ -105,7 +108,7 @@ public:
 public:
   void clear() {
     if (size() == 0) return;
-    Ht::iterator htIterator;
+    HtIterator htIterator;
     for ( htIterator = ht.begin();
 	  htIterator != ht.end();
 	  htIterator ++ ) {
@@ -125,18 +128,18 @@ public:
 
   size_t count(const Key& k) const {
     size_t h = keyHash(k);
-    Ht::const_iterator htIterator = ht.find(h);
+    HtConstIterator htIterator = ht.find(h);
     if (htIterator == ht.end()) return 0;
     return htIterator->second.size();
   } // count
 
   ValueBoolPair find(const Key& k) const {
     size_t h = keyHash(k);
-    Ht::const_iterator htIterator = ht.find(h);
+    HtConstIterator htIterator = ht.find(h);
     if (htIterator == ht.end()) return ValueBoolPair((const Value)NULL, false);
 
     const KeyValuePairVector& kvpv = htIterator->second;
-    KeyValuePairVector::const_iterator kvpvIterator;
+    typename KeyValuePairVector::const_iterator kvpvIterator;
     for ( kvpvIterator = kvpv.begin(); 
 	  kvpvIterator != kvpv.end(); 
 	  kvpvIterator ++ ) {
@@ -148,13 +151,13 @@ public:
 
   ValueBoolPair insert(const KeyValuePair& p) {
     size_t h = keyHash(p.first);
-    Ht::iterator htIterator = ht.find(h);
+    HtIterator htIterator = ht.find(h);
     if (htIterator != ht.end()) {
       KeyValuePairVector& kvpv = htIterator->second;
       xDEBUG(DEB_HashTable, 
 	     printf("insert: h=%u, ht.size()=%u, ht[h].size()=%u\n", h, ht.size(), kvpv.size());
 	     );
-      KeyValuePairVector::iterator kvpvIterator;
+      KeyValuePairVectorIterator kvpvIterator;
       for ( kvpvIterator = kvpv.begin(); 
 	    kvpvIterator != kvpv.end(); 
 	    kvpvIterator ++ ) {
@@ -169,7 +172,7 @@ public:
 	     printf("insert: h=%u, ht.size()=%u, ht[h].size()=%u\n", h, ht.size(), 0));
       KeyValuePairVector kvpv;
       kvpv.push_back(p);
-      pair<Ht::iterator, bool> tmp1 = ht.insert(Ht::value_type(h, kvpv));
+      pair<HtIterator, bool> tmp1 = ht.insert(typename Ht::value_type(h, kvpv));
       assert(tmp1.second == true);
     }
     _size ++;
@@ -180,11 +183,11 @@ public:
     size_t h = keyHash(k);
     xDEBUG(DEB_HashTable, printf("erase: h=%u\n", h));
 
-    Ht::iterator htIterator = ht.find(h);
+    HtIterator htIterator = ht.find(h);
     if (htIterator == ht.end()) return ValueBoolPair((const Value)NULL, false);
 
     KeyValuePairVector& kvpv = htIterator->second;
-    KeyValuePairVector::iterator kvpvIterator;
+    KeyValuePairVectorIterator kvpvIterator;
     for ( kvpvIterator = kvpv.begin(); 
 	  kvpvIterator != kvpv.end(); 
 	  kvpvIterator ++ ) {
@@ -204,24 +207,6 @@ public:
     return ValueKeyPair((const Value)NULL, false);
   } // modify
 
-/*
-  Value& operator[](const Key& k) {
-    size_t h = keyHash(k);
-    Ht::const_iterator htIterator = ht.find(h);
-    if (htIterator == ht.end()) return ValueBoolPair((const Value)NULL, false);
-
-    const KeyValuePairVector& kvpv = htIterator->second;
-    KeyValuePairVector::const_iterator kvpvIterator;
-    for ( kvpvIterator = kvpv.begin(); 
-	  kvpvIterator != kvpv.end(); 
-	  kvpvIterator ++ ) {
-      const Key& kk = kvpvIterator->first;
-      if (keyEq(k, kk) == true) return ValueBoolPair(kvpvIterator->second, true);
-    }
-    return ValueBoolPair((const Value)NULL, false);
-  }
-*/
-
 // The action must not change the membership of the data structure
 // Value v can be changed
 class ForAllAction {
@@ -231,8 +216,8 @@ class ForAllAction {
 
 // oreder is NOT defined
   void forAll(ForAllAction & action) {
-    Ht::iterator htIterator;
-    KeyValuePairVector::iterator kvpvIterator;
+    HtIterator htIterator;
+    KeyValuePairVectorIterator kvpvIterator;
 
     for ( htIterator = ht.begin();
 	  htIterator != ht.end();
@@ -248,28 +233,6 @@ class ForAllAction {
       }
     }
   } //forAll
-
-/*
-  void dump(ostream& os) {
-    Ht::iterator htIterator;
-    KeyValuePairVector::iterator kvpvIterator;
-
-    for ( htIterator = ht.begin();
-	  htIterator != ht.end();
-	  htIterator ++ ) {
-      KeyValuePairVector& kvpv = htIterator->second;
-      for ( kvpvIterator = kvpv.begin(); 
-	    kvpvIterator != kvpv.end(); 
-	    kvpvIterator ++ ) {
-	const Key& k = kvpvIterator->first;
-	Value& v = kvpvIterator->second;
-
-	os << "(" << k << ", " << v << ")" << endl;
-      }
-    }
-  }
-*/
-
 };
 
 } // namespace
