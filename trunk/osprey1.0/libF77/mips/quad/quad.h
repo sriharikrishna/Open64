@@ -36,25 +36,23 @@
 #ifndef __QUAD_H__
 #define __QUAD_H__
 
-#if _COMPILER_VERSION != 400
 #include <stdio.h>
 #include <stdlib.h>
-#endif
-
 #include <inttypes.h>
 #include "cmplx.h"
 #include "qcmplx.h"
 
 typedef double double_t;
 
+/* eraxxon: rename quad to o64quad to prevent header conflicts */
 typedef	struct {
 double	hi;
 double	lo;
-} quad;
+} o64quad;
 
 typedef union {
 	long double ld;
-	quad q;
+	o64quad q;
 } ldquad;
 
 extern	long double	__libm_zero_ld;
