@@ -43,9 +43,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: bitset.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:08 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2003-12-09 19:18:36 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/bitset.h,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *xxx_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/bitset.h,v $ $Revision: 1.1.1.1 $";
+static char *xxx_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/bitset.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 /* This package implements sets of nonnegative INTs.  These can be
@@ -660,7 +660,6 @@ extern void FBS_Union1D_Validate(BS *set, BS_ELT x);
 #endif
 
 extern void BS_Print( BS *set, FILE *f );
-#pragma mips_frequency_hint NEVER BS_Print
 
 #ifdef __cplusplus
 }

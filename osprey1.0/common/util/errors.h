@@ -47,8 +47,8 @@ extern "C" {
  * ====================================================================
  *
  * Module: errors.h
- * $Revision: 1.4 $
- * $Date: 2003-11-04 16:10:42 $
+ * $Revision: 1.5 $
+ * $Date: 2003-12-09 19:18:36 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/errors.h,v $
  *
@@ -395,21 +395,17 @@ extern void Abort_Compiler_Location (
   const char* file_name,
   INT line_number
 );
-#pragma mips_frequency_hint NEVER Abort_Compiler_Location
 
 /* Simple abort report with error code: */
 extern void Fail_Assertion ( INT ecode, ... );
-#pragma mips_frequency_hint NEVER Fail_Assertion
 
 /* Simple abort report with format instead of code: */
 /*PRINTFLIKE1*/
 extern void Fail_FmtAssertion ( const char *fmt, ... );
-#pragma mips_frequency_hint NEVER Fail_FmtAssertion
 
 /* Simple fatal error report with format instead of code: */
 /*PRINTFLIKE1*/
 extern void Fatal_Error ( const char *fmt, ... );
-#pragma mips_frequency_hint NEVER Fatal_Error
 
 /* ====================================================================
  *
@@ -420,16 +416,13 @@ extern void Fatal_Error ( const char *fmt, ... );
 
 /* Simple error report: */
 extern void ErrMsg ( INT ErrCode, ... );
-#pragma mips_frequency_hint NEVER ErrMsg
 
 /* Error report with specified source line number: */
 extern void ErrMsgLine ( INT ErrCode, INT LineNo, ... );
-#pragma mips_frequency_hint NEVER ErrMsgLine
 
 /* Error report with specified source position: */
 #ifdef MONGOOSE_BE
 extern void ErrMsgSrcpos ( INT ErrCode, SRCPOS SrcPos, ... );
-#pragma mips_frequency_hint NEVER ErrMsgSrcpos
 #endif
 
 /* Unconditional assertion checking with error code: */
@@ -471,15 +464,12 @@ extern void DevWarn( const char* FormatString,... )
 	__attribute__((format(printf,1,2)))
 #endif
 	;
-#pragma mips_frequency_hint NEVER DevWarn
 
 extern void DevWarn_Toggle( void );
-#pragma mips_frequency_hint NEVER DevWarn_Toggle
 
 extern BOOL Count_Limit_DevWarn( const char *const src_fname,
 				 const UINT        src_line,
 				 const UINT        limit );
-#pragma mips_frequency_hint NEVER Count_Limit_DevWarn
 
 #define Lmt_DevWarn(limit, args) \
 	( Count_Limit_DevWarn(__FILE__, __LINE__, limit) ? \
