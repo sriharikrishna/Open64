@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.19 $
- * $Date: 2003-11-25 18:08:09 $
+ * $Revision: 1.20 $
+ * $Date: 2003-12-11 22:07:22 $
  * $Author: eraxxon $
  *
  * Revision history:
@@ -2569,6 +2569,8 @@ fei_where(INT32 defined_asg,
     fei_call(2, dummy_type, By_Value_Call, FALSE, inline_state, flags);
   }
   else {
+    /* eraxxon: initialize to avoid warnings */
+    memset(&dummy_type, 0, sizeof(dummy_type));
     fei_store(dummy_type);  /* It's OK for this to be uninitialized */
   }
 

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_pdgcs
- * $Revision: 1.4 $
- * $Date: 2003-12-10 16:04:15 $
+ * $Revision: 1.5 $
+ * $Date: 2003-12-11 22:07:22 $
  * $Author: eraxxon $
  * $Source: 
  *
@@ -59,7 +59,7 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -434,8 +434,10 @@ PDGCS_do_proc(void)
 
   st = &St_Table[PU_Info_proc_sym(pu)];
   PU& p = Pu_Table[ST_pu(st)];
-  if (PU_is_mainpu (p))
+  if (PU_is_mainpu (p)) {
+     memset(&tt, 0, sizeof(tt)); /* eraxxon: initialize to avoid warnings */
      fei_return(2,tt);  /* It's OK for this to be uninitialized */
+  }
 
   if (cwh_stab_pu_has_globals) {
      Set_PU_Info_flags(pu,PU_HAS_GLOBALS);
