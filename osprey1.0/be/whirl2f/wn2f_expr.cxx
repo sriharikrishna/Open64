@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.19 $
- * $Date: 2004-07-27 16:32:00 $
- * $Author: fzhao $
+ * $Revision: 1.20 $
+ * $Date: 2004-11-29 16:16:21 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.20 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -70,6 +70,8 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "wn2f_load_store.h"
 #include "intrn_info.h"          /* INTR macros */
 #include "ty_ftn.h"
+
+extern BOOL W2F_OpenAD; /* w2f_driver.h */
 
 /*---- Fortran names for binary and unary arithmetic operations -------*/
 /*---------------------------------------------------------------------*/
@@ -1307,8 +1309,9 @@ WN2F_cvt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 /*  Maybe we shouldn't or needn't  explicitly output these kinds of 
     convert in .w2f.f file----fzhao
 */
-
-//   WN2F_Convert(expr_tokens, WN_opc_dtype(wn), WN_opc_rtype(wn));
+   if (W2F_OpenAD) {
+     WN2F_Convert(expr_tokens, WN_opc_dtype(wn), WN_opc_rtype(wn));
+   }
    Append_And_Reclaim_Token_List(tokens, &expr_tokens);
 
    return EMPTY_WN2F_STATUS;

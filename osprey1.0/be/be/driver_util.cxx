@@ -38,8 +38,8 @@
  *
  * Module: driver_util.c
  * $Revisionr: 1.34 $
- * $Date: 2004-06-22 16:47:17 $
- * $Author: fzhao $
+ * $Date: 2004-11-29 16:14:13 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/driver_util.cxx,v $
  *
  * Revision history:
@@ -331,6 +331,15 @@ Process_Command_Line (INT argc, char **argv)
 	    case 'e':
 		if (!strcmp( cp, "xceptions" )) {
 		  CXX_Exceptions_On = TRUE;
+		}
+		else {
+		  ErrMsg ( EC_Unknown_Flag, *(cp-1), argv[i] );
+		}
+		break;
+
+	    case 'o':
+		if (!strcmp( cp, "penad" )) {
+		  add_phase_args (PHASE_W2F, argv[i]);
 		}
 		else {
 		  ErrMsg ( EC_Unknown_Flag, *(cp-1), argv[i] );
