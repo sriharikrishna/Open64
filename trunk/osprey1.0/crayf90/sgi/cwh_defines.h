@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_defines.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:30 $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:45:07 $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version

@@ -38,8 +38,8 @@
  *
  * Module: cwh_stats.c
  * $Revision: 
- * $Date: 2002-05-22 20:07:31 $
- * $Author: dsystem $
+ * $Date: 2002-07-12 16:45:09 $
+ * $Author: fzhao $
  * $Source: 
  *
  * Revision history:
@@ -62,7 +62,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stats.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stats.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 

@@ -1,5 +1,4 @@
 /*
-
   Copyright (C) 2000, 2001 Silicon Graphics, Inc.  All Rights Reserved.
 
   This program is free software; you can redistribute it and/or modify it
@@ -36,9 +35,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:30 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:45:07 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $
  *
  * Description: This static data initialization
@@ -50,7 +49,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -114,16 +113,32 @@ fei_static_base(INTPTR sym_idx)
    offset = 0;
    base = current_st;
    /* Check for based as a symbol in common */
-   while (ST_base(base) != base) {
-      offset += ST_ofst(base);
+
+
+
+//   while (ST_base(base) != base) { 
+
+/*      if use "while" stmt,for common block at last base will go  */
+/*      to pu's name,because for source level thinking we already  */
+/*       set common block's base is pu's st instead itself.   fzhao*/
+
+
+   if (ST_base(base) != base && (ST_sclass(ST_base(base))!=SCLASS_TEXT)) {
+/* Since for PU is module,we change base_idx point to the PU_st      */
+/* have to keep data initializer's st point to st instead of base_st */
+
+//      offset += ST_ofst(base); set all initializers in common block have 
+// themselves INITO entry,such must set offset always is 0
+
       base = ST_base(base);
    }
 
-   //   cwh_auxst_dump (base);
+
+// for debug      cwh_auxst_dump (base);
 
    if ((ST_sclass(base) == SCLASS_DGLOBAL) || 
-       (ST_sclass(base) == SCLASS_COMMON)||
-       (ST_sclass(base) == SCLASS_MODULE )) {
+       (ST_sclass(base) == SCLASS_COMMON)) {// June  ||
+//       (ST_sclass(base) == SCLASS_MODULE )){ 
 
        /* convert the COMMON into a DGLOBAL, makeing sure the sclasses
         * are consistent, and the the ST_initialized flag is set. This
@@ -134,7 +149,6 @@ fei_static_base(INTPTR sym_idx)
 
        cwh_data_set_init_flag(base,l_COMLIST);
 
-       current_st = base;
        current_pos = offset;
        init_common_or_module = TRUE; 
 
@@ -143,12 +157,19 @@ fei_static_base(INTPTR sym_idx)
       /* equivalenced item */
 
      cwh_data_set_init_flag(base,l_EQVLIST);
-     current_st = base;
      current_pos = offset;
+     Set_ST_is_initialized(base);
      init_common_or_module = TRUE; 
    }
- 
+
+
    Set_ST_is_initialized(current_st);
+
+# if 0
+   if (ST_sclass(current_st)!=SCLASS_MODULE)
+      Set_ST_sclass(current_st,SCLASS_PSTATIC);  // June
+# endif         
+//   current_st = base;  
 
    if (TY_kind(current_ty) == KIND_ARRAY) {
       is_struct_or_array = TRUE;
@@ -175,9 +196,7 @@ fei_static_base(INTPTR sym_idx)
    return;
 }
    
-/*================================================================
- *
- * fei_static_subscripts
+/*================================================================ * * fei_static_subscripts
  *
  * Get the subscripts for a static initialization. The FE provides
  * subscripts with the least-contiguous subscript in 
@@ -686,13 +705,21 @@ cwh_data_set_init_flag(ST * st, enum list_name list)
   while ((el = cwh_auxst_next_element(st,el,list)) != NULL) {
 
        ST * el_st = I_element(el);
-       Set_ST_sclass(el_st, ST_sclass(st));
+      if (ST_sclass(el_st)!=SCLASS_AUTO)
+          Set_ST_sclass(el_st, ST_sclass(st));
+      else
+          Set_ST_sclass(el_st,SCLASS_PSTATIC); // June
        Set_ST_is_initialized(el_st);
 
        ST * p_st = cwh_auxst_cri_pointee(el_st,0);
 
        if (p_st) {
-	 Set_ST_sclass(p_st, ST_sclass(st));
+        
+         if (ST_sclass(p_st)!= SCLASS_AUTO) 
+	     Set_ST_sclass(p_st, ST_sclass(st));
+         else
+             Set_ST_sclass(p_st,SCLASS_PSTATIC); // June
+
 	 Set_ST_is_initialized(p_st);
        }
 
