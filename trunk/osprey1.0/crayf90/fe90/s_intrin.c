@@ -11279,7 +11279,7 @@ void    eoshift_intrinsic(opnd_type     *result_opnd,
    }
    else {  /* boundary not present */
 
-# if 0 
+/* fzhao try Jan# if 0  */
 
       switch (arg_info_list[info_idx1].ed.type) {
          case Structure :  
@@ -11439,7 +11439,7 @@ void    eoshift_intrinsic(opnd_type     *result_opnd,
               break;
       }
 
-# endif
+/* fzhao try Jan #endif */
 
    }
 

@@ -169,7 +169,6 @@ void	process_cmd_line(int   argc,
    process_v_dbg_flags (str);	/* pass -vN always */
 # endif
 # endif
-
    err_ind = optind;
 
    while ((option = getopt (argc, argv, opt_string)) != EOF) {
@@ -3921,8 +3920,7 @@ static void process_u_option (char *optargs)
 	 dump_flags.ir4_tbl		= FALSE;
 	 dump_flags.mem_report		= FALSE;
          dump_flags.mtrace_info		= TRUE;
-/*	 dump_flags.name_tbls		= TRUE; has bug -------fzhao */
-	 dump_flags.name_tbls		= FALSE;
+	 dump_flags.name_tbls		= TRUE; 
          dump_flags.pdgcs		= TRUE;
 	 dump_flags.sb_tbl		= TRUE;
 	 dump_flags.scp_tbl		= TRUE;

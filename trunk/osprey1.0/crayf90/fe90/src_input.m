@@ -144,7 +144,12 @@
         }
 	
 /* Set sign bit of word holding a char in a char constant context */
+# if 0
 # define MARK_CHAR_CONST(CH)    ((CH) = ((1 << SIGN_BIT) | (CH)))
+# define MARK_CHAR_CONST(CH)    ((CH) = (((int)0x80000000) | (CH)))
+# else
+# define MARK_CHAR_CONST(CH)    ((CH) = (((unsigned)1 << SIGN_BIT) | (CH)))
+# endif
 
 # ifdef _DEBUG
 # 	define PRINT_STMT_SRC()						       \

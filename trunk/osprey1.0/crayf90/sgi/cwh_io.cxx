@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_io.c
- * $Revision: 1.4 $
- * $Date: 2003-01-13 16:11:16 $
+ * $Revision: 1.5 $
+ * $Date: 2003-02-20 01:51:32 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_io.cxx,v $
  *
@@ -57,7 +57,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-  static char *rcs_id = " $Id: cwh_io.cxx,v 1.4 2003-01-13 16:11:16 fzhao Exp $ ";
+  static char *rcs_id = " $Id: cwh_io.cxx,v 1.5 2003-02-20 01:51:32 fzhao Exp $ ";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -2232,7 +2232,7 @@ cwh_io_analyse_expr(WN *tree, IMPDO_INFO *impdo_set, int mode)
      }
    } else {
 ;
-// fzhao Dec    for ( i = 0; i < WN_kid_count(tree); i++ )
+//     for ( i = 0; i < WN_kid_count(tree); i++ )
 //        if (cwh_io_analyse_expr(WN_kid(tree,i), impdo_set, mode))
 //          return TRUE;
    }

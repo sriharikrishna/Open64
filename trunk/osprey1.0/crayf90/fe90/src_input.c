@@ -3482,6 +3482,7 @@ static void free_classify_line (void)
    PP_EOL = nxt_line_end_idx[pp_line_idx] - 1;
    PP_EXPECTED_LINE = expected_line;
 
+
 START:
 
    ch = nxt_line[NXT_COL(1)];

@@ -1418,7 +1418,10 @@ HERE:
                   }
                }
 
-/*fzhao try for intrinsic func                flatten_function_call(result_opnd);   */
+         if (ATP_PROC(spec_idx) != Intrin_Proc)
+               flatten_function_call(result_opnd);  
+/* flatten_function_call cannot work on intrinsic function *
+ * need think about how to change it    ---fzhao Jan       */
 
                if (ATP_ELEMENTAL(spec_idx) &&
                    ATP_PROC(spec_idx) != Intrin_Proc) {
@@ -2377,6 +2380,10 @@ boolean final_arg_work(opnd_type	*list_opnd,
          goto EXIT;
       }
 
+/* if the arg is intrinsic function call then keep it,
+ * do not do anything,go to EXIT ---fzhao Jan
+ */
+
       if (explicit) {
          if (ATP_EXTRA_DARG(spec_idx)) {
             dummy    = SN_ATTR_IDX(ATP_FIRST_IDX(spec_idx) + dummy_idx);
@@ -3070,10 +3077,14 @@ boolean final_arg_work(opnd_type	*list_opnd,
                                 &line,
                                 &col);
 
-
+#if 0
+/* this code cause trouble when the arguments are function call 
+ * will think about how to keep the semantics later fzhao Jan
+ */
       if (! AT_IS_INTRIN(spec_idx)         &&
           dummy != NULL_IDX                &&
-          AT_OBJ_CLASS(dummy) == Data_Obj)  {
+          AT_OBJ_CLASS(dummy) == Data_Obj  && /*fzhao Jan*/
+          IR_OPR(dummy) != Call_Opr )  {
 
          /* check for auxiliary match */
 
@@ -3105,6 +3116,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
          }
       }
 
+# endif
       association = arg_assoc_tbl[a_type][d_type];
 
       if (association == PASS_ADDRESS_FROM_DV           &&

@@ -146,7 +146,7 @@ struct data_info_s {
 	  ErrMsg(EC_Multiple_Initialization,ST_name(st));
 	  message_issued = TRUE;
 	}
-	data_elements[i].is_valid = FALSE;
+ 	data_elements[i].is_valid = FALSE;
 	continue;
       }
       

@@ -262,7 +262,12 @@ int	star         = '*';
 int	quote        = '\'';
 int      db_quote     = '"';
 int      blank        = ' ';
-int      marked_blank = ((1 << SIGN_BIT) | ' ');
+#if 0
+int      marked_blank = ((1 << SIGN_BIT) | ' '); 
+#else
+/*int	 marked_blank = (int)(0x80000000 | ' ');*/
+int      marked_blank = (int)(((unsigned)1 << SIGN_BIT) | ' '); 
+#endif
 int      tab          = '\t';
 int      newline      = '\n';
 int      bang         = '!';

@@ -2051,8 +2051,7 @@ print_op<T>::operator () (UINT idx, T *entry) const {
 // specialization for printing TCONs
 template <>
 inline void
-print_op<TCON>::operator () (UINT idx, TCON *c) const
-{
+print_op<TCON>::operator () (UINT idx, TCON *c) const {
     fprintf (fid, "[%d] %s: %s\n", idx, MTYPE_name(TCON_ty(*c)),Targ_Print (NULL, *c));
 } // print_op<TCON>::operator ()
 

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_intrin
- * $Revision: 1.5 $
- * $Date: 2003-01-13 16:11:16 $
+ * $Revision: 1.6 $
+ * $Date: 2003-02-20 01:51:31 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -56,7 +56,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_intrin.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_intrin.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -1059,7 +1059,7 @@ cwh_do_tranformational(INTRINSIC intrn, INT numargs, TYPE rtype, BOOL is_numeric
 
    wn = WN_Create_Intrinsic(op,intrn,numargs,args);
 
-# if 0 //fzhao try Nov
+# if 0 
    if (is_numeric) {
       wn = cwh_wrap_cvtl(wn,type_from_first);
    }
@@ -1263,7 +1263,7 @@ fei_count(TYPE type)
    op = cwh_make_typed_opcode(OPR_INTRINSIC_OP, Pointer_Size==8 ? MTYPE_I8 : MTYPE_I4, MTYPE_V);
 //   wn = WN_Create_Intrinsic(op,INTRN_SUM,3,args);
    wn = WN_Create_Intrinsic(op,INTRN_COUNT,3,args);
- # if 0 //fzhao Nov  
+ # if 0   
    wn = F90_Wrap_ARREXP(wn);
 # endif
    cwh_stk_push(wn,WN_item);
