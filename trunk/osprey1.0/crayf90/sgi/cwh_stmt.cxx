@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.20 $
- * $Date: 2003-12-11 22:07:22 $
- * $Author: eraxxon $
+ * $Revision: 1.21 $
+ * $Date: 2004-01-06 16:30:48 $
+ * $Author: fzhao $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -216,14 +216,11 @@ fei_object_ref (INTPTR  sym_idx,
 {
   STB_pkt *p ;
 
- if(sym_idx != NULL) { 
-
+ if(sym_idx) { 
   p = cast_to_STB(sym_idx);
   DevAssert((p->form == is_ST),("Odd object ref"));
-
   ST * st = cast_to_ST(p->item);
   DevAssert((st),("null st"));
-
   if (whole_array) {
     cwh_stk_push(st,ST_item_whole_array) ;
   } else {
@@ -920,24 +917,24 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
       keepty = ta;
       wa = cwh_stk_pop_ADDR();
       args[k] = cwh_intrin_wrap_ref_parm(wa,ta);
-      if (keepty !=NULL ) {
-         WN_set_ty(args[k],keepty); //July
+      if (keepty) {
+         WN_set_ty(args[k],keepty);
       }
       break;
 
     case WN_item:
     case WN_item_whole_array:
       ta = cwh_stk_get_TY();
-      keepty = ta;   //July
+      keepty = ta;   
       wa = cwh_stk_pop_WN();
-      if (wa !=NULL) {
+      if (wa) {
          if   (WNOPR(wa)==OPR_ARRAYEXP  ||
                      WNOPR(wa)==OPR_PAREN )
                 wa = cwh_intrin_wrap_value_parm(wa);  
           else wa = cwh_intrin_wrap_ref_parm(wa,ta);
 
-      if (keepty !=NULL)
-            WN_set_ty(wa,keepty); //July
+      if (keepty)
+            WN_set_ty(wa,keepty);
       }
 
       args[k] = wa;
@@ -952,7 +949,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
       wa = cwh_expr_operand(NULL);
 //      wa = cwh_intrin_wrap_value_parm(wa);
       wa = cwh_intrin_wrap_ref_parm(wa,ta);
-      if (keepty!=NULL)
+      if (keepty)
          WN_set_ty(wa,keepty); 
       args[k] = wa;
       break ;
@@ -972,7 +969,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
     association = arg_association_info.top(); 
     arg_association_info.pop();
 
-   if (args[k] != NULL)
+   if (args[k])
       switch (association) {
  
  	case PASS_ADDRESS:
@@ -1024,7 +1021,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   st = cwh_stk_pop_ST(); 
   ts = ty ;
   tr = ty ;
- if (st !=NULL) { 
+ if (st) { 
   if (ST_class(st) != CLASS_FUNC) {  /* Must be indirect call, so ptr to */
                                      /* function. Get function type      */
 
@@ -1054,7 +1051,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
       DevAssert((WNOPR(args[0]) == OPR_PARM),("Odd result"));
       wt = WN_kid(args[0],0);
 
-      DevAssert((wt != NULL),("struct w/o temp"));
+      DevAssert((wt),("struct w/o temp"));
       DevAssert((WNOPR(wt) == OPR_LDA),("struct w/o ADDR_item"));
 
       rt = WN_st(wt);
@@ -4797,7 +4794,7 @@ fei_gen_func_entry(INTPTR sym_idx)
 
  STB_pkt *p ;
 
- if(sym_idx != NULL) {
+ if(sym_idx) {
 
   p = cast_to_STB(sym_idx);
   DevAssert((p->form == is_ST),("Odd object ref"));
@@ -4810,8 +4807,6 @@ fei_gen_func_entry(INTPTR sym_idx)
 
   nkids = cwh_auxst_num_dummies(st);
    ap    = cwh_auxst_arglist(st);
-
-//     nkids = 0;
 
    wn = WN_Create (OPC_FUNC_ENTRY, nkids);
    WN_entry_name(wn) = ST_st_idx (st);
