@@ -1,17 +1,17 @@
-documentation: whirl.ps
+documentation: open64.ps
+
+open64.ps: open64.dvi
+	dvi2ps -f open64.dvi > open64.ps
+
+open64.dvi: open64.tex whirl.tex symtab.tex
+	latex open64
+	latex open64
+	makeindex open64
+	latex open64
+	latex open64
 
 clean:
-	/bin/rm -f *.aux *.dvi *.idx *.ilg *.ind *.log *.toc
+	rm -f open64.{ind,aux,dvi,idx,ilg,toc,log} 
 
 veryclean: clean
-	/bin/rm -f *.ps
-
-whirl.ps: whirl.dvi
-	dvips -f whirl.dvi > whirl.ps
-
-whirl.dvi: whirl.tex
-	latex whirl.tex
-	latex whirl.tex
-	makeindex whirl
-	latex whirl.tex
-	latex whirl.tex
+	rm -f open64.ps
