@@ -114,9 +114,17 @@
 #include "wn_instrument.h"          /* whirl instrumenter */
 #include "mem_ctr.h"
 
+
+#if defined(__CYGWIN__)
+# define DSOext ".dll" /* cygwin needs to use dll for DSOs */
+#else
+# define DSOext ".so"
+#endif
+
+
 extern void Initialize_Targ_Info(void);
 
-#if defined(_GCC_NO_PRAGMAWEAK)
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 extern "C" {
 INT64       New_Construct_Id(void) { return 0; }
 INT64       Get_Next_Construct_Id(void) { return 0; }
@@ -124,7 +132,7 @@ INT64       Get_Next_Construct_Id(void) { return 0; }
 #endif
 
 // symbols defined in cg.so
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 extern void (*CG_Process_Command_Line_p) (INT, char **, INT, char **);
 #define CG_Process_Command_Line (*CG_Process_Command_Line_p)
@@ -161,7 +169,7 @@ extern void (*EH_Generate_Range_List_p) (WN *);
 #endif // __linux__
 
 // symbols defined in wopt.so
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 extern void (*wopt_main_p) (INT argc, char **argv, INT, char **);
 #define wopt_main (*wopt_main_p)
@@ -205,7 +213,7 @@ extern BOOL (*Verify_alias_p) (ALIAS_MANAGER *, WN *);
 #endif // __linux__
 
 // symbols defined in lno.so
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 extern void (*lno_main_p) (INT, char**, INT, char**);
 #define lno_main (*lno_main_p)
@@ -229,7 +237,7 @@ extern WN* (*Perform_Loop_Nest_Optimization_p) (PU_Info*, WN*, WN*, BOOL);
 #endif // __linux__
 
 // symbols defined in ipl.so
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK)
+#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 
 extern void (*Ipl_Extra_Output_p) (Output_File *);
 #define Ipl_Extra_Output (*Ipl_Extra_Output_p)
@@ -260,7 +268,7 @@ extern void (*Perform_Procedure_Summary_Phase_p) (WN*, DU_MANAGER*,
 #include "w2c_weak.h"
 #include "w2f_weak.h"
 
-#if defined(_GCC_NO_PRAGMAWEAK)
+#if defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
 void        Anl_Process_Command_Line (INT phase_argc, char *phase_argv[],
                                       INT argc, char *argv[]) { }
 BOOL        Anl_Needs_Whirl2c(void) { return false; }
@@ -376,47 +384,47 @@ load_components (INT argc, char **argv)
 
     if (Run_cg) {
       Get_Phase_Args (PHASE_CG, &phase_argc, &phase_argv);
-      load_so ("cg.so", CG_Path, Show_Progress);
+      load_so ("cg" DSOext, CG_Path, Show_Progress);
       CG_Process_Command_Line (phase_argc, phase_argv, argc, argv);
     }
 
     if (Run_wopt || Run_preopt || Run_lno || Run_autopar) {
       Get_Phase_Args (PHASE_WOPT, &phase_argc, &phase_argv);
-      load_so ("wopt.so", WOPT_Path, Show_Progress);
+      load_so ("wopt" DSOext, WOPT_Path, Show_Progress);
       wopt_main (phase_argc, phase_argv, argc, argv);
       wopt_loaded = TRUE;
     }
 
     if (Run_ipl) {
       Get_Phase_Args (PHASE_IPL, &phase_argc, &phase_argv);
-      load_so ("ipl.so", Ipl_Path, Show_Progress);
+      load_so ("ipl" DSOext, Ipl_Path, Show_Progress);
       ipl_main (phase_argc, phase_argv);
       Set_Error_Descriptor (EP_BE, EDESC_BE);
     }
 
     if (Run_lno || Run_autopar) {
       Get_Phase_Args (PHASE_LNO, &phase_argc, &phase_argv);
-      load_so ("lno.so", LNO_Path, Show_Progress);
+      load_so ("lno" DSOext, LNO_Path, Show_Progress);
       lno_main (phase_argc, phase_argv, argc, argv);
 
       // load in ipl.so if we need to perform automatic
       // parallelization and interprocedural analysis has
       // been performed
       if (Run_autopar && LNO_IPA_Enabled) {
-	  load_so("ipl.so", Ipl_Path, Show_Progress);
+	  load_so("ipl" DSOext, Ipl_Path, Show_Progress);
       }
   }
 
     if (Run_prompf || Run_w2fc_early) {
       Get_Phase_Args (PHASE_PROMPF, &phase_argc, &phase_argv);
-      load_so("prompf_anl.so", Prompf_Anl_Path, Show_Progress);
+      load_so("prompf_anl" DSOext, Prompf_Anl_Path, Show_Progress);
       Prompf_anl_loaded = TRUE;
       Anl_Process_Command_Line(phase_argc, phase_argv, argc, argv);
     }
 
     if (Run_purple) {
       Get_Phase_Args (PHASE_PURPLE, &phase_argc, &phase_argv);
-      load_so("purple.so", Purple_Path, Show_Progress);
+      load_so("purple" DSOext, Purple_Path, Show_Progress);
       Purple_loaded = TRUE;
       Prp_Process_Command_Line(phase_argc, phase_argv, argc, argv);
     }
@@ -426,7 +434,7 @@ load_components (INT argc, char **argv)
 	(Run_purple && Prp_Needs_Whirl2c()))
     {
       Get_Phase_Args (PHASE_W2C, &phase_argc, &phase_argv);
-      load_so("whirl2c.so", W2C_Path, Show_Progress);
+      load_so("whirl2c" DSOext, W2C_Path, Show_Progress);
       Whirl2c_loaded = TRUE;
       if (Run_prompf)
 	W2C_Set_Prompf_Emission(&Prompf_Id_Map);
@@ -438,7 +446,7 @@ load_components (INT argc, char **argv)
 	(Run_purple && Prp_Needs_Whirl2f()))
     {
       Get_Phase_Args (PHASE_W2F, &phase_argc, &phase_argv);
-      load_so("whirl2f.so", W2F_Path, Show_Progress);
+      load_so("whirl2f" DSOext, W2F_Path, Show_Progress);
       Whirl2f_loaded = TRUE;
       if (Run_prompf)
 	W2F_Set_Prompf_Emission(&Prompf_Id_Map);
@@ -1793,13 +1801,13 @@ main (INT argc, char **argv)
       if (!Run_wopt && !Run_preopt) {
 	/* load wopt */
 	Get_Phase_Args (PHASE_WOPT, &phase_argc, &phase_argv);
-	load_so ("wopt.so", WOPT_Path, Show_Progress);
+	load_so ("wopt" DSOext, WOPT_Path, Show_Progress);
 	wopt_main (phase_argc, phase_argv, argc, argv);
 	wopt_loaded = TRUE;
       }
 
       Get_Phase_Args (PHASE_LNO, &phase_argc, &phase_argv);
-      load_so ("lno.so", LNO_Path, Show_Progress);
+      load_so ("lno" DSOext, LNO_Path, Show_Progress);
       lno_main (phase_argc, phase_argv, argc, argv);
     }
   }
