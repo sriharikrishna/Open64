@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.21 $
- * $Date: 2004-01-06 16:30:48 $
+ * $Revision: 1.22 $
+ * $Date: 2004-03-03 18:25:49 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -191,8 +191,8 @@ fei_user_code_start(void)
 {
   still_in_preamble = FALSE;
   cwh_block_append_given(Preamble_Block);
-  cwh_stmt_add_pragma(WN_PRAGMA_PREAMBLE_END);
   cwh_block_append_given(First_Block);
+  cwh_stmt_add_pragma(WN_PRAGMA_PREAMBLE_END);
   (void) cwh_block_toggle_debug(TRUE) ;
 
   cwh_stk_verify_empty();
