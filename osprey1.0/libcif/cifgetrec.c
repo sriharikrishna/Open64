@@ -3422,7 +3422,7 @@ struct Cif_f90_object *obj;
 	}
 
 	c = token();
-	if (*c != NULL &&
+	if (*c != 0 &&
 	    (i = atol (c)) >= 0) {
 		obj->valoffset = 1;
 		obj->offset = i;
@@ -3863,7 +3863,7 @@ struct Cif_f90_int_block *ib;
 static int ascii_f90_vectorization (vect)
 struct Cif_f90_vectorization *vect;
 {
-    (void) fprintf(stderr, "libcif: vectorization message %d\n", vect);
+    (void) fprintf(stderr, "libcif: vectorization message %p\n", vect);
     return(CIF_F90_VECTORIZATION);
 }
 #endif /* ndef CRAY2 */
