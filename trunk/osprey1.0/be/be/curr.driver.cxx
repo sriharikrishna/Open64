@@ -707,8 +707,8 @@ Adjust_Opt_Level (PU_Info* current_pu, WN *pu, char *pu_name)
 static void
 Ipl_Processing (PU_Info *current_pu, WN *pu)
 {
-    struct DU_MANAGER *du_mgr;
-    struct ALIAS_MANAGER *al_mgr;
+    struct DU_MANAGER *du_mgr = NULL;
+    struct ALIAS_MANAGER *al_mgr = NULL;
 
     MEM_POOL_Push (&MEM_local_pool);
 
