@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.6 $
- * $Date: 2003-06-19 19:22:35 $
- * $Author: broom $
+ * $Revision: 1.7 $
+ * $Date: 2003-07-01 16:49:55 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -658,6 +658,7 @@ static const OPC2CNAME_MAP WN2C_Opc2cname_Map[] =
   {OPC_BI8LE, "<="},
   {OPC_BU4LE, "<="},
   {OPC_BF8LE, "<="},
+
   {OPC_I4U8EQ, "=="},
   {OPC_I4FQEQ, "=="},
   {OPC_I4I8EQ, "=="},
@@ -668,6 +669,40 @@ static const OPC2CNAME_MAP WN2C_Opc2cname_Map[] =
   {OPC_I4I4EQ, "=="},
   {OPC_I4F4EQ, "=="},
   {OPC_I4C4EQ, "=="},
+
+  {OPC_I8U8EQ, "=="},
+  {OPC_I8FQEQ, "=="},
+  {OPC_I8I8EQ, "=="},
+  {OPC_I8U4EQ, "=="},
+  {OPC_I8CQEQ, "=="},
+  {OPC_I8F8EQ, "=="},
+  {OPC_I8C8EQ, "=="},
+  {OPC_I8I4EQ, "=="},
+  {OPC_I8F4EQ, "=="},
+  {OPC_I8C4EQ, "=="},
+
+  {OPC_U4U8EQ, "=="},
+  {OPC_U4FQEQ, "=="},
+  {OPC_U4I8EQ, "=="},
+  {OPC_U4U4EQ, "=="},
+  {OPC_U4CQEQ, "=="},
+  {OPC_U4F8EQ, "=="},
+  {OPC_U4C8EQ, "=="},
+  {OPC_U4I4EQ, "=="},
+  {OPC_U4F4EQ, "=="},
+  {OPC_U4C4EQ, "=="},
+
+  {OPC_U8U8EQ, "=="},
+  {OPC_U8FQEQ, "=="},
+  {OPC_U8I8EQ, "=="},
+  {OPC_U8U4EQ, "=="},
+  {OPC_U8CQEQ, "=="},
+  {OPC_U8F8EQ, "=="},
+  {OPC_U8C8EQ, "=="},
+  {OPC_U8I4EQ, "=="},
+  {OPC_U8F4EQ, "=="},
+  {OPC_U8C4EQ, "=="},
+
   {OPC_I4U8NE, "!="},
   {OPC_I4FQNE, "!="},
   {OPC_I4I8NE, "!="},
@@ -678,6 +713,40 @@ static const OPC2CNAME_MAP WN2C_Opc2cname_Map[] =
   {OPC_I4I4NE, "!="},
   {OPC_I4F4NE, "!="},
   {OPC_I4C4NE, "!="},
+ 
+  {OPC_I8U8NE, "!="},
+  {OPC_I8FQNE, "!="},
+  {OPC_I8I8NE, "!="},
+  {OPC_I8U4NE, "!="},
+  {OPC_I8CQNE, "!="},
+  {OPC_I8F8NE, "!="},
+  {OPC_I8C8NE, "!="},
+  {OPC_I8I4NE, "!="},
+  {OPC_I8F4NE, "!="},
+  {OPC_I8C4NE, "!="},
+
+  {OPC_U4U8NE, "!="},
+  {OPC_U4FQNE, "!="},
+  {OPC_U4I8NE, "!="},
+  {OPC_U4U4NE, "!="},
+  {OPC_U4CQNE, "!="},
+  {OPC_U4F8NE, "!="},
+  {OPC_U4C8NE, "!="},
+  {OPC_U4I4NE, "!="},
+  {OPC_U4F4NE, "!="},
+  {OPC_U4C4NE, "!="},
+
+  {OPC_U8U8NE, "!="},
+  {OPC_U8FQNE, "!="},
+  {OPC_U8I8NE, "!="},
+  {OPC_U8U4NE, "!="},
+  {OPC_U8CQNE, "!="},
+  {OPC_U8F8NE, "!="},
+  {OPC_U8C8NE, "!="},
+  {OPC_U8I4NE, "!="},
+  {OPC_U8F4NE, "!="},
+  {OPC_U8C4NE, "!="},
+
   {OPC_I4I4GT, ">"},
   {OPC_I4U8GT, ">"},
   {OPC_I4F4GT, ">"},
@@ -685,6 +754,31 @@ static const OPC2CNAME_MAP WN2C_Opc2cname_Map[] =
   {OPC_I4I8GT, ">"},
   {OPC_I4U4GT, ">"},
   {OPC_I4F8GT, ">"},
+
+  {OPC_I8I4GT, ">"},
+  {OPC_I8U8GT, ">"},
+  {OPC_I8F4GT, ">"},
+  {OPC_I8FQGT, ">"},
+  {OPC_I8I8GT, ">"},
+  {OPC_I8U4GT, ">"},
+  {OPC_I8F8GT, ">"},
+
+  {OPC_U4I4GT, ">"},
+  {OPC_U4U8GT, ">"},
+  {OPC_U4F4GT, ">"},
+  {OPC_U4FQGT, ">"},
+  {OPC_U4I8GT, ">"},
+  {OPC_U4U4GT, ">"},
+  {OPC_U4F8GT, ">"},
+
+  {OPC_U8I4GT, ">"},
+  {OPC_U8U8GT, ">"},
+  {OPC_U8F4GT, ">"},
+  {OPC_U8FQGT, ">"},
+  {OPC_U8I8GT, ">"},
+  {OPC_U8U4GT, ">"},
+  {OPC_U8F8GT, ">"},
+
   {OPC_I4I4GE, ">="},
   {OPC_I4U8GE, ">="},
   {OPC_I4F4GE, ">="},
@@ -692,6 +786,31 @@ static const OPC2CNAME_MAP WN2C_Opc2cname_Map[] =
   {OPC_I4I8GE, ">="},
   {OPC_I4U4GE, ">="},
   {OPC_I4F8GE, ">="},
+
+  {OPC_I8I4GE, ">="},
+  {OPC_I8U8GE, ">="},
+  {OPC_I8F4GE, ">="},
+  {OPC_I8FQGE, ">="},
+  {OPC_I8I8GE, ">="},
+  {OPC_I8U4GE, ">="},
+  {OPC_I8F8GE, ">="},
+
+  {OPC_U4I4GE, ">="},
+  {OPC_U4U8GE, ">="},
+  {OPC_U4F4GE, ">="},
+  {OPC_U4FQGE, ">="},
+  {OPC_U4I8GE, ">="},
+  {OPC_U4U4GE, ">="},
+  {OPC_U4F8GE, ">="},
+
+  {OPC_U8I4GE, ">="},
+  {OPC_U8U8GE, ">="},
+  {OPC_U8F4GE, ">="},
+  {OPC_U8FQGE, ">="},
+  {OPC_U8I8GE, ">="},
+  {OPC_U8U4GE, ">="},
+  {OPC_U8F8GE, ">="},
+
   {OPC_I4I4LT, "<"},
   {OPC_I4U8LT, "<"},
   {OPC_I4F4LT, "<"},
@@ -699,13 +818,64 @@ static const OPC2CNAME_MAP WN2C_Opc2cname_Map[] =
   {OPC_I4I8LT, "<"},
   {OPC_I4U4LT, "<"},
   {OPC_I4F8LT, "<"},
+
+  {OPC_I8I4LT, "<"},
+  {OPC_I8U8LT, "<"},
+  {OPC_I8F4LT, "<"},
+  {OPC_I8FQLT, "<"},
+  {OPC_I8I8LT, "<"},
+  {OPC_I8U4LT, "<"},
+  {OPC_I8F8LT, "<"},
+
+  {OPC_U4I4LT, "<"},
+  {OPC_U4U8LT, "<"},
+  {OPC_U4F4LT, "<"},
+  {OPC_U4FQLT, "<"},
+  {OPC_U4I8LT, "<"},
+  {OPC_U4U4LT, "<"},
+  {OPC_U4F8LT, "<"},
+
+  {OPC_U8I4LT, "<"},
+  {OPC_U8U8LT, "<"},
+  {OPC_U8F4LT, "<"},
+  {OPC_U8FQLT, "<"},
+  {OPC_U8I8LT, "<"},
+  {OPC_U8U4LT, "<"},
+  {OPC_U8F8LT, "<"},
+
   {OPC_I4I4LE, "<="},
   {OPC_I4U8LE, "<="},
   {OPC_I4F4LE, "<="},
   {OPC_I4FQLE, "<="},
   {OPC_I4I8LE, "<="},
   {OPC_I4U4LE, "<="},
-  {OPC_I4F8LE, "<="}
+  {OPC_I4F8LE, "<="},
+
+  {OPC_I8I4LE, "<="},
+  {OPC_I8U8LE, "<="},
+  {OPC_I8F4LE, "<="},
+  {OPC_I8FQLE, "<="},
+  {OPC_I8I8LE, "<="},
+  {OPC_I8U4LE, "<="},
+  {OPC_I8F8LE, "<="},
+
+  {OPC_U4I4LE, "<="},
+  {OPC_U4U8LE, "<="},
+  {OPC_U4F4LE, "<="},
+  {OPC_U4FQLE, "<="},
+  {OPC_U4I8LE, "<="},
+  {OPC_U4U4LE, "<="},
+  {OPC_U4F8LE, "<="},
+
+  {OPC_U8I4LE, "<="},
+  {OPC_U8U8LE, "<="},
+  {OPC_U8F4LE, "<="},
+  {OPC_U8FQLE, "<="},
+  {OPC_U8I8LE, "<="},
+  {OPC_U8U4LE, "<="},
+  {OPC_U8F8LE, "<="}
+
+
 // << WHIRL 0.30: Replaced OPC_T1{EQ,NE,GT,GE,LT,LE} by OP_BT1 and OPC_I4T1 variants
 }; /* WN2C_Opc2Cname_Map */
 
@@ -3145,7 +3315,7 @@ WN2C_binaryop(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
 			       WN_kid0(wn), 
 			       WN_kid1(wn), 
 			       context);
-   else
+   else 
       Is_True(FALSE, ("Illegal operator (%s=%d) in WN2C_binaryop()",
 		      WN_opc_name(wn), WN_opcode(wn)));
 
