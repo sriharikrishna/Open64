@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.14 $
- * $Date: 2002-10-11 17:31:00 $
+ * $Revision: 1.15 $
+ * $Date: 2002-10-28 21:31:47 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.14 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.15 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -740,15 +740,16 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* Get the lhs of the assignment (dereference address) */
    lhs_tokens = New_Token_Buffer();
-
-   set_WN2F_CONTEXT_has_no_arr_elmt(context);
+   if (WN_opc_operator(WN_kid1(wn)) == OPR_LDA)
+          set_WN2F_CONTEXT_has_no_arr_elmt(context);
    WN2F_Offset_Memref(lhs_tokens, 
 		      WN_kid1(wn),           /* base-symbol */
 		      base_ty,               /* base-type */
 		      TY_pointed(WN_ty(wn)), /* object-type */
 		      WN_store_offset(wn),   /* object-ofst */
 		      context);
-   
+     reset_WN2F_CONTEXT_has_no_arr_elmt(context); 
+
    /* The rhs */
    rhs_tokens = New_Token_Buffer();
    if (TY_is_logical(Ty_Table[TY_pointed(WN_ty(wn))]))
@@ -1071,13 +1072,15 @@ WN2F_iload(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     
    /* Get the object to be loaded (dereference address) */
 
-   set_WN2F_CONTEXT_has_no_arr_elmt(context);
+   if (WN_opc_operator(WN_kid0(wn)) == OPR_LDA)
+          set_WN2F_CONTEXT_has_no_arr_elmt(context);
    WN2F_Offset_Memref(tokens, 
 		      WN_kid0(wn),                     /* base-symbol */
 		      base_ty,                         /* base-type */
 		      TY_pointed(WN_load_addr_ty(wn)), /* object-type */
 		      WN_load_offset(wn),              /* object-ofst */
 		      context);
+    reset_WN2F_CONTEXT_has_no_arr_elmt(context);
 
    /* See if there is any prefetch information with this load, and 
     * if so insert information about it as a comment on a separate
@@ -1352,13 +1355,14 @@ WN2F_lda(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
 //    ty = Stab_Pointer_To(ST_type(st));
        
-
+   set_WN2F_CONTEXT_has_no_arr_elmt(context);
     WN2F_Offset_Symref(tokens, 
 		       WN_st(wn),                           /* base-symbol */
 		       ty,                                  /* base type   */
 		       object_ty,                           /* object-type */
 		       WN_lda_offset(wn),                   /* object-ofst */
 		       context);
+    reset_WN2F_CONTEXT_has_no_arr_elmt(context);
   }
 
   return EMPTY_WN2F_STATUS;

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.10 $
- * $Date: 2002-09-26 21:27:36 $
+ * $Revision: 1.11 $
+ * $Date: 2002-10-28 21:31:47 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.10 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.11 $";
 #endif
 
 #include <alloca.h>
@@ -599,6 +599,10 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
       {
 	 translate_var_ref(tokens, st);
 //Sept	 TY2F_Translate_ArrayElt(tokens, base_ty, offset);
+      if (!WN2F_CONTEXT_has_no_arr_elmt(context)) {
+	   TY2F_Translate_ArrayElt(tokens, base_ty, offset);
+           reset_WN2F_CONTEXT_has_no_arr_elmt(context);
+        }
       }
    }
    else /* incompatible base and object types */
