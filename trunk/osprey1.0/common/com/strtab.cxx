@@ -180,15 +180,21 @@ struct CHARACTER_ARRAY
 //
 // change char to unsigned char should solve this problem!
 // Don't know how many other places still have this kind of problem!
-// 
-#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
-{           
-	    unsigned char c = *buffer;
-	    return c;
-}
-#else
-	    return *buffer;
-#endif
+//
+// clovis@par.univie.ac.at:
+// I tested in Sparc+Solaris (cc and gcc) and Pentium+Linux (gcc), and 
+// the default was always "signed char". Following the recommendation of 
+// gcc man page, I'm casting *buffer to "unsigned char", independently of
+// platform and compiler
+            return (unsigned char)*buffer;
+//#if defined(_SOLARIS_SOLARIS) && !defined(__GNUC__)
+//{           
+//	    unsigned char c = *buffer;
+//	    return c;
+//}
+//#else
+//	    return *buffer;
+//#endif
 	else {
 	    UNALIGN_INT32 unalign (buffer + 1);
 	    return unalign.n;
