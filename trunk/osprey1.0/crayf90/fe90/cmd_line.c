@@ -4277,8 +4277,8 @@ static void process_x_option (char *optargs)
          case Tok_Open_Mp_Dir_Dynamic :
          case Tok_SGI_Dir_Dynamic :
             disregard_directive[Tok_Dir_Dynamic - Tok_Dir_Start]	= TRUE;
-            disregard_mips[Tok_Open_Mp_Dir_Dynamic - Tok_SGI_Dir_Start]	= TRUE;
-            disregard_open_mp[Tok_SGI_Dir_Dynamic - 
+            disregard_mips[Tok_SGI_Dir_Dynamic - Tok_SGI_Dir_Start]	= TRUE;
+            disregard_open_mp[Tok_Open_Mp_Dir_Dynamic - 
                               Tok_Open_Mp_Dir_Start]			= TRUE;
             break;
 
