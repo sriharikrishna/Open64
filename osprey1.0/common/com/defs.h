@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: defs.h
- * $Revision: 1.7 $
- * $Date: 2003-11-21 22:07:31 $
+ * $Revision: 1.8 $
+ * $Date: 2003-12-09 19:27:39 $
  *
  * Revision history:
  *  21-Aug-89 - Original Version
@@ -75,17 +75,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-
-/* portable definition of basic types */
-#include <inttypes.h>
-
-/* Solaris workaround
- */
-#if defined(_SOLARIS_SOLARIS) || defined(_SGI_SGI)
-#include <strings.h>
-#else
-#include <string.h>	/* for bzero */
-#endif
+#include <inttypes.h> /* portable definition of basic types */
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,9 +93,6 @@ extern "C" {
  * ====================================================================
  */
 
-#ifdef __sgi
-# define HOST_SGI
-#endif
 
 /***** Note the size of a word (in malloc units): *****/
 #ifndef HOST_WORD_SIZE
@@ -228,14 +215,6 @@ extern "C" {
  * ====================================================================
  */
 
-  /* Solaris workaround
-   * The old rules said "don't define all the following symbols if
-   * the host is not SGI machine and the compiler is not GNU. I had
-   * to remove the rule to compile with Solaris's CC.
-   */
-
-#if (defined(HOST_SGI) || defined(__GNUC__) || defined(_SOLARIS_SOLARIS))
-
 typedef signed int	INT;	/* The natural integer on the host */
 typedef signed int	INT8;	/* Use the natural integer */
 typedef signed int	INT16;	/* Use the natural integer */
@@ -324,13 +303,13 @@ typedef unsigned long	UINTPS;	/* Pointer-sized integer */
  * targ_const.h is included.
  */
 
-/* Solaris CC workaround
+/* Solaris CC workaround (FIXME)
  * if not define HOST_SUPPORTS_QUAD_FLOAT, later in be/com/emulate.cxx, 
  * the CC compiler will complain that 'long double' cannot be converted
  * into QUAD_TYPE. So I added defined(_SOLARIS_SOLARIS)
  */
 #if (defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400) && _SGIAPI) \
-    || defined(__GNUC__) || defined(_SOLARIS_SOLARIS)
+    || defined(__GNUC__) || defined(_SOLARIS_SOLARIS) || defined(__alpha)
 # define HOST_SUPPORTS_QUAD_FLOAT 1
 #else
 # define HOST_SUPPORTS_QUAD_FLOAT 0
@@ -343,20 +322,12 @@ typedef unsigned long	UINTPS;	/* Pointer-sized integer */
   typedef double	QUADFP;		/* 128-bit floating point */
 #endif
 
-#endif /* HOST_SGI || __GNUC__ */
 
 /* ==================================================================== */
 
-/* We would like a generic memory pointer type, e.g. for use in the
- * memory allocation routines.  Ideally, it is (void *), but some
- * hosts, e.g. ca. 1988 MIPS, can't handle that...
- */
-  
-  /* Solaris CC workaround
-   */
-#if (defined(HOST_SGI) || defined(__GNUC__) || defined(_SOLARIS_SOLARIS))
-  typedef void	*MEM_PTR;
-#endif /* HOST_SGI || __GNUC__*/
+/* A generic memory pointer type, e.g. for use in the memory
+ * allocation routines. */
+typedef void *MEM_PTR;
 
 /* Short hand for those who don't like "char *" */
 typedef char *STRING;
