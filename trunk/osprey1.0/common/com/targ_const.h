@@ -228,6 +228,13 @@ typedef struct TCON TCON;
 
 #define TCON_clear(c)	memset (&c, '\0', sizeof(TCON))
 
+const char *
+TCONFlags_To_Str (UINT64 flags);
+
+UINT64
+Str_To_TCONFlags (const char* str);
+
+
 
 /* ====================================================================
  *

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: targ_const.c
- * $Revision: 1.4 $
- * $Date: 2003-11-04 16:12:49 $
+ * $Revision: 1.5 $
+ * $Date: 2005-02-01 00:39:11 $
  *
  * Revision history:
  *  12-Jun-91 - Original Version
@@ -97,6 +97,7 @@
 #include "const.h"
 #include "quad.h"
 #include "quadsim.h"
+#include "ir_a2b_util.h"                // for b2a and a2b utilities
 
 #include <math.h>
 #include "x_math.h" // for hypot()
@@ -2869,6 +2870,56 @@ Targ_Hexfptoc(const TYPE_ID ty, const char * const str)
   return c;
 } /* Targ_Hexfptoc */
 
+/* ====================================================================
+ * 
+ * TCONFlags_To_Str and Str_To_TCONFlags
+ *
+ * ====================================================================
+*/
+
+// The type for flag value -> string tables
+struct FlagToStr_t : public ir_a2b::flag2str_tbl_entry_t {
+  FlagToStr_t(UINT64 val_ = 0, const char* str_ = 0) 
+    : val(val_), str(str_) { }
+
+  virtual ~FlagToStr_t() { }
+
+  virtual UINT64 getFlagVal() const  { return val; }
+  virtual const char* getStr() const { return str; }
+
+  UINT64      val;
+  const char* str;
+};
+
+
+#define TCONFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t TCONFLAGS_ToStrTbl[] = {
+  TCONFLAGS_ToStrTblENTRY(TCON_ADD_NULL)
+};
+
+const UINT TCONFLAGS_ToStrTblSZ = 
+  (sizeof(TCONFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
+const char *
+TCONFlags_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, TCONFLAGS_ToStrTbl, 
+                       TCONFLAGS_ToStrTblSZ>("TCONFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_TCONFlags (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, TCONFLAGS_ToStrTbl, 
+                       TCONFLAGS_ToStrTblSZ>("TCONFLAGS_ToStrTbl", str);
+}
+
+
 /* ====================================================================
  *
  * Targ_Print
