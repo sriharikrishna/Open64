@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2c.c
- * $Revision: 1.7 $
- * $Date: 2003-09-16 21:26:19 $
+ * $Revision: 1.8 $
+ * $Date: 2003-10-14 20:08:16 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $
  *
@@ -72,7 +72,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/st2c.cxx,v $ $Revision: 1.8 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -402,7 +402,6 @@ ST2C_Define_A_Common_Block(TOKEN_BUFFER  tokens,
        {
 	 //if (ordinal > 0)
 	 //  Prepend_Indented_Newline(union_tokens, 1);
-	 Prepend_Token_Special(union_tokens, ';');
 	 //Prepend_Token_String(union_tokens, variation_name);
 	 Prepend_And_Reclaim_Token_List(union_tokens, 
 					&TY2C_LIST_tokens(ty2c_list));
@@ -412,7 +411,7 @@ ST2C_Define_A_Common_Block(TOKEN_BUFFER  tokens,
 	 Append_And_Reclaim_Token_List(union_tokens, 
 				       &TY2C_LIST_tokens(ty2c_list));
 	 //Append_Token_String(union_tokens, variation_name);
-	 Append_Token_Special(union_tokens, ';');
+//	 Append_Token_Special(union_tokens, ';');
 	 //if (TY2C_LIST_next(ty2c_list) != NULL)
 	 //  Append_Indented_Newline(union_tokens, 1);
        }
@@ -437,7 +436,7 @@ ST2C_Define_A_Common_Block(TOKEN_BUFFER  tokens,
 				    &COMMON_BLOCK_initializer(common));
    }
    
-   //Append_Token_Special(union_tokens, ';');
+   Append_Token_Special(union_tokens, ';');
    Append_And_Reclaim_Token_List(tokens, &union_tokens);
 } /* ST2C_Define_A_Common_Block */
 
@@ -640,9 +639,16 @@ ST2C_decl_const(TOKEN_BUFFER tokens, const ST *st, CONTEXT context)
 {
    Is_True(ST_sym_class(st)==CLASS_CONST, ("expected CLASS_CONST ST"));
 
+   /* A CLASS_CONST symbol never has a name, and as such don't need to be
+    * declared! -----fzhao
+    */
+
+# if 0
    ST2C_basic_decl(tokens, st, context);   /* type, name and storage class */
    Append_Token_Special(tokens, '=');
    TCON2C_translate(tokens, STC_val(st));  /* value */
+# endif
+
 } /* ST2C_decl_const */
 
 

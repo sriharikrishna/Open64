@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: init2c.c
- * $Revision: 1.6 $
- * $Date: 2003-09-17 20:06:54 $
+ * $Revision: 1.7 $
+ * $Date: 2003-10-14 20:08:16 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $
  *
@@ -56,7 +56,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -117,7 +117,6 @@ INITV2C_translate(TOKEN_BUFFER tokens,
 		  TY_IDX       ty, 
 		  INITV_IDX    initv); /* Defined below */
 
-
 static void
 INITV2C_symoff(TOKEN_BUFFER tokens, 
 	       TY_IDX       ty, 
@@ -135,12 +134,11 @@ INITV2C_symoff(TOKEN_BUFFER tokens,
    TY2C_FLD_INFO fld_info;
    fld_info.select_tokens = NULL;
    fld_info.found_fld = FLD_HANDLE();
-
-   Is_True(TY_Is_Pointer_Or_Scalar(ty),
+   Is_True(TY_Is_Pointer_Or_Scalar(ty)||TY_Is_Array(ty)
+            || TY_Is_Struct(ty) , 
 	   ("Unexpected lhs type in INITV2C_symoff()"));
    Is_True(ST_sym_class(St_Table[initv_st]) != CLASS_PREG, 
 	   ("Unexpected st class in INITV2C_symoff()"));      
-      
    /* See if we can use implicit array addressing (only relevant for 
     * zero offset).
     */
@@ -169,6 +167,12 @@ INITV2C_symoff(TOKEN_BUFFER tokens,
 					    FALSE,    /*check_quals*/
 					    TRUE,     /*check_scalars*/
 					    FALSE))); /*ptrs_as_scalars*/
+
+/* Since this function is used to dumpout the constant string
+ * we don't need to add the prefix of type to each element.
+ *--------fzhao
+ */
+# if 0 
    if (casted_address)
    {
       tmp_tokens = New_Token_Buffer();
@@ -176,6 +180,7 @@ INITV2C_symoff(TOKEN_BUFFER tokens,
       WHIRL2C_parenthesize(tmp_tokens);
       Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
    }
+#endif
 
    /* Get the address expression */
    tmp_tokens = New_Token_Buffer();
@@ -250,6 +255,62 @@ INITV2C_symoff(TOKEN_BUFFER tokens,
    }
    Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
 } /* INITV2C_symoff */
+
+static void
+INITV2C_symoff_help(TOKEN_BUFFER tokens,
+               TY_IDX       ty,
+               INITV_IDX    initv)
+{
+  TCON tcon;
+  INITV_IDX  next_initv;
+
+     if (TY_Is_Structured(ty)) {
+        Append_Token_Special(tokens,'{');
+        INITV2C_symoff(tokens, ty, initv);
+        next_initv = INITV_next(initv);
+        while(next_initv !=0){
+          if(INITV_kind (next_initv)== INITVKIND_VAL){
+  	         Append_Token_Special(tokens,',');
+                 tcon = TCON_For_Initv(next_initv);
+                 TCON2C_translate(tokens, tcon);
+           } 
+          else 
+          if(INITV_kind (next_initv)== INITVKIND_SYMOFF){
+  	         Append_Token_Special(tokens,',');
+                 INITV2C_symoff(tokens, ty, next_initv);
+                  
+          }
+
+           next_initv = INITV_next(next_initv);
+         }
+         Append_Token_Special(tokens,'}');
+      }
+    else if (TY_Is_Array(ty)) {
+        Append_Token_Special(tokens,'{');
+        INITV2C_symoff(tokens, ty, initv);
+        next_initv = INITV_next(initv);
+        while(next_initv !=0){
+        if(INITV_kind (next_initv)== INITVKIND_VAL){
+                 Append_Token_Special(tokens,',');
+                 tcon = TCON_For_Initv(next_initv);
+                 TCON2C_translate(tokens, tcon);
+           } else
+          if(INITV_kind (next_initv)== INITVKIND_SYMOFF){
+                 Append_Token_Special(tokens,',');
+                 INITV2C_symoff(tokens, ty, next_initv);
+           
+          }
+
+           next_initv = INITV_next(next_initv);
+         }
+         Append_Token_Special(tokens,'}');
+      }
+    else
+     
+         INITV2C_symoff(tokens, ty, initv);
+
+}
+
 
 
 static void
@@ -716,7 +777,7 @@ INITV2C_translate(TOKEN_BUFFER tokens,
       break;
 
    case INITVKIND_SYMOFF:
-      INITV2C_symoff(tokens, ty, initv);
+      INITV2C_symoff_help(tokens, ty, initv);
       break;
       
    case INITVKIND_ZERO:
@@ -763,12 +824,16 @@ INITO2C_translate(TOKEN_BUFFER tokens, INITO_IDX inito)
     */
 
    if (Stab_Is_Common_Block(INITO_st(inito)) ||
-       Stab_Is_Equivalence_Block(INITO_st(inito)))
+            Stab_Is_Equivalence_Block(INITO_st(inito)))
    {
-      Append_Token_Special(tokens, '{');
+     if ( !TY_Is_Structured(ST_type(INITO_st(inito))) )
+           Append_Token_Special(tokens, '{');
       INITV2C_translate(tokens, ST_type(INITO_st(inito)), INITO_val(inito));
-      Append_Token_Special(tokens, '}');
+     if ( !TY_Is_Structured(ST_type(INITO_st(inito))) )
+          Append_Token_Special(tokens, '}');
    }
-   else
+   else{
       INITV2C_translate(tokens, ST_type(INITO_st(inito)), INITO_val(inito));
+
+    }
 } /* INITO2C_translate */
