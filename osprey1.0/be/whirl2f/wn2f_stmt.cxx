@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.21 $
- * $Date: 2003-02-20 01:53:29 $
+ * $Revision: 1.22 $
+ * $Date: 2003-02-26 16:47:29 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.21 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.22 $";
 #endif
 
 #include <alloca.h>
@@ -2226,7 +2226,7 @@ WN2F_return(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     * from the current PU (PUinfo_current_func).
     */
 
-   if (WN2F_Next_ReturnSite ==NULL) //when this will happen??fzhao
+   if (WN2F_Next_ReturnSite ==NULL) //when will this  happen??  fzhao
         return EMPTY_WN2F_STATUS;
 
    ST               *result_var =
@@ -2677,7 +2677,7 @@ TYPE_ID fmtry;
 if (TY_Is_Pointer(arg_ty))
       fmtry = TY_mtype(TY_pointed(arg_ty));
 else
-fmtry =  TY_mtype(arg_ty); // fzhao Jan try
+      fmtry =  TY_mtype(arg_ty); 
 
       if (fmtry == MTYPE_M) {
           fmtry = TY_pointed(parm_ty);
@@ -2796,7 +2796,7 @@ fmtry =  TY_mtype(arg_ty); // fzhao Jan try
          else                
  	   len_idx = last_arg_idx - (total_implicit_args - implicit_args); 
         if (first_nonemptyarg && !has_stat )
-                 Append_Token_Special(call_tokens, ','); //fzhao Nov
+                 Append_Token_Special(call_tokens, ','); 
         else
                  has_stat = FALSE;
      
@@ -2821,7 +2821,7 @@ fmtry =  TY_mtype(arg_ty); // fzhao Jan try
 
          if (WN_kid(wn, arg_idx)!=NULL) {
               if (first_nonemptyarg && !has_stat)
-                  Append_Token_Special(call_tokens, ','); //fzhao Nov
+                  Append_Token_Special(call_tokens, ','); 
               else
                   has_stat=FALSE;
               first_nonemptyarg = TRUE;
@@ -2841,7 +2841,7 @@ fmtry =  TY_mtype(arg_ty); // fzhao Jan try
 	 /* Assume call-by-reference parameter passing */
         if (WN_kid(wn, arg_idx)!=NULL){
            if (first_nonemptyarg && !has_stat)
-                  Append_Token_Special(call_tokens, ','); //fzhao Nov
+                  Append_Token_Special(call_tokens, ','); 
             else
                   has_stat = FALSE;
 

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.11 $
- * $Date: 2003-02-19 20:15:35 $
+ * $Revision: 1.12 $
+ * $Date: 2003-02-26 16:47:29 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.12 $";
 #endif
 
 #include <ctype.h>
@@ -418,7 +418,6 @@ ST2F_decl_type(TOKEN_BUFFER tokens, ST *st)
 
 } /* ST2F_decl_type */
 
-
 static void 
 ST2F_decl_func(TOKEN_BUFFER tokens, ST *st)
 {
@@ -448,14 +447,17 @@ ST2F_decl_func(TOKEN_BUFFER tokens, ST *st)
       (strcmp(ST_name(st),"_CLOSE") !=0 )    &&
       (strcmp(ST_name(st),"_OPEN")!=0   ))
    {
-      Append_Token_String(tokens, "EXTERNAL");
-      Append_Token_String(tokens, func_name);
+     if(strncmp("_",func_name,1)!=0) { /*don't declare function name begin with "_" as external*/
+        Append_Token_String(tokens, "EXTERNAL");
+        Append_Token_String(tokens, func_name);
+      }
    }
 
    /* Specify the function return type, unless it is void */
 
    return_ty = Func_Return_Type(ST_pu_type(st));
-   ST2F_Declare_Return_Type(tokens,return_ty,func_name);
+  if (strncmp("_",func_name,1)!=0)
+       ST2F_Declare_Return_Type(tokens,return_ty,func_name);
 
 } /* ST2F_decl_func */
 
