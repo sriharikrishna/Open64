@@ -217,10 +217,12 @@ typedef unsigned long          INTPTR;
 #define FEI_OBJECT_NOT_PT_TO_UNIQUE_MEM			34
 #define FEI_OBJECT_READ_ONLY				35
 
+
 #define FEI_OBJECT_DEFERRED_SHAPE                       36  
 #define FEI_OBJECT_IN_MODULE                            37  
 #define FEI_OBJECT_EXTERNAL                             38  
 #define FEI_OBJECT_PRIVATE                              39  
+#define FEI_OBJECT_PARAMETER 				40	
 
 #define FEI_ARRAY_DIMEN_VARY_LB      	 	 	 0
 #define FEI_ARRAY_DIMEN_VARY_EXT     	 	 	 1

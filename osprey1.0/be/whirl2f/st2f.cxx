@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.22 $
- * $Date: 2003-09-22 19:41:03 $
+ * $Revision: 1.23 $
+ * $Date: 2003-09-25 02:22:58 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.22 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.23 $";
 #endif
 
 #include <ctype.h>
@@ -376,7 +376,9 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
     * an equivalence, in which case it is implicitly SAVE.
     */
    if (!Stab_Is_Equivalence_Block(st) &&
-       (ST_sclass(st) == SCLASS_FSTATIC || ST_sclass(st) == SCLASS_PSTATIC))
+       !ST_is_parameter(st) &&
+       (ST_sclass(st) == SCLASS_FSTATIC || 
+         ST_sclass(st) == SCLASS_PSTATIC))
    {
       Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
       Append_Token_String(tokens, "SAVE");
@@ -385,16 +387,26 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
 
 INITPRO:
    /* Generate a DATA statement for initializers */
-   if (ST_is_initialized(st) && 
-       !Stab_No_Linkage(st)  &&
-       (!TY_Is_Structured(ST_type(st)) || 
-	Stab_Is_Common_Block(st)       || 
-	Stab_Is_Equivalence_Block(st))) 
-   {
-      inito = Find_INITO_For_Symbol(st);
-      if (inito != (INITO_IDX) 0)
-	 INITO2F_translate(Data_Stmt_Tokens, inito);
-   }
+   if (ST_is_parameter(st)){
+       inito = Find_INITO_For_Symbol(st);
+       if (inito != (INITO_IDX) 0) {
+          TOKEN_BUFFER decl_tokens=New_Token_Buffer();
+          PARAMETER2F_translate(decl_tokens,inito);
+          Append_F77_Indented_Newline(tokens, 1, NULL);
+          Append_And_Reclaim_Token_List(tokens,&decl_tokens); }
+       }
+     else {
+      if (ST_is_initialized(st) && 
+       !Stab_No_Linkage(st)  )
+//       (!TY_Is_Structured(ST_type(st)) ||  //structure also can be initialized---fzhao
+//	(Stab_Is_Common_Block(st)       || 
+//	Stab_Is_Equivalence_Block(st))) 
+       {
+          inito = Find_INITO_For_Symbol(st);
+          if (inito != (INITO_IDX) 0)
+	     INITO2F_translate(Data_Stmt_Tokens, inito);
+       }
+     }
 } /* ST2F_decl_var */
 
 static void 

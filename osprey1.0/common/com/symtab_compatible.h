@@ -446,6 +446,13 @@ Set_ST_is_u_operator_interface (ST* s)   { s->flags_ext |= ST_IS_U_OPERATOR_INTE
 inline void
 Clear_ST_is_u_operator_interface (ST* s) { s->flags_ext &= ~ST_IS_U_OPERATOR_INTERFACE; }
 
+inline BOOL
+ST_is_parameter (const ST* s)   { return s->flags_ext & ST_IS_PARAMETER;}
+inline void
+Set_ST_is_parameter (ST* s)     { s->flags_ext |= ST_IS_PARAMETER; }
+inline void
+Clear_ST_is_parameter (ST* s)   { s->flags_ext &= ~ST_IS_PARAMETER; }
+
 
 inline BOOL
 ST_is_temp_var (const ST* s)		{ return s->flags & ST_IS_TEMP_VAR;}

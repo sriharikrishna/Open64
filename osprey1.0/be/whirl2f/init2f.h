@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: init2f.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:33 $
+ * $Revision: 1.3 $
+ * $Date: 2003-09-25 02:22:58 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.h,v $
  *
@@ -72,5 +72,7 @@
 extern TOKEN_BUFFER Data_Stmt_Tokens; 
 
 extern void INITO2F_translate(TOKEN_BUFFER tokens, INITO_IDX inito);
+
+extern void PARAMETER2F_translate(TOKEN_BUFFER tokens, INITO_IDX inito);
 
 #endif /* init2f_INCLUDED */

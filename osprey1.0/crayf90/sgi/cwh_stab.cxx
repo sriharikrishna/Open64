@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.22 $
- * $Date: 2003-09-22 19:41:06 $
+ * $Revision: 1.23 $
+ * $Date: 2003-09-25 02:23:00 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.22 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.23 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1161,7 +1161,9 @@ fei_object(char * name_string,
         ST_sclass(st) == SCLASS_FORMAL_REF)
           Set_ST_is_temp_var(st);
   }
-
+  
+  if (test_flag(flag_bits,FEI_OBJECT_PARAMETER))
+     Set_ST_is_parameter(st);
 
   /* F90 pointers and assumed-shape dummies are non-contiguous */
   if (test_flag(flag_bits,FEI_OBJECT_PRIVATE))

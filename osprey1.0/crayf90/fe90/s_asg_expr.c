@@ -1081,6 +1081,7 @@ boolean expr_semantics (opnd_type       *result_opnd,
 
       if (IR_OPR(OPND_IDX((*result_opnd)))==Constant_Array_Construct_Opr ||
        IR_OPR(OPND_IDX((*result_opnd)))== Null_Opr ||
+        IR_OPR(OPND_IDX((*result_opnd)))== Constant_Struct_Construct_Opr ||
            IR_OPR(OPND_IDX((*result_opnd)))== Subscript_Opr ) /* June*/
             ok = fold_aggragate_expression(&opnd, exp_desc, FALSE) && ok; 
 /*  June      else */
