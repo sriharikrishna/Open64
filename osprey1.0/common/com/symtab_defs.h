@@ -507,7 +507,7 @@ enum TY_FLAGS
     TY_IS_CO_ARRAY      = 0x80000,
     TY_IS_WRITTEN	= 0x100000,	//make w2c to output the type definition
 /* key */
-    TY_RETURN_IN_MEM    = 0x00,       // Functions must return objects of this
+    TY_RETURN_IN_MEM    = 0x200000,       // Functions must return objects of this
                                         // type in memory.
 
 };
