@@ -137,9 +137,9 @@ simplifier with other modules:
 
   **************************************************************************/
 
-/** $Revision: 1.1.1.1 $
- $Date: 2002-05-22 20:07:02 $
- $Author: dsystem $
+/** $Revision: 1.2 $
+ $Date: 2002-07-12 16:48:34 $
+ $Author: fzhao $
  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_simp.h,v $
 **/
 

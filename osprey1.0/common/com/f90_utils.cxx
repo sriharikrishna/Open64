@@ -152,6 +152,9 @@ BOOL F90_Size_Walk(WN *expr, INT *ndim, WN **sizes)
    *ndim = 0;
    sized = FALSE;
 
+ if (expr == NULL)
+    return (TRUE);   //fzhao try May 28
+
    switch (WN_operator(expr)) {
     case OPR_COMMA:
        /* Size the things in the block */

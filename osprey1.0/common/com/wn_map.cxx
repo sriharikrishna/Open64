@@ -37,7 +37,7 @@
  * ====================================================================
  *
  * Module: wn_map.c
- * $Author: dsystem $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_map.cxx,v $
  *
  * Revision history:

@@ -38,7 +38,7 @@
 
 
 #ifdef _KEEP_RCS_ID
-static char *dwarf_DST_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST.h,v $ $Revision: 1.1.1.1 $";
+static char *dwarf_DST_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 /* The version number will be accessible through the routines in

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: init2c.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:54 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:52:16 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $
  *
  * Revision history:
@@ -56,7 +56,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"

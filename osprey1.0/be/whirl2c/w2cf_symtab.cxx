@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:55 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:52:17 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
  * Revision history:
@@ -76,7 +76,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>
@@ -887,7 +887,9 @@ W2CF_Symtab_Nameof_St(const ST *st)
    W2CF_Get_Symbol(&symtab, &symhdr, &symbol, &match_symbol, symname);
    
    /* Return the resultant disambiguated name */
-   return W2CF_SYMBOL_name_string(symtab, symbol);
+//   return W2CF_SYMBOL_name_string(symtab, symbol);
+    return valid_name; // fzhao change to keep original name
+
    
 } /* W2CF_Symtab_Nameof_St */
 
@@ -955,7 +957,8 @@ W2CF_Symtab_Nameof_Ty(TY_IDX ty)
    W2CF_Get_Symbol(&symtab, &symhdr, &symbol, &match_symbol, symname);
    
    /* Return the resultant disambiguated name */
-   return W2CF_SYMBOL_name_string(symtab, symbol);
+//   return W2CF_SYMBOL_name_string(symtab, symbol);
+    return valid_name; 
    
 } /* W2CF_Symtab_Nameof_Ty */
 
@@ -991,7 +994,8 @@ W2CF_Symtab_Nameof_Fld(FLD_HANDLE fld)
    W2CF_Get_Symbol(&symtab, &symhdr, &symbol, &match_symbol, symname);
    
    /* Return the resultant disambiguated name */
-   return W2CF_SYMBOL_name_string(symtab, symbol);
+//   return W2CF_SYMBOL_name_string(symtab, symbol);
+   return valid_name;
    
 } /* W2CF_Symtab_Nameof_Fld */
 

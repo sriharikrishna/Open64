@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: config.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:58 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:48:27 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifdef FRONT_END	/* For setting fullwarn, woff in front end */

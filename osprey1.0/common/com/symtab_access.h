@@ -427,6 +427,13 @@ inline void
 Clear_ST_is_in_module (ST& s)          { s.flags_ext &= ~ST_IS_IN_MODULE; }
 
 inline BOOL
+ST_is_block_data (const ST& s)          { return s.flags_ext & ST_IS_BLOCK_DATA;}
+inline void
+Set_ST_is_block_data (ST& s)            { s.flags_ext |= ST_IS_BLOCK_DATA; }
+inline void
+Clear_ST_is_block_data (ST& s)          { s.flags_ext &= ~ST_IS_BLOCK_DATA; }
+
+inline BOOL
 ST_is_external (const ST& s)          { return s.flags_ext & ST_IS_EXTERNAL;}
 inline void
 Set_ST_is_external (ST& s)            { s.flags_ext |= ST_IS_EXTERNAL; }
@@ -1322,6 +1329,13 @@ inline UINT16
 ARB_dimension (const ARB_HANDLE arb)		{ return arb.Entry()->dimension; }
 inline void
 Set_ARB_dimension (ARB_HANDLE arb, UINT16 dim){ arb.Entry()->dimension = dim; }
+
+// fzhao add for co_dimension 
+inline UINT16
+ARB_co_dimension (const ARB_HANDLE arb)            { return arb.Entry()->co_dimension; }
+inline void
+Set_ARB_co_dimension (ARB_HANDLE arb, UINT16 dim){ arb.Entry()->co_dimension = dim; }
+
 
 inline INT64
 ARB_lbnd_val (const ARB_HANDLE arb)		{ return arb.Entry()->Lbnd_val (); }

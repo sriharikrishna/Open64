@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: w2cf_symtab.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:55 $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:52:17 $
  *
  * Revision history:
  *  07-Oct-95 - Original Version

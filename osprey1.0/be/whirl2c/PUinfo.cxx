@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: PUinfo.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:54 $
- * $Author: dsystem $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:52:15 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.1.1.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>
@@ -983,6 +983,7 @@ Accumulate_Expr_PUinfo(WN *root)
    const WN *gparent;
    const WN *next_return_ldid = NULL;
    CALLSITE *last_callsite = NULL;
+   ST * stz;
    
    /* Walk the entire tree to get expression-level information */
    for (wn_iter = WN_WALK_TreeIter(root); 
@@ -999,6 +1000,7 @@ Accumulate_Expr_PUinfo(WN *root)
 	 switch(WN_opc_operator(wn))
 	 {
 	 case OPR_STID:
+              stz = WN_st(wn);
 	    if (ST_sym_class(WN_st(wn)) == CLASS_PREG)
 	       Accumulate_Preg_Info(ST_type(WN_st(wn)), WN_store_offset(wn));
 
