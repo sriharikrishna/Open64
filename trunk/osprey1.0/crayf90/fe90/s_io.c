@@ -2954,10 +2954,10 @@ int fm;
    else
        if (IL_FLD(list_idx) == AT_Tbl_Idx &&
                               i   == FMT_IDX &&
-                              !(namelist_expected)){  
+                              !(namelist_expected) &&
+               ( io_type == Write || io_type == Read)){  
              IL_IDX(list_idx)=ATD_TMP_IDX(ATL_FORMAT_TMP(IL_IDX(list_idx))); 
-/*Sept try             IL_FLD(list_idx) = CN_Tbl_Idx; */
-             IL_FLD(list_idx) = AT_Tbl_Idx;
+             IL_FLD(list_idx) = CN_Tbl_Idx; 
 
        }
       else if (i                == FMT_IDX &&
