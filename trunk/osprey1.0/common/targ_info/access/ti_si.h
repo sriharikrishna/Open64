@@ -326,26 +326,28 @@
  */
 
 /*  $REVISION: $
- *  $Date: 2002-05-22 20:07:06 $
- *  $Author: dsystem $
+ *  $Date: 2003-12-09 19:18:15 $
+ *  $Author: eraxxon $
  *  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_si.h,v $
  */
 
 #ifndef SI_INCLUDED
 #define SI_INCLUDED
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #ifndef SI_RCS_ID
 #define SI_RCS_ID
 #ifdef _KEEP_RCS_ID
-static const char SI_rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_si.h,v $ $Revision: 1.1.1.1 $";
+static const char SI_rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_si.h,v $ $Revision: 1.2 $";
 #endif
 #endif
-
-typedef enum topcode TOPCODE;
 
 #include <topcode.h>
+
+typedef enum topcode TOPCODE;
 
 /****************************************************************************
  ****************************************************************************/
