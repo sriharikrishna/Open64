@@ -323,6 +323,18 @@ namespace {
     };
 }
 
+
+// FIXME: This is a temporary measure until I find time to remove
+// the non-standard hash_map.  This just allows the current source
+// to build with the latest gcc versions (hash_map was already in 
+// use by the original code).
+#if defined(__GNUC__) && ((__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 2)))
+#include <ext/hash_map>
+using namespace __gnu_cxx;
+#else
+#include <ext/hash_map>
+#endif
+
 typedef hash_map<CODEREP*, INT, ptr_hash<CODEREP>, equal_to<CODEREP*>,
     mempool_allocator<CODEREP*> > CHI_CR_TO_INT_MAP;
 extern CHI_CR_TO_INT_MAP* Chi_To_Idx_Map;
