@@ -3297,17 +3297,22 @@ struct  int_dope_entry  {
 typedef struct int_dope_entry           int_dope_type;
 
 
+#if 0 /* eraxxon */
 # ifdef _HOST64
 struct exp_tbl_entry            {
                                 boolean			ext  :  1;
                                 linear_type_type	type : 63;
                                 };
 # elif _HOST32
+# endif
+#endif /* eraxxon */
+/* linear_type_type is an enum, which is defined to be 32 bits, even
+   on 64 bit architectures */
 struct exp_tbl_entry            {
                                 boolean			ext  :  1;
                                 linear_type_type	type : 31;
                                 };
-# endif
+
 
 typedef struct exp_tbl_entry    exp_tbl_type;
 
