@@ -1115,6 +1115,8 @@ struct	rename_only_entry	{Uint		line_num		: 24;
 				 Uint		next_idx		: 16;
                                  Uint		attr_idx   : 24;  
                                  Uint           xx         : 8;
+                               
+                                 Uint           unused2     :  32;
 				};
 
 

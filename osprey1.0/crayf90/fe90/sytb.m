@@ -113,7 +113,7 @@
 # else
 #	define NUM_PDG_WDS		2
 # endif /* _WHIRL_HOST64_TARGET64 */
-#	define NUM_RO_WDS		2
+#	define NUM_RO_WDS		3
 #	define NUM_SB_WDS		5
 #	define NUM_SCP_WDS		26
 #	define NUM_SH_WDS		3
@@ -144,7 +144,7 @@
 #	define NUM_NP_WDS		1
 #	define NUM_PDG_WDS		4
 /* #	define NUM_RO_WDS		4 */
-#	define NUM_RO_WDS		5	
+#	define NUM_RO_WDS		6	
 #	define NUM_SB_WDS		10
 #	define NUM_SCP_WDS		52
 #	define NUM_SH_WDS		6
