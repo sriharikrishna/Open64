@@ -32,38 +32,17 @@
 
 */
 
-// Solaris workaround
-// the following symbols are only defined in IRIX's standard headers
-
-#ifdef _SOLARIS_SOLARIS
-#include <strings.h>                    // <bstring.h>
-#define ET_IR           1               // IRIX elf.h
-#define ELF_SHSTRTAB ".shstrtab"        // IRIX elf.h
-#define EI_MAG0         0         
-#define EI_MAG1         1
-#define EI_MAG2         2
-#define EI_MAG3         3
-#define IS_ELF(ehdr)    ((ehdr).e_ident[EI_MAG0] == ELFMAG0 && \
-                        (ehdr).e_ident[EI_MAG1] == ELFMAG1 && \
-                        (ehdr).e_ident[EI_MAG2] == ELFMAG2 && \
-                        (ehdr).e_ident[EI_MAG3] == ELFMAG3)
-extern char *   sys_errlist[];          // IRIX errno.h
-extern int      sys_nerr;               // IRIX errno.h 
-
-#else
-#include <bstring.h>
-#endif
-
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <elf.h>
+#include <elf.h>                    /* Open64 version */
 #include <fcntl.h> 
 #include <errno.h>
 #include <signal.h>
 #define USE_STANDARD_TYPES
 #include "defs.h"
+#include "alignof.h"                /* for ALIGNOF() */
 #include "cxx_memory.h"
 #include "ipa_section.h"
 #include "wn.h"
@@ -84,11 +63,8 @@ extern int      sys_nerr;               // IRIX errno.h
 #include "ipa_lno_info.h"
 #include "ipl_summary.h"
 
-// Put this here for now.  Later move it on to /usr/include/sys/elf.h and 
-// change SHT_MIPS_NUM to 42.  
-#define SHT_MIPS_IPALNO  (SHT_LOPROC + 42)
 
-#ifdef linux
+#ifdef __linux__
 #define MAPPED_SIZE 0x400000
 #endif
 
@@ -118,9 +94,10 @@ static void Ir_Lno_Signal_Handler(int sig,
   // Invoke a fatal error instead of normal handling.  The variable 
   // 'Doing_mmapped_io' is defined in common/com/ir_bcom.cxx
 
-  if (Doing_mmapped_io && err_num > 0 && err_num < sys_nerr)
+  if (Doing_mmapped_io && err_num > 0) {
     Fatal_Error("I/O error in %s: %s", Current_Output ?
-      Current_Output->file_name : "mmapped object", sys_errlist[err_num]);
+      Current_Output->file_name : "mmapped object", strerror(err_num));
+  }
 
   // Otherwise, handle this as a normal SIGSEGV or SIGBUS
   switch (sig) {
@@ -461,17 +438,7 @@ Elf64_Off IPA_LNO_WRITE_FILE::Create_String_Table_Section(
   strtab_sec->sh_entsize = 1;
 
   // Align the file
-  ofl->file_size = ir_b_align(ofl->file_size,
-
-// Solaris CC workaround
-#if defined(__GNUC__)
-            __alignof__(Elf64_Shdr),
-#elif defined(_SOLARIS_SOLARIS)
-            __alignof(Elf64_Shdr),
-#else			      
-            __builtin_alignof(Elf64_Shdr),
-#endif
-      0);
+  ofl->file_size = ir_b_align(ofl->file_size, ALIGNOF(Elf64_Shdr), 0);
   e_shoff = ofl->file_size;
   return e_shoff;
 } 
@@ -653,15 +620,8 @@ INT IPA_LNO_READ_FILE::Check_Elf_Header()
         ehdr->e_shoff + ehdr->e_shnum * sizeof(Elf64_Shdr) > ifl->mapped_size)
       return IPALNO_FORMAT_ERROR;
     shdr = (Elf64_Shdr *) (baseaddr + ehdr->e_shoff);
-
-// Solaris CC workaround
-#if defined(__GNUC__)
-    if ((long) shdr & (__alignof__(Elf64_Shdr) - 1))
-#elif defined(_SOLARIS_SOLARIS)
-    if ((long) shdr & (__alignof(Elf64_Shdr) - 1))
-#else
-    if ((long) shdr & (__builtin_alignof(Elf64_Shdr) - 1))
-#endif
+    
+    if ((long) shdr & (ALIGNOF(Elf64_Shdr) - 1))
       return IPALNO_FORMAT_ERROR;
     return IPALNO_SUCCESS;
   }

@@ -32,17 +32,6 @@
 
 */
 
-// Solaris workaround
-#ifdef _SOLARIS_SOLARIS
-# define ELF_COMMENT     ".comment"
-# define ELF_SHSTRTAB    ".shstrtab"
-  extern int              sys_nerr;
-  extern char *           sys_errlist[];
-# define ET_IR           1
-# define SHT_MIPS_WHIRL  1
-#endif
-
-
 #ifdef USE_PCH
 # include "common_com_pch.h"
 #endif /* USE_PCH */
@@ -54,20 +43,18 @@
 #include <signal.h>		    /* for signal() */
 #include <string.h>                 /* for strerror() */
 #include <errno.h>		    /* for system error code */
-#include <elf.h>		    /* for all Elf stuff */
+#include <elf.h>		    /* Open64 version */
 #include <sys/elf_whirl.h>	    /* for WHIRL sections' sh_info */
 #include <cmplrs/rcodes.h>
 
 #include "x_stdlib.h" // for mkstemp()
 
-
-// Solaric CC workaround
-// no big deal, just to remove a compiler warning
 #ifndef USE_STANDARD_TYPES
 # define USE_STANDARD_TYPES	    /* override unwanted defines in "defs.h" */
 #endif
 
 #include "defs.h"		    /* for wn_core.h */
+#include "alignof.h"                /* for ALIGNOF() */
 #ifdef OWN_ERROR_PACKAGE
 /* Turn off assertion in the opcode handling routines, we assume the tree
  * is clean.  Also, this removes the dependency on "errors.h", which is not
@@ -126,6 +113,7 @@ extern void *C_Dep_Graph(void);
 extern void Depgraph_Write (void *depgraph, Output_File *fl, WN_MAP off_map);
 }
 #endif /* BACK_END */
+
 
 #define MMAP(addr, len, prot, flags, fd, off)				\
     mmap((void *)(addr), (size_t)(len), (int)(prot), (int)(flags),	\
@@ -269,20 +257,7 @@ layout_sections (Shdr& strtab_sec, Output_File *fl)
     strtab_sec.sh_addralign = 1;
     strtab_sec.sh_entsize = 1;
 
-    fl->file_size = ir_b_align (fl->file_size,
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                                __alignof(Shdr),
-
-#elif !defined(__GNUC__)
-				__builtin_alignof(Shdr),
-#else
-				__alignof__(Shdr),
-#endif
-
-				0);
+    fl->file_size = ir_b_align (fl->file_size, ALIGNOF(Shdr),	0);
     e_shoff = fl->file_size;
 
     /* There are 2 extra sections: the null and the section string table */
@@ -750,19 +725,7 @@ WN_write_tree (PU_Info *pu, WN_MAP off_map, Output_File *fl)
     }
     /* add room for offset to the first node */
     padding += sizeof(Elf64_Word);
-    fl->file_size = ir_b_align (fl->file_size,
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-				__alignof(WN),
-#elif !defined(__GNUC__)
-				__builtin_alignof(WN),
-#else
-				__alignof__(WN),
-#endif
-
-				padding);
+    fl->file_size = ir_b_align (fl->file_size, ALIGNOF(WN), padding);
     tree_base = fl->file_size;
 
     this_tree = ir_b_write_tree (tree, tree_base, fl, off_map);
@@ -957,18 +920,8 @@ namespace
 		   mUINT32& offset) {
 	offset =
 	    ir_b_save_buf (&(data.front()),
-			   data.size () * sizeof(T::value_type),
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                           __alignof(T::value_type),
-#elif !defined(__GNUC__)
-			   __builtin_alignof(T::value_type),
-#else
-			   __alignof__(T::value_type),
-#endif
-			   0, fl) - base;
+			   data.size () * sizeof(T::value_type), 
+			   ALIGNOF(T::value_type), 0, fl) - base;
 	num = data.size ();
     }
 
@@ -985,18 +938,7 @@ namespace
 	while (first != data.end ()) {
 	    const vector<FB_FREQ>& freq = first->freq_targets;
 	    ir_b_save_buf (&(freq.front ()), freq.size () * sizeof(FB_FREQ),
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                           __alignof(FB_FREQ),
-
-#elif !defined(__GNUC__)
-			   __builtin_alignof(FB_FREQ),
-#else
-			   __alignof__(FB_FREQ),
-#endif
-			   0, fl);
+			   ALIGNOF(FB_FREQ), 0, fl);
 	    ++first;
 	}
 
@@ -1023,19 +965,7 @@ WN_write_feedback (PU_Info* pu, Output_File* fl)
     if (strcmp(cur_section->name, MIPS_WHIRL_PU_SECTION) != 0)
 	ErrMsg (EC_IR_Scn_Write, "feedback", fl->file_name);
 
-    fl->file_size = ir_b_align (fl->file_size,
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                                __alignof(Pu_Hdr),
-   
-#elif !defined(__GNUC__)
-				__builtin_alignof(Pu_Hdr),
-#else
-				__alignof__(Pu_Hdr),
-#endif
-				0);
+    fl->file_size = ir_b_align (fl->file_size, ALIGNOF(Pu_Hdr), 0);
     off_t feedback_base = fl->file_size;
 
     if (Cur_PU_Feedback == NULL) {
@@ -1047,19 +977,7 @@ WN_write_feedback (PU_Info* pu, Output_File* fl)
 	// section from the input file to the output file.
 	Elf64_Word size = PU_Info_subsect_offset (pu, WT_FEEDBACK);
 	(void) ir_b_save_buf (PU_Info_feedback_ptr (pu), size,
-
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                             __alignof(Pu_Hdr),
-
-#elif !defined(__GNUC__)
-			     __builtin_alignof(Pu_Hdr),
-#else
-			     __alignof__(Pu_Hdr),
-#endif
-			     0, fl);
+			      ALIGNOF(Pu_Hdr), 0, fl);
 	
 	Set_PU_Info_state (pu, WT_FEEDBACK, Subsect_Written);
 	PU_Info_subsect_size (pu, WT_FEEDBACK) = size;
@@ -1109,7 +1027,7 @@ WN_write_feedback (PU_Info* pu, Output_File* fl)
 		   pu_hdr.pu_num_call_entries,
 		   pu_hdr.pu_call_offset);
 
-    bcopy (&pu_hdr, fl->map_addr + feedback_base, sizeof(pu_hdr));
+    memmove (fl->map_addr + feedback_base, &pu_hdr, sizeof(pu_hdr));
     
 
     Set_PU_Info_state (pu, WT_FEEDBACK, Subsect_Written);
@@ -1231,18 +1149,7 @@ WN_write_prefetch (PU_Info *pu, WN_MAP off_map, Output_File *fl)
 				   sizeof(Elf64_Word), 0, fl);
 
 	cur_offset = ir_b_save_buf((void *)pf_ptr, sizeof(PF_POINTER),
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                                   __alignof(PF_POINTER),
-
-#elif !defined(__GNUC__)     
-				   __builtin_alignof(PF_POINTER),
-#else
-				   __alignof__(PF_POINTER),
-#endif
-				   0, fl);
+				   ALIGNOF(PF_POINTER), 0, fl);
 
 	/* change the WN pointers to offsets. Store a -1 if NULL pointer */
         PF_PTR_ADDR(cur_offset)->wn_pref_1L =
@@ -1424,33 +1331,11 @@ IPA_copy_PU (PU_Info *pu, char *section_base, Output_File *outfile)
     else if (state != Subsect_Written)
 	ErrMsg (EC_IR_Scn_Write, "tree", outfile->file_name);
     subsect = section_base + PU_Info_subsect_offset(pu, WT_TREE);
-    outfile->file_size = ir_b_align(outfile->file_size,
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                                    __alignof(WN),
-
-#elif !defined(__GNUC__)
-				    __builtin_alignof(WN),
-#else
-				    __alignof__(WN),
-#endif
+    outfile->file_size = ir_b_align(outfile->file_size, ALIGNOF(WN),
 				    padding);
     base = outfile->file_size;
     ir_b_save_buf(subsect, PU_Info_subsect_size(pu, WT_TREE),
-
-// Solaris CC workaround
-// we need to use __alignof() when compiling with Solaris CC
-#if !defined(__GNUC__) && defined(_SOLARIS_SOLARIS)
-                                    __alignof(WN),        
-
-#elif !defined(__GNUC__)
-                                    __builtin_alignof(WN),
-#else
-		                    __alignof__(WN),
-#endif
-		  padding, outfile);
+		  ALIGNOF(WN), padding, outfile);
     PU_Info_subsect_offset(pu, WT_TREE) =
 	base - outfile->cur_section->shdr.sh_offset;
 
