@@ -40,32 +40,25 @@
 
 #ifndef __SGI_STL_VECTOR_H
 
-#if defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
-#undef short				// get around bogus type defs.
-#undef int
-#undef long
-#endif // defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
+# if defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
+#  undef short				// get around bogus type defs.
+#  undef int
+#  undef long
+# endif // defined(defs_INCLUDED) && !defined(USE_STANDARD_TYPES)
 
 using namespace std;
 #include <vector>
 
 #endif // __SGI_STL_VECTOR_H
 
-#ifndef ERRORS_INCLUDED
 #include "errors.h"
-#endif // ERRORS_INCLUDED
-
-#ifndef mempool_INCLUDED
 #include "mempool.h"
-#endif // mempool_INCLUDED
-
-#ifndef mempool_allocator_INCLUDED
 #include "mempool_allocator.h"
-#endif
 
-// ARRAY_Ptr is pointer to SEG_ARRAY,
-// _PTR is pointer to SEG_ARRAY::value_type,
-// REF is reference to SEG_ARRAY::value_type.
+
+// SA_Ptr is pointer to SEG_ARRAY,
+// SA_vt_Ptr is pointer to SEG_ARRAY::value_type,
+// SA_vt_Ref is reference to SEG_ARRAY::value_type.
 //
 // These are template parameters because we need both constant and
 // mutable iterators.  For a constant iterator they will be,
@@ -76,21 +69,21 @@ using namespace std;
 // TO DO: add a conversion from the mutable version to the constant
 // version.
 
-template <class ARRAY_Ptr, class T, class _PTR, class REF>
+template <class SA_Ptr, class T, class SA_vt_Ptr, class SA_vt_Ref>
 class SEGMENTED_ARRAY_ITERATOR
 {
 public:
   typedef T                         value_type;
   typedef UINT                      difference_type;
   typedef std::forward_iterator_tag iterator_category;
-  typedef _PTR                      pointer;
-  typedef REF                       reference;
+  typedef SA_vt_Ptr                 pointer;
+  typedef SA_vt_Ref                 reference;
 
 private:
     
-    ARRAY_Ptr segmented_array;
-    _PTR ptr;				// pointer to the current element
-    _PTR segment_last;			// ptr after the current segment
+    SA_Ptr segmented_array;
+    SA_vt_Ptr ptr;			// pointer to the current element
+    SA_vt_Ptr segment_last;		// ptr after the current segment
     UINT map_idx;			// index to the map array
 
 private:
@@ -99,12 +92,12 @@ private:
 
 public:
 
-    SEGMENTED_ARRAY_ITERATOR (ARRAY_Ptr sa, T* p, T* last, UINT idx) 
+    SEGMENTED_ARRAY_ITERATOR (SA_Ptr sa, T* p, T* last, UINT idx) 
 	: segmented_array (sa), ptr (p), segment_last (last) {
 	    map_idx = sa->Block_index(idx);
     }
 
-    SEGMENTED_ARRAY_ITERATOR (ARRAY_Ptr sa, UINT idx)
+    SEGMENTED_ARRAY_ITERATOR (SA_Ptr sa, UINT idx)
 	: segmented_array (sa) {
             map_idx = sa->Block_index(idx);
 	    ptr = &(sa->Entry(idx));
@@ -113,9 +106,9 @@ public:
 
     SEGMENTED_ARRAY_ITERATOR () {}
 
-    REF operator* () const		{ return *ptr; }
-    _PTR Ptr () const			{ return ptr; }
-    _PTR operator->() const              { return ptr; }
+    SA_vt_Ref operator* () const		{ return *ptr; }
+    SA_vt_Ptr Ptr () const			{ return ptr; }
+    SA_vt_Ptr operator->() const              { return ptr; }
     UINT Index () const {
       return map_idx * segmented_array->Block_size() +
              (ptr - segmented_array->Block_begin(map_idx));
