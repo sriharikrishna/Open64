@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: targ_const.c
- * $Revision: 1.2 $
- * $Date: 2002-08-16 19:31:08 $
+ * $Revision: 1.3 $
+ * $Date: 2003-09-22 19:41:05 $
  *
  * Revision history:
  *  12-Jun-91 - Original Version
@@ -2966,7 +2966,8 @@ Targ_Print ( char *fmt, TCON c )
 	    sprintf(r+spos,"...");
 	 }
       } else {
-	 sprintf(r, "(%d bytes) \"", slen);
+//	 sprintf(r, "(%d bytes) \"", slen);
+	 sprintf(r, "\"");
 	 char *t = r + strlen (r);
          char *s = r + 1000;
 	 for (i = 0; i < slen && t < s; i++) {

@@ -99,6 +99,7 @@ ST_type (const ST* s) {
     case CLASS_CONST:
     case CLASS_PREG:
     case CLASS_NAME:
+    case CLASS_PARAMETER:
 	return s->u2.type;
     case CLASS_FUNC:
 	Lmt_DevWarn (SYMTAB_COMPATIBLE_DEVWARN_LIMIT,
@@ -125,6 +126,7 @@ Set_ST_type (ST* s, TY_IDX t) {
     case CLASS_CONST:
     case CLASS_PREG:
     case CLASS_NAME:
+    case CLASS_PARAMETER:
 	s->u2.type = t;
     }
 #else

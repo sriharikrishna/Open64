@@ -56,7 +56,8 @@ enum ST_CLASS
     CLASS_NAME  = 6,			// just hold an ST name
     CLASS_MODULE = 7,                   
     CLASS_TYPE   =8,                    //this ST holds an user defined type's name
-    CLASS_COUNT = 9			// total number of classes
+    CLASS_PARAMETER = 9,
+    CLASS_COUNT = 10			// total number of classes
 }; // ST_CLASS
 
 

@@ -131,6 +131,12 @@ ST_Verify_Class_Sclass(ST_CLASS sym_class, ST_SCLASS storage_class) {
 		  storage_class == SCLASS_COMMENT,
                   (msg, Sclass_Name(storage_class), Class_Name(sym_class)));
         break;
+    case CLASS_PARAMETER:
+         Is_True (storage_class == PSTATIC ||
+                  storage_class == SCLASS_FSTATIC ||
+                  storage_class == SCLASS_EXTERN,
+                 (msg, Sclass_Name(storage_class), Class_Name(sym_class)));
+         break;
     default:
 	Fail_FmtAssertion (msg, Sclass_Name (storage_class),
 			   Class_Name (sym_class));
@@ -450,6 +456,7 @@ ST_Verify_Fields(const ST &s)
     break;
   case CLASS_VAR:
   case CLASS_CONST:
+  case CLASS_PARAMETER:
     Is_True( 0 < TY_IDX_index (ST_type(s)) && 
              TY_IDX_index (ST_type(s)) < TY_Table_Size (),
              (msg, "type")); 

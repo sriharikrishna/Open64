@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.26 $
- * $Date: 2003-09-18 20:34:20 $
+ * $Revision: 1.27 $
+ * $Date: 2003-09-22 19:41:04 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.26 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.27 $";
 #endif
 
 #include <alloca.h>
@@ -1259,6 +1259,29 @@ public:
      BOOL variabledefinemodule = !strcmp(stbasename,scope_name);
 
        nomodulevar = !ST_is_in_module(st)||strcmp(stbasename,scope_name);
+ 
+     if (ST_class(st)==CLASS_PARAMETER)
+       {
+         if (tokens != NULL)
+            {
+              Append_F77_Indented_Newline(tokens,
+                                          lines_between_decls, NULL/*label*/);
+              ST2F_decl_translate(tokens,  st);
+            }
+          else
+            {
+              TOKEN_BUFFER tmp_tokens;
+
+              tmp_tokens = New_Token_Buffer();
+              Append_F77_Indented_Newline(tmp_tokens,
+                                          lines_between_decls, NULL/*label*/);
+              ST2F_decl_translate(tmp_tokens, st);
+              Write_And_Reclaim_Tokens(W2F_File[W2F_FTN_FILE],
+                                       W2F_File[W2F_LOC_FILE],
+                                       &tmp_tokens);
+            }
+         return;
+       }
   
      if (ST_class(st)==CLASS_TYPE &&
             ST_is_in_module(st) )

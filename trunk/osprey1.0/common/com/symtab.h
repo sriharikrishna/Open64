@@ -111,7 +111,7 @@ ST_Init (ST* st, STR_IDX n, ST_CLASS sc, ST_SCLASS stc, ST_EXPORT exp,
     st->flags = 0;
     st->flags_ext = 0;
 /* fzhao add June */
-    if (sc == CLASS_VAR)
+    if (sc == CLASS_VAR || sc == CLASS_PARAMETER)
        Set_ST_keep_name_w2f(st);
 }
 

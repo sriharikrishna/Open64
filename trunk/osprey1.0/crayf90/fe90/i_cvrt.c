@@ -13417,8 +13417,8 @@ static void send_attr_ntry(int		attr_idx)
    int			save_pdg_cn_const;
    boolean		save_sym_constant_expr;
    boolean		sym_offset		= FALSE;
+   boolean		nested_attr		= FALSE;
    TYPE			type_idx;
- int fm =0;
 
 # ifdef _TARGET_OS_MAX
    long_type    	ii;
@@ -13437,6 +13437,7 @@ static void send_attr_ntry(int		attr_idx)
 
       if (AT_ATTR_LINK(attr_idx) != NULL_IDX) {
          child_idx = attr_idx;
+         nested_attr = TRUE;
 
          while (AT_ATTR_LINK(attr_idx) != NULL_IDX) {
             attr_idx = AT_ATTR_LINK(attr_idx);
@@ -13582,7 +13583,7 @@ static void send_attr_ntry(int		attr_idx)
          break;
 
       case Constant:
-         if (ATD_FLD(attr_idx) == AT_Tbl_Idx) {
+         if (ATD_FLD(attr_idx) == AT_Tbl_Idx ) { 
             /* Aggregate Constant */
             /* change the tmp to a variable */
 
@@ -13594,10 +13595,12 @@ static void send_attr_ntry(int		attr_idx)
             goto EXIT;
          }
 
+#if 0
          if (cmd_line_flags.debug_lvl > Debug_Lvl_2 &&
              !cmd_line_flags.dwarf_debug) {
             goto EXIT;
          }
+#endif
 
          if (AT_COMPILER_GEND(attr_idx)) {
             goto EXIT;
@@ -13694,16 +13697,29 @@ static void send_attr_ntry(int		attr_idx)
          PDG_DBG_PRINT_END    
 
 # ifdef _ENABLE_FEI
-         fei_smt_parameter(AT_OBJ_NAME_PTR(attr_idx),
+   /* If it the parameter is not get from use-association
+      and also is not get from the host-association,then
+      generate a local symbol table entry to record the definition
+    */
+       if ( !nested_attr &&
+            (!AT_MODULE_OBJECT(attr_idx) ||
+               (AT_MODULE_OBJECT(attr_idx) && 
+                 AT_ORIG_MODULE_IDX(attr_idx)==NULL_IDX)))
+            fei_smt_parameter(AT_OBJ_NAME_PTR(attr_idx),
                            type_idx,
                            PDG_CN_IDX(const_idx),
                            constant_class,
                            AT_DEF_LINE(attr_idx));
 # endif
 
+#if 0 
          if (cmd_line_flags.dwarf_debug) {
             PDG_CN_IDX(const_idx) = save_pdg_cn_const;
          }
+#endif
+
+        PDG_CN_IDX(const_idx) = save_pdg_cn_const;
+
          goto EXIT;
 
       case Struct_Component:
@@ -13937,7 +13953,6 @@ static void send_attr_ntry(int		attr_idx)
       ((long64) AT_MODULE_OBJECT(attr_idx)      << FEI_OBJECT_IN_MODULE) |
       ((long64) AT_PRIVATE(attr_idx)            << FEI_OBJECT_PRIVATE )); 
 
-      fm = AT_MODULE_OBJECT(attr_idx);  
 
 
       if (AT_MODULE_IDX(attr_idx)!=NULL_IDX ||
