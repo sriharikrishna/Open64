@@ -94,3 +94,5 @@ $(TARGET): $(OBJS)
 	$(AR) $(AR_FLAGS) $(TARGET) $(OBJS)
 
 include $(COMMONRULES)
+
+LDIRT = libiberty.a
