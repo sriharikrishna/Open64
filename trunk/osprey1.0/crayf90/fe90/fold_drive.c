@@ -628,13 +628,14 @@ CONTINUE:
 
       case SRK_Opr :
 
+     if (l_value_ptr!=NULL)
        for (i = 0; i < num_host_wds[l_linear_type]; i++) {
                l_value.v[i] = ((long_type *)l_value_ptr)[i];
             }
 
+     if (r_value_ptr!=NULL)
        for (i = 0; i < num_host_wds[r_linear_type]; i++) {
               r_value.v[i] = ((long_type *)r_value_ptr)[i];
-             ((long_type *)r_value_ptr)[i]=r_value.v[i]; /* fff */
             }
 
  
