@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.16 $
- * $Date: 2003-06-25 16:27:49 $
+ * $Revision: 1.17 $
+ * $Date: 2004-02-17 20:24:34 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.17 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -459,6 +459,7 @@ extern INTPTR
 fei_co_array_dimen(INT32  flag_bits,
                 INT64  low_bound,
                 INT64  extent,
+		INT32  arraydims,
                 INT32  axis,
                 TYPE   span_type,
                 INT64  bitsize,
@@ -474,6 +475,8 @@ fei_co_array_dimen(INT32  flag_bits,
   BOOL flow_dependent;
 
   hosted = test_flag(flag_bits,FEI_ARRAY_DIMEN_HOSTED_TYPE) || in_hosted_dtype ;
+
+  top_of_decl_bounds = arraydims;
 
   if (top_of_decl_bounds == ANULL && axis == 1) { /*no array rank */
      decl_bounds = New_ARB();
