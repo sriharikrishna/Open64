@@ -43,8 +43,8 @@ extern "C" {
  * ====================================================================
  *
  * Module: config_targ.h
- * $Revision: 1.4 $
- * $Date: 2003-01-13 20:13:08 $
+ * $Revision: 1.5 $
+ * $Date: 2003-01-17 17:51:52 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_TARG.h,v $
  *
@@ -80,7 +80,7 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *config_targ_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_TARG.h,v $ $Revision: 1.4 $";
+static char *config_targ_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_TARG.h,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "mtypes.h"

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: config_targ.c
- * $Revision: 1.4 $
- * $Date: 2003-01-13 20:13:08 $
+ * $Revision: 1.5 $
+ * $Date: 2003-01-17 17:51:52 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_TARG.cxx,v $
  *
