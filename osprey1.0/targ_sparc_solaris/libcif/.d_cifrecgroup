@@ -1,0 +1,4 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcif/../../libcif/cif.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcif/../../libcif/cif_int.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/libcif/../../libcif/cifrecgroup.c

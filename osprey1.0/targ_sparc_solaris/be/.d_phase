@@ -1,0 +1,4 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../be/com/phase.cxx
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../be/com/phase.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/defs.h

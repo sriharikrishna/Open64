@@ -1,0 +1,10 @@
+# dependences for compilation
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/config_host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/defs.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/err_host.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/com/srcpos.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/cxx_memory.cxx
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/cxx_memory.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/errdesc.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/errors.h
+/net/basuri5/fzhao/uPro64/osprey1.0/targ_sparc_solaris/be/../../common/util/mempool.h
