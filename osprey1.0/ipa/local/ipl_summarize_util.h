@@ -49,13 +49,17 @@
 #ifndef ipl_summarize_util_INCLUDED
 #define ipl_summarize_util_INCLUDED
 
-#ifndef __SGI_STL_VECTOR_H
 #include <vector.h>
-#endif
 
 #ifndef FB_WHIRL_INCLUDED
 #include "fb_whirl.h"
 #endif
+
+#ifndef ipl_summarize_util_i_INCLUDED
+#include "ipl_summarize_util.i"                // summary util
+#endif // ipl_summarize_util_i_INCLUDED
+
+
 
 #if (!defined(_STANDALONE_INLINER) && !defined(_LIGHTWEIGHT_INLINER))
 // return the callsite id of a particular call
@@ -113,9 +117,6 @@ struct AUX_SYMBOL_ACCESS
 
 };
 extern AUX_SYMBOL_ACCESS Aux_Symbol;
-
-extern void
-Init_Aux_Symbol_Info (SYMTAB_IDX level);
 
 extern void 
 Set_lang (SUMMARY_PROCEDURE *proc);
