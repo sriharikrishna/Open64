@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.8 $
- * $Date: 2002-09-18 17:53:20 $
+ * $Revision: 1.9 $
+ * $Date: 2002-09-20 20:03:00 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.9 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -695,7 +695,8 @@ fei_user_type(char         *name_string,
   INT32 i;
   ST *st;
   
-
+ if (size==0)
+    size =32; /*default shape array or pointer set is 4bytes i.e 32 bits*/
   sequence = (FORT_SEQUENCE) sequence_arg;
 
   ty_idx = cast_to_TY(cr_ty_idx);
