@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.3 $
- * $Date: 2002-07-16 20:20:02 $
+ * $Revision: 1.4 $
+ * $Date: 2002-07-18 20:15:19 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.4 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1498,8 +1498,15 @@ WN2F_src_triplet(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
   WN2F_translate(tokens, kid0, context);
   Append_Token_Special(tokens, ':');
   WN2F_translate(tokens, kid1, context); 
-  Append_Token_Special(tokens, ':');
-  WN2F_translate(tokens, kid2, context); 
+
+  if (WN_operator(kid2) == OPR_INTCONST &&
+      WN_const_val(kid2) == 1)
+      ;
+  else {
+        Append_Token_Special(tokens, ':');
+        WN2F_translate(tokens, kid2, context); 
+       }
+
   return EMPTY_WN2F_STATUS;
 
     }
