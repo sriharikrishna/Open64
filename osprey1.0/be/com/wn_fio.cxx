@@ -38,7 +38,6 @@
 #include "be_com_pch.h"
 #endif /* USE_PCH */
 #pragma hdrstop
-#include <values.h>
 #include <isam.h>
 #include "defs.h"
 #include "strtab.h"

@@ -1,4 +1,4 @@
-#include <values.h>
+
 #include "defs.h"
 #include "glob.h"
 #include "config.h"

@@ -39,7 +39,6 @@
 #endif /* USE_PCH */
 #pragma hdrstop
 #include <math.h>
-#include <values.h>
 #include <alloca.h>
 
 #include "defs.h"
