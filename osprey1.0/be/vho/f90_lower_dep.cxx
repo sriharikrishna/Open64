@@ -44,7 +44,12 @@
 
 // Needed to make MAT package work
 
-template <> MEM_POOL* MAT<mINT32>::_default_pool = NULL; 
+#if !defined(__GNUC__) && defined(__sgi)
+  template<> MEM_POOL* MAT<mINT32>::_default_pool = NULL; 
+#else
+  MEM_POOL* MAT<mINT32>::_default_pool = NULL; 
+#endif
+
 
 
 //----------------------------------------------------------------------------------
