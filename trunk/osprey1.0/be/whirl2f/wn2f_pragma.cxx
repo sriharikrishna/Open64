@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_pragma.c
- * $Revision: 1.4 $
- * $Date: 2002-09-19 16:25:58 $
- * $Author: open64 $
+ * $Revision: 1.5 $
+ * $Date: 2005-02-02 22:09:52 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $
  *
  * Revision history:
@@ -56,7 +56,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $ $Revision: 1.5 $";
 #endif
 
 #include "alloca.h"
@@ -1078,6 +1078,27 @@ Append_Nest_Clauses(TOKEN_BUFFER tokens,
 
 
 static void
+Append_ST_String(TOKEN_BUFFER tokens, WN *pragma)
+{
+  // Note: pragma should have symbol of CLASS_CONST and TCON of STR
+  // Append_A_Clause_Symbol(...) will include quote marks around the
+  // string
+
+  // Append_A_Clause_Symbol effectively does: 
+  // TOKEN_BUFFER tmp_tokens = New_Token_Buffer();
+  // TCON2F_translate(tmp_tokens, WN_val(pragma), FALSE/*is_logical*/);
+  
+  char* tmpval = Targ_Print(NULL, WN_val(pragma));
+  
+  // hide the beginning and ending quote marks
+  char* val = tmpval + 1;
+  val[strlen(val)-1] = '\0';
+  
+  Append_Token_String(tokens, val);
+}
+
+
+static void
 Skip_Pragma_Clauses(WN         **clause_list,  
                     WN2F_CONTEXT context)
 {
@@ -1971,6 +1992,13 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
 	 Append_Token_String(tokens, "ASSERT DO PREFER (SERIAL)");
       break;
 
+   /* eraxxon: OpenAD specific pragmas */
+   case WN_PRAGMA_OPENAD_XXX: {
+      WN2F_Directive_Newline(tokens, "C$OPENAD XXX", WN_Get_Linenum(apragma));
+      Append_Token_Special(tokens, ' ');
+      Append_ST_String(tokens, apragma);
+      break;
+   }
       
    default:
       /* The others are always clauses that are processed as part of other
