@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.18 $
- * $Date: 2003-06-06 21:58:47 $
- * $Author: fzhao $
+ * $Revision: 1.19 $
+ * $Date: 2003-11-25 18:08:09 $
+ * $Author: eraxxon $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -4734,7 +4734,9 @@ fei_use(INT32 rename_only_num,INT32 bonly)
    opc = OPCODE_make_op(OPR_USE,MTYPE_V,MTYPE_V);
    
    wn  =  WN_Create(opc,rename_only_num);
-   wn->common.rtype = bonly; // only?
+   // eraxxon: OPC_USE is only valid with MTYPE_V,MTYPE_V.  Why change
+   // 'rtype' when it can lead to bogus OPCODEs?
+   //wn->common.rtype = bonly; // only?
 
    WN_st_idx(wn) = ST_st_idx(st);
    for (i=rename_only_num-1; i>=0; i--)
