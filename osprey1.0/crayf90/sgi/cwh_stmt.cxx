@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.3 $
- * $Date: 2002-07-16 20:17:02 $
+ * $Revision: 1.4 $
+ * $Date: 2002-07-18 16:02:19 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -867,6 +867,8 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   BOOL        forward_barrier = FALSE;
   BOOL        backward_barrier = FALSE;
   WN * barrier_wn;
+  WN * len;
+
 
   /* figure # of args, including character lengths, clear return temp ST */
 
@@ -941,6 +943,8 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
 
      tr = TY_ret_type(TY_pointed(ST_type(st)));
   }
+
+# if 0
   if (ST_auxst_has_rslt_tmp(st) || cwh_types_is_character(tr)) {
 
     tr = cwh_types_WN_TY(args[0],FALSE);
@@ -973,6 +977,7 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
     }
   }
   
+# endif
 
   /* create call (or indirect call if dummy procedure)  */
 
@@ -1088,10 +1093,12 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
     /* by value when read of temp..                */
     
     if (TY_mtype(ts) != MTYPE_V) {
-
-
-//      if (wn != NULL)
-	cwh_stk_push(wn,WN_item);
+       if (!cwh_types_is_character(ts))
+	     cwh_stk_push(wn,WN_item);
+       else {
+           len = WN_CreateIntconst(OPC_U4INTCONST,TY_size(ts));
+           cwh_stk_push_STR(len,wn,ts,WN_item);
+       }
     }
   }
   
