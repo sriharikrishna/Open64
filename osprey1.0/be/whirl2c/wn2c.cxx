@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.20 $
- * $Date: 2004-07-02 14:45:35 $
- * $Author: fzhao $
+ * $Revision: 1.20.2.1 $
+ * $Date: 2004-11-24 20:47:22 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.20.2.1 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -2419,7 +2419,6 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
      bool extern_void_fun = (ST_sym_class(st) == CLASS_FUNC && ST_sclass(st) == SCLASS_EXTERN); 
      extern_void_fun = extern_void_fun && (TY_mtype(TY_ret_type(ST_pu_type(st))) != MTYPE_F8);
      global = global || extern_void_fun;
-     global = Compile_Upc && global;
 
      TY_IDX st_ty  = ST_class(st) == CLASS_VAR ? ST_type(st) :
        ST_class(st) == CLASS_FUNC ? ST_pu_type(st) : ST_type(st);
@@ -2437,7 +2436,8 @@ WN2C_Append_Symtab_Vars(TOKEN_BUFFER tokens,
 	 !(ST_sym_class(st) == CLASS_FUNC && lookup(ST_name(st))) &&
 	 (Stab_External_Def_Linkage(st)                        || 
 	  (ST_sym_class(st) == CLASS_VAR && ST_sclass(st) == SCLASS_CPLINIT) ||
-	  BE_ST_w2fc_referenced(st)))
+	  BE_ST_w2fc_referenced(st)) || 
+          global )
        {
 	 tmp_tokens = New_Token_Buffer();
 	 if (ST_is_weak_symbol(st))
@@ -5886,7 +5886,10 @@ WN2C_lda(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
 	 if (STATUS_is_lvalue(lda_status))
 	    Prepend_Token_Special(expr_tokens, '&');
 	 
-	 WN2C_prepend_cast(expr_tokens, WN_ty(wn), FALSE/*ptr_to_type*/);
+//	 WN2C_prepend_cast(expr_tokens, WN_ty(wn), FALSE/*ptr_to_type*/);
+// unparsed code with the type casting will 
+// cause gcc/frontend issue warnings----FMZ
+
 	 STATUS_reset_lvalue(lda_status); /* Not returning an lvalue */
       }
       else if (STATUS_is_lvalue(lda_status) && !CONTEXT_needs_lvalue(context))
