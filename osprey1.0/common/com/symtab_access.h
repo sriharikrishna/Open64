@@ -323,6 +323,14 @@ inline void
 Clear_ST_is_return_var (ST& s)		{ s.flags &= ~ST_IS_RETURN_VAR; }
 
 inline BOOL
+ST_is_private (const ST& s)          { return s.flags & ST_IS_PRIVATE;}
+inline void
+Set_ST_is_private (ST& s)            { s.flags |= ST_IS_PRIVATE; }
+inline void
+Clear_ST_is_private (ST& s)          { s.flags &= ~ST_IS_PRIVATE; }
+
+
+inline BOOL
 ST_is_value_parm (const ST& s)		{ return s.flags & ST_IS_VALUE_PARM;}
 inline void
 Set_ST_is_value_parm (ST& s)		{ s.flags |= ST_IS_VALUE_PARM; }
@@ -442,6 +450,12 @@ Set_ST_is_external (ST& s)            { s.flags_ext |= ST_IS_EXTERNAL; }
 inline void
 Clear_ST_is_external (ST& s)          { s.flags_ext &= ~ST_IS_EXTERNAL; }
 
+inline BOOL
+ST_is_M_imported (const ST& s)          { return s.flags_ext & ST_IS_M_IMPORTED;}
+inline void
+Set_ST_is_M_imported (ST& s)            { s.flags_ext |= ST_IS_M_IMPORTED; }
+inline void
+Clear_ST_is_M_imported (ST& s)          { s.flags_ext &= ~ST_IS_M_IMPORTED; }
 
 inline BOOL
 ST_declared_static (const ST& s)	{ return s.flags & ST_DECLARED_STATIC;}
