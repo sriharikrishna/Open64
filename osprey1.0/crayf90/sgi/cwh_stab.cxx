@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.23 $
- * $Date: 2003-09-25 02:23:00 $
+ * $Revision: 1.24 $
+ * $Date: 2003-11-13 21:12:31 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.23 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.24 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -3456,7 +3456,7 @@ cwh_stab_mk_pu(TY_IDX pty, SYMTAB_IDX level)
 INTPTR
 fei_smt_parameter(char * name_string,
    	   	  TYPE   type,
-                  INT32	 con_idx,
+                  INTPTR con_idx,
 		  INT32	 Class,
 		  INT32	 lineno)
 
