@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2c.c
- * $Revision: 1.9 $
- * $Date: 2004-07-23 17:40:09 $
+ * $Revision: 1.10 $
+ * $Date: 2004-07-27 22:17:16 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $
  *
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.10 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -767,8 +767,9 @@ TY2C_Translate_Structure(TY_IDX ty,CONTEXT context)
    ASSERT_DBG_FATAL(TY_kind(ty_rt) == KIND_STRUCT, 
 		    (DIAG_W2F_UNEXPECTED_TYPE_KIND, 
 		     TY_kind(ty_rt), "TY2C_Translate_Structure"));
-   struct_tokens = New_Token_Buffer();
 */
+
+   struct_tokens = New_Token_Buffer();
 
    /* header of the structure */
    if (TY_is_union(ty))
