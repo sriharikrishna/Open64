@@ -1418,7 +1418,7 @@ HERE:
                   }
                }
 
-                flatten_function_call(result_opnd); 
+/*fzhao try for intrinsic func                flatten_function_call(result_opnd);   */
 
                if (ATP_ELEMENTAL(spec_idx) &&
                    ATP_PROC(spec_idx) != Intrin_Proc) {

@@ -2288,6 +2288,9 @@ boolean expr_sem (opnd_type       *result_opnd,
             case Alloc_Obj_Opr        :
 
                ok = alloc_obj_opr_handler(result_opnd, exp_desc, rank_in);
+               IR_OPR(ir_idx) = Subscript_Opr; /*fzhao add Dec*/
+               ok = subscript_opr_handler(result_opnd, exp_desc, rank_in);
+
                break;
 
             case Cvrt_Opr             :
@@ -11068,6 +11071,7 @@ static boolean alloc_obj_opr_handler(opnd_type		*result_opnd,
    int			ir_idx;
    int			line;
    int			listp_idx;
+   int			list_keep_idx;
    int			list_idx;
    boolean		ok = TRUE;
    opnd_type		opnd;
@@ -11157,6 +11161,7 @@ static boolean alloc_obj_opr_handler(opnd_type		*result_opnd,
 
          /* process subscripts */
          list_idx              = IR_IDX_R(ir_idx);
+
          save_xref_state       = xref_state;
 
          if (xref_state != CIF_No_Usage_Rec) {
@@ -11166,7 +11171,12 @@ static boolean alloc_obj_opr_handler(opnd_type		*result_opnd,
          in_component_ref      = FALSE;
 
          for (i = 1; i <= IR_LIST_CNT_R(ir_idx); i++) {
+            list_keep_idx = list_idx;
 
+            if (IL_FLD(list_idx) == IR_Tbl_Idx &&
+                  IR_OPR(IL_IDX(list_idx)) == Triplet_Opr)
+                      list_idx = IR_IDX_L(IL_IDX(list_idx));
+                   
             if (IL_FLD(list_idx) == IL_Tbl_Idx) {
                /* lower and upper bound here */
 
@@ -11312,7 +11322,8 @@ static boolean alloc_obj_opr_handler(opnd_type		*result_opnd,
                exp_desc->foldable = exp_desc->foldable && exp_desc_r.foldable;
             }
 
-            list_idx = IL_NEXT_LIST_IDX(list_idx);
+/*            list_idx = IL_NEXT_LIST_IDX(list_idx);*/
+            list_idx = IL_NEXT_LIST_IDX(list_keep_idx);
 
          } /* for ... */
 

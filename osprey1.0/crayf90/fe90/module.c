@@ -6321,10 +6321,16 @@ static	boolean  read_in_module_tbl(int		 fp_file_idx,
 
          /* There is no only-list or rename-list, so just issue */
          /* a warning that the module is empty.                 */
-
+/*Since some modules may only declare some constants   */
+/*whirl2f will dump out empty modules(constants are    */
+/*already folded in the all expressions which use the  */
+/*parameters).This should be OK----fzhao                */
+/*
          PRINTMSG(AT_DEF_LINE(module_attr_idx), 867, Warning,
                   AT_DEF_COLUMN(module_attr_idx),
                   AT_OBJ_NAME_PTR(module_attr_idx));
+*/
+         ;
       }
       goto EXIT;
    }

@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.10 $
- * $Date: 2002-10-31 22:52:22 $
- * $Author: open64 $
+ * $Revision: 1.11 $
+ * $Date: 2003-01-13 16:11:16 $
+ * $Author: fzhao $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -2469,7 +2469,13 @@ fei_where(INT32 defined_asg,
   INT64 flags = 0;
 
   msk = cwh_expr_operand(NULL);
-  msk = F90_Wrap_ARREXP(msk);
+
+/*  msk = F90_Wrap_ARREXP(msk); */
+/* since we keep the logical expression in 
+ * the "where" block,the mask is no longer 
+ * temporary variable,therefore we cannot call F90_Wrap_ARREXP
+ * to generate OPR_ARREXPR here
+ */
 
   wl = cwh_block_new_and_current(); 
 
@@ -3575,6 +3581,7 @@ fei_else(void)
 {
    WN *if_else;
    WN *if_cnstrct;
+
    /* pop off the if construct */
    if_cnstrct = cwh_stk_pop_WN();
 
@@ -4369,7 +4376,7 @@ cwh_stmt_conformance_checks_walk (WN *tree, WN *stmt, WN *block, WN ** sizes, IN
 	 cwh_stmt_conformance_checks_walk (WN_kid(tree,i), stmt, block, NULL, NULL);
        }
        if (sizes) {
-	 F90_Size_Walk(tree,ndim,sizes);
+//fzhao try????Oct	 F90_Size_Walk(tree,ndim,sizes);
        }
        break;
 

@@ -36,9 +36,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.13 $
- * $Date: 2002-10-21 19:29:18 $
- * $Author: open64 $
+ * $Revision: 1.14 $
+ * $Date: 2003-01-13 16:11:16 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
  * Revision history:
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.14 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -677,8 +677,12 @@ if (Class ==  PDGCS_Proc_Imported &&
   Set_ST_ofst(st_local_cp, 0);
 }
     
-  if (sym_class == F90_Module)
+  if (sym_class == F90_Module){
     Set_ST_emit_symbol(st);
+    Set_ST_emit_symbol(st_local_cp);
+    Set_ST_is_in_module(st);
+    Set_ST_is_in_module(st_local_cp);
+   } //fzhao Nov
 
   if (test_flag(flags, FEI_PROC_HASRSLT))
     Set_ST_auxst_has_rslt_tmp(st,TRUE) ;

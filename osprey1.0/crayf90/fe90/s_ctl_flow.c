@@ -1533,7 +1533,8 @@ void deallocate_stmt_semantics (void)
 
    list_idx = IR_IDX_L(ir_idx);
 
-   while (list_idx != NULL_IDX && FALSE) {
+/*   while (list_idx != NULL_IDX && FALSE) { fzhao Jun*/
+   while (list_idx != NULL_IDX ) {
 
       COPY_OPND(opnd, IL_OPND(list_idx));
       exp_desc.rank = 0;
@@ -1604,9 +1605,12 @@ void deallocate_stmt_semantics (void)
             COPY_OPND(dope_opnd, IR_OPND_L(OPND_IDX(dope_opnd)));
          }
          else {
+; 
+# if 0 /*fzhao Janu */
             find_opnd_line_and_column(&opnd, &line, &col);
             PRINTMSG(line, 626, Internal, col,
                      "Dv_Deref_Opr", "deallocate_stmt_semantics");
+# endif
          }
       }
       else {

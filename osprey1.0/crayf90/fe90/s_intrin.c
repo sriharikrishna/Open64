@@ -10723,7 +10723,6 @@ void    all_intrinsic(opnd_type     *result_opnd,
 
 
    TRACE (Func_Entry, "all_intrinsic", NULL);
-
    ir_idx = OPND_IDX((*result_opnd));
    list_idx1 = IR_IDX_R(ir_idx);
    list_idx2 = IL_NEXT_LIST_IDX(list_idx1);
@@ -10834,7 +10833,6 @@ void    all_intrinsic(opnd_type     *result_opnd,
 
    /* must reset foldable and will_fold_later because there is no */
    /* folder for this intrinsic in constructors.                  */
-
    res_exp_desc->foldable = FALSE;
    res_exp_desc->will_fold_later = FALSE;
 
@@ -11913,7 +11911,6 @@ void    precision_intrinsic(opnd_type     *result_opnd,
    IR_TYPE_IDX(ir_idx) = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
-# if 0 
    switch (arg_info_list[info_idx1].ed.linear_type) {
       case Complex_4:
            num = PRECISION_REAL4_F90;
@@ -11948,11 +11945,6 @@ void    precision_intrinsic(opnd_type     *result_opnd,
    OPND_COL_NUM((*result_opnd))  = IR_COL_NUM(ir_idx);
    res_exp_desc->constant = TRUE;
    res_exp_desc->foldable = TRUE;
-
-# endif
-
-      res_exp_desc->foldable = FALSE;  
-      res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "precision_intrinsic", NULL);
 
