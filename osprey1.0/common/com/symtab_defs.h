@@ -385,7 +385,8 @@ enum LABEL_KIND
     LKIND_END_EH_RANGE		= 3,
     LKIND_BEGIN_HANDLER		= 4,
     LKIND_END_HANDLER		= 5,
-    LKIND_TAG			= 6	// symbolic address, never branched to
+    LKIND_TAG			= 6,	// symbolic address, never branched to
+    LKIND_COUNT			= 7	// total number of kinds
 };
 
 enum LABEL_FLAGS
@@ -437,7 +438,8 @@ enum ST_ATTR_KIND
 {
     ST_ATTR_UNKNOWN		= 0,
     ST_ATTR_DEDICATED_REGISTER	= 1,	// physical register number
-    ST_ATTR_SECTION_NAME	= 2	// name of sections where defined.
+    ST_ATTR_SECTION_NAME	= 2,	// name of sections where defined.
+    ST_ATTR_KIND_COUNT          = 3	// total number of kinds
 };
 
 struct ST_ATTR

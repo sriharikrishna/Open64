@@ -1581,6 +1581,30 @@ EnumToStr_t TYKindToNameTbl[KIND_LAST] = {
 };
 
 
+#define STATTR_ToStrTblENTRY(flg) \
+  EnumToStr_t(flg, #flg)
+
+EnumToStr_t STATTR_ToStrTbl[] = {
+  STATTR_ToStrTblENTRY(ST_ATTR_UNKNOWN),
+  STATTR_ToStrTblENTRY(ST_ATTR_DEDICATED_REGISTER),
+  STATTR_ToStrTblENTRY(ST_ATTR_SECTION_NAME)
+};
+
+
+#define LKIND_ToStrTblENTRY(flg) \
+  EnumToStr_t(flg, #flg)
+
+EnumToStr_t LKIND_ToStrTbl[] = {
+  LKIND_ToStrTblENTRY(LKIND_DEFAULT),
+  LKIND_ToStrTblENTRY(LKIND_ASSIGNED),
+  LKIND_ToStrTblENTRY(LKIND_BEGIN_EH_RANGE),
+  LKIND_ToStrTblENTRY(LKIND_END_EH_RANGE),
+  LKIND_ToStrTblENTRY(LKIND_BEGIN_HANDLER),
+  LKIND_ToStrTblENTRY(LKIND_END_HANDLER),
+  LKIND_ToStrTblENTRY(LKIND_TAG)
+};
+
+
 const char *
 Class_Name (ST_CLASS cl)
 {
@@ -1649,6 +1673,40 @@ Name_To_Kind (const char* nm)
 }
 
 
+const char *
+LABEL_Kind_Name (LABEL_KIND k)
+{
+  using namespace ir_a2b;
+  return MapEnumToStr<EnumToStr_t, LKIND_ToStrTbl, 
+                      LKIND_COUNT>("LKIND_ToStrTbl", (INT)k);
+}
+
+LABEL_KIND
+Name_To_LABEL_Kind (const char* nm)
+{
+  using namespace ir_a2b;
+  return (LABEL_KIND)MapStrToEnum<EnumToStr_t, LKIND_ToStrTbl, 
+                                  LKIND_COUNT>("LKIND_ToStrTbl", nm);
+}
+
+
+const char *
+ST_ATTR_Kind_Name (ST_ATTR_KIND k)
+{
+  using namespace ir_a2b;
+  return MapEnumToStr<EnumToStr_t, STATTR_ToStrTbl, 
+                      ST_ATTR_KIND_COUNT>("STATTR_ToStrTbl", (INT)k);
+}
+
+ST_ATTR_KIND
+Name_To_ST_ATTR_Kind (const char* nm)
+{
+  using namespace ir_a2b;
+  return (ST_ATTR_KIND)MapStrToEnum<EnumToStr_t, STATTR_ToStrTbl, 
+                                    ST_ATTR_KIND_COUNT>("STATTR_ToStrTbl", nm);
+}
+
+
 /* ====================================================================
  *
  * xxxFlag_Name 
@@ -1676,6 +1734,21 @@ struct FlagToStr_t : public ir_a2b::flag2str_tbl_entry_t {
   UINT64      val;
   const char* str;
 };
+
+
+// FILE_INFO_FLAGS
+#define FIFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t FIFLAGS_ToStrTbl[] = {
+  FIFLAGS_ToStrTblENTRY(FI_IPA),
+  FIFLAGS_ToStrTblENTRY(FI_NEEDS_LNO),
+  FIFLAGS_ToStrTblENTRY(FI_HAS_INLINES),
+  FIFLAGS_ToStrTblENTRY(FI_HAS_MP)
+};
+
+const UINT FIFLAGS_ToStrTblSZ = 
+  (sizeof(FIFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
 
 
 // ST_FLAGS
@@ -1717,7 +1790,8 @@ FlagToStr_t STFLAGS_ToStrTbl[] = {
   STFLAGS_ToStrTblENTRY(ST_HAS_NAMED_SECTION)
 };
 
-const UINT STFLAGS_ToStrTblSZ = (sizeof(STFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+const UINT STFLAGS_ToStrTblSZ = 
+  (sizeof(STFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
 
 
 // ST_EXT_FLAGS
@@ -1750,9 +1824,56 @@ const UINT STEXTFLAGS_ToStrTblSZ =
 
 
 // FLD_FLAGS
+#define FLDFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t FLDFLAGS_ToStrTbl[] = {
+  FLDFLAGS_ToStrTblENTRY(FLD_LAST_FIELD),
+  FLDFLAGS_ToStrTblENTRY(FLD_EQUIVALENCE),
+  FLDFLAGS_ToStrTblENTRY(FLD_BEGIN_UNION),
+  FLDFLAGS_ToStrTblENTRY(FLD_END_UNION),
+  FLDFLAGS_ToStrTblENTRY(FLD_BEGIN_MAP),
+  FLDFLAGS_ToStrTblENTRY(FLD_END_MAP),
+  FLDFLAGS_ToStrTblENTRY(FLD_IS_BIT_FIELD),
+  FLDFLAGS_ToStrTblENTRY(FLD_IS_POINTER)
+};
+
+const UINT FLDFLAGS_ToStrTblSZ = 
+  (sizeof(FLDFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
 // ARB_FLAGS
+#define ARBFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t ARBFLAGS_ToStrTbl[] = {
+  ARBFLAGS_ToStrTblENTRY(ARB_CONST_LBND),
+  ARBFLAGS_ToStrTblENTRY(ARB_CONST_UBND),
+  ARBFLAGS_ToStrTblENTRY(ARB_CONST_STRIDE),
+  ARBFLAGS_ToStrTblENTRY(ARB_FIRST_DIMEN),
+  ARBFLAGS_ToStrTblENTRY(ARB_LAST_DIMEN),
+  ARBFLAGS_ToStrTblENTRY(ARB_EMPTY_LBND),
+  ARBFLAGS_ToStrTblENTRY(ARB_EMPTY_UBND),
+  ARBFLAGS_ToStrTblENTRY(ARB_STAR_UBND),
+  ARBFLAGS_ToStrTblENTRY(ARB_EMPTY_STRIDE)
+};
+
+const UINT ARBFLAGS_ToStrTblSZ = 
+  (sizeof(ARBFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
 // LABEL_FLAGS
-// ST_ATTR_KIND
+#define LBLFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t LBLFLAGS_ToStrTbl[] = {
+  LBLFLAGS_ToStrTblENTRY(LABEL_TARGET_OF_GOTO_OUTER_BLOCK),
+  LBLFLAGS_ToStrTblENTRY(LABEL_ADDR_SAVED),
+  LBLFLAGS_ToStrTblENTRY(LABEL_ADDR_PASSED)
+};
+
+const UINT LBLFLAGS_ToStrTblSZ = 
+  (sizeof(LBLFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
 
 
 // TY_FLAGS
@@ -1789,6 +1910,18 @@ const UINT TYFLAGS_ToStrTblSZ =
 
 
 // TY_PU_FLAGS
+#define TYPUFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t TYPUFLAGS_ToStrTbl[] = {
+  TYPUFLAGS_ToStrTblENTRY(TY_RETURN_TO_PARAM),
+  TYPUFLAGS_ToStrTblENTRY(TY_IS_VARARGS),
+  TYPUFLAGS_ToStrTblENTRY(TY_HAS_PROTOTYPE)
+};
+
+const UINT TYPUFLAGS_ToStrTblSZ = 
+  (sizeof(TYPUFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
 
 // PU_FLAGS
 #define PUFLAGS_ToStrTblENTRY(flg) \
@@ -1843,7 +1976,6 @@ const UINT PUFLAGS_ToStrTblSZ =
   (sizeof(PUFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
 
 
-
 // PU_SRC_LANG_FLAGS
 #define PUSRCLANGFLAGS_ToStrTblENTRY(flg) \
   FlagToStr_t(flg, #flg)
@@ -1862,7 +1994,41 @@ const UINT PUSRCLANGFLAGS_ToStrTblSZ =
   (sizeof(PUSRCLANGFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
 
 
-// FILE_INFO_FLAGS
+// BLK
+#define BLKFLAGS_ToStrTblENTRY(flg) \
+  FlagToStr_t(flg, #flg)
+
+FlagToStr_t BLKFLAGS_ToStrTbl[] = {
+  BLKFLAGS_ToStrTblENTRY(BLK_SECTION),
+  BLKFLAGS_ToStrTblENTRY(BLK_ROOT_BASE),
+  BLKFLAGS_ToStrTblENTRY(BLK_IS_BASEREG),
+  BLKFLAGS_ToStrTblENTRY(BLK_DECREMENT),
+  BLKFLAGS_ToStrTblENTRY(BLK_EXEC),
+  BLKFLAGS_ToStrTblENTRY(BLK_NOBITS),
+  BLKFLAGS_ToStrTblENTRY(BLK_MERGE),
+  BLKFLAGS_ToStrTblENTRY(BLK_COMPILER_LAYOUT)
+};
+
+const UINT BLKFLAGS_ToStrTblSZ = 
+  (sizeof(BLKFLAGS_ToStrTbl) / sizeof(FlagToStr_t));
+
+
+const char *
+FILE_INFO_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, FIFLAGS_ToStrTbl, 
+                       FIFLAGS_ToStrTblSZ>("FIFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_FILE_INFO_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, FIFLAGS_ToStrTbl, 
+                       FIFLAGS_ToStrTblSZ>("FIFLAGS_ToStrTbl", str);
+}
+
 
 const char *
 ST_FLAGS_To_Str (UINT64 flags)
@@ -1899,6 +2065,57 @@ Str_To_ST_EXT_FLAGS (const char* str)
 
 
 const char *
+FLD_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, FLDFLAGS_ToStrTbl,
+		       FLDFLAGS_ToStrTblSZ>("FLDFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_FLD_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, FLDFLAGS_ToStrTbl, 
+                       FLDFLAGS_ToStrTblSZ>("FLDFLAGS_ToStrTbl", str);
+}
+
+
+const char *
+ARB_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, ARBFLAGS_ToStrTbl, 
+		       ARBFLAGS_ToStrTblSZ>("ARBFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_ARB_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, ARBFLAGS_ToStrTbl, 
+                       ARBFLAGS_ToStrTblSZ>("ARBFLAGS_ToStrTbl", str);
+}
+
+
+const char *
+LABEL_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, LBLFLAGS_ToStrTbl, 
+		       LBLFLAGS_ToStrTblSZ>("LBLFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_LABEL_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, LBLFLAGS_ToStrTbl, 
+                       LBLFLAGS_ToStrTblSZ>("LBLFLAGS_ToStrTbl", str);
+}
+
+
+const char *
 TY_FLAGS_To_Str (UINT64 flags)
 {
   using namespace ir_a2b;
@@ -1912,6 +2129,23 @@ Str_To_TY_FLAGS (const char* str)
   using namespace ir_a2b;
   return MapStrToFlags<FlagToStr_t, TYFLAGS_ToStrTbl, 
                        TYFLAGS_ToStrTblSZ>("TYFLAGS_ToStrTbl", str);
+}
+
+
+const char *
+TY_PU_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, TYPUFLAGS_ToStrTbl, 
+		       TYPUFLAGS_ToStrTblSZ>("TYPUFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_TY_PU_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, TYPUFLAGS_ToStrTbl, 
+                       TYPUFLAGS_ToStrTblSZ>("TYPUFLAGS_ToStrTbl", str);
 }
 
 
@@ -1948,6 +2182,23 @@ Str_To_PU_SRC_LANG_FLAGS (const char* str)
   return MapStrToFlags<FlagToStr_t, PUSRCLANGFLAGS_ToStrTbl, 
                        PUSRCLANGFLAGS_ToStrTblSZ>("PUSRCLANGFLAGS_ToStrTbl", 
 						  str);
+}
+
+
+const char *
+BLK_FLAGS_To_Str (UINT64 flags)
+{
+  using namespace ir_a2b;
+  return MapFlagsToStr<FlagToStr_t, BLKFLAGS_ToStrTbl, 
+		       BLKFLAGS_ToStrTblSZ>("BLKFLAGS_ToStrTbl", flags);
+}
+
+UINT64
+Str_To_BLK_FLAGS (const char* str)
+{
+  using namespace ir_a2b;
+  return MapStrToFlags<FlagToStr_t, BLKFLAGS_ToStrTbl, 
+                       BLKFLAGS_ToStrTblSZ>("BLKFLAGS_ToStrTbl", str);
 }
 
 
@@ -2085,16 +2336,15 @@ ST::Print (FILE *f, BOOL verbose) const
 	    fprintf (f, " (#%d, %s)  ", TY_IDX_index (rettype_idx), name_str);
 
 	    fprintf (f, "PU[%d] ", u2.pu);
-	    if (Pu_Table[u2.pu].src_lang & PU_C_LANG)	fprintf (f, "C  ");
-	    if (Pu_Table[u2.pu].src_lang & PU_CXX_LANG)	fprintf (f, "C++  ");
-	    if (Pu_Table[u2.pu].src_lang & PU_F77_LANG)	fprintf (f, "F77  ");
-	    if (Pu_Table[u2.pu].src_lang & PU_F90_LANG)	fprintf (f, "F90  ");
-
+	    const char* srclang = 
+	      PU_SRC_LANG_FLAGS_To_Str(Pu_Table[u2.pu].src_lang);
+	    fprintf (f, "%s  ", srclang);
+	    
 	    mUINT64 flags = Pu_Table[u2.pu].flags;
 	    fprintf (f, "flags: %s", PU_FLAGS_To_Str(flags));
-	    if (TY_return_to_param(ty_idx))	fprintf (f, " return_to_param");
-	    if (TY_is_varargs(ty_idx))		fprintf (f, " varargs");
-	    if (TY_has_prototype(ty_idx))	fprintf (f, " prototype");
+	    if (TY_return_to_param(ty_idx)) fprintf (f, " return_to_param");
+	    if (TY_is_varargs(ty_idx))	    fprintf (f, " varargs");
+	    if (TY_has_prototype(ty_idx))   fprintf (f, " prototype");
 	    fprintf (f, "\n");
 	}
     }
@@ -2143,13 +2393,8 @@ FLD::Print (FILE *f) const
     Print_TY_IDX_verbose (f, type);
     fprintf (f, "\n\t\tfl:0x%04x", flags);
     if (flags) {
-	if (flags & FLD_LAST_FIELD)	fprintf (f, " last_field");
-	if (flags & FLD_EQUIVALENCE)	fprintf (f, " equivalence");
-	if (flags & FLD_BEGIN_UNION)	fprintf (f, " begin_union");
-	if (flags & FLD_END_UNION)	fprintf (f, " end_union");
-	if (flags & FLD_BEGIN_MAP)	fprintf (f, " begin_map");
-	if (flags & FLD_END_MAP)	fprintf (f, " end_map");
-	if (flags & FLD_IS_BIT_FIELD)	fprintf (f, " bit_field");
+        const char* flgstr = FLD_FLAGS_To_Str(flags);
+	fprintf (f, " %s", flgstr);
     }
     if (st != 0)
 	fprintf (f, " st (%d,%d)", ST_IDX_level (st), ST_IDX_index (st));
@@ -2189,18 +2434,8 @@ TY::Print (FILE *f) const
 /*FMZH    fprintf (f, " (f: 0x%04x", flags);*/
     fprintf (f, " (f: 0x%08x", flags);
     if (flags) {
-	if (flags & TY_IS_CHARACTER)	fprintf (f, " character");
-	if (flags & TY_IS_LOGICAL)	fprintf (f, " logical");
-	if (flags & TY_IS_UNION)	fprintf (f, " union");
-	if (flags & TY_IS_PACKED)	fprintf (f, " packed");
-	if (flags & TY_PTR_AS_ARRAY)	fprintf (f, " ptr_as_array");
-	if (flags & TY_ANONYMOUS)	fprintf (f, " anonymous");
-	if (flags & TY_SPLIT)		fprintf (f, " split");
-	if (flags & TY_IS_F90_POINTER)	fprintf (f, " f90_pointer");
-	if (flags & TY_NOT_IN_UNION)	fprintf (f, " not_in_union");
-	if (flags & TY_NO_ANSI_ALIAS)	fprintf (f, " no_ansi_alias");
-	if (flags & TY_IS_NON_POD)	fprintf (f, " non_pod");
-	if (flags & TY_IS_SHARED)	fprintf (f, " shared");
+        const char* flgstr = TY_FLAGS_To_Str(flags);
+	fprintf (f, " %s", flgstr);
     }
     fprintf (f, ")");
 
@@ -2318,13 +2553,10 @@ void
 LABEL::Print (FILE *f) const
 {
     const char *name_str = name_idx ? &Str_Table[name_idx] : "(anon)";
-
     fprintf (f, "%s: kind = 0x%08x fl = 0x%08x", name_str, kind, flags);
-    if (flags & LABEL_TARGET_OF_GOTO_OUTER_BLOCK)
-      fprintf (f, " target_of_goto_outer_block"); 
-    if (flags & LABEL_ADDR_SAVED)  fprintf (f, " addr_saved");
-    if (flags & LABEL_ADDR_PASSED) fprintf (f, " addr_passed");
-    fprintf (f, "\n");
+
+    const char* flgstr = LABEL_FLAGS_To_Str(flags);
+    fprintf (f, " %s\n", flgstr);
 } // LABEL::Print
 
 
@@ -2362,10 +2594,8 @@ FILE_INFO::Print (FILE *f) const
 {
     fprintf (f, "gp_group: %d, flags: 0x%08x", gp_group, flags);
     if (flags) {
-	if (flags & FI_IPA)		fputs (" IPA-generated", f);
-	if (flags & FI_NEEDS_LNO)	fputs (" needs_LNO", f);
-	if (flags & FI_HAS_INLINES)	fputs (" has_inlines", f);
-	if (flags & FI_HAS_MP)		fputs (" has_mp", f);
+      const char* flgstr = FILE_INFO_FLAGS_To_Str(flags);
+      fprintf (f, " %s", flgstr);
     }
 
     fputs ("\n", f);
