@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.12 $
- * $Date: 2002-10-09 16:04:14 $
+ * $Revision: 1.13 $
+ * $Date: 2002-10-21 19:29:18 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.12 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.13 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -195,7 +195,8 @@ fei_proc(char         *name_string,
 	 INT32         alt_entry_idx,
 	 TYPE          result_type,
 	 INT32         proc_idx,
-         INT64         flags )
+         INT64         flags,
+         INT32         in_interface )
 {
   INTPTR p;
 
@@ -256,7 +257,8 @@ fei_proc(char         *name_string,
                       Sym_class_arg,
                       Class_arg,
                       result_type,
-                      flags);
+                      flags,
+		      in_interface);
 
   }
 
@@ -378,6 +380,7 @@ fei_proc_def(char         *name_string,
     Set_PU_is_mainpu(pu);
     Set_PU_no_inline(pu);
 
+# if 0 /*fzhao:don't need generate this extra symbal table entry for main pgrogam */
     Main_ST = NULL;
 
     if (strcmp(crayf90_def_main,ST_name(st)) != 0) {
@@ -395,6 +398,7 @@ fei_proc_def(char         *name_string,
       Set_ST_pu(Main_ST, pu_idx);
       cwh_stab_set_linenum(Main_ST,lineno);
     }
+# endif
   }
 
 #if 0
@@ -587,12 +591,17 @@ fei_proc_imp(INT32 lineno,
 	     INT32          Sclass_arg,
 	     INT32          Class_arg,
 	     TYPE           result_type,
-	     INT64          flags)
+	     INT64          flags,
+             INT32          in_interface)
 {
-  ST * st ;
+  ST * st  ;
+  ST * st_local_cp;
   STB_pkt *p  ;
   PROC_CLASS     Class;
   FUNCTION_SYM   sym_class;
+  TY_IDX ret_cp_ty;
+  TY_IDX ty_cp;
+  PU_IDX pu_cp_idx;
 
   INT map = 0;
   
@@ -654,6 +663,20 @@ fei_proc_imp(INT32 lineno,
     break;
   }
 
+if (Class ==  PDGCS_Proc_Imported &&
+       !in_interface) {
+  st_local_cp = Copy_ST(st,CURRENT_SYMTAB);
+  st_local_cp->storage_class = SCLASS_EXTERN;
+  ret_cp_ty = cast_to_TY(t_TY(result_type)) ;
+  ty_cp = cwh_types_mk_procedure_TY(ret_cp_ty,0,TRUE,FALSE);
+  pu_cp_idx = cwh_stab_mk_pu(ty_cp, CURRENT_SYMTAB);
+
+  Set_PU_decl_view(pu_cp_idx); /*the extra PU entry for declaration only--Oct */
+ 
+  st_local_cp->u2.type =(TY_IDX)pu_cp_idx ;
+  Set_ST_ofst(st_local_cp, 0);
+}
+    
   if (sym_class == F90_Module)
     Set_ST_emit_symbol(st);
 
@@ -833,7 +856,8 @@ fei_proc_parent( char          *name_string,
 			sym_class,
 			PDGCS_Proc_Imported,
 			result_type,
-			flags);
+			flags,
+                         0);
 
   level = PU_lexical_level(Get_Current_PU()) - 1;
 

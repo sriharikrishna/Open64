@@ -796,7 +796,8 @@ static INTPTR fei_proc_imp     ( INT32         lineno,
                                  INT32         sclass,
                                  INT32         Class,
                                  TYPE          result_type,
-                                 INT64         flags);
+                                 INT64         flags,
+				 INT32         in_interface);
 
 
 static void cwh_stab_adjust_base_name(ST * st);
