@@ -84,8 +84,6 @@ typedef enum {
 #define Set_ST_addr_taken_saved(st)    Set_ST_addr_saved(st)
 #define Reset_ST_addr_taken_saved(st)  Reset_ST_addr_saved(st)
 
-#pragma set woff 1172
-
 static BOOL
 VHO_WN_is_zero ( WN * wn )
 {
@@ -844,7 +842,7 @@ VHO_Lower_Switch ( WN * wn )
   VHO_Switch_Cluster_Table =
     TYPE_MEM_POOL_ALLOC_N(INT32, MEM_local_pool_ptr, (VHO_Switch_Ncases+1));
 
-  last_label = INT32_MIN;
+  last_label = (LABEL_IDX)INT32_MIN; 
 
   for ( i = 0, case_goto = WN_first(block);
         i < VHO_Switch_Ncases;
@@ -5462,4 +5460,3 @@ WN * VHO_Lower_Driver (PU_Info* pu_info,
  
 #endif /* FRONT_END */
 
-#pragma reset woff 1172
