@@ -43,8 +43,8 @@ extern "C" {
  * ====================================================================
  *
  * Module: config_host.h
- * $Revision: 1.3 $
- * $Date: 2003-11-04 16:14:17 $
+ * $Revision: 1.4 $
+ * $Date: 2003-12-09 19:27:18 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_host.h,v $
  *
@@ -71,7 +71,7 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *config_host_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_host.h,v $ $Revision: 1.3 $";
+static char *config_host_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_host.h,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 /* What is the byte sex of the host?  Note that the variable
@@ -81,10 +81,10 @@ static char *config_host_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/
 #if (defined(__sgi) || defined(__sun) || defined(__MACH__))
 # define HOST_IS_BIG_ENDIAN	1
 # define HOST_IS_LITTLE_ENDIAN	0
-#elif (defined(__linux__) || defined(__CYGWIN__))
+#elif (defined(__linux__) || defined(__CYGWIN__) || defined(__alpha))
 # define HOST_IS_BIG_ENDIAN	0
 # define HOST_IS_LITTLE_ENDIAN	1
-#elif
+#else
 # error "Error: Unknown host."
 #endif
 
