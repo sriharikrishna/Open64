@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: wn2f.h
- * $Revision: 1.4 $
- * $Date: 2002-08-30 21:21:21 $
- * $Author: open64 $
+ * $Revision: 1.5 $
+ * $Date: 2003-01-10 02:47:29 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.h,v $
  *
  * Revision history:
@@ -320,6 +320,7 @@ typedef struct WN2F_Context
    ((c).flags = (c).flags | WN2F_CONTEXT_HAS_NO_ARR_ELMT)
 #define reset_WN2F_CONTEXT_has_no_arr_elmt(c)\
    ((c).flags = (c).flags & ~WN2F_CONTEXT_HAS_NO_ARR_ELMT)
+
 
 
     /* ---- Utilities to aid in WN to Fortran translation ---- */

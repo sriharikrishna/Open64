@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_io.c
- * $Revision: 1.3 $
- * $Date: 2002-08-22 15:48:38 $
+ * $Revision: 1.4 $
+ * $Date: 2003-01-10 02:47:29 $
  *
  * Revision history:
  *  5-June-95 - Original Version
@@ -303,6 +303,11 @@ WN2F_io_format(TOKEN_BUFFER tokens,
    case IOF_NAMELIST_DIRECTED:
       WN2F_emit_ctrl(tokens,"NML",context);
       WN2F_translate(tokens, WN_kid(item,WN_kid_count(item)-1), context);
+      Clear_BE_ST_w2fc_referenced(WN_st(WN_kid(item,WN_kid_count(item)-1)));
+/* don't dump out Namelist name and corresponding type
+ * in *.w2f.f file.When call WN2F_translate,the namelist name(st entry) will
+ * be set "referenced".Clear the flag.--------fzhao
+ */
       break;
 
    case IOF_UNFORMATTED:

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.16 $
- * $Date: 2002-10-31 22:54:17 $
- * $Author: open64 $
+ * $Revision: 1.17 $
+ * $Date: 2003-01-10 02:47:29 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.16 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.17 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -740,7 +740,8 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* Get the lhs of the assignment (dereference address) */
    lhs_tokens = New_Token_Buffer();
-   if (WN_opc_operator(WN_kid1(wn)) == OPR_LDA)
+   if (WN_opc_operator(WN_kid1(wn)) == OPR_LDA ||
+       WN_opc_operator(WN_kid1(wn)) == OPR_LDID )
           set_WN2F_CONTEXT_has_no_arr_elmt(context);
    WN2F_Offset_Memref(lhs_tokens, 
 		      WN_kid1(wn),           /* base-symbol */
@@ -1284,13 +1285,14 @@ WN2F_ldid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
           */
 
       }
-
+      set_WN2F_CONTEXT_has_no_arr_elmt(context);
       WN2F_Offset_Symref(tokens, 
 			 WN_st(wn),           /* base-symbol */
 			 base_ptr_ty,         /* base-type */
 			 object_ty,           /* object-type */
 			 WN_load_offset(wn),  /* object-ofst */
 			 context);
+      reset_WN2F_CONTEXT_has_no_arr_elmt(context);
 
       if (!deref && STAB_IS_POINTER_REF_PARAM(WN_st(wn)))
       {
@@ -1706,6 +1708,7 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     * the default for Fortran, we denormalize to base 1 here.
     */
    BOOL  deref = WN2F_CONTEXT_deref_addr(context);
+
    WN    * kid;
    TY_IDX ptr_ty;
    TY_IDX array_ty;
@@ -1755,7 +1758,8 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	  */
        WN2F_translate(tokens, kid, context);
      }
-     else if (!TY_ptr_as_array(Ty_Table[ptr_ty]) && TY_Is_Character_String(array_ty))
+     else if (!TY_ptr_as_array(Ty_Table[ptr_ty]) && 
+                    TY_Is_Character_String(array_ty) )
      {
 	 /* We assume that substring accesses are treated in the handling
 	  * of intrinsic functions, except when the substrings are to be
@@ -2254,6 +2258,9 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 	WN2F_translate(tokens, base, context);
 	reset_WN2F_CONTEXT_deref_addr(context);
       }
+# if 0
+ /* need to take a look see when we need dump out substring--fzhao Jan*/ 
+
  if (WN_operator(base) != OPR_CALL &&
      WN_operator(base) != OPR_LDA &&
       (WN_operator(base1) != OPR_ARRAY ||
@@ -2264,6 +2271,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 		     lower_bnd,
 		     WN_Skip_Parm(length),
 		     context);
+#endif
       return ;
    }
 } /* WN2F_String_Argument */

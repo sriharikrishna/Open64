@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: tcon2f.c
- * $Revision: 1.4 $
- * $Date: 2002-08-16 19:30:46 $
+ * $Revision: 1.5 $
+ * $Date: 2003-01-10 02:47:29 $
  *
  * Revision history:
  *  27-Apr-95 - Original Version
@@ -214,7 +214,7 @@ TCON2F_hollerith(TOKEN_BUFFER tokens, TCON tvalue)
 
    
 void 
-TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
+TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical,TY_IDX object_ty)
 {
 
    /* Translates the given TCON to a Fortran representation.  Since
@@ -242,6 +242,7 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
    else /* Only integral values can be treated as boolean */
       is_logical = FALSE; 
 
+
    if (!is_logical)
    {
       switch (TCON_ty(tvalue))
@@ -250,19 +251,36 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
 	 max_strlen = (Get_Maximum_Linelength()*2)/3;
 	 strlen = Targ_String_Length(tvalue);
 	 strbase = Targ_String_Address(tvalue);
-	 if (max_strlen > 0 && max_strlen < strlen)
+
+int seg_length;
+if (object_ty!=NULL)
+     seg_length =  TY_size(object_ty);
+else
+     seg_length = max_strlen;
+
+         
+//	 if (max_strlen > 0 && max_strlen < strlen)
+	 if (max_strlen > 0 && seg_length < strlen)
 	 {
 	    /* We need to split the string constant into substrings */
-	    str = (char *) alloca(max_strlen + 1);
-	    while (strlen > max_strlen)
+//	    str = (char *) alloca(max_strlen + 1);
+	    str = (char *) alloca(seg_length + 1);
+//	    while (strlen > max_strlen)
+	    while (strlen > seg_length)
 	    {
-	       for (stridx = 0; stridx < max_strlen; stridx++)
+//fzhao Dec	       for (stridx = 0; stridx < max_strlen; stridx++)
+	       for (stridx = 0; stridx < seg_length; stridx++)
 		  str[stridx] = strbase[stridx];
 	       str[stridx] = '\0';
 	       strbase = &strbase[stridx];
-	       strlen -= max_strlen;
-	       TCON2F_Append_String_Const(tokens, str, max_strlen);
+//	       strlen -= max_strlen;
+	       strlen -= seg_length;
+//	       TCON2F_Append_String_Const(tokens, str, max_strlen);
+	       TCON2F_Append_String_Const(tokens, str, seg_length);
+if (object_ty==NULL)
 	       Append_Token_String(tokens, "//"); /* Concatenation */
+else
+	       Append_Token_Special(tokens, ','); 
 	    }
 	 }
 	 TCON2F_Append_String_Const(tokens, strbase, strlen);
@@ -346,3 +364,9 @@ TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
   
 
 } /* TCON2F_translate */
+
+void
+TCON2F_translate(TOKEN_BUFFER tokens, TCON tvalue, BOOL is_logical)
+{
+   TCON2F_translate(tokens,tvalue,is_logical,NULL);
+} 

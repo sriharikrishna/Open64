@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.11 $
- * $Date: 2002-10-28 21:31:47 $
- * $Author: open64 $
+ * $Revision: 1.12 $
+ * $Date: 2003-01-10 02:47:29 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
  *
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.12 $";
 #endif
 
 #include <alloca.h>
@@ -1115,8 +1115,8 @@ const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
     * we are entering a context where we expect this expression
     * to be a logically valued argument.
     */
-if (wn ==NULL)
-    assert(0);
+// if (wn ==NULL)
+//    assert(0);
 
    if (OPCODE_is_boolean(WN_opcode(wn)) && 
        WN2F_expr_has_boolean_arg(WN_opcode(wn)))  /* expect logical args */
