@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.9 $
- * $Date: 2003-06-26 20:01:25 $
- * $Author: fzhao $
+ * $Revision: 1.10 $
+ * $Date: 2003-12-11 22:06:00 $
+ * $Author: eraxxon $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -532,7 +532,7 @@ fei_nseq_subscr( TYPE result_type )
       det = cwh_addr_offset() ;
 
       if (TY_is_f90_pointer(Ty_Table[det.type])) {
-
+	 ty = det.type; /* eraxxon: added to initialize 'ty' */
 	 may_be_noncontig = TRUE;
 	 esize = cwh_addr_compute_stride_fudge_factor(ty);
       }
