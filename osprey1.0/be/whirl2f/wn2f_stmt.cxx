@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.23 $
- * $Date: 2003-06-19 19:22:36 $
- * $Author: broom $
+ * $Revision: 1.24 $
+ * $Date: 2003-07-15 21:13:19 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.23 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.24 $";
 #endif
 
 #include <alloca.h>
@@ -3241,6 +3241,7 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    TY_IDX        return_ty;
    TOKEN_BUFFER  header_tokens;
    INT           implicit = 0 ;
+   BOOL          add_rsl_decl = 0;
 
 
 
@@ -3317,6 +3318,9 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
         * in Fortran, so we use the corresponding integral type
         * instead.
         */
+
+          add_rsl_decl = 1;
+#if 0
           if (TY_Is_Pointer(return_ty))
              TY2F_translate(header_tokens,
                          Stab_Mtype_To_Ty(TY_mtype(return_ty)));
@@ -3326,6 +3330,8 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
                  else
                    TY2F_translate(header_tokens, return_ty);
                }
+#endif
+
 
           }
        else /* subroutine */
@@ -3369,7 +3375,7 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
                        /* Bug: next and last param may be implicit */
                        /* this causes the argument list to end with a comma (radu@par.univie.ac.at) */
-                       /* if (param+1 < num_params)
+                       /* if (param+1 < num_params) */
 			  /*     Append_Token_Special(header_tokens, ','); */
                    }else
                       rslt = param_st[param];
@@ -3393,7 +3399,31 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
                                     W2CF_Symtab_Nameof_St(rslt));
                Append_Token_Special(header_tokens, ')');
          }
-      /* Emit parameter declarations, indented and on a new line */
+
+//add "use w2f__types" to include kind-of-types definition
+     Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
+     Append_Token_String(header_tokens, "use w2f__types");
+
+//add type declaration of the function 
+          if (add_rsl_decl){
+            TOKEN_BUFFER temp_tokens = New_Token_Buffer();
+            Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
+	
+            if (TY_Is_Pointer(return_ty))
+                TY2F_translate(temp_tokens,
+                         Stab_Mtype_To_Ty(TY_mtype(return_ty)));
+             else {
+                  if (TY_kind(return_ty)==KIND_ARRAY && !TY_is_character(return_ty))
+                   TY2F_translate(temp_tokens,TY_AR_etype(return_ty));
+                 else
+                   TY2F_translate(temp_tokens, return_ty);
+                  }
+
+             Append_Token_String(temp_tokens, W2CF_Symtab_Nameof_St(st));
+             Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
+
+           }
+
 
       for (param = first_param; param < num_params ; param++)
    
