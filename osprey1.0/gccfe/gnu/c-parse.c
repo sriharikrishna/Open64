@@ -37,7 +37,7 @@ static int yygrowstack();
 
 /* Since parsers are distinct for each language, put the language string
    definition here.  */
-const char *language_string = "GNU UPC";
+const char * const language_string = "GNU UPC";
 
 /* Like YYERROR but do call yyerror.  */
 #define YYERROR1 { yyerror ("syntax error"); YYERROR; }
