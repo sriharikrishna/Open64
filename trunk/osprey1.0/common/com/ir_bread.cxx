@@ -512,7 +512,8 @@ check_elf_header (const char* baseaddr, Elf64_Word size, const ELF& tag)
 	ehdr->e_version != EV_CURRENT) {
         return ERROR_RETURN; 
     }
-    if (ehdr->e_type != ET_IR || ehdr->e_shentsize != sizeof(ELF::Elf_Shdr)) {
+    if (ehdr->e_type != ET_IR 
+	|| ehdr->e_shentsize != sizeof(typename ELF::Elf_Shdr)) {
 	return ERROR_RETURN;
     }
     if (Target_ABI != ABI_UNDEF && 
@@ -528,12 +529,12 @@ check_elf_header (const char* baseaddr, Elf64_Word size, const ELF& tag)
 	return ERROR_RETURN;
     }
     if (ehdr->e_shoff >= size ||
-	ehdr->e_shoff + ehdr->e_shnum * sizeof(ELF::Elf_Shdr) > size) {
+	ehdr->e_shoff + ehdr->e_shnum * sizeof(typename ELF::Elf_Shdr) > size) {
 	return ERROR_RETURN;
     }
     typename ELF::Elf_Shdr* shdr =
 	(typename ELF::Elf_Shdr *) (baseaddr + ehdr->e_shoff);
-    if ((long) shdr & (ALIGNOF(ELF::Elf_Shdr) - 1)) {
+    if ((long) shdr & (ALIGNOF(typename ELF::Elf_Shdr) - 1)) {
 	return ERROR_RETURN;
     }
     return tag.Elf_class();

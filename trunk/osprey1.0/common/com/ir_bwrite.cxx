@@ -462,8 +462,8 @@ write_output (UINT64 e_shoff, const typename ELF::Elf_Shdr& strtab_sec,
     ehdr->e_shoff = e_shoff;
     ehdr->e_flags = Config_ELF_From_Target (! Use_32_Bit_Pointers, FALSE,
 					    (INT) Target_ISA);  
-    ehdr->e_ehsize = sizeof(ELF::Elf_Ehdr);
-    ehdr->e_shentsize = sizeof(ELF::Elf_Shdr);
+    ehdr->e_ehsize = sizeof(typename ELF::Elf_Ehdr);
+    ehdr->e_shentsize = sizeof(typename ELF::Elf_Shdr);
     ehdr->e_shnum = fl->num_of_section + 2;
     ehdr->e_shstrndx = fl->num_of_section + 1;
 
@@ -485,11 +485,12 @@ write_output (UINT64 e_shoff, const typename ELF::Elf_Shdr& strtab_sec,
     /* Finally, the section header table */
     typename ELF::Elf_Shdr* shdr =
 	(typename ELF::Elf_Shdr *) (base_addr + e_shoff);
-    memset (shdr, 0, sizeof(ELF::Elf_Shdr)); /* First null entry */
+    memset (shdr, 0, sizeof(typename ELF::Elf_Shdr)); /* First null entry */
     shdr++;
     if (tag.Elf_class() == ELFCLASS64) {
 	for (i = 0; i < fl->num_of_section; i++, shdr++)
-	    memcpy (shdr, &(fl->section_list[i].shdr), sizeof(ELF::Elf_Shdr));
+	    memcpy (shdr, &(fl->section_list[i].shdr), 
+		    sizeof(typename ELF::Elf_Shdr));
     } else {
 	// convert Elf64_Shdr to Elf32_Shdr
 	for (i = 0; i < fl->num_of_section; i++, shdr++) {
@@ -505,7 +506,7 @@ write_output (UINT64 e_shoff, const typename ELF::Elf_Shdr& strtab_sec,
 	    shdr->sh_entsize = fl->section_list[i].shdr.sh_entsize;
 	}
     }
-    memcpy (shdr, &strtab_sec, sizeof(ELF::Elf_Shdr));
+    memcpy (shdr, &strtab_sec, sizeof(typename ELF::Elf_Shdr));
 } /* write_output */
 
 #endif  // __GNUC__ _SOLARIX_SOLARIS
@@ -924,8 +925,8 @@ namespace
 		   mUINT32& offset) {
 	offset =
 	    ir_b_save_buf (&(data.front()),
-			   data.size () * sizeof(T::value_type), 
-			   ALIGNOF(T::value_type), 0, fl) - base;
+			   data.size () * sizeof(typename T::value_type), 
+			   ALIGNOF(typename T::value_type), 0, fl) - base;
 	num = data.size ();
     }
 

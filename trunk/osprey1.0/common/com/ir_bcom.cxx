@@ -415,16 +415,12 @@ Elf64_Word
 write_table (TABLE& fld, off_t base_offset,
 	     Output_File *fl)
 {
-
-    off_t cur_offset = ir_b_align (fl->file_size, ALIGNOF(TABLE::base_type),
-				   0);
-    fl->file_size = ir_b_align (fl->file_size, ALIGNOF(TABLE::base_type), 0);
-
-#ifndef __GNUC__
-    const WRITE_TABLE_OP<TABLE::base_type> write_table_op(fl);
-#else
+    off_t cur_offset = ir_b_align (fl->file_size, 
+				   ALIGNOF(typename TABLE::base_type), 0);
+    fl->file_size = ir_b_align (fl->file_size, 
+				ALIGNOF(typename TABLE::base_type), 0);
+    
     const WRITE_TABLE_OP<typename TABLE::base_type> write_table_op(fl);
-#endif
 
     For_all_blocks (fld, write_table_op);
     return cur_offset - base_offset;
