@@ -865,8 +865,11 @@ Edition 42:
 
 
 static char USMID [] = "\n%Z%%M%	%I%	%G% %U%\n";
-static char rcsid [] = "$Id: edition.c,v 1.1.1.1 2002-05-22 20:06:18 dsystem Exp $";
+static char rcsid [] = "$Id: edition.c,v 1.2 2002-07-18 17:31:13 fzhao Exp $";
 /* $Log: not supported by cvs2svn $
+ * Revision 1.1.1.1  2002/05/22 20:06:18  dsystem
+ * Initial import
+ *
  * Revision 2.46  1997/07/22 23:31:22  gbt
  * MIPS NaNs are the opposite of SPARC/T90-IEEE/Alpha NaNs: the
  * latter has the high bit of the mantissa clear for signalling
