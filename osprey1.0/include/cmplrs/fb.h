@@ -36,20 +36,11 @@
 #ifndef __FB_H__
 #define __FB_H__
 
-#include <sys/types.h>
+#include <inttypes.h>
 
-// Solaris workaround
-
-#ifdef _SOLARIS_SOLARIS
 typedef uint64_t        FB_offset;
 typedef uint64_t        FB_xword;
 typedef uint32_t        FB_word;
-
-#else
-typedef __uint64_t	FB_offset;
-typedef __uint64_t	FB_xword;
-typedef __uint32_t	FB_word;
-#endif
 
 typedef unsigned short	FB_half;
 
