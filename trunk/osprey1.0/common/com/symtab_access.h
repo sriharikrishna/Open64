@@ -1061,6 +1061,20 @@ inline void
 Clear_TY_is_logical (TY_IDX tyi)    { Clear_TY_is_logical(Ty_Table[tyi]); }
 
 inline BOOL
+TY_is_sequence (const TY& ty)            { return ty.flags & TY_IS_SEQUENCE; }
+inline void
+Set_TY_is_sequence (TY& ty)              { ty.flags |= TY_IS_SEQUENCE; }
+inline void
+Clear_TY_is_sequence (TY& ty)            { ty.flags &= ~TY_IS_SEQUENCE; }
+inline BOOL
+TY_is_sequence (const TY_IDX tyi)    { return TY_is_sequence(Ty_Table[tyi]); }
+inline void
+Set_TY_is_sequence (TY_IDX tyi)      { Set_TY_is_sequence(Ty_Table[tyi]); }
+inline void
+Clear_TY_is_sequence (TY_IDX tyi)    { Clear_TY_is_sequence(Ty_Table[tyi]); }
+
+
+inline BOOL
 TY_is_union (const TY& ty)		{ return ty.flags & TY_IS_UNION; }
 inline void
 Set_TY_is_union (TY& ty)		{ ty.flags |= TY_IS_UNION; }
