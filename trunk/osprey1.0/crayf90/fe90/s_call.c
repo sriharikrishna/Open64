@@ -3287,7 +3287,11 @@ boolean final_arg_work(opnd_type	*list_opnd,
             ATD_NOT_PT_UNIQUE_MEM(
                    (find_left_attr(&IL_OPND(list_idx)))) = TRUE;
 # endif
-
+# if 0 /*we need keep arrsection for whirl2f dumpout correct 
+        *actual arguments,otherwise it will dumpout the firset 
+        *element of the array section
+        *-z
+        */
             /* these are always arrays, no need for %val() or vfunction chks */
 
             COPY_OPND(opnd, IL_OPND(list_idx));
@@ -3319,6 +3323,8 @@ boolean final_arg_work(opnd_type	*list_opnd,
 
                IR_TYPE_IDX(ir_idx) = CRI_Ch_Ptr_8;
             }
+# endif
+
 # endif
 
             break;
