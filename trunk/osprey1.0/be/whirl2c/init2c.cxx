@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: init2c.c
- * $Revision: 1.5 $
- * $Date: 2003-09-10 21:20:15 $
+ * $Revision: 1.6 $
+ * $Date: 2003-09-17 20:06:54 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $
  *
@@ -56,7 +56,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/init2c.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -266,8 +266,10 @@ INITV2C_val(TOKEN_BUFFER tokens,
    INITV_IDX  next_initv;
 
 // "struct" and "union" variables appeared in the Tcons if declared as "static" variables
+// and "array" variable too---fzhao
 
-   Is_True(TY_Is_Pointer_Or_Scalar(ty) || TY_Is_Array_Of_Chars(ty) || TY_Is_Structured(ty),
+   Is_True(TY_Is_Pointer_Or_Scalar(ty) || TY_Is_Array_Of_Chars(ty) || 
+                TY_Is_Structured(ty)|| TY_Is_Array(ty),
 	   ("Unexpected lhs type in INITV2C_val()"));
       
    /* Make sure the types are assignment compatible, by casting pointer
@@ -281,6 +283,7 @@ INITV2C_val(TOKEN_BUFFER tokens,
       WHIRL2C_parenthesize(tmp_tokens);
       Append_And_Reclaim_Token_List(tokens, &tmp_tokens);
    }
+
 
    /* Translate the constant value */
 
@@ -758,6 +761,7 @@ INITO2C_translate(TOKEN_BUFFER tokens, INITO_IDX inito)
     * attribute (offset in data section) has no significance for 
     * the translation to C.
     */
+
    if (Stab_Is_Common_Block(INITO_st(inito)) ||
        Stab_Is_Equivalence_Block(INITO_st(inito)))
    {
