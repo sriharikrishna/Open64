@@ -1117,8 +1117,10 @@ Clear_TY_is_packed (TY_IDX tyi)     { Clear_TY_is_packed(Ty_Table[tyi]); }
 
 
 
+//------------------------------------------------------------------------------
+// UPC specific functions
+//------------------------------------------------------------------------------
 
-#ifdef COMPILE_UPC
 inline UINT32
 TY_block_size (const TY& ty)	{ return ty.block_size;}
 inline void
@@ -1169,8 +1171,10 @@ Set_TY_is_relaxed (TY_IDX tyi)       { Set_TY_is_relaxed(Ty_Table[tyi]); }
 inline void
 Clear_TY_is_relaxed (TY_IDX tyi)     { Clear_TY_is_relaxed(Ty_Table[tyi]); }
 
+//------------------------------------------------------------------------------
+// UPC specific functions end
+//------------------------------------------------------------------------------
 
-#endif
 
 inline BOOL
 TY_ptr_as_array (const TY& ty)		{ return ty.flags & TY_PTR_AS_ARRAY; }

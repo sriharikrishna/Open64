@@ -87,7 +87,6 @@ HOSTDEFS += -Dlonglong
 HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE
 # need to define BUILD_WHIRL2F to get appropriate code from common sources
 HOSTDEFS += -DMONGOOSE_BE -DBUILD_WHIRL2F -D_LIBELF_XTND_64
-HOSTDEFS += -DCOMPILE_UPC
 
 ifeq ($(BUILD_VARIANT), DEBUG)
 HOSTDEFS += -DIs_True_On
@@ -302,7 +301,7 @@ endif
 
 ifeq ($(BUILD_OS), SOLARIS)
 CFLAGS = -D_SOLARIS_SOLARIS -D_SOLARIS -Dlonglong -D_LONGLONG -D_SVR4_SOURCE \
-	-DMONGOOSE_BE -DBUILD_WHIRL2F -D_LIBELF_XTND_64 -DCOMPILE_UPC $(LCINCS) $(OPTIMIZER)
+	-DMONGOOSE_BE -DBUILD_WHIRL2F -D_LIBELF_XTND_64 $(LCINCS) $(OPTIMIZER)
  ifeq ($(BUILD_COMPILER), VENDOR)
  ifeq ($(BUILD_SB), YES)
  CFLAGS += -xsb
@@ -389,7 +388,9 @@ endif
 #  $(LDFLAGS) is removed
 #---------------------------------------------------------------------
 whirl2f: whirl2f.so whirl2f_be $(WHIRL2F_MAIN_OBJS) be.so be
+	rm -f whirl2f90
 	$(C++F) -o whirl2f $(WHIRL2F_MAIN_OBJS)
+	if test ! -r whirl2f90; then ln -f $(TARGDIR)/be/be whirl2f90 ; fi
 
 be.so:
 	if test ! -r be.so; then ln -f -s $(TARGDIR)/be/be.so ./be.so; fi

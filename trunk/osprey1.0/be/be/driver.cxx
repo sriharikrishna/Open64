@@ -1757,6 +1757,11 @@ extern "C" {
   void be_debug(void) {}
 }
 
+
+void RiceWhirl2f (INT * argc, char * **argv);
+
+
+
 INT
 main (INT argc, char **argv)
 {
@@ -1774,6 +1779,9 @@ main (INT argc, char **argv)
   Set_Error_File ( NULL );
   Set_Error_Phase ( "Back End Driver" );
   Preconfigure ();
+
+  RiceWhirl2f ( & argc, & argv);
+
   Process_Command_Line (argc, argv);
   
   /*For UPC - lie and pretend we run LNO */
@@ -2056,3 +2064,138 @@ main (INT argc, char **argv)
 
   
 } /* main */
+
+
+static BOOL
+Has_Extension__1 (char *name,	/* The filename to check */
+	       char *ext)	/* The extension to look for */
+{
+  INT16 nlen = strlen(name);
+  INT16 elen = strlen(ext);
+
+  /* If ext is longer than name, no chance: */
+  if ( elen > nlen ) return FALSE;
+
+  /* Otherwise compare the tail of name to ext: */
+  return ( strcmp ( &name[nlen-elen], ext ) == 0 );
+} /* Has_Extension__1 */
+
+
+static char *libpath[3] = 
+{"LD_LIBRARY_PATH",
+ "LD_LIBRARYN32_PATH",
+ "LD_LIBRARY64_PATH"
+};
+static const char * const errstring = "%s: can't allocate memory\n";
+
+void RiceWhirl2f (INT * _argc, char * **_argv) {
+  char path[PATH_MAX];
+  char *p;
+  char *env;
+  char * myname;
+  int argidx, i, len;
+  char **new_argv;
+  BOOL dash_fB_option = FALSE;
+  char *newlibpath[3];
+  int argc = *_argc;
+  char **argv = *_argv;
+  myname= Last_Pathname_Component (argv[0]);
+
+  if (myname && strcmp(myname, "whirl2f90") == 0) {
+
+    // set Run_w2f
+    Run_w2f=1;
+    strcpy (path, argv[0]);
+    if (p = strrchr(path, '/'))
+      p[0] = 0;
+    else
+      strcpy (path, ".");
+
+    for (i = 0; i<3; i++)
+      {
+	len = strlen (path) + 1;
+	len += strlen (libpath[i]) + 1;    /* env. variable name plus '=' */
+
+	env = getenv (libpath[i]);
+
+	if (env) {
+	  len += strlen (env) + 1;    /* old path plus ':' */
+
+	  newlibpath[i] = (char *) malloc (len);
+	  if (newlibpath[i] == 0) {
+	    fprintf (stderr, errstring, argv[0]);
+	    exit(RC_NORECOVER_USER_ERROR);
+	  }
+
+	  sprintf (newlibpath[i], "%s=%s:%s", libpath[i], env, path);
+	} else {
+	  newlibpath[i] = (char *) malloc (len);
+	  if (newlibpath[i] == 0) {
+	    fprintf (stderr, errstring, argv[0]);
+	    exit(RC_NORECOVER_USER_ERROR);
+	  }
+
+	  sprintf (newlibpath[i], "%s=%s", libpath[i], path);
+	}
+      } /* For each libpath kind */
+    for (i = 0; i<3; i++)
+      putenv (newlibpath[i]);
+    // strcat (path, "/whirl2f");
+
+
+    /* Copy the argument list into a new list of strings, with a spare
+     * element for a missing -fB option.
+     */
+    new_argv = (char **) malloc((argc+2)*sizeof(char *));
+    for (argidx = 0; argidx < argc; argidx++)
+      {
+	new_argv[argidx] = (char *) malloc(strlen(argv[argidx]) + 1);
+	new_argv[argidx] = strcpy(new_argv[argidx], argv[argidx]);
+	if (new_argv[argidx][0] == '-' &&
+	    new_argv[argidx][1] == 'f' &&
+	    new_argv[argidx][2] == 'B')
+	  dash_fB_option = TRUE;
+      }
+
+    if (!dash_fB_option)
+      {
+	/* Create a "-fB" option, provided the file-argument (only argument
+	 * not preceded by a '-') represents the WHIRL file if suffixed by
+	 * ".B", ".I", ".N" or ".o".
+	*/
+	argidx = argc-1;
+	while (argidx > 0)
+	  {
+	    if (new_argv[argidx][0] != '-' && /* A file argument */
+		(Has_Extension__1(new_argv[argidx], ".B") ||
+		 Has_Extension__1(new_argv[argidx], ".I") ||
+		 Has_Extension__1(new_argv[argidx], ".N") ||
+		 Has_Extension__1(new_argv[argidx], ".o")))
+	      {
+		/* A file argument representing the WHIRL input file.  We need
+		 * to change this around a little bit.  Put this filename under
+		 * a "-fB,filename" option and add a new filename with the
+		 * suffix substituted by ".f".
+		 */
+		dash_fB_option = TRUE;
+		new_argv[argc] = (char *) malloc(strlen(new_argv[argidx]) + 5);
+		(void)strcpy(new_argv[argc], "-fB,");
+		(void)strcpy(&new_argv[argc][4], new_argv[argidx]);
+		argc++;
+	  
+		new_argv[argidx][strlen(new_argv[argidx])-1] = 'f';
+		argidx = 1; /* We are done! */
+	      }
+	    argidx--;
+	  } /*while*/
+      } /*if (!dash_fB_option)*/
+    new_argv[argc] = NULL;
+
+    // change the program name to be whirl2f
+    new_argv[0][ strlen(new_argv[0])-2 ] = 0;
+
+    * _argc = argc;
+    * _argv = new_argv;
+  }
+}
+
