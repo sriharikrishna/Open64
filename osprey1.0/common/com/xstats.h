@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: xstats.h
- * $Revision: 1.4 $
- * $Date: 2004-01-15 00:20:27 $
- * $Author: dotsenko $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:48:34 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/xstats.h,v $
  *
  * Description:
@@ -53,7 +53,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *xstats_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/xstats.h,v $ $Revision: 1.4 $";
+static char *xstats_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/xstats.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "opcode.h"

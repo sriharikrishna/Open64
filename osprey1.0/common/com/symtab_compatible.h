@@ -99,7 +99,6 @@ ST_type (const ST* s) {
     case CLASS_CONST:
     case CLASS_PREG:
     case CLASS_NAME:
-    case CLASS_TYPE:
     case CLASS_PARAMETER:
 	return s->u2.type;
     case CLASS_FUNC:
@@ -127,7 +126,6 @@ Set_ST_type (ST* s, TY_IDX t) {
     case CLASS_CONST:
     case CLASS_PREG:
     case CLASS_NAME:
-    case CLASS_TYPE:
     case CLASS_PARAMETER:
 	s->u2.type = t;
     }

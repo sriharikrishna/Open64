@@ -1,4 +1,4 @@
-/* $Id: x_math.c,v 1.2 2004-02-28 21:05:05 eraxxon Exp $ */
+/* $Id: x_math.c,v 1.1 2003-11-04 15:59:37 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -27,12 +27,12 @@ inline long double hypotl(long double x, long double y)
 
 /****************************************************************************/
 
-extern double c_hypot(double x, double y) 
+double c_hypot(double x, double y) 
 { return hypot(x,y); }
 
-extern float c_hypotf(float x, float y) 
+float c_hypotf(float x, float y) 
 { return hypotf(x,y); }
 
-extern long double c_hypotl(long double x, long double y) 
+long double c_hypotl(long double x, long double y) 
 { return hypotl(x,y); }
 

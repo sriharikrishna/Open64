@@ -860,23 +860,6 @@ static const struct {
   INTRN_SETNULL_S_R, "SETNULL_S_R",
   INTRN_SETNULL_P_R, "SETNULL_P_R",
   INTRN_SUB_PI, "SUB_PI",
-  INTRN_U4READFRAMEPOINTER,     "U4READFRAMEPOINTER",
-  INTRN_U8READFRAMEPOINTER,     "U8READFRAMEPOINTER",
-  INTRN_APPLY_ARGS,             "APPLY_ARGS",
-  INTRN_APPLY,                  "APPLY",
-  INTRN_RETURN,                 "RETURN",
-  INTRN_VA_START,               "VA_START",
-  INTRN_SAVE_XMMS,              "SAVE_XMMS",
-  INTRN_LANDING_PAD_ENTRY,      "INTRN_LANDING_PAD_ENTRY",
-  INTRN_ISGREATER,              "ISGREATER",
-  INTRN_ISGREATEREQUAL,         "ISGREATEREQUAL",
-  INTRN_ISLESS,                 "ISLESS",
-  INTRN_ISLESSEQUAL,            "ISLESSEQUAL",
-  INTRN_ISLESSGREATER,          "ISLESSGREATER",
-  INTRN_ISUNORDERED,            "INTRN_ISUNORDERED",
-                                                                                   
-  INTRN_SUBSU2,                 "INTRN_SUBSU2",
-  INTRN_SUBSV16I2,              "INTRN_SUBSV16I2",
   INTRINSIC_LAST,		"INTRINSIC_LAST"
 
 };

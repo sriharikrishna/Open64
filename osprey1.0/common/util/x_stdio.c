@@ -1,4 +1,4 @@
-/* $Id: x_stdio.c,v 1.2 2004-02-28 21:05:05 eraxxon Exp $ */
+/* $Id: x_stdio.c,v 1.1 2003-11-04 15:59:37 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -16,8 +16,8 @@
 
 /****************************************************************************/
 
-extern int ux_fileno(FILE *stream)
+int ux_fileno(FILE *stream)
 { return fileno(stream); }
 
-extern FILE *ux_fdopen(int fildes, const char *mode)
+FILE *ux_fdopen(int fildes, const char *mode)
 { return fdopen(fildes, mode); }

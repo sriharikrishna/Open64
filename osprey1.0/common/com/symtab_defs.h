@@ -57,7 +57,7 @@ enum ST_CLASS
     CLASS_BLOCK	= 5,			// base to a block of data
     CLASS_NAME  = 6,			// just hold an ST name
     CLASS_MODULE = 7,                   
-    CLASS_TYPE   = 8,                   // holds user defined type name
+    CLASS_TYPE   =8,                    //this ST holds an user defined type's name
     CLASS_PARAMETER = 9,
     CLASS_COUNT = 10			// total number of classes
 }; // ST_CLASS
@@ -161,25 +161,20 @@ enum ST_FLAGS
 
 enum ST_EXT_FLAGS
  {
-    ST_IS_POINTER              = 0x0001,  
-    ST_IS_ALLOCATABLE          = 0x0002,
-    ST_IS_IN_MODULE            = 0x0004,
-    ST_IS_EXTERNAL             = 0x0008,
-    ST_IS_BLOCK_DATA           = 0x0010, 
-    ST_IS_INTENT_IN_ARGUMENT   = 0x0020,
-    ST_IS_INTENT_OUT_ARGUMENT  = 0x0040,
-    ST_IS_ASSIGN_INTERFACE     = 0x0080,
-    ST_IS_OPERATOR_INTERFACE   = 0x0100,
-    ST_IS_U_OPERATOR_INTERFACE = 0x0200,
-    ST_IS_PRIVATE              = 0x0400,
-    ST_IS_M_IMPORTED           = 0x0800,
-    ST_IS_IMPLEM_LEVEL_TEMP    = 0x1000,
-    ST_IS_PARAMETER	       = 0x2000,
-/* key */
-    ST_ONE_PER_PU 	       = 0x4000,               // Only 1 instance per pu
-    ST_COPY_CONSTRUCTOR_ST     = 0x8000,    // ST is copy constructor function
-    ST_INITV_IN_OTHER_ST       = 0x10000,    // ST is being used as an initianliation offset by other symbol
-    ST_IS_INITIALIZED_IN_F90    =0x20000
+    ST_IS_POINTER              = 0x0000000000000001,  
+    ST_IS_ALLOCATABLE          = 0x0000000000000002,
+    ST_IS_IN_MODULE            = 0x0000000000000004,
+    ST_IS_EXTERNAL             = 0x0000000000000008,
+    ST_IS_BLOCK_DATA           = 0x0000000000000010, 
+    ST_IS_INTENT_IN_ARGUMENT   = 0x0000000000000020,
+    ST_IS_INTENT_OUT_ARGUMENT  = 0x0000000000000040,
+    ST_IS_ASSIGN_INTERFACE     = 0x0000000000000080,
+    ST_IS_OPERATOR_INTERFACE   = 0x0000000000000100,
+    ST_IS_U_OPERATOR_INTERFACE = 0x0000000000000200,
+    ST_IS_PRIVATE              = 0x0000000000000400,
+    ST_IS_M_IMPORTED           = 0x0000000000000800,
+    ST_IS_IMPLEM_LEVEL_TEMP    = 0x0000000000001000,
+    ST_IS_PARAMETER	       = 0x0000000000002000
   
  }; // ST_EXT_FLAGS
 
@@ -505,11 +500,7 @@ enum TY_FLAGS
     TY_IS_STRICT        = 0x20000,
     TY_IS_RELAXED       = 0x40000,
     TY_IS_CO_ARRAY      = 0x80000,
-    TY_IS_WRITTEN	= 0x100000,	//make w2c to output the type definition
-/* key */
-    TY_RETURN_IN_MEM    = 0x200000,       // Functions must return objects of this
-                                        // type in memory.
-
+    TY_IS_WRITTEN	= 0x100000	//make w2c to output the type definition
 };
 
 
@@ -545,7 +536,6 @@ public:
 	TY_IDX etype;			// type of array element (array only)
 	TY_IDX pointed;			// pointed-to type (pointers only)
 	mUINT32 pu_flags;		// attributes for KIND_FUNCTION
-        ST_IDX copy_constructor;        // copy constructor X(X&) (record only)
     } u2;
 
     mUINT32 block_size;                 // block size for UPC shared data
@@ -575,15 +565,7 @@ public:
 	return u2.pointed;
       }
     void Set_pointed (TY_IDX idx)	{ u2.pointed = idx; }
-   
-    ST_IDX Copy_constructor () const
-      {
-        Is_True(kind == KIND_STRUCT,
-                ("non-KIND_STRUCT type has no copy constructor"));
-        return u2.copy_constructor;
-      }
-    void Set_copy_constructor (ST_IDX idx)      { u2.copy_constructor = idx; }
- 
+    
     PU_IDX Pu_flags () const		{ return u2.pu_flags; }
     void Set_pu_flag (TY_PU_FLAGS f)	{ u2.pu_flags |= f; }
     void Clear_pu_flag (TY_PU_FLAGS f)	{ u2.pu_flags &= ~f; }
@@ -645,14 +627,6 @@ public:
 						// optimization
 #define PU_IS_THUNK		0x0000000400000000LL // pu is a C++ thunk
 #define PU_DECL_VIEW		0x0000000800000000LL // pu is a multiply copy for declare "external" 
-#define PU_NEED_UNPARSED	0x0000001000000000LL // pu flag for unparser to discard some unwanted PU
-#define PU_NEEDS_MANUAL_UNWINDING       0x0000000800000000LL // PU has cleanups in outermost scope and
-                                                             //hence needs to call _Unwind_Resume itself
-#ifdef TARG_X8664
-#define PU_FF2C_ABI             0x0000001000000000LL 
-                                               // PU use g77 linkage convention for returns of complex and float
-#endif
-
 
 enum PU_SRC_LANG_FLAGS
 {

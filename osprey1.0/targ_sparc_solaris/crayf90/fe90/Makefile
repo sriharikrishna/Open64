@@ -39,7 +39,7 @@
 #
 #  Define build parameters
 #
-PWD := $(shell pwd)
+PWD = $(shell pwd)
 
 BUILD_AREA     = ../..
 BUILD_TOT      = $(PWD)/../../..

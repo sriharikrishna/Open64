@@ -259,12 +259,7 @@ char *	 convert_to_string (long_type	*the_constant,
 
             case Dont_Care:
             default:
-/*FMZH               fmt1 = LLDEC_FMT;*/
-/* mostly default should give hex form since the sprintf is given 
-   2-word for integer(8) type constant this should be work well for
-   little endian machine
- */
-               fmt1 = LLHEX_FMT;
+               fmt1 = LLDEC_FMT;
                break;
          }
 

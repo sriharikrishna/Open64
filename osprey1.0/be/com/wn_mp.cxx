@@ -1009,7 +1009,6 @@ static void Create_Func_DST ( char * st_name )
 			0,
 			FALSE,			/* declaration */
 			FALSE,			/* prototype */
-                        FALSE,                  /* is_artificial*/
 			FALSE			/* external */
 			);
   (void)DST_append_child( dst, nested_dst );

@@ -476,23 +476,12 @@ WN_TREE_ITER<PRE_ORDER, WHIRL>::Unwind() {
         Pop(); // Pop(parent_wn) + MORE WORK NEEDED
     } 
     else { // parent is NON_BLOCK ie increment kid_count to get next sibling
-      // eraxxon, 2004.07.12: In special circumstances, some nodes may
-      // have NULL children.  For example, a call with missing
-      // optional Fortran parameters is currently represented as a
-      // CALL node with NULL PARM nodes.
-      BOOL usedNextChild = FALSE;
       INT indx = Get_kid_index();
-      while ((0 <= indx) && (indx < WN_kid_count(parent_wn) - 1)) {
-	indx = Inc_kid_index();
-	WN* kid = WN_kid(parent_wn, indx);
-	if (kid) {
-	  Set_wn(kid);
-	  usedNextChild = TRUE;
-	  done = TRUE;
-	  break;
-	}
+      if ((0 <= indx) && (indx < WN_kid_count(parent_wn) - 1)) {
+        Set_wn(WN_kid(parent_wn,Inc_kid_index()));
+        done = TRUE;
       }
-      if (!usedNextChild) {
+      else {
         Pop(); // Pop(parent_wn) + MORE WORK NEEDED
       }
     } // else parent is NON_BLOCK
@@ -514,12 +503,11 @@ WN_TREE_ITER<PRE_ORDER, WHIRL>::WN_TREE_next ()
       Unwind(); // Pop(parent_wn) + MORE WORK NEEDED
 
   } // if (OPCODE_OPERATOR(WN_opcode(wn)) == OPR_BLOCK)
-  else { // not a block ==> look at kid_count to determine where to go
+  else  // not a block ==> look at kid_count to determine where to go
     if ((WN_kid_count(_wn) != 0) && (WN_kid0(_wn)))
       Push(); // go down
     else  // go sideways (if parent is BLOCK) or UP otherwise
       Unwind(); // Pop(parent_wn) + MORE WORK NEEDED
-  }
 }
 
 
@@ -584,13 +572,12 @@ WN_TREE_ITER<POST_ORDER, WHIRL>::Wind ()
 	Push();
       else // leaf block 
 	done = TRUE;
-    } else { // parent is NON_BLOCK ie increment kid_count to get next sibling
+    } else  // parent is NON_BLOCK ie increment kid_count to get next sibling
       if ((WN_kid_count(_wn) == 0) || (!WN_kid0(_wn)))
 	// leaf node
 	done = TRUE;
       else 
 	Push();
-    }
   } // while (!done)
 } // Wind
 
@@ -620,25 +607,13 @@ WN_TREE_ITER<POST_ORDER, WHIRL>::WN_TREE_next ()
       Pop(); // Pop(parent_wn) 
   } // if (OPCODE_OPERATOR(WN_opcode(wn)) == OPR_BLOCK)
   else { // not a block ==> look at kid_count to determine where to go
-    // eraxxon, 2004.07.12: In special circumstances, some nodes may
-    // have NULL children.  For example, a call with missing
-    // optional Fortran parameters is currently represented as a
-    // CALL node with NULL PARM nodes.
-    BOOL usedNextChild = FALSE;
     INT indx = Get_kid_index();
-    while ((0 <= indx) && (indx < WN_kid_count(parent_wn) - 1)) {
-      indx = Inc_kid_index();
-      WN* kid = WN_kid(parent_wn, indx);
-      if (kid) {
-	Set_wn(kid);
-	Wind();
-	usedNextChild = TRUE;
-	break;
-      }
+    if ((0 <= indx) && (indx < WN_kid_count(parent_wn) - 1)) {
+      Set_wn(WN_kid(parent_wn, Inc_kid_index()));
+      Wind();
     }
-    if (!usedNextChild) {
+    else 
       Pop(); // Pop(parent_wn) 
-    }
   } // else 
 }
 

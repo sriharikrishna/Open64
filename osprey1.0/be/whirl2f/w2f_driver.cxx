@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.9 $
- * $Date: 2004-07-13 13:37:19 $
+ * $Revision: 1.8 $
+ * $Date: 2003-12-09 19:25:59 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.9 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.8 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -692,7 +692,7 @@ W2F_Process_Command_Line (INT phase_argc, char *phase_argv[],
     if (W2F_Ansi_Format)
        W2F_Format_Kind = F77_ANSI_FORMAT;
     else
-       W2F_Format_Kind = F77_ANSI_FORMAT; 
+W2F_Format_Kind = F77_ANSI_FORMAT; 
 
 } /* W2F_Process_Command_Line */
 

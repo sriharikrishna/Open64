@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2c.c
- * $Revision: 1.20 $
- * $Date: 2004-07-02 14:45:35 $
- * $Author: fzhao $
+ * $Revision: 1.16 $
+ * $Date: 2003-12-09 19:22:28 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.16 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -528,7 +528,6 @@ static const OPC2CNAME_MAP WN2C_Opc2cname_Map[] =
   {OPC_U8F4FLOOR, "_U8F4FLOOR"},
   {OPC_U8FQFLOOR, "_U8FQFLOOR"},
   {OPC_U8F8FLOOR, "_U8F8FLOOR"},
-  {OPC_F8F8FLOOR,"_F8F8FLOOR"}, 
   {OPC_I4BNOT, "~"},
   {OPC_U8BNOT, "~"},
   {OPC_I8BNOT, "~"},
@@ -2199,32 +2198,22 @@ WN2C_Append_Symtab_Types(TOKEN_BUFFER tokens, UINT lines_between_decls)
     * to the W2C_File[W2C_DOTH_FILE] (at file-level); otherwise, append them
     * them to the given token-list.
     */
-   TY_IDX       ty,ty_idx;
+   TY_IDX       ty;
    TOKEN_BUFFER tmp_tokens;
 
-   //WEI: This code is obviously broken, but should we fix it?
-   //FMZ: we fix the bug--June 30,2004
 
-   /* Declare structure types. --*/
+   //WEI: This code is obviously broken, but should we fix it?
+   /* Declare structure types. */
    for (ty = 1; ty < TY_Table_Size(); ty++)
    {
-     ty_idx = ty<<8;
-     if (TY_Is_Structured(ty_idx)       &&
-	 !TY_split(Ty_Table[ty_idx])    &&
-	 !TY_is_translated_to_c(ty_idx)  &&
-	  !Stab_Reserved_Ty(ty_idx))
+   
+     if (TY_Is_Structured(ty)       &&
+	 !TY_split(Ty_Table[ty])    &&
+	 !TY_is_translated_to_c(ty)  &&
+	  !Stab_Reserved_Ty(ty))
       {
 	 tmp_tokens = New_Token_Buffer();
-
-         Set_TY_is_written(ty_idx); 
-         //this should  be done in frontend,will fix later--FMZ
-
-//	 TY2C_translate_unqualified(tmp_tokens, ty);
-         //misuse this ty as TY_IDX--FMZ
-
-	 TY2C_translate_unqualified(tmp_tokens, ty_idx);
-
-#if 0 //not correct code---FMZ
+	 TY2C_translate_unqualified(tmp_tokens, ty);
 	 Append_Token_Special(tmp_tokens, ';');
 	 Append_Indented_Newline(tmp_tokens, lines_between_decls);
 	 if (tokens != NULL)
@@ -2234,8 +2223,6 @@ WN2C_Append_Symtab_Types(TOKEN_BUFFER tokens, UINT lines_between_decls)
 				     NULL, /* No srcpos map */
 				     &tmp_tokens);
 	 }
-#endif
-
       }
    }
 }  /* WN2C_Append_Symtab_Types */
@@ -3797,22 +3784,12 @@ WN2C_compgoto(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
    INT32     goto_entry;
    MTYPE     switch_mty;
    STATUS    status = EMPTY_STATUS;
-   OPCODE    myopcode;
-   const  WN *compgotoid;
    
    Is_True(WN_operator(wn) == OPR_COMPGOTO,
 	   ("Invalid operator for WN2C_compgoto()"));
 
    /* Emit the switch control */
-   /* FMZ-fix bug for switch based on a field of structure-type variable*/ 
-  //  switch_mty = TY_mtype(WN_Tree_Type(WN_compgoto_idx(wn)));
-   compgotoid = WN_compgoto_idx(wn);
-   myopcode   = WN_opcode(compgotoid); 
-   if (OPCODE_has_field_id(myopcode) && WN_field_id(compgotoid)) 
-         switch_mty = WN_rtype(compgotoid);
-   else
-         switch_mty = TY_mtype(WN_Tree_Type(compgotoid));
-
+   switch_mty = TY_mtype(WN_Tree_Type(WN_compgoto_idx(wn)));
    Append_Token_String(tokens, "switch");
    Append_Token_Special(tokens, '(');
    (void)WN2C_translate(tokens, WN_compgoto_idx(wn), context);
@@ -3891,24 +3868,12 @@ WN2C_switch(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
    const WN *goto_stmt;
    MTYPE     switch_mty;
    STATUS    status = EMPTY_STATUS;
-   OPCODE    myopcode;
-   const  WN *compgotoid;
-
+   
    Is_True(WN_operator(wn) == OPR_SWITCH, 
 	   ("Invalid operator for WN2C_switch()"));
 
-   compgotoid = WN_compgoto_idx(wn);
-   myopcode   = WN_opcode(compgotoid);
-
    /* Emit the switch control */
-   /* FMZ-fix bug for switch based on a field of structure-type variable*/ 
-//   switch_mty = TY_mtype(WN_Tree_Type(WN_compgoto_idx(wn)));
-
-   if (OPCODE_has_field_id(myopcode) && WN_field_id(compgotoid))
-         switch_mty = WN_rtype(compgotoid);
-   else
-         switch_mty = TY_mtype(WN_Tree_Type(compgotoid));
-
+   switch_mty = TY_mtype(WN_Tree_Type(WN_compgoto_idx(wn)));
    Append_Token_String(tokens, "switch");
    Append_Token_Special(tokens, '(');
    (void)WN2C_translate(tokens, WN_switch_test(wn), context);
@@ -3927,10 +3892,8 @@ WN2C_switch(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
       Is_True(WN_operator(goto_stmt) == OPR_CASEGOTO,
 	      ("Expected each SWITCH case to be an OPR_CASEGOTO"));
       Append_Token_String(tokens, "case");
-
       TCON2C_translate(tokens, 
 		       Host_To_Targ(switch_mty, WN_const_val(goto_stmt)));
-
       Append_Token_Special(tokens, ':');
       Increment_Indentation();
       Append_Indented_Newline(tokens, 1);
@@ -3957,6 +3920,7 @@ WN2C_switch(TOKEN_BUFFER tokens, const WN *wn, CONTEXT context)
       
    /* Emit the end of the switch body */
    Append_Token_Special(tokens, '}');
+
    STATUS_set_block(status);
    return status;
 } /* WN2C_switch */
@@ -6227,7 +6191,7 @@ WN2C_translate_file_scope_defs(CONTEXT context)
    WN2C_new_symtab();
 
    //WEI: don't see why this needs to be called
-//#if 0 WEI set "#if 0/#endif" cause some static constant
+//#if 0 WEI(who is this?) set "#if 0/#endif" cause some static constant
 // missed output to the corresponding w2c.h file.This cause bug #19 (see bug
 // track website),get back the function call----fzhao
 

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.25 $
- * $Date: 2004-07-13 13:36:36 $
- * $Author: eraxxon $
+ * $Revision: 1.21 $
+ * $Date: 2004-01-06 20:33:14 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -65,9 +65,7 @@ extern WN* PU_Body;
 extern BOOL Array_Bnd_Temp_Var;
 
 #define NUMBER_OF_OPERATORS (OPERATOR_LAST + 1)
-
-//#define DBGPATH 1
-
+// #define DBGPATH 1
 typedef WN2F_STATUS (*WN2F_HANDLER_FUNC)(TOKEN_BUFFER, WN*, WN2F_CONTEXT);
 extern WN2F_HANDLER_FUNC  WN2F_Handler[NUMBER_OF_OPERATORS];
 BOOL Use_Purple_Array_Bnds_Placeholder = FALSE;
@@ -141,58 +139,37 @@ WN2F_tempvar_rhs(TOKEN_BUFFER tokens,
    TOKEN_BUFFER rhs_tokens;
 
    /* The rhs */
-   if (tokens) {
-      rhs_tokens = New_Token_Buffer();
-      WN2F_translate(rhs_tokens, WN_kid0(wn), context);
-      Append_And_Reclaim_Token_List(tokens, &rhs_tokens);
-   }
+      if (tokens){
+         rhs_tokens = New_Token_Buffer();
+          WN2F_translate(rhs_tokens, WN_kid0(wn), context);
+          Append_And_Reclaim_Token_List(tokens, &rhs_tokens);
+       }
 }
 
-// GetTmpVarTransInfo: mfef90 may define array bound extents using
-// temporaries that cannot be directly translated into Fortran. E.g:
-// 't__1' below
-//    REAL(w2f__8) XXX(1 : t__1)
-// should be the formal parameter 'N'
-//    REAL(w2f__8) XXX(1 : N)
-// This routine finds the definition of 't__1'
-//    t__1 = N
-// so that 't__1' can be used instead of 'N'.
+
 static BOOL
 GetTmpVarTransInfo(TOKEN_BUFFER   decl_tokens,
                    ST_IDX         arbnd,
                    WN*            wn)
 {
-   // Note: wn must be an OPR_BLOCK
+   WN * stmt;
+   WN *first_stmt;
 
-   // Search through all the statements in 'wn' trying to find the
-   // definition of the tempvar in 'arbnd'.
-   const char* bndSymNm = ST_name(ST_ptr(arbnd));
-  
-   WN* foundStmt = NULL;
-   for (WN* stmt = WN_first(wn); (stmt); stmt = WN_next(stmt)) {
-      // mfef90 typically generates temporary-define statements like this
-      bool isDefinedInSTID = 
-	((WN_operator(stmt) == OPR_STID) && 
-	 (strcmp(ST_name(WN_st(stmt)), bndSymNm) == 0));
-      // whirl2xaif will generate statements like this
-      bool isDefinedInISTORE =
-	((WN_operator(stmt) == OPR_ISTORE) && 
-	 (WN_operator(WN_kid1(stmt)) == OPR_LDA) &&
-	 (strcmp(ST_name(WN_st(WN_kid1(stmt))), bndSymNm) == 0));
-      
-      if (isDefinedInSTID || isDefinedInISTORE) {
-	 foundStmt = stmt;
-	 break;
+   first_stmt = WN_first(wn);
+   stmt = first_stmt;
+   while ((stmt !=NULL)&&((WN_operator(stmt)!=OPR_STID)
+                           ||(WN_operator(stmt) ==OPR_STID)
+			   &&strcmp(ST_name(WN_st(stmt)),ST_name(ST_ptr(arbnd)))))
+
+       stmt = WN_next(stmt);
+ 
+
+   if ( stmt){
+        WN2F_tempvar_rhs(decl_tokens,stmt);
+         return TRUE;
       }
-   }
-   
-   if (foundStmt) {
-      WN2F_tempvar_rhs(decl_tokens, foundStmt);
-      return TRUE;
-   }
-   else {
-      return FALSE;
-   }
+   else return FALSE;
+
 }
 
 static WN *
@@ -887,7 +864,7 @@ Construct_Fld_Path(FLD_HANDLE   fld,
 } /* Construct_Fld_Path */
 
 
-const char * 
+static const char * 
 TY2F_Fld_Name(FLD_HANDLE fld, 
 	      BOOL       common_or_equivalence,
 	      BOOL       alt_return_name)
@@ -1305,73 +1282,72 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
              break;
       }
    }
-   else {
-     switch(mt) 
-     {
-       /* Strictly speaking unsigned integers not supported in Fortran,
-	* but we are lenient and treat them as the signed equivalent.
-	*/
-     case MTYPE_U1:
-     case MTYPE_I1:
-       base_name = "INTEGER";
-       kind_spec = "(w2f__i1)"; 
-       break;
-       
-     case MTYPE_U2:
-     case MTYPE_I2:
-       base_name = "INTEGER";
-       kind_spec = "(w2f__i2)"; 
-       break;
-     case MTYPE_U4:
-     case MTYPE_I4:
-       base_name = "INTEGER";
-       kind_spec = "(w2f__i4)"; 
-       break;
-     case MTYPE_U8:
-     case MTYPE_I8:
-       base_name = "INTEGER";
-       kind_spec = "(w2f__i8)"; 
-       break;
-       
-     case MTYPE_F4:
-       kind_spec = "(w2f__4)"; 
-       base_name = "REAL";
-       break;
-       
-     case MTYPE_F8:
-       kind_spec = "(w2f__8)";
-       base_name = "REAL";
-       break;
-       
-     case MTYPE_FQ:
-       kind_spec = "(w2f__16)";
-       base_name = "REAL";
-       break;
-       
-     case MTYPE_C4:
-       base_name = "COMPLEX";
-       kind_spec = "(w2f__4)"; 
-       break;
-     case MTYPE_C8:
-       base_name = "COMPLEX";
-       kind_spec = "(w2f__8)";
-       break;
-     case MTYPE_CQ:
-       base_name = "COMPLEX";
-       kind_spec = "(w2f__16)";
-       break;
-       
-     case MTYPE_M:
-       base_name = "memory block";
-       break;
-       
-     default:
-       ASSERT_DBG_FATAL(FALSE,
-			(DIAG_W2F_UNEXPECTED_BTYPE, 
-			 MTYPE_name(mt), 
-			 "TY2F_scalar"));
-     } /* switch(TY_btype(ty) */
-   }
+   else switch(mt)
+   {
+      /* Strictly speaking unsigned integers not supported in Fortran,
+       * but we are lenient and treat them as the signed equivalent.
+       */
+   case MTYPE_U1:
+   case MTYPE_I1:
+      base_name = "INTEGER";
+      kind_spec = "(w2f__i1)"; 
+      break;
+     
+   case MTYPE_U2:
+   case MTYPE_I2:
+      base_name = "INTEGER";
+      kind_spec = "(w2f__i2)"; 
+      break;
+   case MTYPE_U4:
+   case MTYPE_I4:
+      base_name = "INTEGER";
+      kind_spec = "(w2f__i4)"; 
+      break;
+   case MTYPE_U8:
+   case MTYPE_I8:
+      base_name = "INTEGER";
+      kind_spec = "(w2f__i8)"; 
+      break;
+      break;
+      
+  case MTYPE_F4:
+     kind_spec = "(w2f__4)"; 
+     base_name = "REAL";
+     break;
+
+   case MTYPE_F8:
+     kind_spec = "(w2f__8)";
+     base_name = "REAL";
+     break;
+
+   case MTYPE_FQ:
+      kind_spec = "(w2f__16)";
+      base_name = "REAL";
+      break;
+      
+   case MTYPE_C4:
+      base_name = "COMPLEX";
+     kind_spec = "(w2f__4)"; 
+      break;
+   case MTYPE_C8:
+      base_name = "COMPLEX";
+     kind_spec = "(w2f__8)";
+      break;
+   case MTYPE_CQ:
+      base_name = "COMPLEX";
+      kind_spec = "(w2f__16)";
+      break;
+      
+   case MTYPE_M:
+      base_name = "memory block";
+      break;
+
+   default:
+      ASSERT_DBG_FATAL(FALSE,
+		       (DIAG_W2F_UNEXPECTED_BTYPE, 
+			MTYPE_name(mt), 
+			"TY2F_scalar"));
+   } /* switch(TY_btype(ty) */
 
    if (TY_size(ty) > 0)
    {
@@ -1382,40 +1358,36 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
 	    kind_type = TY_size(ty);
 	 }
 
-         if (strcmp(kind_spec,"NULL") == 0) {
-	    kind_spec = 
-	      Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
-	 }
-	 Prepend_Token_String(decl_tokens,
-			      Concat2_Strings(base_name, kind_spec));
+         if (!strcmp(kind_spec,"NULL"))
+             kind_spec = Concat3_Strings("(",Number_as_String(kind_type, "%lld"),")");
+	 Prepend_Token_String(decl_tokens,Concat2_Strings(base_name,kind_spec));
       } else {
-         if (TY_is_character(ty)) {
-	    Prepend_Token_String(
-		    decl_tokens,
-		    Concat3_Strings(Concat2_Strings(base_name, "("),
-				    Number_as_String(TY_size(ty), "%lld"),
-				    ")"));
-	}
-        else {
-	   Prepend_Token_String(
-		   decl_tokens, 
-		   Concat3_Strings(base_name, "*", 
-				   Number_as_String(TY_size(ty), "%lld")));
-	}
+        if (TY_is_character(ty))
+            Prepend_Token_String(
+                              decl_tokens,
+                              Concat3_Strings(Concat2_Strings(base_name, "("),
+                                              Number_as_String(TY_size(ty), "%lld"),
+                                              ")"));
+        else
+	 Prepend_Token_String(
+			      decl_tokens, 
+			      Concat3_Strings(base_name,
+					      "*", 
+					      Number_as_String(TY_size(ty), "%lld")));
       }
    }
    else
    {
-      if (mt == MTYPE_M) {
-	 Prepend_Token_String(decl_tokens, ".mblock.");
-      }
-      else
-      {
-	 ASSERT_DBG_FATAL(TY_is_character(ty),
-			  (DIAG_W2F_UNEXPECTED_TYPE_SIZE,
-			   TY_size(ty),"TY2F_scalar"));
-	 Prepend_Token_String(decl_tokens, "CHARACTER*(*)");
-      }
+     if (mt == MTYPE_M)
+      Prepend_Token_String(decl_tokens, ".mblock.");
+     else
+    {
+       
+      ASSERT_DBG_FATAL(TY_is_character(ty),
+		       (DIAG_W2F_UNEXPECTED_TYPE_SIZE,
+			TY_size(ty),"TY2F_scalar"));
+      Prepend_Token_String(decl_tokens, "CHARACTER*(*)");
+    }
    }
 } /* TY2F_scalar */
 
@@ -1869,15 +1841,14 @@ TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
   /* Emit specification statements for every element of the
    * common block, including equivalences.
    */
-  TOKEN_BUFFER decl_tokens = New_Token_Buffer();
 
-  Append_Token_String(decl_tokens, "COMMON");
+  Append_Token_String(tokens, "COMMON");
   if (name != NULL && *name != '\0')
-    Append_Token_String(decl_tokens, Concat3_Strings("/", name, "/"));
-  TY2F_List_Common_Flds(decl_tokens, TY_flist(ty));
+    Append_Token_String(tokens, Concat3_Strings("/", name, "/"));
+  TY2F_List_Common_Flds(tokens, TY_flist(ty));
   
 
-  TY2F_Declare_Common_Flds(decl_tokens, // vars in common block type decl
+  TY2F_Declare_Common_Flds(tokens,   // variables in common block type declaration
 			   TY_flist(ty),
 			   FALSE, /*alt_return*/
 			   &is_equiv);
@@ -1888,19 +1859,17 @@ TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
 
 # if 0 //June
 
-  Append_Token_String(decl_tokens, "COMMON");
+  Append_Token_String(tokens, "COMMON");
   if (name != NULL && *name != '\0')
-    Append_Token_String(decl_tokens, Concat3_Strings("/", name, "/"));
-  TY2F_List_Common_Flds(decl_tokens, TY_flist(ty));
+    Append_Token_String(tokens, Concat3_Strings("/", name, "/"));
+  TY2F_List_Common_Flds(tokens, TY_flist(ty));
 
 #endif
 
   /* Emit equivalences, if there are any */
 
   if (is_equiv)
-    TY2F_Equivalence_List(decl_tokens, ty_idx /*struct_ty*/);
-
-  Append_And_Reclaim_Token_List(tokens, &decl_tokens);
+    TY2F_Equivalence_List(tokens, ty_idx /*struct_ty*/);
 
 } /* TY2F_Translate_Common */
 
@@ -2064,13 +2033,11 @@ TY2F_Translate_Fld_Path(TOKEN_BUFFER   tokens,
       /* Separate fields with the dot-notation. */
 
       fld_path = fld_path->next;
-
       if (fld_path != NULL)
       {
 	 TY2F_Fld_Separator(tokens) ;
 	 alt_ret_name = FALSE; /* Only applies to first field on the path */
       }
-
     } /* while */
 
 } /* TY2F_Translate_Fld_Path */

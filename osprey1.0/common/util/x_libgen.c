@@ -1,4 +1,4 @@
-/* $Id: x_libgen.c,v 1.2 2004-02-28 21:05:05 eraxxon Exp $ */
+/* $Id: x_libgen.c,v 1.1 2003-12-10 16:05:18 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -25,7 +25,7 @@
 
 static char tempbuf[PATH_MAX];
 
-extern char*
+char*
 ux_basename(char *const s)
 {
   register char *p;
@@ -47,7 +47,7 @@ ux_basename(char *const s)
 }
 
 
-extern char*
+char*
 ux_dirname(char *const s)
 {
   register char *p;

@@ -1,8 +1,4 @@
 /*
- * Copyright 2004 PathScale, Inc.  All Rights Reserved.
- */
-
-/*
 
   Copyright (C) 2000, 2001 Silicon Graphics, Inc.  All Rights Reserved.
 
@@ -44,9 +40,9 @@
  * ====================================================================
  *
  * Module: dwarf_DST_producer.h
- * $Revision: 1.4 $
- * $Date: 2004-06-28 18:39:47 $
- * $Author: eraxxon $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:48:29 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST_producer.h,v $
  *
  * Revision history:
@@ -68,7 +64,7 @@
 
 
 #ifdef _KEEP_RCS_ID
-static char *dwarf_DST_producer_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST_producer.h,v $ $Revision: 1.4 $";
+static char *dwarf_DST_producer_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST_producer.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -229,7 +225,6 @@ DST_mk_subprogram(USRCPOS      decl,
 		  DST_vtable_elem_location vtable_elem_location,
 		  BOOL         is_declaration,
 		  BOOL         is_prototyped,
-                  BOOL         is_artificial,
 		  BOOL         is_external);
 
 /* Adds a pubname pseudo-attribute to the given subprogram.  Called for C++
@@ -260,13 +255,6 @@ DST_add_specification_to_subprogram (DST_INFO_IDX subprogram_def,
 extern void
 DST_add_specification_to_variable  (DST_INFO_IDX variable_def,
 				    DST_INFO_IDX field_decl);
-
-/* Adds a linkage_name (i.e. a mangled name) attribute to the given 
- * subprogram.  Called for C++ functions.
-*/
-extern void
-DST_add_linkage_name_to_variable(DST_INFO_IDX variable_def,
-				   char        *linkage_name);
 
 /* Creates a DW_TAG_entry_point and returns its idx
  * (Fortran specific)

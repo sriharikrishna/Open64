@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.19 $
- * $Date: 2004-04-26 21:44:52 $
- * $Author: eraxxon $
+ * $Revision: 1.16 $
+ * $Date: 2003-12-08 15:45:41 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
  *
@@ -67,13 +67,11 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.16 $";
 #endif
 
 #include <alloca.h>
 #include <set>
-
-#include "x_string.h"        // for strcasecmp()
 #include "whirl2f_common.h"
 #include "PUinfo.h"          /* From be/whirl2c directory */
 #include "wn2f.h"
@@ -465,9 +463,7 @@ WN2F_Sum_Offsets(WN *addr)
     break;
 
     case OPR_ADD:
-#if 0 
     sum += WN2F_Sum_Offsets(WN_kid0(addr));
-#endif
     sum += WN2F_Sum_Offsets(WN_kid1(addr));
     break;
 
@@ -669,7 +665,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
 	     * operator ('.').
 	     */
 	    (void)translate_var_ref(tokens, st);
-	    TY2F_Fld_Separator(tokens);
+	    Append_Token_Special(tokens, WN2F_F90_pu ? '%' : '.');
 	 }
 # if 0
 	 if (Stab_Is_Equivalence_Block(st) &&
@@ -731,7 +727,6 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 
    /* Prepare to dereference the base-address expression */
    set_WN2F_CONTEXT_deref_addr(context);
-   fld_type_z = 0;
 
    if (WN2F_Is_Address_Preg(addr,addr_ty))
    {
@@ -739,7 +734,7 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
      /* and high level type is more or less useless */
      /* just go with WN tree ADDs etc.              */
 
-    (void)WN2F_translate(tokens, addr, context);
+     (void)WN2F_translate(tokens, addr, context);
 
      if (offset != 0)
      {
@@ -835,23 +830,13 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	  * is already set up correctly to handle the combined offsets.
 	  */
 
-         WN_OFFSET offset = WN2F_Sum_Offsets(addr);
          WN_OFFSET tmp = WN2F_Sum_Offsets(addr);
-
          if (tmp < TY_size(TY_pointed(addr_ty)))
              offset += tmp;
          else 
              offset = tmp;
-       
-         WN_OFFSET offset_add = (WN_operator(addr)==OPR_ADD)?   \
-                                 WN_const_val(WN_kid1(addr)):0;
 
-          if (fld_type_z && WN_operator(addr)==OPR_ADD) {
- 	       offset_add = WN_const_val(WN_kid1(WN_kid1(addr)));
-          
-          } else
-              fld_path = TY2F_Get_Fld_Path(base_ty, object_ty, offset);
-
+	 fld_path = TY2F_Get_Fld_Path(base_ty, object_ty, offset);
 	 ASSERT_DBG_WARN(fld_path != NULL,
 			 (DIAG_W2F_NONEXISTENT_FLD_PATH, 
 			  "WN2F_Offset_Memref"));
@@ -861,54 +846,36 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	 /* The deepest ARRAY (with the address) is handled     */
 	 /* by the WN2F_array processing, but the others        */
 	 /* are field references with array components.         */
-
-      if (!fld_type_z){
+	 
 	 LOC_INFO det(fld_path);
 	 det.WN2F_Find_And_Mark_Nested_Address(addr);
 	 addr = det._nested_addr;
-       }
+
 	 /* Get the base expression to precede the path */
 
 	 (void)WN2F_translate(tokens, addr, context);
+	 TY2F_Fld_Separator(tokens);
 
 	 /* Append the path-name, perhaps w/o array subscripts. */
-  
-          if (fld_type_z &&  offset_add) {
-                 fld_path = TY2F_Get_Fld_Path(fld_type_z, fld_type_z, offset_add);
-              } 
 
-         if (fld_path != NULL )
-             {
-             if (fld_type_z && offset_add){
-	         TY2F_Fld_Separator(tokens);
-                 Append_Token_String(tokens,
-                           TY2F_Fld_Name(fld_path->fld,FALSE,FALSE));
-             }else {
-               if (!offset_add && fld_type_z 
-                               && TY_kind(fld_type_z) == KIND_STRUCT){
-	          TY2F_Fld_Separator(tokens);
-	          TY2F_Translate_Fld_Path(tokens, 
+	 if (fld_path != NULL)
+         {
+	   TY2F_Translate_Fld_Path(tokens, 
 				   fld_path, 
 				   deref_fld, 
 				   FALSE/*common*/,
 				   FALSE/*as_is*/,
 				   context);
-	         }				 
-              }
-             fld_type_z = FLD_type(fld_path->fld);
-	     TY2F_Free_Fld_Path(fld_path);
-	   }
-  #if 0
-	   else
-           {
-	     Append_Token_String(tokens, 
+					 
+	   TY2F_Free_Fld_Path(fld_path);
+	 }
+	 else
+         {
+	   Append_Token_String(tokens, 
 			       Number_as_String(offset, 
 						"<field-at-offset=%lld>"));
-	  }
-  #endif        
-
+	 }
        } /* if (neither common-block nor equivalence field-access */
-
      } /* if (object_ty is incompatible with base_ty) */
    } /* else */
 
@@ -1066,29 +1033,13 @@ WN2F_comment(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
    ASSERT_DBG_FATAL(WN_opcode(wn) == OPC_COMMENT,
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_comment"));
-
-   /* Used to avoid comments with special interpretation.  Note that
-      this is basically a prefix test.
+   
+   /* Avoid comments with special interpretation
     */
-   static char* avoid[] = {
-     "ENDLOOP",
-     /* original text of I/O stmt is saved in comment nodes */
-     /*   open, close, rewind, backspace, format? */
-     "read", "write", "print" 
-   };
-   static int avoidSZ = sizeof(avoid) / sizeof(char*);
-   
-   const char* com = Index_To_Str(WN_GetComment(wn));
-   
-   for (int i = 0; i < avoidSZ; ++i) {
-     const char* str = avoid[i];
-     if (ux_strncasecmp(com, str, strlen(str)) == 0) { 
-       return EMPTY_WN2F_STATUS; 
-     }
+   if (strcmp(Index_To_Str(WN_GetComment(wn)), "ENDLOOP") != 0)
+   {
    }
-   
-   WHIRL2F_Append_Comment(tokens, com, 0, 0);
-   
+
    return EMPTY_WN2F_STATUS;
 } /* WN2F_comment */
 
@@ -1160,19 +1111,21 @@ WN2F_dump_context( WN2F_CONTEXT c)
 
 WN2F_STATUS 
 WN2F_translate(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
-{   
-   const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+{   OPERATOR op ;  
+const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
 
    /* Determine whether we are in a context where we expect this
     * expression to have logically valued arguments, or whether
     * we are entering a context where we expect this expression
     * to be a logically valued argument.
     */
+
    if (OPCODE_is_boolean(WN_opcode(wn)) && 
        WN2F_expr_has_boolean_arg(WN_opcode(wn)))  /* expect logical args */
    {
-      /* Note that this may also be a logical argument, so
-       * WN2F_CONTEXT_is_logical_arg(context) may also hold TRUE.
+      /* Note that this may also be a logical argument, so 
+       * WN2F_CONTEXT_is_logical_arg(context) may also hold
+       * TRUE.
        */
       set_WN2F_CONTEXT_has_logical_arg(context);
    }
@@ -1185,22 +1138,19 @@ WN2F_translate(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
        */
       reset_WN2F_CONTEXT_has_logical_arg(context);
       set_WN2F_CONTEXT_is_logical_arg(context);
+    ;
    }
    else
    {
+
       reset_WN2F_CONTEXT_has_logical_arg(context);
+
       reset_WN2F_CONTEXT_is_logical_arg(context);
    }
-   
+  op=WN_opc_operator(wn);  
    /* Dispatch to the appropriate handler for this construct.
     */
-   OPERATOR op = WN_opc_operator(wn);
-   WN2F_STATUS ret = WN2F_Handler[WN_opc_operator(wn)](tokens, wn, context);
-   
-   /* reset: this flag should only affect children of 'wn', not any siblings */
-   reset_WN2F_CONTEXT_has_logical_arg(context);
-   
-   return ret;
+   return WN2F_Handler[WN_opc_operator(wn)](tokens, wn, context);
 } /* WN2F_translate */
 
 WN2F_STATUS 

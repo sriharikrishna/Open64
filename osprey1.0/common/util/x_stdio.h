@@ -1,4 +1,4 @@
-/* $Id: x_stdio.h,v 1.2 2004-02-28 21:05:05 eraxxon Exp $ */
+/* $Id: x_stdio.h,v 1.1 2003-11-04 15:59:37 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -8,8 +8,8 @@
  * ====================================================================
  *
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_stdio.h,v $
- * $Revision: 1.2 $
- * $Date: 2004-02-28 21:05:05 $
+ * $Revision: 1.1 $
+ * $Date: 2003-11-04 15:59:37 $
  *
  * Nathan Tallent.
  *
@@ -48,10 +48,10 @@ extern "C" {
 #endif
 
   /* Unix */
-  extern int ux_fileno(FILE *stream);
+  int ux_fileno(FILE *stream);
   
   /* Unix */
-  extern FILE *ux_fdopen(int fildes, const char *mode);
+  FILE *ux_fdopen(int fildes, const char *mode);
 
 #if defined(__cplusplus)
 } /* extern "C" */

@@ -102,7 +102,6 @@ TOOL_SUBDIRS = \
         crayf90/sgi \
         driver \
         gccfe \
-	gccfe/gnu\
         ir_tools \
         whirl2f \
         whirl2c \
@@ -114,7 +113,7 @@ TOOL_SUBDIRS = \
 
 SUBDIRS=$(INCLUDE_SUBDIRS) $(LIBRARY_SUBDIRS) $(TOOL_SUBDIRS)
 
-CurrentDirectory:=$(shell pwd)
+CurrentDirectory=$(shell pwd)
 
 default clean clobber:
 	@for d in $(SUBDIRS); do \

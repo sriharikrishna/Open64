@@ -2289,11 +2289,8 @@ boolean expr_sem (opnd_type       *result_opnd,
             case Alloc_Obj_Opr        :
 
                ok = alloc_obj_opr_handler(result_opnd, exp_desc, rank_in);
-
-               if (IR_FLD_R(ir_idx) != NO_Tbl_Idx){
-                   IR_OPR(ir_idx) = Subscript_Opr; /*fzhao add Dec*/ 
-                   ok = subscript_opr_handler(result_opnd, exp_desc, rank_in);
-                }
+               IR_OPR(ir_idx) = Subscript_Opr; /*fzhao add Dec*/
+               ok = subscript_opr_handler(result_opnd, exp_desc, rank_in);
 
                break;
 
@@ -9927,7 +9924,7 @@ static boolean subscript_opr_handler(opnd_type		*result_opnd,
 
                      (exp_desc->rank)++;
 
-# if 0
+# if 1
                      find_opnd_line_and_column((opnd_type *)
                                                 &IL_OPND(list_idx),
                                                &opnd_line,

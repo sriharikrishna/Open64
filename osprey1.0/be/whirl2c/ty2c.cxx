@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2c.c
- * $Revision: 1.8 $
- * $Date: 2004-06-30 20:28:17 $
- * $Author: fzhao $
+ * $Revision: 1.7 $
+ * $Date: 2003-12-09 19:22:27 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $
  *
  * Revision history:
@@ -54,7 +54,7 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"
@@ -737,8 +737,6 @@ static void TY2C_Output_Struct_Type(TY_IDX ty,
     }
 
     TOKEN_BUFFER tmp_tokens = New_Token_Buffer(); 
-    
-
     CONTEXT_reset_incomplete_ty2c(context); 
     Set_TY_is_translated_to_c(ty);  //need to force all later struct type decl to be incomplete
     TY2C_complete_struct(tmp_tokens, ty, context);
@@ -751,103 +749,19 @@ static void TY2C_Output_Struct_Type(TY_IDX ty,
 }
 
 
-/*FMZ: the function "TY2C_Translate_Structure" for output the 
- *     definition of a structure/union into the ***.w2c.h file
- *     -----June 30,2004
- */
-static void
-TY2C_Translate_Structure(TY_IDX ty,CONTEXT context)
-{
-   TOKEN_BUFFER fld_tokens, struct_tokens;
-   FLD_ITER     fld_iter;
-   const UINT   current_indent = Current_Indentation();
-   TY& ty_rt  = Ty_Table[ty];
-   
-   ASSERT_DBG_FATAL(TY_kind(ty_rt) == KIND_STRUCT, 
-		    (DIAG_W2F_UNEXPECTED_TYPE_KIND, 
-		     TY_kind(ty_rt), "TY2C_Translate_Structure"));
-
-   struct_tokens = New_Token_Buffer();
-
-   /* header of the structure */
-   if (TY_is_union(ty))
-       Append_Token_String(struct_tokens, "union");
-   else 
-       Append_Token_String(struct_tokens, "struct");
-
-   Append_Token_String(struct_tokens, 
- 	 	       Concat3_Strings(" ", W2CF_Symtab_Nameof_Ty(ty), " {"));
-
-   /* body of the structure */
-   Increment_Indentation();
-   FLD_IDX flist = ty_rt.Fld();
-
-   if (flist != 0) {
-     fld_iter = Make_fld_iter(TY_flist(ty_rt));
-     do
-       {
-  	     FLD_HANDLE fld (fld_iter);
-
-	     Append_Indented_Newline(struct_tokens,1);
-
-	     /* Declare this field */
-	     fld_tokens = New_Token_Buffer();
-	     Append_Token_String(fld_tokens,FLD_name(fld_iter)); 
-
-             TY2C_translate(fld_tokens, FLD_type(fld),context);
-             Append_Token_Special(fld_tokens,';');
-
-	     Append_And_Reclaim_Token_List(struct_tokens, &fld_tokens);
-
-        } while (!FLD_last_field (fld_iter++)) ;
-      }
-
-   /* the tail of the structure */
-   Decrement_Indentation();
-   Append_Indented_Newline(struct_tokens,1);
-   Append_Token_String(struct_tokens, " } ;");
-   Append_Indented_Newline(struct_tokens,1);
-
-   CONTEXT_reset_incomplete_ty2c(context);
-
-   Append_Indented_Newline(struct_tokens, 1);
-
-   Write_And_Reclaim_Tokens(W2C_File[W2C_DOTH_FILE],
-                             NULL,
-                             &struct_tokens);
-
-
-} /* TY2C_Translate_Structure */
-
 /*
  * WEI: This function is modified to output only incomplete struct types.
  * Complete struct type will be output by TY2C_complete_struct, through TY2C_Output_Struct_Type
  */
-/* FMZ:This function is modified again.Complete struct type will be output
- * by "TY2C_Translate_Structure" --- June 30,2004
-  */
 static void 
 TY2C_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
 {
   
- const UINT   current_indent = Current_Indentation();
-
   if (!TY_is_translated_to_c(ty)) {
     //Add this struct type to the global w2c.h
     CONTEXT_reset_incomplete_ty2c (context);
-//FMZ     TY2C_Output_Struct_Type(ty, 1, context);
-
-     Set_Current_Indentation(0);
-     //structure definition starts from the 1st column
-
-     Set_TY_is_translated_to_c(ty);
-     //need to force all later struct type decl to be incomplete
-
-     TY2C_Translate_Structure(ty,context);
-
-     Set_Current_Indentation(current_indent);
-
-    }
+    TY2C_Output_Struct_Type(ty, 1, context);
+  }
   
   if (Compile_Upc) {
     //WEI: special case for shared types
@@ -861,22 +775,18 @@ TY2C_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty, CONTEXT context)
       TY2C_prepend_qualifiers(decl_tokens, ty, context);
       return;
     }
-   }
-
-  if (TY_is_translated_to_c(ty)){  
-      Prepend_Token_String(decl_tokens, W2CF_Symtab_Nameof_Ty(ty));
-      BOOL    is_equivalenced = Stab_Is_Equivalenced_Struct(ty);
-    //  if (TY_is_union(ty) || is_equivalenced) //fzhao
-      if (TY_is_union(ty) )
-        Prepend_Token_String(decl_tokens, "union");
-      else
-        Prepend_Token_String(decl_tokens, "struct");
+  }
+  Prepend_Token_String(decl_tokens, W2CF_Symtab_Nameof_Ty(ty));
   
-      TY2C_prepend_qualifiers(decl_tokens, ty, context);
-    }
-
-
- } /* TY2C_struct */
+  BOOL    is_equivalenced = Stab_Is_Equivalenced_Struct(ty);
+//  if (TY_is_union(ty) || is_equivalenced) //fzhao
+  if (TY_is_union(ty) )
+    Prepend_Token_String(decl_tokens, "union");
+  else
+    Prepend_Token_String(decl_tokens, "struct");
+  
+  TY2C_prepend_qualifiers(decl_tokens, ty, context);
+} /* TY2C_struct */
 
 
 static void 

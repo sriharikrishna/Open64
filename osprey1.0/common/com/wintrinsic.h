@@ -71,8 +71,8 @@
 ***
 **/
 
-/** $Revision: 1.6 $
-*** $Date: 2004-06-28 18:39:47 $
+/** $Revision: 1.4 $
+*** $Date: 2003-05-14 13:30:26 $
 *** $Author: eraxxon $
 *** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wintrinsic.h,v $
 **/
@@ -1233,33 +1233,7 @@ typedef enum {
   
   /* this one somehow gets missing */
   INTRN_SUB_PI = 881,
-  /* gcc stuff */
-  INTRN_U4READFRAMEPOINTER = 882,
-  INTRN_U8READFRAMEPOINTER = 883,
-  INTRN_APPLY_ARGS = 884,
-  INTRN_APPLY      = 885,
-  INTRN_RETURN     = 886,
-                                                                                                       
-  /* x86-64 vararg support */
-  INTRN_VA_START   = 887,
-  INTRN_SAVE_XMMS  = 888,
-                                                                                                       
-  /* EH stuff */
-  INTRN_LANDING_PAD_ENTRY = 889,
-                                                                                                       
-  /* C99 builtins */
-  INTRN_ISGREATER       = 890,
-  INTRN_ISGREATEREQUAL  = 891,
-  INTRN_ISLESS          = 892,
-  INTRN_ISLESSEQUAL     = 893,
-  INTRN_ISLESSGREATER   = 894,
-  INTRN_ISUNORDERED     = 895,
-                                                                                                       
-  /* Saturation arithmetic */
-  INTRN_SUBSU2          = 896,
-  INTRN_SUBSV16I2       = 897,
-                                                                                                       
-  INTRINSIC_LAST  = 897 
+  INTRINSIC_LAST = 882
 
 } INTRINSIC;
 

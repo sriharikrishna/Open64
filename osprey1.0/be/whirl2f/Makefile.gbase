@@ -366,18 +366,9 @@ install:: default
 # add -G for dynamic shared object, remove $(STD_DSO_LOADOPTS) $(EXPORT_LIST)
 # $(LDFLAGS) $(LLDLIBS), LLDLIBS = -none -lc  
 #----------------------------------------------------------------------
-
-ifeq ($(filter LINUX TRU64 IRIX, $(BUILD_OS)), $(BUILD_OS))
-  WHIRL2F_LIBS += $(BE_DSO)
+ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
+  WHIRL2F_LIBS = $(BE_DSO)
 endif
-ifeq ($(BUILD_OS), IRIX)
-  # On IRIX, we link with libcomutil.a to grab the definition of
-  # ux_strncasecmp().  For some reason, even when the symbol is externed
-  # in the source and in libcomutil.a, it remains 'HIDDEN' within be.so 
-  # and the runtime link will fail. 
-  WHIRL2F_LIBS += $(TARG_COMUTIL_DIR)/libcomutil.a
-endif
-
 
 ifeq ($(BUILD_OS), SOLARIS)
   WHIRL2F_SO_LOC = $(BE_WHIRL2F_DIR)/Exported $(BE_BE_DIR)/so_locations

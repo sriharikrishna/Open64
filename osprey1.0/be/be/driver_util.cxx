@@ -38,8 +38,8 @@
  *
  * Module: driver_util.c
  * $Revisionr: 1.34 $
- * $Date: 2004-06-22 16:47:17 $
- * $Author: fzhao $
+ * $Date: 2003-02-21 21:13:41 $
+ * $Author: jle $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/driver_util.cxx,v $
  *
  * Revision history:
@@ -426,8 +426,7 @@ Process_Command_Line (INT argc, char **argv)
 	case 'w':
 	    if (strcmp (myname, "wopt") == 0)
 		Run_wopt = TRUE;
-	    else if (strcmp (myname, "whirl2c") == 0 || 
-                     strcmp(myname,"whirl2c_be") == 0 ) //FMZ:we need debug version
+	    else if (strcmp (myname, "whirl2c") == 0)
 		Run_w2c = TRUE;
 	    else if (strcmp (myname, "whirl2f") == 0)
 		Run_w2f = TRUE;

@@ -1569,8 +1569,6 @@ inline mINT16 WN_num_actuals(const WN *wn)
   for(i= n-1; i>=0; i--)
   {
     WN *kid = WN_kid(wn,i);
-    if (!kid) { continue; } /* eraxxon: handle buggy WHIRL (from mfef90) */
-
     OPERATOR kid_opr = WN_operator(kid);
     if ( (kid_opr != OPR_PARM) || !WN_Parm_Dummy(kid) )
     {

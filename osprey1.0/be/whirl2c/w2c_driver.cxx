@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2c_driver.c
- * $Revision: 1.6 $
- * $Date: 2004-07-02 18:37:30 $
- * $Author: fzhao $
+ * $Revision: 1.5 $
+ * $Date: 2003-06-12 15:27:49 $
+ * $Author: broom $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -292,12 +292,10 @@ Process_Filename_Options(const char *src_filename, const char *irb_filename)
 	    New_Extension(fname, W2C_Extension(W2C_LOC_FILE));
       }
    }
-#if 0 //FMZ--see the comment about global_data file in this file
    if (W2C_File_Name[W2C_DATA_FILE] == NULL) {
      W2C_File_Name[W2C_DATA_FILE] = 
        New_Extension ( fname, W2C_Extension(W2C_DATA_FILE) );
    }
-#endif
 
 } /* Process_Filename_Options */
 
@@ -1206,13 +1204,7 @@ W2C_Outfile_Init(BOOL emit_global_decls)
    // add the init file to output
    Write_String(W2C_File[W2C_DOTC_FILE], W2C_File[W2C_LOC_FILE],
 		"/* Included code from the initialization script */\n");
-/* We may not need the file named as "foo.global_data.c"
- * in all of  our test code this forces us give an empty file 
- * named "foo.global_data.c" (suppose test code named "foo.c"  to go
- * through the unparser.
- * FMZ----July 2,2004
- */
-#if 0
+
    char buf[MAX_LINE_LEN];
    FILE* in = fopen(W2C_File_Name[W2C_DATA_FILE], "r");
    if (in == NULL) {
@@ -1222,8 +1214,6 @@ W2C_Outfile_Init(BOOL emit_global_decls)
    while (fgets(buf, MAX_LINE_LEN, in) != NULL) {
      Write_String(W2C_File[W2C_DOTC_FILE], W2C_File[W2C_LOC_FILE], buf);
    }
-#endif 
-
    /*
      fstream fs;
      string line;

@@ -63,23 +63,21 @@ get_section (void *handle, Elf64_Word type, Elf64_Word info);
 extern void Set_Verbose_Info (BOOL val);
 
 /* Check the Elf headers (called from elfdump) */
-extern INT WN_massage_input (char *baseaddr, Elf64_Word size, 
-			     char* file_revision);
+extern INT WN_massage_input (char *baseaddr, Elf64_Word size, char*);
 
 /* Find the beginning of a particular section */
 extern void *WN_get_section_base (void *handle, INT sect);
 
 /* return size of elf section */
-extern Elf64_Word Get_Elf_Section_Size (void *handle, Elf64_Word type, 
-					Elf64_Word info);
+extern Elf64_Word Get_Elf_Section_Size (void *handle, Elf64_Word type, Elf64_Word info);
 
 
 /* Call these once at the beginning and end, respectively. */
-extern void *WN_inline_open_file (const char* file_name, off_t *mapped_size,
+extern void *WN_inline_open_file (char* file_name, off_t *mapped_size,
 				  char* file_revision); 
 
 extern void *
-WN_open_input (const char *filename, off_t *mapped_size);
+WN_open_input (char *filename, off_t *mapped_size);
 
 
 /*
@@ -139,9 +137,9 @@ extern INT WN_get_flags (void *handle, char ***argv);
  * Open_Global_Input only opens the global file,
  * Open_Local_Input only opens the local file.
  */
-extern void* Open_Input_Info (const char *input_file);
-extern void* Open_Global_Input (const char *input_file);
-extern void* Open_Local_Input (const char *input_file);
+extern void* Open_Input_Info (char *input_file);
+extern void* Open_Global_Input (char *input_file);
+extern void* Open_Local_Input (char *input_file);
 extern PU_Info *Read_Global_Info (INT32 *p_num_PUs);
 extern void Read_Local_Info (MEM_POOL *pool, PU_Info *pu);
 extern void Free_Local_Info (PU_Info *pu);

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: mempool.h
- * $Revision: 1.3 $
- * $Date: 2004-05-24 17:03:48 $
- * $Author: fzhao $
+ * $Revision: 1.2 $
+ * $Date: 2003-07-16 19:41:34 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/mempool.h,v $
  *
  * Revision history:
@@ -763,9 +763,9 @@ class CXX_MEM_POOL {
 public:
   MEM_POOL *operator()() { return &mem_pool; }
 
-  CXX_MEM_POOL(const char *name, BOOL bbzero) {
+  CXX_MEM_POOL(const char *name, BOOL bzero) {
     mem_pool.magic_num = 0;		/* force it to be uninitialized */
-    MEM_POOL_Initialize(&mem_pool, name, bbzero);
+    MEM_POOL_Initialize(&mem_pool, name, bzero);
     MEM_POOL_Push(&mem_pool);
   };
   ~CXX_MEM_POOL() {

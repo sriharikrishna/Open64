@@ -3002,14 +3002,13 @@ void    num_images_intrinsic(opnd_type     *result_opnd,
                  ir_idx,
                  res_exp_desc,
                  spec_idx,
-		FALSE);
+                 FALSE);
 
    IR_RANK(ir_idx) = res_exp_desc->rank;
 
 
    if (ATP_INTRIN_ENUM(*spec_idx) == Rem_Images_Intrinsic) {
       ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
-#if 0
       point_five = 0.5;
 
 /* JEFFL - Do we need to convert endian? - BRIANJ */
@@ -3062,12 +3061,9 @@ void    num_images_intrinsic(opnd_type     *result_opnd,
       IR_FLD_L(ir_idx) = IR_Tbl_Idx;
       IR_OPND_R(ir_idx) = null_opnd;
       IR_OPR(ir_idx) = Int_Opr;
-#endif
-
    }
    else if (ATP_INTRIN_ENUM(*spec_idx) == Log2_Images_Intrinsic) {
       ATP_EXTERNAL_INTRIN(*spec_idx) = FALSE;
-#if 0
       point_five = 0.5;
       cn_idx = ntr_const_tbl(REAL_DEFAULT_TYPE, FALSE,(long_type *)&point_five);
 
@@ -3097,7 +3093,6 @@ void    num_images_intrinsic(opnd_type     *result_opnd,
       IR_FLD_L(ir_idx) = IR_Tbl_Idx;
       IR_OPND_R(ir_idx) = null_opnd;
       IR_OPR(ir_idx) = Int_Opr;
-#endif 
    }
    else if (ATP_INTRIN_ENUM(*spec_idx) == This_Image_Intrinsic) {
 
@@ -3193,20 +3188,18 @@ void    num_images_intrinsic(opnd_type     *result_opnd,
                if (ATD_ALLOCATABLE(attr_idx)) {
                   attr_idx = ATD_VARIABLE_TMP_IDX(attr_idx);
                }
-#if 0 
+
                COPY_OPND(opnd, IL_OPND(list_idx1));
                generate_bounds_list(ATD_PE_ARRAY_IDX(attr_idx),
                                     &opnd,
                                     &loc_exp_desc);
                COPY_OPND(IL_OPND(list_idx1), opnd);
-#endif
                arg_info_list[info_idx1].ed = loc_exp_desc;
 
             }
          }
       }
    }
-
 
 EXIT:
 

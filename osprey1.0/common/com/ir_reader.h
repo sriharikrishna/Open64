@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: ir_reader.h
- * $Revision: 1.3 $
- * $Date: 2004-02-25 16:39:55 $
- * $Author: eraxxon $
+ * $Revision: 1.2 $
+ * $Date: 2002-07-12 16:48:31 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ir_reader.h,v $
  *
  * Revision history:
@@ -55,14 +55,14 @@
 
 
 #ifdef _KEEP_RCS_ID
-static const char *opt_irrcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ir_reader.h,v $ $Revision: 1.3 $";
+static char *opt_irrcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ir_reader.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 extern void IR_reader_init(void);
 extern void IR_reader_finish(void);
-extern FILE *IR_open(const char *filename);
+extern FILE *IR_open(char *filename);
 extern void IR_close(void);
-extern BOOL IR_open_output(const char *filename);
+extern BOOL IR_open_output(char *filename);
 extern void IR_close_output(void);
 extern WN * IR_get_func(void);
 extern void IR_put_func(WN * wn, FILE *f);
@@ -74,7 +74,7 @@ extern void IR_Srcpos_Filename (SRCPOS srcpos,         /* in */
 /* for debugging */
 struct ALIAS_MANAGER;    /* forward declaration */
 
-extern void Check_for_IR_Dump(INT phase, WN *pu, const char *phase_name);
+extern void Check_for_IR_Dump(INT phase, WN *pu, char *phase_name);
 
 extern void dump_wn(WN *wn);
 extern void dump_tree(WN *wn);

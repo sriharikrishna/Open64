@@ -5814,7 +5814,7 @@ void assign_offset(int	attr_idx)
 
    type_idx		= ATD_TYPE_IDX(attr_idx);
 
-   if (ATD_IM_A_DOPE(attr_idx) || ATD_POINTER(attr_idx)) {
+   if (ATD_IM_A_DOPE(attr_idx)) {
 
 # if defined(GENERATE_WHIRL)
       align_bit_length(&offset, storage_bit_size_tbl[CRI_Ptr_8]);

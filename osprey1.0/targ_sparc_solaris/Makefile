@@ -98,7 +98,7 @@ TOOL_SUBDIRS = \
 
 SUBDIRS=$(INCLUDE_SUBDIRS) $(LIBRARY_SUBDIRS) $(TOOL_SUBDIRS)
 
-CurrentDirectory:=$(shell pwd)
+CurrentDirectory=$(shell pwd)
 
 default clean clobber:
 	@for d in $(SUBDIRS); do \

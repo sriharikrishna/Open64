@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_dst.c
- * $Revision: 1.4 $
- * $Date: 2004-05-25 02:52:45 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2003-11-04 16:12:49 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 static char *source_file = __FILE__;
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -434,7 +434,6 @@ cwh_dst_mk_func(ST * st)
 			  0,	       
 			  FALSE, 
 			  FALSE, 
-                          FALSE,
 			  TRUE); 
 
     if (p != NULL && !PU_is_mainpu(pu)) 
@@ -483,7 +482,6 @@ cwh_dst_mk_MAIN(ST *mn, DST_INFO_IDX en_idx)
 			   DW_VIRTUALITY_none,
 			   0,	       
 			   TRUE,
-                           FALSE,
 			   FALSE, 
 			   TRUE); 
 

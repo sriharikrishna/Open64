@@ -39,11 +39,11 @@
 #
 #  Define build parameters
 #
-PWD := $(shell pwd)
+PWD = $(shell pwd)
 
 BUILD_AREA     = ../..
 BUILD_TOT      = $(PWD)/../../..
-BUILD_BASE     = $(BUILD_TOT)/kgccfe/gnu
+BUILD_BASE     = $(BUILD_TOT)/gccfe/gnu
 
 include $(BUILD_AREA)/Makefile.platform
 

@@ -8062,7 +8062,6 @@ int cast_typeless_constant(int		cn_idx,
    boolean	right_justified;
    long_type	the_constant[MAX_WORDS_FOR_NUMERIC];
    boolean	zero_pad;
-   long_type    swap_for_little_endian;
 
 
    TRACE (Func_Entry, "cast_typeless_constant", NULL);
@@ -8238,23 +8237,6 @@ int cast_typeless_constant(int		cn_idx,
       }
    }
 # endif
-
-
-/* must swap the two  words for little endian machine
-   since there is only problem for integer(8) or larger
-   rank interger (occupy 2 or more than two words) and
-   now we only accept up to 8 bytes integer,we only need
-   swap the two words----FMZH
-*/
-# if defined(_TARGET_LITTLE_ENDIAN)
-    if (new_word_size == 2) {
-      swap_for_little_endian = the_constant[0];
-      the_constant[0] = the_constant[1];
-      the_constant[1] = swap_for_little_endian;
-    }
-# endif
-
-
 
    if (TYP_TYPE(type_idx) == Typeless &&
        CN_BOZ_CONSTANT(cn_idx)) {

@@ -1097,7 +1097,6 @@ extern INTPTR fei_array_dimen     	  ( INT32 flag_bits,
 extern INTPTR fei_co_array_dimen             ( INT32 flag_bits,
                                             INT64 low_bound,
                                             INT64 extent,
-					    INT32 arraydims,
                                             INT32 rank,
                                             TYPE  span_type,
                                             INT64 bitsize,
@@ -1516,8 +1515,7 @@ extern void  fei_new_select_case 	  ( INT64 low_value_pres,
                                  	    INT64 high_value_pres,
                                  	    INT32 case_follows );
 extern void  fei_new_select      	  ( INT32 num_cases,
-                                 	    INT32 default_label_idx,
-					    INT32 last_label_idx );
+                                 	    INT32 default_label_idx );
 extern TYPE  fei_dope_vector              ( INT32 num_dims, 
                                     	    TYPE  base_type,
                                      	    INT32 flags );

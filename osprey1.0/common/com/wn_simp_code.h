@@ -1625,7 +1625,7 @@ static simpnode  simp_add_sub(OPCODE opc,
    simpnode x[4], t, dt;
    BOOL s[4], bt, constant_moved;
    INT32 num_const,num_ops,i,j,k,ic1,ic2,d1,d2;
-
+   
    ty = OPCODE_rtype(opc);
    issub = (OPCODE_operator(opc) == OPR_SUB);
    if (issub) {
@@ -1646,10 +1646,8 @@ static simpnode  simp_add_sub(OPCODE opc,
    }
 
    /* Try the simple ones first */
-   /* eraxxon: a constant can be either OPR_INTCONST or OPR_CONST
-      (cf. SIMP_Is_Constant()).  We must check for INTCONST before
-      trying to extract its value! */
-   if (k1const && SIMP_Is_Int_Constant(k1) &&
+
+   if (k1const && 
        (SIMP_IS_TYPE_INTEGRAL(ty) && SIMP_Int_ConstVal(k1)==0) ||
        (SIMP_IS_TYPE_FLOATING(ty) && is_floating_equal(k1,0.0))) {
       SHOW_RULE(" x +- 0 ");
@@ -1663,8 +1661,7 @@ static simpnode  simp_add_sub(OPCODE opc,
       return (r);
    }
 
-   /* eraxxon: Test for INTCONST (see above) */
-   if (k0const && issub && SIMP_Is_Int_Constant(k0) &&
+   if (k0const && issub &&
        (SIMP_IS_TYPE_INTEGRAL(ty) && SIMP_Int_ConstVal(k0)==0) ||
        (SIMP_IS_TYPE_FLOATING(ty) && is_floating_equal(k0,0.0))) {
       SHOW_RULE(" 0 - x ");

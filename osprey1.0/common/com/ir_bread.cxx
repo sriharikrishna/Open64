@@ -505,7 +505,7 @@ Set_Verbose_Info (BOOL val)
 
 template <class ELF>
 INT
-check_elf_header (const char* baseaddr, Elf64_Word size, const ELF& tag)
+check_elf_header (char* baseaddr, Elf64_Word size, const ELF& tag)
 {
     typename ELF::Elf_Ehdr* ehdr = (typename ELF::Elf_Ehdr*) baseaddr;
     if (ehdr->e_ident[EI_VERSION] != EV_CURRENT ||
@@ -541,7 +541,7 @@ check_elf_header (const char* baseaddr, Elf64_Word size, const ELF& tag)
 
 
 static INT
-check_elf_header (const char *baseaddr, Elf64_Word size)
+check_elf_header (char *baseaddr, Elf64_Word size)
 {
     if (size < sizeof(Elf64_Ehdr))
 	return ERROR_RETURN;
@@ -560,11 +560,10 @@ check_elf_header (const char *baseaddr, Elf64_Word size)
 } /* check_elf_header */
 
 
-// Note: file_revision may be changed
 template <class ELF>
 INT
-check_section_headers (char *baseaddr, Elf64_Word size, 
-		       char* file_revision, const ELF& tag) 
+check_section_headers (char *baseaddr, Elf64_Word size, char* file_revision, 
+		       const ELF& tag) 
 {
     typename ELF::Elf_Ehdr* ehdr = (typename ELF::Elf_Ehdr*) baseaddr;
     typename ELF::Elf_Shdr* shdr =
@@ -652,7 +651,6 @@ fix_comp_flags (char *base, Elf64_Word size)
 } /* fix_comp_flags */
 
 
-// Note: 'file_revision' may be changed
 INT
 WN_massage_input (char *baseaddr, Elf64_Word size, char* file_revision)
 {
@@ -678,9 +676,8 @@ WN_massage_input (char *baseaddr, Elf64_Word size, char* file_revision)
 } /* WN_massage_input */
 
 
-// Note: 'file_revision' may be changed
 static void *
-read_file (const char *filename, off_t* mapped_size, char* file_revision)
+read_file (char *filename, off_t* mapped_size, char* file_revision)
 {
     int fd;
     INT st;
@@ -703,8 +700,7 @@ read_file (const char *filename, off_t* mapped_size, char* file_revision)
 
     close (fd);
 
-    if ((st = WN_massage_input(map_addr, stat_buf.st_size, 
-			       file_revision)) <= 0) {
+    if ((st = WN_massage_input (map_addr, stat_buf.st_size,file_revision)) <= 0) {
 	munmap (map_addr, stat_buf.st_size);
 	return (void *) (st);
     }
@@ -732,7 +728,7 @@ Get_Elf_Section_Size (void *handle, Elf64_Word type, Elf64_Word info)
  */
 
 void *
-WN_open_input (const char *filename, off_t *mapped_size)
+WN_open_input (char *filename, off_t *mapped_size)
 {
     if (filename == 0) {
 	errno = ENOENT;
@@ -748,11 +744,10 @@ WN_open_input (const char *filename, off_t *mapped_size)
 
 /* open a new file, used by the inliner when performing across
  * file inlining. Note, mapped file size is not saved in the
- * static variable.  Note that 'file_revision' may change.
+ * static variable.
  */
 extern void *
-WN_inline_open_file(const char* file_name, off_t *mapped_size, 
-		    char* file_revision)
+WN_inline_open_file(char* file_name, off_t *mapped_size, char* file_revision)
 {
     if (file_name == 0) {
 	errno = ENOENT;
@@ -1263,14 +1258,14 @@ WN_free_input (void *handle, off_t mapped_size)
  * These routines use the standard compiler error reporting mechanism.
  */
 
-static void *global_fhandle;       /* file handle */
-static void *local_fhandle;        /* file handle */
-static const char *global_ir_file; /* name of ir input file */
-static const char *local_ir_file;  /* name of ir input file */
+static void *global_fhandle;	/* file handle */
+static void *local_fhandle;	/* file handle */
+static char *global_ir_file;	/* name of ir input file */
+static char *local_ir_file;	/* name of ir input file */
 
 static void
-open_specified_input (const char *input_file, const char **ir_input, 
-		      void **fhandle, off_t *mapped_size)
+open_specified_input (char *input_file, 
+	char **ir_input, void **fhandle, off_t *mapped_size)
 {
     Set_Error_Phase ( "Reading WHIRL file" );
     *ir_input = input_file;
@@ -1289,7 +1284,7 @@ open_specified_input (const char *input_file, const char **ir_input,
 
 // same ir file for both global and local
 void *
-Open_Input_Info (const char *input_file)
+Open_Input_Info (char *input_file)
 {
 	open_specified_input (input_file, 
 		&global_ir_file, &global_fhandle, &global_mapped_size);
@@ -1300,7 +1295,7 @@ Open_Input_Info (const char *input_file)
 }
 
 void *
-Open_Global_Input (const char *input_file)
+Open_Global_Input (char *input_file)
 {
 	open_specified_input (input_file, 
 		&global_ir_file, &global_fhandle, &global_mapped_size);
@@ -1308,7 +1303,7 @@ Open_Global_Input (const char *input_file)
 }
 
 void *
-Open_Local_Input (const char *input_file)
+Open_Local_Input (char *input_file)
 {
 	open_specified_input (input_file, 
 		&local_ir_file, &local_fhandle, &local_mapped_size);

@@ -2110,24 +2110,12 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       case OPR_CIOR:
       case OPR_LAND:
       case OPR_LIOR:
-        /* [RTYPE] : b : [DESC] : V */
+        // [RTYPE] : b : [DESC] : V
         valid = Is_MTYPE_b [rtype] && desc == MTYPE_V;
         break;
 
-#ifndef  FRONT_END_FORTRAN
-        /* In Fortran, the rtype of floor() is int, but is double in C/C++. */
-
-      case OPR_FLOOR:
-        /* [RTYPE] : f,i [DESC] : f */
-        valid = Is_MTYPE_f_i[rtype] && Is_MTYPE_f[desc];
-        break;
-#endif
-
-
       case OPR_CEIL:
-#ifdef FRONT_END_FORTRAN
-      case OPR_FLOOR: 
-#endif
+      case OPR_FLOOR:
       case OPR_RND:
       case OPR_TRUNC:
         // [RTYPE] : i [DESC] : f

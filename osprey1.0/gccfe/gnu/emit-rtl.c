@@ -966,8 +966,7 @@ gen_realpart (mode, x)
   else if (WORDS_BIG_ENDIAN)
     return gen_highpart (mode, x);
   else
-/*FMZH    return gen_lowpart (mode, x);*/
-    return gen_highpart (mode, x);
+    return gen_lowpart (mode, x);
 }
 
 /* Return the imaginary part (which has mode MODE) of a complex value X.

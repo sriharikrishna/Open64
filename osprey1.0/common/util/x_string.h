@@ -1,4 +1,4 @@
-/* $Id: x_string.h,v 1.2 2004-02-28 21:05:05 eraxxon Exp $ */
+/* $Id: x_string.h,v 1.1 2003-11-04 15:59:37 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -8,8 +8,8 @@
  * ====================================================================
  *
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_string.h,v $
- * $Revision: 1.2 $
- * $Date: 2004-02-28 21:05:05 $
+ * $Revision: 1.1 $
+ * $Date: 2003-11-04 15:59:37 $
  *
  * Nathan Tallent.
  *
@@ -47,16 +47,15 @@ extern "C" {
 #endif
   
   /* Unix */
-  extern int ux_strcasecmp(const char *s1, const char *s2);
-  extern int ux_strncasecmp(const char *s1, const char *s2, size_t n);
+  int ux_strcasecmp(const char *s1, const char *s2);
+  int ux_strncasecmp(const char *s1, const char *s2, size_t n);
 
   /* Unix */
-  extern char *ux_strdup(const char *s1);
+  char *ux_strdup(const char *s1);
 
   /* Unix */
-  extern void *ux_memccpy(void * /*restrict*/ s1, 
-			  const void * /*restrict*/ s2, 
-			  int c, size_t n);
+  void *ux_memccpy(void * /*restrict*/ s1, const void * /*restrict*/ s2, 
+		  int c, size_t n);
   
 #if defined(__cplusplus)
 } /* extern "C" */

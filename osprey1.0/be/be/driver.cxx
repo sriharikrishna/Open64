@@ -878,8 +878,7 @@ Post_LNO_Processing (PU_Info *current_pu, WN *pu)
 
 //            printf("before W2F_Outfile_Translate_Pu-------------------\n");
 //            fdump_tree(stdout,pu);
-              if (PU_need_unparsed(ST_pu(WN_st(pu)))) 
-	          W2F_Outfile_Translate_Pu(pu);
+	    W2F_Outfile_Translate_Pu(pu);
 //            printf("after W2F_Outfile_Translate_Pu====================\n");
 //            fdump_tree(stdout,pu);
 

@@ -98,8 +98,6 @@ HOSTDEFS += -DSGI_MONGOOSE
 HOSTDEFS += -DFRONT_END
 HOSTDEFS += -DFRONT_F90
 HOSTDEFS += -D_PDGCS 
-HOSTDEFS += 
-
 HOSTDEFS += -DUSE_STANDARD_TYPES
 ifeq ($(BUILD_OS), LINUX)
   HOSTDEFS += -D__MIPS_AND_IA64_ELF_H
@@ -305,9 +303,6 @@ ifeq ($(BUILD_OS), SOLARIS)
   endif
   CXXFLAGS = $(CFLAGS) -w
 endif
-
-CXXFLAGS +=
-CFLAGS +=
 
 #----------------------------------------------------------------------
 #  Define target

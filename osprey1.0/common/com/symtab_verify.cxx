@@ -132,7 +132,7 @@ ST_Verify_Class_Sclass(ST_CLASS sym_class, ST_SCLASS storage_class) {
                   (msg, Sclass_Name(storage_class), Class_Name(sym_class)));
         break;
     case CLASS_PARAMETER:
-         Is_True (storage_class == SCLASS_PSTATIC ||
+         Is_True (storage_class == PSTATIC ||
                   storage_class == SCLASS_FSTATIC ||
                   storage_class == SCLASS_EXTERN,
                  (msg, Sclass_Name(storage_class), Class_Name(sym_class)));

@@ -122,13 +122,14 @@ COMMON_COM_TARG_DIR	= $(BUILD_TOT)/common/com/$(BUILD_TARGET_DIR)
 COMMON_TARG_INFO_ACCESS_DIR = $(BUILD_TOT)/common/targ_info/access
 COMMON_UTIL_DIR		= $(BUILD_TOT)/common/util
 COMMON_UTIL_TARG_DIR	= $(BUILD_TOT)/common/util/$(BUILD_TARGET_DIR)
+
+ifeq ($(BUILD_OS), IRIX)
 INCLUDE_DIR 		= $(BUILD_TOT)/include
-
-# special include directories
-TARG_INC                = $(BUILD_AREA)/include
-
-ifeq ($(BUILD_OS), LINUX)
-  INCLUDE_DIR 		+= $(TARG_INC)
+else
+INCLUDE_DIR 		= $(BUILD_AREA)/include
+endif
+ifeq ($(BUILD_OS), SOLARIS)
+INCLUDE_DIR 		= $(BUILD_TOT)/include
 endif
 
 GNU_DIR			= $(BUILD_BASE)/gnu
@@ -158,7 +159,6 @@ SRC_DIRS =		\
   $(COMMON_UTIL_DIR)	\
   $(COMMON_UTIL_TARG_DIR)\
   $(COMMON_TARG_INFO_ACCESS_DIR)
-
 INC_DIRS =		\
   $(INCLUDE_DIR)	\
   $(COMMON_COM_DIR)	\
@@ -172,8 +172,6 @@ INC_DIRS =		\
   $(GNU_CONFIG_DIR)	\
   $(GNU_CONFIG_TARG_DIR) \
   $(GNU_COMMON_DIR)/include
-
-
 
 #----------------------------------------------------------------------
 #  List of source files.  Please keep them in alphabetical order.
