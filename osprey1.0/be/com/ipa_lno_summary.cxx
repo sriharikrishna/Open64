@@ -122,11 +122,11 @@ void IVAR::IPA_LNO_Print(FILE* fp,
 {
   if (Is_Formal()) {
     fprintf(fp, "FORMAL_POSITION = %d, OFFSET = %d, MTYPE = %s\n",
-            Formal_Position(), Offset(), Machine_Types[Mtype()].name);
+            Formal_Position(), Offset(), Mtype_Name(Mtype()));
   }
   else {
     fprintf(fp, "GLOBAL %s, OFFSET = %d, MTYPE = %s\n",
-            ST_name(St_Idx()), Offset(), Machine_Types[Mtype()].name);
+            ST_name(St_Idx()), Offset(), Mtype_Name(Mtype()));
   }
 }
 
