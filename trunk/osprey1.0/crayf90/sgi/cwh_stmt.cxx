@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.8 $
- * $Date: 2002-09-18 17:53:20 $
+ * $Revision: 1.9 $
+ * $Date: 2002-10-24 19:42:43 $
  * $Author: open64 $
  *
  * Revision history:
@@ -2978,19 +2978,21 @@ fei_concat(INT32 numops)
   WN  * rsz;
   WN  * wt ;
   WN  * ae ;
+  WN  * wwnn;
   TY_IDX ty ;  
   BOOL *va ;
   WN  *wr;
 
   ae  = NULL ;
-  sc  = numops + 1 ;
+  sc = numops;
+
   nm  = 2 * sc ;
   sz  = (WN **) malloc(nm * sizeof(WN *)) ;
   wn  = (WN **) malloc(nm * sizeof(WN *)) ;
   va  = (BOOL *) malloc(nm * sizeof(BOOL)) ;
   rsz = WN_Zerocon(cwh_bound_int_typeid);
 
-  for (i = sc ; i >= 2 ;  i--) {
+  for (i = sc ; i >= 1 ;  i--) {
     k = i + numops ;
     switch (cwh_stk_get_class()) {
       case STR_item:
@@ -3023,9 +3025,8 @@ fei_concat(INT32 numops)
 
   /* if an ARRAYEXP (ae) appeared it was an elemental */
   /* concat and an array valued temp is needed        */
-
+# if 0
   ty = cwh_types_mk_character_TY(WN_COPY_Tree(rsz),NULL,TRUE);
-
   if (ae != NULL) {
      ty = cwh_types_array_temp_TY(ae,ty) ;
      wt = cwh_expr_temp(ty,WN_COPY_Tree(rsz),f_T_PASSED);     
@@ -3036,17 +3037,15 @@ fei_concat(INT32 numops)
      wt = cwh_expr_temp(ty,WN_COPY_Tree(rsz),f_T_PASSED);   
      wr = WN_COPY_Tree(wt) ;
   }
+# endif
 
-  wn[0] = wt;
-  wn[1] = WN_COPY_Tree(rsz) ;
-  sz[0] = WN_COPY_Tree(rsz) ;
-  sz[1] = NULL ;
-  va[0] = FALSE;
-  va[1] = TRUE ;
+  wn[0] = WN_COPY_Tree(rsz) ;
+  sz[0] = NULL ;
+  va[0] = TRUE ;
 
-  cwh_intrin_call(INTRN_CONCATEXPR,nm,wn,sz,va,MTYPE_V);
+  wwnn = cwh_intrin_call(INTRN_CONCATEXPR,nm,wn,sz,va,MTYPE_V);
 
-  cwh_stk_push_STR(rsz,wr,ty,WN_item);
+  cwh_stk_push_STR(rsz,wwnn,ty,WN_item);
 
   free(sz);
   free(wn);

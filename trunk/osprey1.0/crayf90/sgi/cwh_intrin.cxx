@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_intrin
- * $Revision: 1.3 $
- * $Date: 2002-08-23 22:00:40 $
+ * $Revision: 1.4 $
+ * $Date: 2002-10-24 19:42:43 $
  * $Author: open64 $
  * $Source: 
  *
@@ -56,7 +56,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_intrin.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_intrin.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -2303,7 +2303,8 @@ cwh_intrin_call(INTRINSIC intr, INT16 numargs, WN ** k, WN**sz, BOOL *v, TYPE_ID
 
   WN_Set_Call_Default_Flags(wn);
 
-  cwh_block_append(wn);
+if (intr!=INTRN_CONCATEXPR)
+      cwh_block_append(wn);
 
   return (wn);
 }
