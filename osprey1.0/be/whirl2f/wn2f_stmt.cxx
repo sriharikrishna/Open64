@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.11 $
- * $Date: 2002-09-18 17:51:41 $
+ * $Revision: 1.12 $
+ * $Date: 2002-09-19 16:25:58 $
  * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.12 $";
 #endif
 
 #include <alloca.h>
@@ -3227,7 +3227,8 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
     */
 
        first_param = ST2F_FIRST_PARAM_IDX(funtype);
-
+       BOOL isFirstArg = TRUE; /* become FALSE after first argument has been emitted */
+                               /* (radu@par.univie.ac.at) */
       if (param_st[first_param] != NULL)
          {
           Append_Token_Special(header_tokens, '(');
@@ -3243,11 +3244,19 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
                  if (STAB_PARAM_HAS_IMPLICIT_LENGTH(param_st[param])) 
                        implicit = 1;
                  if (!ST_is_return_var(param_st[param])) {
+		   /* separate argument with a comma, if not the first one */
+                   /* (radu@par.univie.ac.at) */
+		       if(isFirstArg == FALSE)
+                            Append_Token_Special(header_tokens, ',');
+                       else
+                            isFirstArg = FALSE;
                        Append_Token_String(header_tokens,
                                            W2CF_Symtab_Nameof_St(param_st[param]));
 
-                  if (param+1 < num_params)
-                        Append_Token_Special(header_tokens, ',');
+                       /* Bug: next and last param may be implicit */
+                       /* this causes the argument list to end with a comma (radu@par.univie.ac.at) */
+                       /* if (param+1 < num_params)
+			  /*     Append_Token_Special(header_tokens, ','); */
                    }else
                       rslt = param_st[param];
 
@@ -3262,7 +3271,9 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
         Append_Token_Special(header_tokens, ')');
      }
    
-      if (rslt !=NULL) {
+      if (rslt !=NULL && strcasecmp(W2CF_Symtab_Nameof_St(st), W2CF_Symtab_Nameof_St(rslt)) != 0) {
+	/* append the RESULT option only if it is different from the function name */
+        /* (radu@par.univie.ac.at) */
                Append_Token_String(header_tokens,"result(");
                Append_Token_String( header_tokens,
                                     W2CF_Symtab_Nameof_St(rslt));

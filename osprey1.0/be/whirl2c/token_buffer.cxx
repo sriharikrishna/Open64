@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: token_buffer.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:16 $
- * $Author: fzhao $
+ * $Revision: 1.3 $
+ * $Date: 2002-09-19 16:25:58 $
+ * $Author: open64 $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/token_buffer.cxx,v $
  *
  * Revision history:
@@ -100,7 +100,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/token_buffer.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/token_buffer.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <stdio.h>
@@ -1292,11 +1292,13 @@ write_separator(FILE        *ofile,  /* NULL when strbuf!=NULL */
       char         ch2 = (kind2 == SPECIAL_TOKEN? TOKEN_char(a_token2) : 'a');
       
       if (kind1 == SEPARATOR_TOKEN        ||
-	  kind1 == DIRECTIVE_TOKEN        ||
+	  /* add separator for the C$OMP and C$PAR directive tokens (radu@par.univie.ac.at) */
+	  kind1 == DIRECTIVE_TOKEN && TOKEN_string_size(a_token1) < 3 ||
 	  kind1 == SRCPOS_DIRECTIVE_TOKEN ||
 	  kind1 == SRCPOS_MAP_TOKEN       ||
 	  kind2 == SEPARATOR_TOKEN        ||
-	  kind2 == DIRECTIVE_TOKEN        ||
+	  /* add separator for the C$OMP and C$PAR directive tokens (radu@par.univie.ac.at) */
+	  kind2 == DIRECTIVE_TOKEN && TOKEN_string_size(a_token2) < 3 ||
 	  kind2 == SRCPOS_DIRECTIVE_TOKEN ||
 	  kind2 == SRCPOS_MAP_TOKEN)
 	 separate = FALSE;
