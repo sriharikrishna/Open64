@@ -55,7 +55,12 @@ int ar_underflow_modes = 1<<AR_UNDERFLOW_TO_DENORM;
  * three condtions. Let GNU compiler do so, too. In case of Solaris,
  * Use native math library for intrinsic function evaluation
  */
-#if defined(_CRAYMPP) || defined(__mips)
+
+/*#if defined(_CRAYMPP) || defined(__mips)
+    "ar_power" is not correct here use other one
+    for __mips
+ */
+#if defined(_CRAYMPP) 
 
 /* Call native, F90-compiled routines to evaluate all functions */
 
