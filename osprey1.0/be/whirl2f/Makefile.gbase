@@ -366,8 +366,9 @@ install:: default
 # add -G for dynamic shared object, remove $(STD_DSO_LOADOPTS) $(EXPORT_LIST)
 # $(LDFLAGS) $(LLDLIBS), LLDLIBS = -none -lc  
 #----------------------------------------------------------------------
-ifeq ($(filter LINUX TRU64, $(BUILD_OS)), $(BUILD_OS))
-  WHIRL2F_LIBS = $(BE_DSO)
+
+ifeq ($(filter LINUX TRU64 IRIX, $(BUILD_OS)), $(BUILD_OS))
+  WHIRL2F_LIBS = $(BE_DSO) $(TARG_COMUTIL_DIR)/libcomutil.a
 endif
 
 ifeq ($(BUILD_OS), SOLARIS)
