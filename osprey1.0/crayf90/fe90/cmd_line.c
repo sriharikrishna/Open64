@@ -4835,7 +4835,8 @@ static void set_prog_file_names (char *argv[])
                source_form		= Fixed_Form;
             }
             else if (EQUAL_STRS(stp, ".f90") ||
-                     EQUAL_STRS(stp, ".F90")) {
+		     EQUAL_STRS(stp, ".caf") ||
+		     EQUAL_STRS(stp, ".F90")) {
                cmd_line_flags.src_form	= Free_Form;
                source_form		= Free_Form;
             }
