@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.31 $
- * $Date: 2004-02-09 16:55:45 $
- * $Author: fzhao $
+ * $Revision: 1.32 $
+ * $Date: 2004-02-13 21:23:54 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.31 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.32 $";
 #endif
 
 #include <alloca.h>
@@ -2548,22 +2548,21 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    TY_IDX kid_ty;
    TY_IDX parm_ty;
    BOOL first_nonemptyarg = FALSE;
-TYPE_ID fmtry;
-
+   TYPE_ID fmtry;
+   
    /* Emit any relevant call-site directives
     */
-
-   if (WN_operator(wn) == OPR_CALL || WN_operator(wn) == OPR_PICCALL)
-   {
+   
+   if (WN_operator(wn) == OPR_CALL || WN_operator(wn) == OPR_PICCALL) {
      is_user_call = TRUE;
      if (WN2F_CONTEXT_io_stmt(context))
-	 /* Emit directives before io stmt */
-	 WN2F_Callsite_Directives(WN2F_io_prefix_tokens(), wn, WN_st(wn));
-      else
-	 /* Emit directives before this stmt */
-	 WN2F_Callsite_Directives(tokens, wn, WN_st(wn));
+       /* Emit directives before io stmt */
+       WN2F_Callsite_Directives(WN2F_io_prefix_tokens(), wn, WN_st(wn));
+     else
+       /* Emit directives before this stmt */
+       WN2F_Callsite_Directives(tokens, wn, WN_st(wn));
    }
-
+   
    /* Begin the call statement on a new line, unless it is part of an io
     * statement.
     */
@@ -2572,174 +2571,165 @@ TYPE_ID fmtry;
    /* Tokenize the function-value expression and gather information
     * about the function type and index range of arguments.
     */
-   if (WN_operator(wn) == OPR_INTRINSIC_CALL)
-   {
-      /* Note that all intrinsics that return a CHARACTER string
-       * will have been treated specially in WN2F_intrinsic_call(),
-       * so we need only consider returns through a first non-
-       * string parameter here.
-       */
-      switch (WN_intrinsic(wn))
-      {
-      case INTRN_F4VACOS:
-      case INTRN_F8VACOS:
-      case INTRN_F4VASIN:
-      case INTRN_F8VASIN:
-      case INTRN_F4VATAN:
-      case INTRN_F8VATAN:
-      case INTRN_F4VCOS:
-      case INTRN_F8VCOS:
-      case INTRN_F4VEXP:
-      case INTRN_F8VEXP:
-      case INTRN_F4VLOG:
-      case INTRN_F8VLOG:
-      case INTRN_F4VLOG10:
-      case INTRN_F8VLOG10:
-      case INTRN_F4VSIN:
-      case INTRN_F8VSIN:
-      case INTRN_F4VSQRT:
-      case INTRN_F8VSQRT:
-      case INTRN_F4VTAN:
-      case INTRN_F8VTAN:
-	 /* Use the run-time library name for the vector intrinsic functions.
-	  */
-	 Append_Token_String(call_tokens, 
-			     Concat2_Strings(INTRN_rt_name(WN_intrinsic(wn)),
-					     "$"));
-	 break;
-
-      default:
-	 Append_Token_String(call_tokens, WN_intrinsic_name((INTRINSIC)WN_intrinsic(wn)));
-	 break;
-      }
-      return_ty = WN_intrinsic_return_ty(WN_opcode(wn), (INTRINSIC) WN_intrinsic(wn), wn);
-      return_to_param = WN_intrinsic_return_to_param(return_ty);
-      first_arg_idx = (return_to_param? 1 : 0);
-      last_arg_idx = WN_kid_count(wn) - 1;
+   if (WN_operator(wn) == OPR_INTRINSIC_CALL) {
+     /* Note that all intrinsics that return a CHARACTER string
+      * will have been treated specially in WN2F_intrinsic_call(),
+      * so we need only consider returns through a first non-
+      * string parameter here.
+      */
+     switch (WN_intrinsic(wn)) {
+     case INTRN_F4VACOS:
+     case INTRN_F8VACOS:
+     case INTRN_F4VASIN:
+     case INTRN_F8VASIN:
+     case INTRN_F4VATAN:
+     case INTRN_F8VATAN:
+     case INTRN_F4VCOS:
+     case INTRN_F8VCOS:
+     case INTRN_F4VEXP:
+     case INTRN_F8VEXP:
+     case INTRN_F4VLOG:
+     case INTRN_F8VLOG:
+     case INTRN_F4VLOG10:
+     case INTRN_F8VLOG10:
+     case INTRN_F4VSIN:
+     case INTRN_F8VSIN:
+     case INTRN_F4VSQRT:
+     case INTRN_F8VSQRT:
+     case INTRN_F4VTAN:
+     case INTRN_F8VTAN:
+       /* Use the run-time library name for the vector intrinsic functions.
+	*/
+       Append_Token_String(call_tokens, 
+			   Concat2_Strings(INTRN_rt_name(WN_intrinsic(wn)), 
+					   "$"));
+       break;
+       
+     default:
+       Append_Token_String(call_tokens, 
+			   WN_intrinsic_name((INTRINSIC)WN_intrinsic(wn)));
+       break;
+     }
+     return_ty = WN_intrinsic_return_ty(WN_opcode(wn), 
+					(INTRINSIC) WN_intrinsic(wn), wn);
+     return_to_param = WN_intrinsic_return_to_param(return_ty);
+     first_arg_idx = (return_to_param? 1 : 0);
+     last_arg_idx = WN_kid_count(wn) - 1;
    }
-   else
-   {
-      /* Only two things vary for CALL, ICALL, and PICCALL nodes: the
-       * method used to get the function type and the last_arg_idx.
-       */
-      TY_IDX func_ty;
-
-      if (WN_operator(wn) == OPR_CALL)
-      {
+   else {
+     /* Only two things vary for CALL, ICALL, and PICCALL nodes: the
+      * method used to get the function type and the last_arg_idx.
+      */
+     TY_IDX func_ty;
+     
+     if (WN_operator(wn) == OPR_CALL) {
        if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE") !=0 &&
            strcmp(ST_name(WN_st(wn)),"_END") !=0 &&      
-            (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE") !=0 ))
+	   (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE") !=0 ))
+	 
+         ST2F_use_translate(call_tokens, WN_st(wn));
+       else {
+	 if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE")== 0 ) {
+	   is_allocate_stmt = TRUE;
+	   Append_Token_String(call_tokens,"ALLOCATE"); }
+	 else if (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE")== 0) {
+	   Append_Token_String(call_tokens,"DEALLOCATE");
+	   set_WN2F_CONTEXT_has_no_arr_elmt(context);
+	   is_allocate_stmt = TRUE;
+	 } 
+       }
+       
+       if (strcmp(ST_name(WN_st(wn)),"PRESENT")== 0)
+	 set_WN2F_CONTEXT_has_no_arr_elmt(context);
+       
+       
+       if (strcmp(ST_name(WN_st(wn)),"ALLOCATED")== 0) {
+	 Append_Token_Special(call_tokens,'(');
+	 Append_Token_String(call_tokens,
+			     ST_name(WN_st(WN_kid0(WN_kid0(WN_kid0(wn))))));
+	 /* Get the array name,it shoud be CALL->PARM->ARRSECTION->LDA->st_name
+	  * Is there any other possible?
+	  */
+	 Append_Token_Special(call_tokens,')');
+	 Append_And_Reclaim_Token_List(tokens, &call_tokens);
+	 return EMPTY_WN2F_STATUS;
+       }    
+       
+       func_ty = ST_pu_type(WN_st(wn));
+       last_arg_idx = WN_kid_count(wn) - 1;
+     }
+     else if (WN_operator(wn) == OPR_ICALL) {
+       (void)WN2F_translate(call_tokens, 
+			    WN_kid(wn, WN_kid_count(wn) - 1), 
+			    context);
+       func_ty = WN_ty(wn);
+       last_arg_idx = WN_kid_count(wn) - 2;
+     }
+     else { /* (WN_operator(wn) == OPR_PICCALL) */
+       ASSERT_DBG_FATAL(WN_operator(wn) == OPR_PICCALL, 
+			(DIAG_W2F_UNEXPECTED_OPC, "WN2F_call"));
+       ST2F_use_translate(call_tokens, WN_st(wn));
+       func_ty = ST_type(WN_st(wn));
+       last_arg_idx = WN_kid_count(wn) - 2;
+     } /* if OPR_CALL */
 
-	 ST2F_use_translate(call_tokens, WN_st(wn));
-        else {
-          if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE")== 0 ) {
-	     is_allocate_stmt = TRUE;
-             Append_Token_String(call_tokens,"ALLOCATE"); }
-          else if (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE")== 0)
-           {
-            Append_Token_String(call_tokens,"DEALLOCATE");
-            set_WN2F_CONTEXT_has_no_arr_elmt(context);
-            is_allocate_stmt = TRUE;
-           } 
-         }
-
-         if (strcmp(ST_name(WN_st(wn)),"PRESENT")== 0)
-                   set_WN2F_CONTEXT_has_no_arr_elmt(context);
-
-
-        if (strcmp(ST_name(WN_st(wn)),"ALLOCATED")== 0)
-         {
-          Append_Token_Special(call_tokens,'(');
-          Append_Token_String(call_tokens,ST_name(WN_st(WN_kid0(WN_kid0(WN_kid0(wn))))));
-/* Get the array name,it shoud be CALL->PARM->ARRSECTION->LDA->st_name
- * Is there any other possible?
- */
-          Append_Token_Special(call_tokens,')');
-          Append_And_Reclaim_Token_List(tokens, &call_tokens);
-          return EMPTY_WN2F_STATUS;
-         }    
-
-	 func_ty = ST_pu_type(WN_st(wn));
-	 last_arg_idx = WN_kid_count(wn) - 1;
-      }
-      else if (WN_operator(wn) == OPR_ICALL)
-      {
-	 (void)WN2F_translate(call_tokens, 
-			      WN_kid(wn, WN_kid_count(wn) - 1), 
-			      context);
-	 func_ty = WN_ty(wn);
-	 last_arg_idx = WN_kid_count(wn) - 2;
-      }
-      else /* (WN_operator(wn) == OPR_PICCALL) */
-      {
-	 ASSERT_DBG_FATAL(WN_operator(wn) == OPR_PICCALL, 
-			  (DIAG_W2F_UNEXPECTED_OPC, "WN2F_call"));
-	 ST2F_use_translate(call_tokens, WN_st(wn));
-	 func_ty = ST_type(WN_st(wn));
-	 last_arg_idx = WN_kid_count(wn) - 2;
-      } /* if OPR_CALL */
-
-      return_ty = W2X_Unparse_Target->Func_Return_Type(func_ty);
-      return_to_param = W2X_Unparse_Target->Func_Return_To_Param(func_ty);
-      first_arg_idx = ST2F_FIRST_PARAM_IDX(func_ty);
+     return_ty = W2X_Unparse_Target->Func_Return_Type(func_ty);
+     return_to_param = W2X_Unparse_Target->Func_Return_To_Param(func_ty);
+     first_arg_idx = ST2F_FIRST_PARAM_IDX(func_ty);
    } /* if OPR_INTRINSIC_CALL */
    
    /* Determine the number of implicit arguments appended to the end
     * of the argument list (i.e. string lengths).
     */
    for (arg_idx = first_arg_idx, total_implicit_args = 0; 
-	arg_idx <= last_arg_idx - total_implicit_args; 
-	arg_idx++)
-   {
-    if (WN_kid(wn,arg_idx)==NULL)
-          ;
-    else
-    {
-     tempopc = WN_opcode(WN_kid(wn,arg_idx));
-     kidofparm = WN_kid0(WN_kid(wn, arg_idx));
-     if (WN_operator(kidofparm) !=OPR_CALL && 
-             WN_operator(kidofparm)!= OPR_INTRINSIC_CALL) 
-      {
-          arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
-
-          parm_ty = WN_ty(WN_kid(wn,arg_idx));
-
-if (TY_Is_Pointer(arg_ty))
-      fmtry = TY_mtype(TY_pointed(arg_ty));
-else
-      fmtry =  TY_mtype(arg_ty); 
-
-      if (fmtry == MTYPE_M) {
-          fmtry = TY_pointed(parm_ty);
-	  fmtry = TY_mtype(fmtry);
-        }
-
-          if ((TY_Is_Character_Reference(arg_ty) ||
-	         TY_Is_Chararray_Reference(arg_ty) ||
-                  (TY_mtype(TY_pointed(arg_ty))==MTYPE_M &&
-                     (TY_Is_Character_Reference(parm_ty) ||
-                       TY_Is_Chararray_Reference(parm_ty))))
-               && !is_allocate_stmt)
-             {
-	         total_implicit_args++;
-             }
+        arg_idx <= last_arg_idx - total_implicit_args; 
+        arg_idx++) {
+     if (WN_kid(wn,arg_idx)==NULL)
+       ;
+     else {
+       tempopc = WN_opcode(WN_kid(wn,arg_idx));
+       kidofparm = WN_kid0(WN_kid(wn, arg_idx));
+       if (WN_operator(kidofparm) != OPR_CALL && 
+           WN_operator(kidofparm) != OPR_INTRINSIC_CALL) {
+         arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
+         
+         parm_ty = WN_ty(WN_kid(wn,arg_idx));
+         
+         if (TY_Is_Pointer(arg_ty))
+           fmtry = TY_mtype(TY_pointed(arg_ty));
+         else
+           fmtry = TY_mtype(arg_ty); 
+         
+         if (fmtry == MTYPE_M) {
+           fmtry = TY_pointed(parm_ty);
+           fmtry = TY_mtype(fmtry);
+         }
+         
+         if ((TY_Is_Character_Reference(arg_ty) 
+	      || TY_Is_Chararray_Reference(arg_ty) 
+	      || (TY_Is_Pointer(arg_ty) 
+		  && TY_mtype(TY_pointed(arg_ty))==MTYPE_M
+		  && (TY_Is_Character_Reference(parm_ty) 
+		      || TY_Is_Chararray_Reference(parm_ty))))
+             && !is_allocate_stmt) {
+           total_implicit_args++;
+         }
        }
-      else  /*the argument is function call
-             * if the return value is Chararray or Character Reference:
-             */
-       {
-          if (WN_operator(kidofparm) == OPR_CALL)
-           {
-              kid_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
-             if (W2X_Unparse_Target->Func_Return_Character (kid_ty))
- 		  total_implicit_args++; 
-
-	    }
-           else
-              if (WN_operator(kidofparm) == OPR_INTRINSIC_CALL &&
-                    WN_intrinsic(kidofparm) == INTRN_CONCATEXPR)
-                      total_implicit_args++;
-        }
+       else { /*the argument is function call
+	       * if the return value is Chararray or Character Reference:
+	       */
+         if (WN_operator(kidofparm) == OPR_CALL) {
+           kid_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
+           if (W2X_Unparse_Target->Func_Return_Character (kid_ty))
+             total_implicit_args++; 
+           
+         }
+         else {
+           if (WN_operator(kidofparm) == OPR_INTRINSIC_CALL &&
+               WN_intrinsic(kidofparm) == INTRN_CONCATEXPR)
+             total_implicit_args++;
+	 }
+       }
      }
    }
    
@@ -2750,266 +2740,257 @@ else
     * ADRTMP or VALTMP OPR_INTRINSIC_OP nodes, as these should be
     * handled appropriately by WN2F_translate().
     */
-
-      if ((WN_operator(wn) == OPR_CALL)  &&
-            strcmp(ST_name(WN_st(wn)),"_END") ==0 )
-       {
-         ;
-          } else {
-         
-   Append_Token_Special(call_tokens, '(');
-   set_WN2F_CONTEXT_no_parenthesis(context);
-
-//WARNING
- /* tempoarily add a piece of code for processiong optinal arguments
-  * in intrinsic function "system_clock".
-  * will change later to process all intrinsic functions with optional arguments
-  * fzhao----- Feb19
-  */
-
- if (strcmp(ST_name(WN_st(wn)),"SYSTEM_CLOCK") != 0) {
-
-   for (arg_idx = first_arg_idx, implicit_args = 0; 
-	arg_idx <= last_arg_idx - implicit_args; 
-	arg_idx++)
-   {
-     if (WN_kid(wn, arg_idx) == NULL)
-           ;
-     else
-     {
-      kidofparm = WN_kid0(WN_kid(wn, arg_idx));
-       if (WN_operator(kidofparm) !=OPR_CALL)
-             arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
-       else
-          arg_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
-
-      if (WN_operator(wn) == OPR_INTRINSIC_CALL &&
-	  INTRN_by_value(WN_intrinsic(wn)))
-      {
-	 /* Call-by value, but argument should be emitted without
-	  * the %val() qualifier.
-	  */
-         if (WN_kid(wn, arg_idx)!=NULL) {
-              first_nonemptyarg = TRUE;
-	      WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
-         }
-      } 
-      else if ((WN_operator(kidofparm) !=OPR_CALL && 
-                  (TY_Is_Character_Reference(arg_ty)  ||
-                    (TY_mtype(TY_pointed(arg_ty))==MTYPE_M &&
-                     (TY_Is_Character_Reference(parm_ty) ||
-                       TY_Is_Chararray_Reference(parm_ty)))) ||
-               WN_operator(kidofparm)==OPR_CALL &&
-                   W2X_Unparse_Target->Func_Return_Character(arg_ty) )            &&
-               !is_allocate_stmt)
-      {
-	 /* Handle substring arguments here.  These are always assumed
-	  * to be passed by reference. For a function result, the length
-          * follows the address - does this look like char fn result?
-          * can't tell, but make good guess..
-	  */
-
-	 INT len_idx ;
-	 INT cur_idx = arg_idx ;
-
-         implicit_args++;
-
-  	 if ((is_user_call) &&
-             (cur_idx == first_arg_idx) &&
-             (cur_idx == first_arg_idx) && (WN_kid_count(wn) >= cur_idx + 2) &&
-            ( WN_kid(wn,cur_idx+1) != NULL) &&
-             (WN_Parm_By_Value(WN_kid(wn,cur_idx + 1))) &&
-             ((return_ty != 0) && (TY_kind(return_ty) == KIND_VOID))) 
-         {
-	      len_idx = cur_idx + 1 ;
-         }
-         else                
- 	   len_idx = last_arg_idx - (total_implicit_args - implicit_args); 
-        if (first_nonemptyarg && !has_stat )
-                 Append_Token_Special(call_tokens, ','); 
-        else
-                 has_stat = FALSE;
+   
+   if ((WN_operator(wn) == OPR_CALL)  &&
+       strcmp(ST_name(WN_st(wn)),"_END") ==0 ) {
+     ;
+   } else {
      
-        first_nonemptyarg = TRUE;
-	 WN2F_String_Argument(call_tokens,
-			      WN_kid(wn, cur_idx), /* string base */
-			      WN_kid(wn, len_idx), /* string length */
-			      context);
-      }
-      else if (!TY_Is_Pointer(arg_ty) || 
-	       (WN_operator(WN_kid(wn, arg_idx)) == OPR_INTRINSIC_OP &&
-		INTR_is_valtmp(WN_intrinsic(WN_kid(wn, arg_idx)))))
-      {
-	 /* Need to explicitly note this as a value parameter.
-	  */
+     Append_Token_Special(call_tokens, '(');
+     set_WN2F_CONTEXT_no_parenthesis(context);
+     
+     //WARNING
+     /* tempoarily add a piece of code for processiong optinal
+      * arguments in intrinsic function "system_clock".  will change
+      * later to process all intrinsic functions with optional
+      * arguments fzhao----- Feb19
+      */
 
-         if (WN_operator(kidofparm) == OPR_INTRINSIC_CALL &&
-               WN_intrinsic(kidofparm)==INTRN_CONCATEXPR)
-
-                 implicit_args++;
-    /*parser always generate an extra arg for concat operator*/
-
-         if (WN_kid(wn, arg_idx)!=NULL) {
-              if (first_nonemptyarg && !has_stat)
-                  Append_Token_Special(call_tokens, ','); 
-              else
-                  has_stat=FALSE;
-              first_nonemptyarg = TRUE;
-	      WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+     if (strcmp(ST_name(WN_st(wn)),"SYSTEM_CLOCK") != 0) {
+       
+       for (arg_idx = first_arg_idx, implicit_args = 0; 
+            arg_idx <= last_arg_idx - implicit_args; 
+            arg_idx++) {
+         if (WN_kid(wn, arg_idx) == NULL)
+           ;
+         else {
+           kidofparm = WN_kid0(WN_kid(wn, arg_idx));
+           if (WN_operator(kidofparm) !=OPR_CALL)
+             arg_ty = WN_Tree_Type(WN_kid(wn, arg_idx));
+           else
+             arg_ty = PU_prototype (Pu_Table[ST_pu(WN_st(kidofparm))]);
+	   
+           if (WN_operator(wn) == OPR_INTRINSIC_CALL &&
+               INTRN_by_value(WN_intrinsic(wn))) {
+             /* Call-by value, but argument should be emitted without
+              * the %val() qualifier.
+              */
+             if (WN_kid(wn, arg_idx)!=NULL) {
+               first_nonemptyarg = TRUE;
+               WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+             }
+           } 
+           else if ((WN_operator(kidofparm) != OPR_CALL
+		     && (TY_Is_Character_Reference(arg_ty)
+			 || (TY_Is_Pointer(arg_ty)
+			     && TY_mtype(TY_pointed(arg_ty)) == MTYPE_M 
+			     && (TY_Is_Character_Reference(parm_ty) 
+				 || TY_Is_Chararray_Reference(parm_ty)))) 
+		     || WN_operator(kidofparm) == OPR_CALL
+		     && W2X_Unparse_Target->Func_Return_Character(arg_ty) ) 
+                    && !is_allocate_stmt) {
+             /* Handle substring arguments here.  These are always assumed
+              * to be passed by reference. For a function result, the length
+              * follows the address - does this look like char fn result?
+              * can't tell, but make good guess..
+              */
+             
+             INT len_idx ;
+             INT cur_idx = arg_idx ;
+             
+             implicit_args++;
+             
+             if ((is_user_call) &&
+                 (cur_idx == first_arg_idx) &&
+                 (cur_idx == first_arg_idx) && 
+		 (WN_kid_count(wn) >= cur_idx + 2) &&
+                 ( WN_kid(wn,cur_idx+1) != NULL) &&
+                 (WN_Parm_By_Value(WN_kid(wn,cur_idx + 1))) &&
+                 ((return_ty != 0) && (TY_kind(return_ty) == KIND_VOID))) {
+               len_idx = cur_idx + 1 ;
+             }
+             else                
+               len_idx = last_arg_idx - (total_implicit_args - implicit_args); 
+             if (first_nonemptyarg && !has_stat )
+               Append_Token_Special(call_tokens, ','); 
+             else
+               has_stat = FALSE;
+             
+             first_nonemptyarg = TRUE;
+             WN2F_String_Argument(call_tokens,
+                                  WN_kid(wn, cur_idx), /* string base */
+                                  WN_kid(wn, len_idx), /* string length */
+                                  context);
+           }
+           else if (!TY_Is_Pointer(arg_ty) || 
+                    (WN_operator(WN_kid(wn, arg_idx)) == OPR_INTRINSIC_OP &&
+                     INTR_is_valtmp(WN_intrinsic(WN_kid(wn, arg_idx))))) {
+             /* Need to explicitly note this as a value parameter.
+              */
+             
+             if (WN_operator(kidofparm) == OPR_INTRINSIC_CALL &&
+                 WN_intrinsic(kidofparm)==INTRN_CONCATEXPR)
+               
+               implicit_args++;
+             /*parser always generate an extra arg for concat operator*/
+             
+             if (WN_kid(wn, arg_idx)!=NULL) {
+               if (first_nonemptyarg && !has_stat)
+                 Append_Token_Special(call_tokens, ','); 
+               else
+                 has_stat=FALSE;
+	       first_nonemptyarg = TRUE;
+	       WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+             }
+             // Append_Token_Special(call_tokens, ')');
+           }
+           else { /* TY_Is_Pointer(arg_ty) */
+             /* There is also an implicit string length when the argument
+              * is an array of character strings.
+              */
+             if (TY_Is_Chararray_Reference(arg_ty) &&
+                 !is_allocate_stmt)
+               implicit_args++;
+             
+             /* Assume call-by-reference parameter passing */
+             if (WN_kid(wn, arg_idx)!=NULL){
+               if (first_nonemptyarg && !has_stat)
+                 Append_Token_Special(call_tokens, ','); 
+               else
+                 has_stat = FALSE;
+               
+               first_nonemptyarg = TRUE;
+               fld_type_z = 0;
+               WN2F_Offset_Memref(call_tokens, 
+                                  WN_kid(wn, arg_idx), /* address expression */
+                                  arg_ty,              /* address type */
+                                  TY_pointed(arg_ty),  /* object type */
+                                  0,                   /* offset from address*/
+                                  context);
+             }
+           }
+           // if ((arg_idx+implicit_args) < last_arg_idx)
+           //   Append_Token_Special(call_tokens, ',');
+           
+           if ((arg_idx+implicit_args) < (last_arg_idx-1) && 
+	       WN_kid(wn, arg_idx)!=NULL)
+             ;
+           // Append_Token_Special(call_tokens, ',');
+           else 
+             if ((arg_idx+implicit_args) == (last_arg_idx-1)) { 
+               if (WN_operator(wn) == OPR_CALL &&
+                   (strcmp(ST_name(WN_st(wn)),"_ALLOCATE")== 0  ||
+                    strcmp(ST_name(WN_st(wn)),"_DEALLOCATE")== 0)) {
+                 if ((WN_opc_operator(WN_kid0(WN_kid(wn, (last_arg_idx)))))
+		     == OPR_LDA) {
+                   Append_Token_Special(call_tokens, ',');
+                   Append_Token_String(call_tokens,"STAT=");
+                   has_stat=TRUE;
+                 } else
+                   arg_idx++;
+                 ;
+                 
+               }
+               else 
+                 if (WN_kid(wn, arg_idx)!=NULL && WN_kid(wn,arg_idx+1)!=NULL)
+                   ;
+               
+               /* argument could be "optional" argument,so there could
+		  be NULL wn */
+               // Append_Token_Special(call_tokens, ',');
+             }
          }
-//	 Append_Token_Special(call_tokens, ')');
-      }
-      else /* TY_Is_Pointer(arg_ty) */
-      {
-	 /* There is also an implicit string length when the argument
-	  * is an array of character strings.
-	  */
-	 if (TY_Is_Chararray_Reference(arg_ty) &&
-              !is_allocate_stmt)
-	    implicit_args++;
-
-	 /* Assume call-by-reference parameter passing */
-        if (WN_kid(wn, arg_idx)!=NULL){
-           if (first_nonemptyarg && !has_stat)
-                  Append_Token_Special(call_tokens, ','); 
-            else
-                  has_stat = FALSE;
-
+       }
+     } /*not system_clock*/
+     else { /* here for system clock*/
+       arg_idx = 0;  
+       if (WN_kid(wn, arg_idx)!=NULL) {
+         first_nonemptyarg =TRUE;
+         Append_Token_String(call_tokens,"count=");
+         WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+       }
+       arg_idx++;
+       if (WN_kid(wn, arg_idx)!=NULL) {
+         if (first_nonemptyarg)
+           Append_Token_Special(call_tokens, ',');
+         else
            first_nonemptyarg = TRUE;
-            fld_type_z = 0;
-	    WN2F_Offset_Memref(call_tokens, 
-			    WN_kid(wn, arg_idx), /* address expression */
-			    arg_ty,              /* address type */
-			    TY_pointed(arg_ty),  /* object type */
-			    0,                   /* offset from address */
-			    context);
-        }
-      }
-//      if ((arg_idx+implicit_args) < last_arg_idx)
-//	 Append_Token_Special(call_tokens, ',');
-
-     if ((arg_idx+implicit_args) < (last_arg_idx-1) && WN_kid(wn, arg_idx)!=NULL)
-          ;
-//          Append_Token_Special(call_tokens, ',');
-     else 
-      if ((arg_idx+implicit_args) == (last_arg_idx-1)) { 
-        if (WN_operator(wn) == OPR_CALL &&
-             (strcmp(ST_name(WN_st(wn)),"_ALLOCATE")== 0  ||
-              strcmp(ST_name(WN_st(wn)),"_DEALLOCATE")== 0)) {
-         if ((WN_opc_operator(WN_kid0(WN_kid(wn, (last_arg_idx)))))==OPR_LDA) {
-          Append_Token_Special(call_tokens, ',');
-          Append_Token_String(call_tokens,"STAT=");
-          has_stat=TRUE;
-         } else
-        arg_idx++;
-          ;
-
-          }
-        else 
-         if (WN_kid(wn, arg_idx)!=NULL && WN_kid(wn,arg_idx+1)!=NULL)
-               ;
-
-           /* argument could be "optional" argument,so there could be NULL wn */
-//              Append_Token_Special(call_tokens, ',');
-      }
-    }
+         Append_Token_String(call_tokens,"count_rate=");
+         WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+       }
+       arg_idx++;
+       if (WN_kid(wn, arg_idx)!=NULL) {
+         if (first_nonemptyarg)
+           Append_Token_Special(call_tokens, ',');
+         else first_nonemptyarg =TRUE;
+         Append_Token_String(call_tokens,"count_max=");
+         WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
+       }
+       
+     }
+     
+     reset_WN2F_CONTEXT_no_parenthesis(context);
+     reset_WN2F_CONTEXT_has_no_arr_elmt(context);
+     Append_Token_Special(call_tokens, ')');
    }
- } /*not system_clock*/
-  else /* here for system clock*/
-   {
-    arg_idx = 0;  
-    if (WN_kid(wn, arg_idx)!=NULL) {
-    first_nonemptyarg =TRUE;
-    Append_Token_String(call_tokens,"count=");
-    WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
-     };
-    arg_idx++;
-    if (WN_kid(wn, arg_idx)!=NULL) {
-    if (first_nonemptyarg)
-        Append_Token_Special(call_tokens, ',');
-    else
-        first_nonemptyarg = TRUE;
-    Append_Token_String(call_tokens,"count_rate=");
-    WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
-     };
-    arg_idx++;
-    if (WN_kid(wn, arg_idx)!=NULL) {
-      if (first_nonemptyarg)
-          Append_Token_Special(call_tokens, ',');
-      else first_nonemptyarg =TRUE;
-    Append_Token_String(call_tokens,"count_max=");
-    WN2F_translate(call_tokens, WN_kid(wn, arg_idx), context);
-    }
-
- }
- 
-   reset_WN2F_CONTEXT_no_parenthesis(context);
-   reset_WN2F_CONTEXT_has_no_arr_elmt(context);
-   Append_Token_Special(call_tokens, ')');
-}
-
+   
    /* Only save off return-values for calls outside io-statements.
     * I assume here that no call information inside io-statements
     * have been recorded, assuming such calls are not walked when
     * traversing the stetements of a PU in PUinfo.c.
     */
-   if (!WN2F_CONTEXT_io_stmt(context))
-   {   
-      /* Update the call site information to denote this one */
-      if (WN2F_Prev_CallSite == NULL)
-	 WN2F_Prev_CallSite = PUinfo_Get_CallSites();
-      else
-	 WN2F_Prev_CallSite = CALLSITE_next(WN2F_Prev_CallSite);
-
-      ASSERT_DBG_FATAL(CALLSITE_call(WN2F_Prev_CallSite) == wn,
-		       (DIAG_W2F_UNEXPECTED_CALLSITE, "WN2F_call()"));
-
-      /* Next, save off the function return value to a (temporary)
-       * variable or a return-register, as is appropriate.
-       */
-      if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
-      {
-	 /* This is not a subroutine, so a CALL statement is not valid
-	  * Fortran.  We must assign the resultant value to some location.
-	  * We do that here!
-	  */
-	 ASSERT_DBG_WARN(return_to_param || first_arg_idx == 0,
-			  (DIAG_A_STRING, 
-			   "WN2F_call expects first argument as kid0 "
-			   "when not returning through first argument"));
-
-	 if (return_to_param)
-	 {
-	    /* Return through a parameter:  Assign the call-value to
-	     * the dereferenced implicit argument expression (first_arg).
-	     */
-            fld_type_z = 0;
-	    (void)WN2F_Offset_Memref(tokens, 
-				     WN_kid0(wn),  /* return addr expression */
-				     WN_Tree_Type(WN_kid0(wn)), /* addr type */
-				     return_ty,    /* object type */
-				     0,            /* offset from address */
-				     context);
-	    Append_Token_Special(tokens, '=');
-	 }
-	 else /* Do not return to a parameter */
-
+   if (!WN2F_CONTEXT_io_stmt(context)) {
+     /* Update the call site information to denote this one */
+     if (WN2F_Prev_CallSite == NULL)
+       WN2F_Prev_CallSite = PUinfo_Get_CallSites();
+     else
+       WN2F_Prev_CallSite = CALLSITE_next(WN2F_Prev_CallSite);
+     
+     ASSERT_DBG_FATAL(CALLSITE_call(WN2F_Prev_CallSite) == wn,
+                      (DIAG_W2F_UNEXPECTED_CALLSITE, "WN2F_call()"));
+     
+     /* Next, save off the function return value to a (temporary)
+      * variable or a return-register, as is appropriate.
+      */
+     if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID) {
+       /* This is not a subroutine, so a CALL statement is not valid
+        * Fortran.  We must assign the resultant value to some location.
+        * We do that here!
+        */
+       ASSERT_DBG_WARN(return_to_param || first_arg_idx == 0,
+                       (DIAG_A_STRING, 
+                        "WN2F_call expects first argument as kid0 "
+                        "when not returning through first argument"));
+       
+       if (return_to_param) {
+         /* Return through a parameter:  Assign the call-value to
+          * the dereferenced implicit argument expression (first_arg).
+          */
+         fld_type_z = 0;
+         (void)WN2F_Offset_Memref(tokens, 
+                                  WN_kid0(wn),  /* return addr expression */
+                                  WN_Tree_Type(WN_kid0(wn)), /* addr type */
+                                  return_ty,    /* object type */
+                                  0,            /* offset from address */
+                                  context);
+         Append_Token_Special(tokens, '=');
+       }
+       else /* Do not return to a parameter */
          ;
-      }
-      else /* No return value, i.e. a SUBROUTINE */
-      {
-           if (!WN2F_CONTEXT_io_stmt(context)) 
-
-              WN2F_Stmt_Newline(tokens, NULL/*label*/, WN_Get_Linenum(wn), context);
-
-         if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE") !=0 &&
-            strcmp(ST_name(WN_st(wn)),"_END") !=0 &&
-            (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE") !=0 ))
-	 Prepend_Token_String(call_tokens, "CALL");
-      }
+     }
+     else { /* No return value, i.e. a SUBROUTINE */
+       if (!WN2F_CONTEXT_io_stmt(context)) 
+         
+         WN2F_Stmt_Newline(tokens, NULL/*label*/, WN_Get_Linenum(wn), context);
+       
+       if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE") !=0 &&
+           strcmp(ST_name(WN_st(wn)),"_END") !=0 &&
+           (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE") !=0 ))
+         Prepend_Token_String(call_tokens, "CALL");
+     }
    }
    Append_And_Reclaim_Token_List(tokens, &call_tokens);
-
+   
    return EMPTY_WN2F_STATUS;
 } /* WN2F_call */
 
