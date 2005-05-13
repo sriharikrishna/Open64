@@ -1477,6 +1477,12 @@ Had_Internal_Error (void)
  * ====================================================================
  */
 
+#if defined(__sgi)
+// On some versions of IRIX, namespace std will not be defined.  We
+// need at least a definition of 'std' so that the IRIX compiler won't
+// complain when it sees the 'using' below.
+namespace std { }
+#endif
 
 // StrSignal: See interface description
 extern const char* StrSignal(int sig)
