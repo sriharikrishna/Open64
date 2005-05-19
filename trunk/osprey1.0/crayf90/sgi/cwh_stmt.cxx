@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.26 $
- * $Date: 2004-12-14 17:34:47 $
- * $Author: eraxxon $
+ * $Revision: 1.27 $
+ * $Date: 2005-05-19 15:56:29 $
+ * $Author: fzhao $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -3173,13 +3173,6 @@ fei_concat(INT32 numops)
 
   cwh_stk_push_STR(rsz,wwnn,ty,WN_item);
 
-/* when free memory as this sequence,malloc will issue seg
- * fault when the wwnn apperance as a parameter in io stmt
- * this only occurs on mapy--fzhao
- */
-//  free(sz);
-//  free(wn);
-
   free(va);
   free(wn);
   free(sz);
@@ -4809,30 +4802,49 @@ fei_nullify(INT32 listnum)
    ST     * st  ;
    WN     * wn  ;
    WN     * wa  ;
-   int    i ;
-
+   int    i ; 
+   FLD_det det  ;
 
    opc = OPCODE_make_op(OPR_NULLIFY,MTYPE_V,MTYPE_V);
-
-   wn  =  WN_Create(opc,listnum);
+   wn  =  WN_Create(opc,listnum); 
 
    for (i=listnum-1; i>=0; i--)
     {
     switch(cwh_stk_get_class()) {
      case ST_item: 
         st = cwh_stk_pop_ST();
-        WN_kid(wn,i) = WN_CreateIdname ( 0, st);
+        wa = WN_CreateIdname ( 0, st);
         break;
      case WN_item:
         wa = cwh_stk_pop_WN();
         break;
+     case FLD_item:
+         det = cwh_addr_offset();
+         if (cwh_stk_get_class() == ST_item ||
+            cwh_stk_get_class() == ST_item_whole_array) {
+             st  = cwh_stk_pop_ST();
+	     wa  = cwh_addr_ldid(st,det.off,det.type);
+          } else {
+             wa = cwh_stk_pop_WHIRL();
+             wa = cwh_expr_bincalc(OPR_ADD,wa,WN_Intconst(Pointer_Mtype,det.off));
+             wa = F90_Wrap_ARREXP(wa);
+          }
+        break;
+      case STR_item:
+          cwh_stk_pop_STR();
+          cwh_stk_pop_WN();
+          cwh_stk_get_TY();
+          wa  = cwh_stk_pop_WN();
+          wa = cwh_expr_extract_arrayexp(wa,DELETE_ARRAYEXP_WN);
+        break;
+
      default:
         cwh_stk_pop_whatever() ;
         wa = NULL;
         break;
     }
 
-     WN_kid(wn,i) = wa ;
+    WN_kid(wn,i) = wa ;
    }
    cwh_block_append(wn);
    return;
