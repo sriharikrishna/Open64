@@ -39,9 +39,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.h
- * $Revision: 1.3 $
- * $Date: 2002-08-16 19:30:47 $
- * $Author: open64 $
+ * $Revision: 1.4 $
+ * $Date: 2005-05-19 16:06:36 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.h,v $
  *
  * Revision history:
@@ -162,6 +162,9 @@ extern WN2F_STATUS
 
 extern WN2F_STATUS
    WN2F_noio_implied_do(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
+
+extern WN2F_STATUS
+   WN2F_idname(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
 
 #endif /* wn2f_stmt_INCLUDED */
 

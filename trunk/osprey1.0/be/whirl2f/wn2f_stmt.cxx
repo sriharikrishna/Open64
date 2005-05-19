@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.33 $
- * $Date: 2004-06-28 21:02:39 $
+ * $Revision: 1.34 $
+ * $Date: 2005-05-19 16:06:36 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.33 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.34 $";
 #endif
 
 #include <alloca.h>
@@ -3215,6 +3215,7 @@ WN2F_STATUS
 WN2F_nullify_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
  {
    int k ;
+   WN* kidwn;
 
    const char *st_name;
 
@@ -3224,21 +3225,27 @@ WN2F_nullify_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
      Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(tokens, "NULLIFY (");
 
-     for(k=0;k< WN_kid_count(wn);k++ )
-
-       { st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(wn,k)));
-        Set_BE_ST_w2fc_referenced(WN_st(WN_kid(wn,k)));
+     for(k=0;k< WN_kid_count(wn);k++ ) {
         if (k==0)
            ;
         else
           Append_Token_String(tokens,",");
-          Append_Token_String(tokens,st_name);
+
+        kidwn=WN_kid(wn,k);
+
+        while (( WN_operator(kidwn)==OPR_ARRAY) ||
+              (WN_operator(kidwn)==OPR_ARRSECTION)) {
+            kidwn = WN_kid0(kidwn); //skip array scripts part
+         }
+
+        (void)WN2F_translate(tokens,kidwn,context);
 
        }
+
       Append_Token_Special(tokens,')' );
 
      return EMPTY_WN2F_STATUS;
- } //WN2F_namelist_stmt
+ } //WN2F_nullify_stmt
 
 //**********************************************
 WN2F_STATUS
@@ -3532,7 +3539,20 @@ WN2F_noio_implied_do(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    Append_Token_Special(tokens,')');
    return EMPTY_WN2F_STATUS;
+} //WN2F_noio_implied_do
 
-}
+WN2F_STATUS
+WN2F_idname(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
+{ 
+  const char *st_name;
+  ASSERT_DBG_FATAL(WN_operator(wn) == OPR_IDNAME,
+                 (DIAG_W2F_UNEXPECTED_OPC, "WN2F_idname"));
+   st_name = W2CF_Symtab_Nameof_St(WN_st(wn));
+   Append_Token_String(tokens,st_name);
+   Set_BE_ST_w2fc_referenced(WN_st(wn));
+   return EMPTY_WN2F_STATUS;
+
+} //WN2F_idname
+
 
 
