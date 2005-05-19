@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.33 $
- * $Date: 2004-11-29 16:16:20 $
- * $Author: eraxxon $
+ * $Revision: 1.34 $
+ * $Date: 2005-05-19 16:06:36 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.33 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.34 $";
 #endif
 
 #include <ctype.h>
@@ -784,11 +784,15 @@ void ReorderParms(ST **parms,INT32 num_params)
 
   workset.clear();
   reorder_parms = (ST **)alloca((num_params + 1) * sizeof(ST *));
-  for (i=0; i<num_params; i++)
-      st_idx_to_parms[(ST_IDX)(parms[i]->st_idx)] = i;
+  for (i=0; i<num_params; i++) {
+    if (!parms[i]) //parmsp[i] could be NULL for ".len"
+      continue;
+    st_idx_to_parms[(ST_IDX)(parms[i]->st_idx)] = i;
+  }
 
-  for (i=0; i<num_params; i++)
-   if (TY_kind(ST_type(parms[i])) == KIND_POINTER ){
+  for (i=0; i<num_params; i++) {
+    if (! parms[i]) continue;
+    if (TY_kind(ST_type(parms[i])) == KIND_POINTER ){
         ty_index = TY_pointed(ST_type(parms[i]));
 
         if ((TY_kind(ty_index) == KIND_ARRAY) &&
@@ -835,6 +839,7 @@ void ReorderParms(ST **parms,INT32 num_params)
           }/*while*/
       }
    }
+ }
   INT32 keep = 0;
 
   for (i = 0; i<num_params; i++){
