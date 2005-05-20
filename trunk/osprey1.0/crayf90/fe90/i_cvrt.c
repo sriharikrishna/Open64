@@ -4930,7 +4930,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
 
 
-   case Whole_Substring_Opr :
+   case Whole_Substring_Opr : 
    case Substring_Opr :
         whole_substring = IR_OPR(ir_idx) == Whole_Substring_Opr;
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx), 
@@ -6270,7 +6270,8 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
                         
         next_idx = IR_IDX_R(ir_idx);
         dim = IR_LIST_CNT_R(ir_idx);
-        while (dim != 1) {
+/*        while (dim != 1) { */
+        while (dim > 1) {
            next_idx = IL_NEXT_LIST_IDX(next_idx);
            dim = dim - 1;
         }
