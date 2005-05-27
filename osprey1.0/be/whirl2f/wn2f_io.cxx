@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_io.c
- * $Revision: 1.7 $
- * $Date: 2003-12-09 19:25:35 $
+ * $Revision: 1.8 $
+ * $Date: 2005-05-27 21:08:48 $
  *
  * Revision history:
  *  5-June-95 - Original Version
@@ -754,6 +754,40 @@ WN2F_ios_inquire(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 			   context);
 } /* WN2F_ios_inquire */
 
+static void
+WN2F_ios_inqlength(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
+{
+   INT 	ios_kid;
+   BOOL emitted = FALSE;
+   ASSERT_WARN(WN_IOSTMT(wn) == IOS_INQLENGTH,
+                  (DIAG_W2F_UNEXPECTED_IOS,
+                   IOSTATEMENT_name(WN_IOSTMT(wn)), "WN2F_ios_inqlength"));
+
+   Append_Token_String(tokens, "INQUIRE");
+   Append_Token_Special(tokens,'(');
+   for (ios_kid=0; ios_kid<=WN_kid_count(wn)-1; ios_kid++)
+     {
+        WN *item = WN_kid(wn, ios_kid); 
+        if (WN2F_IS_IOC(item) && WN_IOITEM(item)==IOC_INQLENGTH_VAR){
+              Append_Token_String(tokens,"IOLENGTH =");
+              WN2F_translate(tokens, WN_kid0(item), context);
+              Append_Token_Special(tokens,')');
+           }
+
+         if (WN2F_IS_IOL(item)) {
+             TOKEN_BUFFER item_buffer = New_Token_Buffer();
+             if (WN2F_io_list(item_buffer, item, context)){
+                if (emitted )
+                       Append_Token_Special(tokens, ',');
+                 else 
+                       emitted = TRUE;
+		Append_And_Reclaim_Token_List(tokens, &item_buffer);
+              }
+          }
+      }
+     reset_WN2F_CONTEXT_origfmt_ioctrl(context);
+
+} /*WN2F_ios_inqlength*/
 
 static void 
 WN2F_ios_namelist(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
@@ -1291,6 +1325,7 @@ void WN2F_Io_initialize(void)
    Ios_Handler[IOS_CR_INQUIRE] = &WN2F_ios_inquire;
    Ios_Handler[IOS_CR_ENDFILE] = &WN2F_ios_endfile;
    Ios_Handler[IOS_CR_BACKSPACE] = &WN2F_ios_backspace;
+   Ios_Handler[IOS_INQLENGTH] = &WN2F_ios_inqlength;
 
 
 
