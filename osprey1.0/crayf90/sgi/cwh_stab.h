@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_stab.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:09 $
+ * $Revision: 1.3 $
+ * $Date: 2005-06-08 22:15:56 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.h,v $
  *
@@ -56,7 +56,7 @@
 #define CWH_STAB_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.h,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -89,7 +89,7 @@ typedef struct al {
 
 extern STB_pkt * cwh_stab_packet(void * thing, enum is_form fm) ;
 extern STB_pkt * cwh_stab_packet_typed(void * thing, enum is_form fm, TY_IDX  ty) ;
-
+extern ST * cwh_stab_seen_derived_type_or_imported_var(ST *c, char* name);
 #define IS_FORMAL(s) (((ST_sclass(s) == SCLASS_FORMAL) ||         \
 		       (ST_sclass(s) == SCLASS_FORMAL_REF)) &&    \
 		      (!Has_Base_Block(st)))

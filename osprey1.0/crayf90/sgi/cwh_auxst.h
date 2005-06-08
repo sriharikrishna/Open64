@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_auxst.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:07 $
+ * $Revision: 1.3 $
+ * $Date: 2005-06-08 22:15:55 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.h,v $
  *
@@ -56,7 +56,7 @@
 #define CWH_AUXST_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.h,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* de/allocation */
@@ -83,7 +83,8 @@ enum list_name {
   l_SPLITLIST,             /* STs of split commons, for pragmas          */
   l_EQVLIST,		   /* STs in Equivalence                         */
   l_DST_COMLIST,	   /* COMMON STs (Global) for DST info in PU     */
-  l_DST_PARMLIST	   /* Parameter STs (Global) for DST info in PU  */
+  l_DST_PARMLIST,	   /* Parameter STs (Global) for DST info in PU  */
+  l_TYMDLIST  		   /* STs of derived type or imported variable   */
 };
 
 

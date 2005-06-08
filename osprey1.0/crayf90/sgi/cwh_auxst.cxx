@@ -36,9 +36,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.3 $
- * $Date: 2003-11-28 23:04:08 $
- * $Author: eraxxon $
+ * $Revision: 1.4 $
+ * $Date: 2005-06-08 22:15:55 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.cxx,v $
  *
  * Revision history:
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.cxx,v $ $Revision: 1.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h> /* for memset() */
@@ -368,6 +368,10 @@ cwh_auxst_find_list(AUXST * o, enum list_name list)
 
   case l_DST_PARMLIST:
     l = AUXST_Dstparmlist(o);
+    break;
+
+  case l_TYMDLIST:
+    l = AUXST_TyMdlist(o);
     break;
 
   default:

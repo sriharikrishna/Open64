@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.18 $
- * $Date: 2004-02-17 22:41:52 $
+ * $Revision: 1.19 $
+ * $Date: 2005-06-08 22:15:56 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.18 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.19 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -669,6 +669,67 @@ fei_next_type_idx(INT32 flag, INT32 align)
 }
 
 /*===================================================
+ * fei_imported_type 
+ * 
+ ====================================================
+*/
+extern INT32
+fei_imported_type(char 	*name_string,
+		  INTPTR modst_idx)
+{
+      TY_IDX ty_idx;
+      STB_pkt  *modp;
+      ST *st;
+
+      modp = cast_to_STB(modst_idx);
+      st = cwh_stab_seen_derived_type_or_imported_var(cast_to_ST(modp->item),name_string);
+      if (st) {
+          ty_idx = ST_type(st);
+          return (cast_to_int(ty_idx));
+       } else
+           return 0;
+} /* fei_imported_type */
+
+
+/*===================================================
+ * fei_get_pdg_type
+ * 
+ ====================================================
+*/
+
+extern TYPE 
+fei_get_pdg_type(INT32		ty_idx, 
+                 INT32		table_type,
+	   	 INT32 		basic_type,
+		 INT32 		nbr_components)
+{ 
+  TYPE t ;
+  dtype_t d ;
+  INT32 i;
+
+  TY& ty = Ty_Table[cast_to_TY(ty_idx)];
+  t.table_type = (TABLE_TYPE)table_type ;
+  t.basic_type = (BASIC_TYPE)basic_type ;
+  cwh_types_fill_type(0,&t,(TY_IDX)ty_idx);
+                                     
+  for (i=0; i<nbr_components; i++) {
+     FLD_HANDLE fld = New_FLD ();
+     if (i == 0) {
+        Set_TY_fld(ty, fld);
+        d.dty_last = fld.Idx ();
+     }
+  }
+
+  d.dty = ty_idx ;
+  d.ncompos  = nbr_components ;
+//  d.seq      = (sequence != Seq_None);
+//  d.hosted   = in_hosted_dtype ;
+                                                                                      
+  cwh_types_push_dtype(d);
+
+  return(t);
+}
+/*===================================================
  *
  * fei_user_type
  *
@@ -691,26 +752,35 @@ fei_next_type_idx(INT32 flag, INT32 align)
 void
 fei_user_type(char         *name_string,
 	      INT32         nbr_components,
-	      INT32         first_idx,
 	      INT64         size,
 	      INT32         sequence_arg,
 	      INT32         cr_ty_idx,
 	      INT32         align,
-              INT32         external)
+	      INTPTR        modst_idx,
+              INT32         definition)
     
 {
   TY_IDX ty_idx    ;
+  TYPE t;
   dtype_t  d ;
   FORT_SEQUENCE sequence;
   INT32 i;
-  ST *st;
+  ST *st, *currscp;
+  STB_pkt  *modp;
   
+
+ if (modst_idx)
+   {
+      modp = cast_to_STB(modst_idx);
+      currscp = cast_to_ST(modp->item);
+ } else 
+     currscp = Scope_tab[CURRENT_SYMTAB].st;
+
  if (size==0)
     size =32; /*default shape array or pointer set is 4bytes i.e 32 bits*/
   sequence = (FORT_SEQUENCE) sequence_arg;
 
   ty_idx = cast_to_TY(cr_ty_idx);
-
   TY& ty = Ty_Table[ty_idx];
 
   TY_Init (ty, bit_to_byte(size), KIND_STRUCT, MTYPE_M, Save_Str(name_string));
@@ -718,18 +788,17 @@ fei_user_type(char         *name_string,
   if (sequence == Seq_Mixed)
        Set_TY_is_sequence(ty);
 
-
-    st = New_ST(CURRENT_SYMTAB);
-
-    ST_Init(st,
+  if (definition) {
+     st = New_ST(GLOBAL_SYMTAB);
+     ST_Init(st,
           Save_Str(name_string),
           CLASS_TYPE,
           SCLASS_UNKNOWN,
           EXPORT_LOCAL,
           ty_idx);
-
-  if (external)
-    Set_TY_is_external(ty);
+     Set_ST_base(st,currscp);
+     cwh_auxst_add_item(currscp,st,l_TYMDLIST) ;
+   }
 
   for (i=0; i<nbr_components; i++) {
      FLD_HANDLE fld = New_FLD ();
@@ -744,7 +813,7 @@ fei_user_type(char         *name_string,
    */
   if (sequence ==  Seq_Char) {
      Set_TY_is_packed(ty);
-  }
+    }
 
   d.dty = ty_idx ;
   d.ncompos  = nbr_components ;
@@ -752,9 +821,44 @@ fei_user_type(char         *name_string,
   d.hosted   = in_hosted_dtype ;
 
   cwh_types_push_dtype(d);
+  
+  return  ;
 
 }
 
+void fei_gen_st_for_type(char *name_string,
+                         TYPE type_idx, 
+	    		 INTPTR modst_idx)
+{
+   ST * st, *modst;
+   STB_pkt *p;
+   TY_IDX ty_idx;
+
+   if (modst_idx) {
+          p = cast_to_STB(modst_idx);
+          modst = cast_to_ST(p->item) ;
+   } else 
+      modst = Scope_tab[CURRENT_SYMTAB].st;
+
+    st = cwh_stab_seen_derived_type_or_imported_var(modst,name_string);
+
+    if (st)
+         return;
+
+    ty_idx = cast_to_TY(t_TY(type_idx)); 
+    st = New_ST(GLOBAL_SYMTAB);
+
+    ST_Init(st,
+         Save_Str(name_string),
+         CLASS_TYPE,
+         SCLASS_UNKNOWN,
+         EXPORT_LOCAL,
+         ty_idx);
+
+     Set_ST_base(st,modst);
+     cwh_auxst_add_item(modst,st,l_TYMDLIST) ;
+     return ;
+}
 /*===================================================
  *
  * fei_member

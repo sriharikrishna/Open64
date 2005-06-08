@@ -123,6 +123,7 @@ typedef struct auxst {
 	LIST      eqvlist;
 	LIST      dst_comms;
 	LIST      dst_parms;
+	LIST	  derived_type_and_mod_var;
 	char    * stem     ;
         struct auxst * next_auxst;
 	USRCPOS   pos      ;
@@ -161,6 +162,7 @@ typedef struct auxst {
 #define AUXST_Equivs(o)       ((LIST *) &(o)->eqvlist) 
 #define AUXST_Dstcomlist(o)   ((LIST *) &(o)->dst_comms)
 #define AUXST_Dstparmlist(o)  ((LIST *) &(o)->dst_parms)
+#define AUXST_TyMdlist(o)      ((LIST *) &(o)->derived_type_and_mod_var) 
 
 
 
