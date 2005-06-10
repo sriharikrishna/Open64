@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.34 $
- * $Date: 2005-05-19 16:06:36 $
+ * $Revision: 1.35 $
+ * $Date: 2005-06-10 19:26:49 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.34 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.35 $";
 #endif
 
 #include <alloca.h>
@@ -94,6 +94,7 @@ extern BOOL    W2F_Prompf_Emission; /* Defined in w2f_driver.c */
 extern BOOL    W2F_Emit_Cgtag;      /* Defined in w2f_driver.c */
 
 extern TOKEN_BUFFER  param_tokens;
+extern TOKEN_BUFFER  derived_type_tokens;
 
 static const char WN2F_Purple_Region_Name[] = "prp___region";
 static const char unnamed_interface[] = "unnamed interface"; 
@@ -1254,6 +1255,7 @@ public:
      int  lens = strlen(scope_name);
      char *stbasename = ST_name(stbase);
      BOOL nomodulevar;
+     PU_IDX current_PU=ST_pu(Scope_tab[Current_scope].st);
 
 
      char *stname = ST_name(st);
@@ -1284,18 +1286,21 @@ public:
          return;
        }
   
-     if (ST_class(st)==CLASS_TYPE &&
-            ST_is_in_module(st) )
-        if (!TY_is_external(ST_type(st))){
-            Append_F77_Indented_Newline(tokens,
+     if (ST_class(st)==CLASS_TYPE) {
+        if (ST_pu(ST_base(st)) == current_PU) { 
+               Append_F77_Indented_Newline(tokens,
                                         lines_between_decls, NULL/*label*/);
-
-            ST2F_decl_translate(tokens,  st);
-             return;
-         }
-        else
-            return;
-
+        //output the derived type definition only by the ST entry
+        // we will set Set_TY_is_translated_to_c for other cases 
+	// such as when unparsing function name and parameters, 
+        // unparsing the variables with the derived type --FMZ
+               Reset_TY_is_translated_to_c(ST_type(st));
+               ST2F_decl_translate(tokens,  st);
+         } else // set the type table entry already output  
+                // (actually don't need to output---FMZ
+               Set_TY_is_translated_to_c(ST_type(st)); 
+        return;
+      }
 
      if (!BE_ST_w2fc_referenced(st) && !ST_has_nested_ref(st)
             && !ST_is_in_module(st)   
@@ -1428,20 +1433,31 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
 
   /* Declare constants */
 
+  derived_type_tokens = New_Token_Buffer();
   decl_tokens = New_Token_Buffer();
   WN2F_Append_Symtab_Consts(decl_tokens, CURRENT_SYMTAB, 1/*Newlines*/);
-  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens))
+  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(derived_type_tokens)) {
+         Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
+         Append_And_Reclaim_Token_List(tokens, &derived_type_tokens);
+     }
+  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens)) {
     WHIRL2F_Append_Comment(tokens, "**** Constants ****", 1, 1);
   Append_And_Reclaim_Token_List(tokens, &decl_tokens);
+   }
 
   /* Declare variables and reset the "referenced" flag */
 
   decl_tokens = New_Token_Buffer();
+  derived_type_tokens = New_Token_Buffer();
   symtab = PU_lexical_level(pu);
 
   WN2F_Append_Symtab_Vars(decl_tokens, GLOBAL_SYMTAB, 1); 
 
-   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens))
+  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(derived_type_tokens)) {
+         Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
+         Append_And_Reclaim_Token_List(tokens, &derived_type_tokens);
+     }
+   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens)) 
         WHIRL2F_Append_Comment(tokens,
                            "**** Global Variables ****", 1, 1);
   Append_And_Reclaim_Token_List(tokens, &decl_tokens);
@@ -1454,15 +1470,21 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
    }
 
   decl_tokens = New_Token_Buffer();
+  derived_type_tokens = New_Token_Buffer();
   WN2F_Append_Symtab_Vars(decl_tokens, symtab, 1/*Newlines*/);
   Stab_Reset_Referenced_Flag(symtab);
   Stab_Reset_Referenced_Flag(GLOBAL_SYMTAB);
 
+  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(derived_type_tokens)) {
+         Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
+         Append_And_Reclaim_Token_List(tokens, &derived_type_tokens);
+    }
   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens)) 
+     {
         WHIRL2F_Append_Comment(tokens, 
 			   "**** Local Variables and functions ****", 1, 1);
     Append_And_Reclaim_Token_List(tokens, &decl_tokens); 
-
+     }
   /* Declare pseudo registers and other temporary variables after
    * regular variables, since the declaration of these may create
    * more temporary variables (e.g. to handle implied do-loops

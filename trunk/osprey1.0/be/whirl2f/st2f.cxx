@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.34 $
- * $Date: 2005-05-19 16:06:36 $
+ * $Revision: 1.35 $
+ * $Date: 2005-06-10 19:26:49 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.34 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.35 $";
 #endif
 
 #include <ctype.h>
@@ -227,6 +227,11 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
    }
 
   base = ST_base(st);
+
+// do not output type declaration by variables
+  if (TY_kind(ST_type(st))== KIND_STRUCT)
+          Set_TY_is_translated_to_c(ST_type(st));
+
 
 //  if (ST_sclass(st)==SCLASS_DGLOBAL && Stab_Is_Common_Block(base))
 //	goto INITPRO;
@@ -784,15 +789,11 @@ void ReorderParms(ST **parms,INT32 num_params)
 
   workset.clear();
   reorder_parms = (ST **)alloca((num_params + 1) * sizeof(ST *));
-  for (i=0; i<num_params; i++) {
-    if (!parms[i]) //parmsp[i] could be NULL for ".len"
-      continue;
-    st_idx_to_parms[(ST_IDX)(parms[i]->st_idx)] = i;
-  }
+  for (i=0; i<num_params; i++)
+      st_idx_to_parms[(ST_IDX)(parms[i]->st_idx)] = i;
 
-  for (i=0; i<num_params; i++) {
-    if (! parms[i]) continue;
-    if (TY_kind(ST_type(parms[i])) == KIND_POINTER ){
+  for (i=0; i<num_params; i++)
+   if (TY_kind(ST_type(parms[i])) == KIND_POINTER ){
         ty_index = TY_pointed(ST_type(parms[i]));
 
         if ((TY_kind(ty_index) == KIND_ARRAY) &&
@@ -839,7 +840,6 @@ void ReorderParms(ST **parms,INT32 num_params)
           }/*while*/
       }
    }
- }
   INT32 keep = 0;
 
   for (i = 0; i<num_params; i++){
@@ -1138,11 +1138,19 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       for (param = first_param; param < num_params -implicit_parms; param++) {
 
 	 Append_F77_Indented_Newline(param_tokens, 1, NULL/*label*/);
-	 if (params[param] ) 
+	 if (params[param] )  {
+            /* don't output derived type definition by the parameter 
+             * the definition of a derived type only output by the 
+             * corresponding symbol table entry (global symbol table 
+	     * entry with CLASS==TYPE and base-st point to PU_st 
+	     *----FMZ
+	     */
+            if ( TY_kind(ST_type(params[param]))== KIND_STRUCT)
+                    Set_TY_is_translated_to_c(return_ty);
    
             if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
 
-	     ST2F_decl_translate(param_tokens, params[param]);
+	      ST2F_decl_translate(param_tokens, params[param]);
 
              if (ST_is_optional_argument( params[param])) {
                 Append_F77_Indented_Newline(param_tokens, 1, NULL/*label*/);
@@ -1171,6 +1179,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
              if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
                      ST2F_decl_translate(param_tokens, params[param]);
        }
+   }
 
 #if 0
 //must issue scalar args first,then issue array args---fzhao
@@ -1331,9 +1340,18 @@ ST2F_Declare_Return_Type(TOKEN_BUFFER tokens,TY_IDX return_ty, const char *name)
 
 	if (TY_Is_Pointer(return_ty))
 	  TY2F_translate(decl_tokens, Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-	else
-	  TY2F_translate(decl_tokens, return_ty);
-
+	else  {
+          if (TY_kind(return_ty)== KIND_STRUCT)
+              Set_TY_is_translated_to_c(return_ty);
+              TY2F_translate(decl_tokens, return_ty);
+         }
+/* 
+ *     else 
+ *         TY2F_translate(decl_tokens, return_ty);
+ * We need to see if the type is derived type,since this reaches the 
+ * type entry ealier than ST entry for the derived type---see wn2f_stmt.cxx
+ * "wrtie_st" about "CLASS==TYPE" ---FMZ
+*/
 	TY2F_Prepend_Structures(decl_tokens);
 	Append_And_Reclaim_Token_List(tokens, &decl_tokens);
     }

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.29 $
- * $Date: 2004-11-29 16:16:21 $
- * $Author: eraxxon $
+ * $Revision: 1.30 $
+ * $Date: 2005-06-10 19:26:49 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -60,6 +60,8 @@
 #include "tcon2f.h"
 #include "wn2f_load_store.h"
 #include "ty_ftn.h"
+
+TOKEN_BUFFER derived_type_tokens = New_Token_Buffer();
 
 extern WN* PU_Body;
 extern BOOL Array_Bnd_Temp_Var;
@@ -1471,11 +1473,15 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
        * the corresponding integral type instead.  We do not expect
        * such pointers to be dereferenced anywhere.
        */
+
+      if (TY_kind(TY_AR_etype(ty))==KIND_STRUCT)
+           Set_TY_is_translated_to_c(TY_AR_etype(ty));
+
       if (TY_Is_Pointer(TY_AR_etype(ty)))
 	 TY2F_translate(decl_tokens,
 			Stab_Mtype_To_Ty(TY_mtype(TY_AR_etype(ty))));
-      else
-	 TY2F_translate(decl_tokens, TY_AR_etype(ty));
+      else  
+         TY2F_translate(decl_tokens, TY_AR_etype(ty));
 
  if (ARB_co_dimension(arb_base)<=0){
      co_dim=0;
@@ -1986,8 +1992,17 @@ TY2F_Translate_Equivalence(TOKEN_BUFFER tokens, TY_IDX ty_idx, BOOL alt_return)
 void 
 TY2F_Prepend_Structures(TOKEN_BUFFER tokens)
 {
+/*
+ * we will put TY2F_Structure_Decls into a static token buffer
+ * "derived_type_tokens"---FMZ
+*/
+#if 0 
    if (TY2F_Structure_Decls != NULL)
       Prepend_And_Reclaim_Token_List(tokens, &TY2F_Structure_Decls);
+#endif
+   if (TY2F_Structure_Decls != NULL)
+      Prepend_And_Reclaim_Token_List(derived_type_tokens, &TY2F_Structure_Decls);
+
 } /* TY2F_Prepend_Structures */
 
 
