@@ -11095,7 +11095,10 @@ static TYPE get_basic_type(int	type_idx,
 
    case Structure:
       dt_attr_idx = TYP_IDX(type_idx);
-      idx = send_derived_type(type_idx,TRUE);
+      if (curr_scp_idx==ATT_SCP_IDX(dt_attr_idx))
+           idx = send_derived_type(type_idx,FALSE);
+      else 
+           idx = send_derived_type(type_idx,TRUE);
       break;
 
 
@@ -13655,8 +13658,8 @@ static void send_attr_ntry(int		attr_idx)
    flag = (long64) 0;
 
    if (PDG_AT_IDX(attr_idx) != NULL_IDX ) {
-        if (LN_DEF_LOC(attr_idx)      	&&
-            AT_OBJ_CLASS(attr_idx) == Derived_Type ) {
+       if (AT_OBJ_CLASS(attr_idx) == Derived_Type &&
+              ATT_SCP_IDX(attr_idx)==curr_scp_idx ) {
            if (AT_MODULE_IDX(attr_idx)) {
 	             send_attr_ntry(AT_MODULE_IDX(attr_idx));
 	             fei_gen_st_for_type(AT_OBJ_NAME_PTR(attr_idx),
@@ -14438,9 +14441,13 @@ static void send_attr_ntry(int		attr_idx)
             ATT_TY_IDX(attr_idx)        = ntr_derived_type_tbl();
             TBL_REALLOC_CK(pdg_type_tbl, 1);/*need to enlarge pdg_type_tbl */
 
+            if (curr_scp_idx==ATT_SCP_IDX(attr_idx))
+                   nested_attr = FALSE;
+            else 
+                   nested_attr= TRUE;
+
             send_derived_type(ATT_TY_IDX(attr_idx),nested_attr);
         } 
-
 
       goto EXIT; 
                
