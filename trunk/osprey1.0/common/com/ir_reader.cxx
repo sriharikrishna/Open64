@@ -88,7 +88,7 @@
 #include "stab.h"
 #include "const.h"
 #include "targ_const.h"
-extern char * Targ_Print ( char *fmt, TCON c );
+extern char * Targ_Print ( const char *fmt, TCON c );
 #include "targ_sim.h"
 #include "strtab.h"
 #include "irbdata.h"
