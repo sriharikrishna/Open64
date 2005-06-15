@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.35 $
- * $Date: 2005-06-10 19:26:49 $
+ * $Revision: 1.36 $
+ * $Date: 2005-06-15 20:46:27 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.35 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.36 $";
 #endif
 
 #include <ctype.h>
@@ -1094,11 +1094,9 @@ ST2F_func_header(TOKEN_BUFFER tokens,
        Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
        Append_Token_String(header_tokens, "use");
        Append_Token_String(header_tokens, st_name);
-       if (WN_rtype(stmt) == 1)
-           Append_Token_String(header_tokens, ",only:");
-       else
-          if (WN_kid_count(stmt)>0)
-               Append_Token_String(header_tokens, ",");
+
+       if (WN_kid_count(stmt)>0)
+               Append_Token_String(header_tokens, ",only:");
 
        for(k=0;k< WN_kid_count(stmt);k=k+2 ) {
 
