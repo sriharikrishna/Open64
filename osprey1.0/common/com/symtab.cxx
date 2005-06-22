@@ -2263,6 +2263,7 @@ ST::Print (FILE *f, BOOL verbose) const
 
     switch (sym_class) {
     case CLASS_VAR:
+    case CLASS_TYPE: //FMZ 
 	ty_idx = u2.type;
 	break;
 
