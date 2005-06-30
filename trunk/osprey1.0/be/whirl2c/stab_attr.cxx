@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: stab_attr.c
- * $Revision: 1.5 $
- * $Date: 2003-12-09 19:20:23 $
- * $Author: eraxxon $
+ * $Revision: 1.6 $
+ * $Date: 2005-06-30 15:57:28 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $
  *
  * Revision history:
@@ -55,7 +55,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -105,8 +105,9 @@ Stab_Reset_Referenced_Flag(SYMTAB_IDX symtab)
    if (W2X_Unparse_Target->Redeclare_File_Types() && symtab == GLOBAL_SYMTAB) {
 
       for (TY_IDX ty = 1; ty < TY_Table_Size(); ty++)
-         if (TY_Is_Structured(ty))
+         if (TY_Is_Structured(ty<<8)){
 	    Reset_TY_is_translated_to_c(ty);
+         }
    }
 
    FOREACH_SYMBOL(symtab, st, st_idx)

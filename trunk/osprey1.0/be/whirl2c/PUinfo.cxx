@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: PUinfo.c
- * $Revision: 1.7 $
- * $Date: 2003-06-19 19:43:30 $
- * $Author: broom $
+ * $Revision: 1.8 $
+ * $Date: 2005-06-30 15:57:28 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
  * Revision history:
@@ -67,7 +67,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.8 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>
@@ -1367,8 +1367,11 @@ PUinfo_Get_ReturnPreg(TY_IDX return_ty)
 	 preg_num2 = RETURN_INFO_preg (return_info, 1);
       }
 
-      else
-	 Fail_FmtAssertion ("PUinfo_Get_ReturnPreg: more than 2 return registers");
+      else {
+         printf(" the RETURN_INFO_count(return_info) is %d ---FMZ \n",RETURN_INFO_count(return_info) );  //FMZ test
+
+	 Fail_FmtAssertion ("PUinfo_Get_ReturnPreg: more than 2 return registers");  
+  }
    }
 
    else {
