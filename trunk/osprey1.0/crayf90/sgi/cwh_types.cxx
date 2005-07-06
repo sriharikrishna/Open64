@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.19 $
- * $Date: 2005-06-08 22:15:56 $
+ * $Revision: 1.20 $
+ * $Date: 2005-07-06 21:42:43 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.19 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.20 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -1375,7 +1375,8 @@ if (co_top_decl_bounds != ANULL) {
   if ( const_str && size!=0) 
         Set_TY_size(ty_idx, size);
   else 
-        Set_TY_size(ty_idx, 4); //need handle pointer in derived type
+        Set_TY_size(ty_idx, TY_size(base_idx)); //pointer in derived type
+                                                //get the size of the pointee
 
 /*
  * move the function call "cwh_types_unique_TY" to fei_descriptor
