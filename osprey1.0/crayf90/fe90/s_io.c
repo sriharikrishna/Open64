@@ -4522,6 +4522,7 @@ static boolean io_list_semantics(opnd_type     *top_opnd,
             }
             else /* 11/07/00[sos]: else clause changed for PV 799401 */
             {
+#if 0 /* do not lower or flatten the structure io item--FMZ */
 
                IL_STRUCT_REF(list_idx) = TRUE;
                IL_ARG_DESC_VARIANT(list_idx) = TRUE;
@@ -4540,6 +4541,22 @@ static boolean io_list_semantics(opnd_type     *top_opnd,
                IL_ARG_DESC_IDX(list_idx) = arg_info_list_top;
                arg_info_list[arg_info_list_top]    = init_arg_info;
                arg_info_list[arg_info_list_top].ed = exp_desc;
+#else
+            COPY_OPND(opnd, IL_OPND(list_idx));
+            find_opnd_line_and_column(&opnd, &line, &col);
+
+            NTR_IR_TBL(asg_idx);
+            IR_OPR(asg_idx) = Io_Item_Type_Code_Opr;
+            IR_TYPE_IDX(asg_idx) = exp_desc.type_idx;
+            IR_LINE_NUM(asg_idx) = line;
+            IR_COL_NUM(asg_idx) = col;
+
+            COPY_OPND(IR_OPND_L(asg_idx), opnd);
+            IL_FLD(list_idx) = IR_Tbl_Idx;
+            IL_IDX(list_idx) = asg_idx;
+
+#endif
+
             }
          }
          else {
