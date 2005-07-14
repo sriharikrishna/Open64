@@ -260,8 +260,8 @@ endif
 
 LCXXDEFS = $(LCDEFS)
 
-LCOPTS += $(STD_COMPILE_OPTS)
-LCXXOPTS += $(STD_COMPILE_OPTS) $(WOFF)
+LCOPTS += $(STD_COMPILE_OPTS) $(WOFF)
+LCXXOPTS += $(STD_COMPILE_OPTS)
 
 # setup stuff to build shared or non-shared
 GLDOPTS = $(STD_LOAD_OPTS)
