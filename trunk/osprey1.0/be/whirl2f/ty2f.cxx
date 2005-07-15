@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.31 $
- * $Date: 2005-06-30 16:24:18 $
+ * $Revision: 1.32 $
+ * $Date: 2005-07-15 19:16:01 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -1672,8 +1672,8 @@ TY2F_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty)
 
   if (!TY_is_translated_to_c(ty))
     {
-      TY2F_Translate_Structure(ty);
       Set_TY_is_translated_to_c(ty); /* Really, translated to Fortran, not C */
+      TY2F_Translate_Structure(ty);
     }
 
   if (!WN2F_F90_pu) {
@@ -1704,8 +1704,8 @@ TY2F_2_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty)
 
   if (!TY_is_translated_to_c(ty))
     {
-      TY2F_Translate_Structure(ty);
       Set_TY_is_translated_to_c(ty); /* Really, translated to Fortran, not C */
+      TY2F_Translate_Structure(ty);
     }
 
 } /* TY2F_2_struct */
