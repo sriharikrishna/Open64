@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.20 $
- * $Date: 2005-07-06 21:42:43 $
+ * $Revision: 1.21 $
+ * $Date: 2005-07-18 17:25:56 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.21 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -785,7 +785,9 @@ fei_user_type(char         *name_string,
 
   TY_Init (ty, bit_to_byte(size), KIND_STRUCT, MTYPE_M, Save_Str(name_string));
 
-  if (sequence == Seq_Mixed)
+  if (sequence == Seq_Mixed ||
+      sequence == Seq_Char  || 
+      sequence == Seq_Numeric)
        Set_TY_is_sequence(ty);
 
   if (definition) {
@@ -918,6 +920,7 @@ fei_member(char          *name_string,
     }
    else 
      tr_idx = ty_idx;
+
   FLD_Init (fld, Save_Str(name_string), tr_idx, off);
 
   if (p1)
