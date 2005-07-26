@@ -1,4 +1,4 @@
-$Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/README.Open64,v 1.4 2005-06-06 21:33:49 eraxxon Exp $
+$Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/README.Open64,v 1.3 2004-12-01 16:18:09 eraxxon Exp $
 
 =============================================================================
 ==
@@ -21,13 +21,6 @@ Contents:
 Rice University's Open64 is a multi-platform version of the SGI
 Pro64/Open64 compiler suite that includes new support for
 source-to-source transformation.  
-
-We started with Pro64 0.01.0-11, and then performed a partial merge
-with version 0.01.0-13 (we were only interested in the Fortran front
-end, unparser, and common directories).  Next, we started working on
-the C frontend and unparser by merging with the UPC version.  Since
-the C frontend was based on gcc 2.96, we merged Pathscale's C
-frontend, which is based on gcc 3.x.
 
 We are presently working on reconnecting this source-to-source
 translation infrastructure into the back-end analysis to support

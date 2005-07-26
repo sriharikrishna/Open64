@@ -632,7 +632,6 @@ static void parse_cpnt_dcl_stmt()
 
                have_attr_list			= TRUE;
                ATD_POINTER(AT_WORK_IDX)		= TRUE;
-/* keep array form,don't generate dope vector */
 /*               ATD_IM_A_DOPE(AT_WORK_IDX)	= TRUE; */
                ATT_POINTER_CPNT(CURR_BLK_NAME)	= TRUE;
               ATT_NUMERIC_CPNT(CURR_BLK_NAME)	= TRUE;
@@ -885,8 +884,7 @@ static void parse_cpnt_dcl_stmt()
 
          if (ATD_POINTER(attr_idx)) {
 
-            if (BD_ARRAY_CLASS(bd_idx) != Deferred_Shape && 
- 		BD_ARRAY_CLASS(bd_idx) != Deferred_Shape1 ) {
+            if (BD_ARRAY_CLASS(bd_idx) != Deferred_Shape) {
                PRINTMSG(save_line, 189, Error, save_column,
                         AT_OBJ_NAME_PTR(attr_idx));
                AT_DCL_ERR(attr_idx)	 = TRUE;
@@ -955,7 +953,7 @@ static void parse_cpnt_dcl_stmt()
 
          if (old_bd_idx != NULL_IDX && 
              old_bd_idx == ATD_ARRAY_IDX(AT_WORK_IDX) ){ /*  && */
-/*             BD_ARRAY_CLASS(old_bd_idx) != Deferred_Shape) { &*/
+/* Sept            BD_ARRAY_CLASS(old_bd_idx) != Deferred_Shape) { &*/
             bd_idx = reserve_array_ntry(BD_RANK(old_bd_idx));
             COPY_BD_NTRY(bd_idx, old_bd_idx);
             ATD_ARRAY_IDX(attr_idx) = ntr_array_in_bd_tbl(bd_idx);
@@ -966,7 +964,7 @@ static void parse_cpnt_dcl_stmt()
          bd_idx	= ATD_ARRAY_IDX(attr_idx);
       
          if (BD_RESOLVED(bd_idx) ) { /* || */
-# if 0 /*keep deferred shape array form */
+# if 0 /*Sept */
              BD_ARRAY_CLASS(bd_idx) == Deferred_Shape ||
              BD_ARRAY_CLASS(bd_idx) == Assumed_Shape) {
 # endif
@@ -4465,8 +4463,7 @@ static long parse_attr_spec(int		*array_idx,
                }
                else {
                   ATD_ALLOCATABLE(AT_WORK_IDX)	= TRUE;
-/*  keep array form do not generate dope vector */
-/*     ATD_IM_A_DOPE(AT_WORK_IDX)    = TRUE; */
+/*                  ATD_IM_A_DOPE(AT_WORK_IDX)    = TRUE; */
                }
             }
             break;
@@ -4562,8 +4559,7 @@ static long parse_attr_spec(int		*array_idx,
             }
             else { /* EXTERNAL, INTRINSIC are illegal, so can't be pgm_unit   */
                ATD_POINTER(AT_WORK_IDX)   = TRUE;
-/* keep array form don't generate dope vector */
-/*              ATD_IM_A_DOPE(AT_WORK_IDX) = TRUE; */
+/*               ATD_IM_A_DOPE(AT_WORK_IDX) = TRUE; */
             }
             break;
 

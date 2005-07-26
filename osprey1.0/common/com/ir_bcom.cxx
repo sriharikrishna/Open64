@@ -66,7 +66,6 @@
 #include "pu_info.h"
 #include "ir_bwrite.h"
 #include "ir_bcom.h"
-#include <vector>
 
 /* For 4K page, each kernel page maps to 4Mbytes user address space */
 #define MAPPED_SIZE		0x400000
@@ -561,36 +560,27 @@ ir_b_write_local_symtab (const SCOPE& pu, off_t base_offset, Output_File *fl)
 extern Elf64_Word
 ir_b_write_dst (DST_TYPE dst, off_t base_offset, Output_File *fl)
 {
-  vector<char *> savedOffsets;
-  Elf64_Word cur_offset;
-  DST_BLOCK_IDX i;
-  block_header *dst_blocks;
-  Current_DST = dst;
-  
-  dst_blocks = ((DST_Type *)dst)->dst_blocks;
-  FOREACH_DST_BLOCK(i) {
-    /* may have 64-bit data fields, so align at 8 bytes */
-    savedOffsets.push_back(dst_blocks[i].offset);
-    cur_offset = ir_b_save_buf (dst_blocks[i].offset, 
-				dst_blocks[i].size, ALIGNOF(INT64), 0, fl);
-    dst_blocks[i].offset = (char*)(cur_offset - base_offset);
-  } 
-  FOREACH_DST_BLOCK(i) {
+    Elf64_Word cur_offset;
+    DST_BLOCK_IDX i;
+    block_header *dst_blocks;
+    Current_DST = dst;
+
+    dst_blocks = ((DST_Type *)dst)->dst_blocks;
+    FOREACH_DST_BLOCK(i) {
+	/* may have 64-bit data fields, so align at 8 bytes */
+	cur_offset = ir_b_save_buf (dst_blocks[i].offset, 
+		dst_blocks[i].size, ALIGNOF(INT64), 0, fl);
+	dst_blocks[i].offset = (char*)(cur_offset - base_offset);
+    } 
+    FOREACH_DST_BLOCK(i) {
+	cur_offset = ir_b_save_buf
+	    ((char*)&dst_blocks[i], sizeof(block_header),
+	     ALIGNOF(block_header), 0, fl);
+    } 
     cur_offset = ir_b_save_buf
-      ((char*)&dst_blocks[i], sizeof(block_header),
-       ALIGNOF(block_header), 0, fl);
-  } 
-  cur_offset = ir_b_save_buf
-    ((char*)&((DST_Type *)dst)->last_block_header, sizeof(mINT32), 
-     ALIGNOF(INT32), 0, fl);
-
-
-  // restore dst_blocks offsets
-  FOREACH_DST_BLOCK(i) {
-    dst_blocks[i].offset = savedOffsets[i];
-  }
-  
-  return cur_offset - base_offset;
+	((char*)&((DST_Type *)dst)->last_block_header, sizeof(mINT32), 
+	 ALIGNOF(INT32), 0, fl);
+    return cur_offset - base_offset;
 }
 
 

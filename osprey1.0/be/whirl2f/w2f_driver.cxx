@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.11 $
- * $Date: 2005-06-30 16:24:18 $
- * $Author: fzhao $
+ * $Revision: 1.10 $
+ * $Date: 2004-11-29 16:14:13 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.10 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -627,7 +627,6 @@ W2F_Enter_Global_Symbols(void)
     */
 
    For_all(Ty_Table,enter_fld());
-
 
    /* Enter_Sym_Info for every variable and function in the current 
     * (global) symbol table.  Note that we always invent names for the
@@ -1334,17 +1333,6 @@ W2F_Outfile_Translate_Pu(WN *pu)
       Increment_Indentation();
    } else
       WN2F_Emit_End_Stmt(tokens,FALSE);
-
-   /* Avoid to dump out some type definitions which 
-    * do not defined in this PU--especially in nested PU
-    * types of  dummy arguments could be derived type defined
-    * in the parent PU 
-    * --FMZ
-    */
-   for (TY_IDX ty = 1; ty < TY_Table_Size(); ty++) {
-       if (TY_kind(ty<<8)==KIND_STRUCT)
-            Set_TY_is_translated_to_c(ty<<8);
-       }
 
    (void)WN2F_translate(tokens, pu, Global_Context);
    Write_And_Reclaim_Tokens(W2F_File[W2F_FTN_FILE], 

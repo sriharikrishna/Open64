@@ -63,17 +63,16 @@
 \*****************************************************************/
 
 static  void	allocate_pdg_link_tbls(void);
-static  void	clean_pdg_link_tbls_for_nested_pu(void);
 static	void	cvrt_exp_to_pdg(int, fld_type);
 static	void	cvrt_ir_to_pdg(int);
-static	void	cvrt_proc_to_pdg(char *,boolean);
+static	void	cvrt_proc_to_pdg(char *);
 static	void	cvrt_sytb_to_pdg(void);
 static	void	finish_symbolic_expr(void);
 static	TYPE	get_basic_type(int, int, int);
 static	TYPE	get_type_desc(int);
 static	void	send_attr_ntry(int);
 static	void	send_darg_list(int, int);
-static	TYPE	send_derived_type(int,int);
+static	TYPE	send_derived_type(int);
 static	void	send_dummy_procedure(int);
 static	void	send_label(int);
 static	void	send_label_def(int);
@@ -643,11 +642,11 @@ void cvrt_to_pdg (char	*compiler_gen_date)
       child_idx	= SCP_FIRST_CHILD_IDX(curr_scp_idx);
       SCP_FIRST_CHILD_IDX(curr_scp_idx) = NULL_IDX;
 
-      cvrt_proc_to_pdg(compiler_gen_date,FALSE);
+      cvrt_proc_to_pdg(compiler_gen_date);
 
       if (child_idx != NULL_IDX) {
          curr_scp_idx = child_idx;
-         cvrt_proc_to_pdg(compiler_gen_date,TRUE);
+         cvrt_proc_to_pdg(compiler_gen_date);
       }
 
       curr_scp_idx = MAIN_SCP_IDX;
@@ -663,11 +662,11 @@ void cvrt_to_pdg (char	*compiler_gen_date)
       free_tables();
    }
    else {
-      cvrt_proc_to_pdg(compiler_gen_date,FALSE);
+      cvrt_proc_to_pdg(compiler_gen_date);
    }
 
 # else
-   cvrt_proc_to_pdg(compiler_gen_date,FALSE);
+   cvrt_proc_to_pdg(compiler_gen_date);
 # endif
 
    TBL_FREE(pdg_link_tbl);
@@ -697,7 +696,7 @@ void cvrt_to_pdg (char	*compiler_gen_date)
 |*	NOTHING								      *|
 |*									      *|
 \******************************************************************************/
-static void cvrt_proc_to_pdg (char	*compiler_gen_date,boolean is_child)
+static void cvrt_proc_to_pdg (char	*compiler_gen_date)
 
 {
    boolean	check_scp	= TRUE;
@@ -738,13 +737,10 @@ PROCESS_SIBLING:
 		goto HERE1; 
     }
 
-   if (!is_child ) /* do not re-allocate the table for nested PUs--FMZ */
-       allocate_pdg_link_tbls(); 
-
    if (SCP_FIRST_CHILD_IDX(curr_scp_idx) != NULL_IDX) {
       save_curr_scp_idx	= curr_scp_idx;
       curr_scp_idx = SCP_FIRST_CHILD_IDX(curr_scp_idx);
-      cvrt_proc_to_pdg(compiler_gen_date ,TRUE);
+      cvrt_proc_to_pdg(compiler_gen_date);
       curr_scp_idx = save_curr_scp_idx;
    }
 
@@ -756,11 +752,8 @@ PROCESS_SIBLING:
       runtime_ptr_chk_driver();
    }
 
-   clean_pdg_link_tbls_for_nested_pu();
 
-/* 
    allocate_pdg_link_tbls();
-*/
 
 /*   pgm_attr_idx	= SCP_ATTR_IDX(curr_scp_idx); */
 
@@ -4937,7 +4930,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
 
 
-   case Whole_Substring_Opr : 
+   case Whole_Substring_Opr :
    case Substring_Opr :
         whole_substring = IR_OPR(ir_idx) == Whole_Substring_Opr;
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx), 
@@ -6277,8 +6270,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
                         
         next_idx = IR_IDX_R(ir_idx);
         dim = IR_LIST_CNT_R(ir_idx);
-/*        while (dim != 1) { */
-        while (dim > 1) {
+        while (dim != 1) {
            next_idx = IL_NEXT_LIST_IDX(next_idx);
            dim = dim - 1;
         }
@@ -6745,6 +6737,7 @@ CONTINUE:
 # endif
         break;
 
+/*FMZ add for allocate stmt with pointer */
                                                                                       
    case Alloc_Obj_Opr:
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
@@ -10827,7 +10820,6 @@ static TYPE get_basic_type(int	type_idx,
    int		p_idx;
    int		save_pdg_at_idx;
 # endif
-   int		dt_attr_idx;
 
 
    TRACE (Func_Entry, "get_basic_type", NULL);
@@ -11094,11 +11086,7 @@ static TYPE get_basic_type(int	type_idx,
 
 
    case Structure:
-      dt_attr_idx = TYP_IDX(type_idx);
-      if (curr_scp_idx==ATT_SCP_IDX(dt_attr_idx))
-           idx = send_derived_type(type_idx,FALSE);
-      else 
-           idx = send_derived_type(type_idx,TRUE);
+      idx = send_derived_type(type_idx);
       break;
 
 
@@ -12255,8 +12243,7 @@ static void  send_dummy_procedure(int	attr_idx)
                                      0,
                                      0,
                                      0,
-                                     AT_DEF_LINE(attr_idx),
-				     0);
+                                     AT_DEF_LINE(attr_idx));
 # endif
 
    PDG_DBG_PRINT_START    
@@ -12712,7 +12699,7 @@ EXIT:
 |*	NOTHING								      *|
 |*									      *|
 \******************************************************************************/
-static TYPE	send_derived_type(int type_idx, INT32 nested_attr)
+static TYPE	send_derived_type(int	type_idx)
 
 {
    int		attr_idx;
@@ -12740,39 +12727,11 @@ static TYPE	send_derived_type(int type_idx, INT32 nested_attr)
       pdg_type_tbl[type_idx] = pdg_type_idx;
       goto EXIT;
    }
-
-/* add if dt_attr_idx is imported by use statement, 
- * check if there is type table entry in whirl, if there is
- * a type table entry, just get set pdg_type_idx ---FMZ
- */
-   if (AT_MODULE_IDX(dt_attr_idx)) {
-          send_attr_ntry(AT_MODULE_IDX(dt_attr_idx));
-          dt_idx = fei_imported_type(AT_OBJ_NAME_PTR(dt_attr_idx),
-                                                  PDG_AT_IDX(AT_MODULE_IDX(dt_attr_idx)));
-          if (dt_idx) {
-             pdg_type_idx = fei_get_pdg_type(dt_idx,Basic,
-					     S_tructure,
-					     ATT_NUM_CPNTS(dt_attr_idx));
-             pdg_type_tbl[type_idx] = pdg_type_idx;
-             PDG_AT_IDX(dt_attr_idx) = dt_idx;
-             PDG_AT_TYP_IDX(dt_attr_idx) = type_idx;
-
-             dt_attr_idx = TYP_IDX(type_idx);
-
-             while (AT_ATTR_LINK(dt_attr_idx) != NULL_IDX) {
-                PDG_AT_IDX(dt_attr_idx) = dt_idx;
-                dt_attr_idx = AT_ATTR_LINK(dt_attr_idx);
-             }
-/*              return pdg_type_idx; */
-            goto COMPONT;
-           }
-    }
 # if 0 /*August 2002*/
    flag = ((long) (ATT_SCP_IDX(dt_attr_idx) != curr_scp_idx) 
                                            << FEI_NEXT_TYPE_IDX_HOSTED_TYPE);
 #endif
 
-#if 0
    PDG_DBG_PRINT_START    
    PDG_DBG_PRINT_C("fei_next_name");
    PDG_DBG_PRINT_D("(1) logical", TRUE);
@@ -12781,7 +12740,6 @@ static TYPE	send_derived_type(int type_idx, INT32 nested_attr)
 # ifdef _ENABLE_FEI
    cpnt_idx = fei_next_name(TRUE);
 # endif
-#endif
 
    PDG_DBG_PRINT_START    
    PDG_DBG_PRINT_C("fei_next_type_idx");
@@ -12816,17 +12774,14 @@ static TYPE	send_derived_type(int type_idx, INT32 nested_attr)
    PDG_DBG_PRINT_C("fei_user_type");
    PDG_DBG_PRINT_S("(1) AT_OBJ_NAME", AT_OBJ_NAME_PTR(dt_attr_idx));
    PDG_DBG_PRINT_D("(2) ATT_NUM_CPNTS", ATT_NUM_CPNTS(dt_attr_idx));
-#if 0
    PDG_DBG_PRINT_D("(3) cpnt_idx", cpnt_idx);
-#endif
-   PDG_DBG_PRINT_LLD("(3) struct size", size);
-   PDG_DBG_PRINT_S("(4) sequence", p_sequence[sequence]);
-   PDG_DBG_PRINT_D("(5) dt_idx", dt_idx);
-   PDG_DBG_PRINT_D("(6) alignment", pdg_align[ATT_ALIGNMENT(dt_attr_idx)]);
+   PDG_DBG_PRINT_LLD("(4) struct size", size);
+   PDG_DBG_PRINT_S("(5) sequence", p_sequence[sequence]);
+   PDG_DBG_PRINT_D("(6) dt_idx", dt_idx);
+   PDG_DBG_PRINT_D("(7) alignment", pdg_align[ATT_ALIGNMENT(dt_attr_idx)]);
    PDG_DBG_PRINT_END    
 
 # ifdef _ENABLE_FEI
-#if 0 
   if (AT_ORIG_MODULE_IDX(dt_attr_idx)!=NULL_IDX ||
        (curr_scp_idx!=1)&& (ATT_SCP_IDX(dt_attr_idx)==1))
            fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
@@ -12846,58 +12801,9 @@ static TYPE	send_derived_type(int type_idx, INT32 nested_attr)
                     dt_idx,
                     pdg_align[ATT_ALIGNMENT(dt_attr_idx)],
                     FALSE);
-#else
 
-/*
-  if ((AT_ORIG_MODULE_IDX(dt_attr_idx)==NULL_IDX)  && 
-      (curr_scp_idx==1)   &&   
-      (ATT_SCP_IDX(dt_attr_idx)==1)) 
-*/
-       /* we may don't need this one AT_MODULE_OBJECT(dt_attr_idx)) */
-    if ( !nested_attr &&
-         LN_DEF_LOC(dt_attr_idx) &&  /*definition */
-         AT_MODULE_IDX(dt_attr_idx)==NULL_IDX) /*not imported */
-           fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
-                    ATT_NUM_CPNTS(dt_attr_idx),
-                    size,
-                    sequence,
-                    dt_idx,
-                    pdg_align[ATT_ALIGNMENT(dt_attr_idx)],
-	 	    0,  /* for AT_MODULE_IDX(dt_attr_idx) */ 
-                    TRUE);
-
-     else if (nested_attr)
-         fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
-                    ATT_NUM_CPNTS(dt_attr_idx),
-                    size,
-                    sequence,
-                    dt_idx,
-                    pdg_align[ATT_ALIGNMENT(dt_attr_idx)],
-                     0,
-                    FALSE);
-   else  if (AT_MODULE_IDX(dt_attr_idx)) {
-          send_attr_ntry(AT_MODULE_IDX(dt_attr_idx));
-          fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
-                    ATT_NUM_CPNTS(dt_attr_idx),
-                    size,
-                    sequence,
-                    dt_idx,
-                    pdg_align[ATT_ALIGNMENT(dt_attr_idx)],
-                    PDG_AT_IDX(AT_MODULE_IDX(dt_attr_idx)),
-                    TRUE);
-          }
-   else 
-         fei_user_type(AT_OBJ_NAME_PTR(dt_attr_idx),
-                    ATT_NUM_CPNTS(dt_attr_idx),
-                    size,
-                    sequence,
-                    dt_idx,
-                    pdg_align[ATT_ALIGNMENT(dt_attr_idx)],
-                     0,
-                    TRUE);
- 
-#endif
 # endif
+
 
    PDG_DBG_PRINT_START
    PDG_DBG_PRINT_C("fei_descriptor");
@@ -12919,7 +12825,6 @@ static TYPE	send_derived_type(int type_idx, INT32 nested_attr)
    PDG_DBG_PRINT_START
    PDG_DBG_PRINT_T("(r) type", pdg_type_idx);
    PDG_DBG_PRINT_END
-
    pdg_type_tbl[type_idx] = pdg_type_idx;
    PDG_AT_IDX(dt_attr_idx) = dt_idx;
    PDG_AT_TYP_IDX(dt_attr_idx) = type_idx;
@@ -12929,17 +12834,6 @@ static TYPE	send_derived_type(int type_idx, INT32 nested_attr)
       PDG_AT_IDX(dt_attr_idx) = dt_idx;
       dt_attr_idx = AT_ATTR_LINK(dt_attr_idx);
    }
-
-COMPONT:
-
-   PDG_DBG_PRINT_START    
-   PDG_DBG_PRINT_C("fei_next_name");
-   PDG_DBG_PRINT_D("(1) logical", TRUE);
-   PDG_DBG_PRINT_END
-
-# ifdef _ENABLE_FEI
-   cpnt_idx = fei_next_name(TRUE);
-# endif
 
    prev_idx = NULL_IDX;
    sn_idx = ATT_FIRST_CPNT_IDX(dt_attr_idx);
@@ -13551,48 +13445,8 @@ static void allocate_pdg_link_tbls(void)
 
 }  /* allocate_pdg_link_tbls */
 
-/******************************************************************************\
-|*									      *|
-|* Description:								      *|
-|*									      *|
-|* Input parameters:							      *|
-|*	NONE								      *|
-|*									      *|
-|* Output parameters:							      *|
-|*	NONE								      *|
-|*									      *|
-|* Returns:								      *|
-|*	NOTHING								      *|
-|*									      *|
-\******************************************************************************/
 
-static void clean_pdg_link_tbls_for_nested_pu(void)
- {
-   register int   attr_idx; 
- 
-   TRACE (Func_Entry, "clean_pdg_link_tbls_for_nested_pu", NULL);
 
-   for  ( attr_idx=1; attr_idx < pdg_link_tbl_size; attr_idx++ ) 
-    { 
-       if (AT_OBJ_CLASS(attr_idx) == Derived_Type        ||
-           (AT_OBJ_CLASS(attr_idx) == Data_Obj && 
-             ATD_CLASS(attr_idx) ==  Struct_Component)) {
-	         PDG_CN_IDX(attr_idx) = 0;
-	         PDG_SB_IDX(attr_idx) = 0 ;
-       }
-       else {
-       /* clean the pdg link table entries */
-	         PDG_AT_IDX(attr_idx) = 0;
-	         PDG_AT_TYP_IDX(attr_idx) = 0;
-	         PDG_CN_IDX(attr_idx) = 0;
-	         PDG_SB_IDX(attr_idx) = 0 ;
-            }
-    }
-
-   TRACE (Func_Exit, "clean_pdg_link_tbls_for_nested_pu", NULL);
-    return;
- }
- 
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
@@ -13657,22 +13511,9 @@ static void send_attr_ntry(int		attr_idx)
 
    flag = (long64) 0;
 
-   if (PDG_AT_IDX(attr_idx) != NULL_IDX ) {
-       if (AT_OBJ_CLASS(attr_idx) == Derived_Type &&
-              ATT_SCP_IDX(attr_idx)==curr_scp_idx ) {
-           if (AT_MODULE_IDX(attr_idx)) {
-	             send_attr_ntry(AT_MODULE_IDX(attr_idx));
-	             fei_gen_st_for_type(AT_OBJ_NAME_PTR(attr_idx),
-                                 pdg_type_tbl[PDG_AT_TYP_IDX(attr_idx)],
-                                  PDG_AT_IDX(AT_MODULE_IDX(attr_idx)));
-             }
-           else 
-                  fei_gen_st_for_type(AT_OBJ_NAME_PTR(attr_idx),
-                                 pdg_type_tbl[PDG_AT_TYP_IDX(attr_idx)],0);
-       }
-
-          goto EXIT;   /* already sent */
-    }
+   if (PDG_AT_IDX(attr_idx) != NULL_IDX) {
+      goto EXIT;   /* already sent */
+   }
 
    if (!AT_IGNORE_ATTR_LINK(attr_idx)) {
 
@@ -14309,9 +14150,7 @@ static void send_attr_ntry(int		attr_idx)
          PDG_DBG_PRINT_END    
 
 # ifdef _ENABLE_FEI
-         if (AT_MODULE_IDX(attr_idx)) {
-             send_attr_ntry(AT_MODULE_IDX(attr_idx));
-             PDG_AT_IDX(attr_idx) = fei_object(class == Name ? 
+         PDG_AT_IDX(attr_idx) = fei_object(class == Name ? 
                                            str : AT_OBJ_NAME_PTR(attr_idx),
                                            type_idx,
                                            flag,
@@ -14327,28 +14166,7 @@ static void send_attr_ntry(int		attr_idx)
                                            0,
                                            io_type_code_pdg_idx,
                                            0, 
-                                           AT_DEF_LINE(attr_idx),
-					   PDG_AT_IDX(AT_MODULE_IDX(attr_idx)));
-          }
-          else
-             PDG_AT_IDX(attr_idx) = fei_object(class == Name ? 
-                                           str : AT_OBJ_NAME_PTR(attr_idx),
-                                           type_idx,
-                                           flag,
-                                           class,
-                                           PDG_SB_IDX(sb_idx),
-                                           dv_alias,
-                                           ptr_idx,
-                                           offset,
-                              	           intent,
-                                           bit_len,
-                                           ptr_align,
-                                           align,
-                                           0,
-                                           io_type_code_pdg_idx,
-                                           0, 
-                                           AT_DEF_LINE(attr_idx),
-					   0);
+                                           AT_DEF_LINE(attr_idx));
 # endif
       }
 
@@ -14432,23 +14250,18 @@ static void send_attr_ntry(int		attr_idx)
 
       break;
 
-   case Derived_Type: 
+   case Derived_Type:
+
         if (ATT_TY_IDX(attr_idx)==NULL_IDX ) {
             CLEAR_TBL_NTRY(type_tbl, TYP_WORK_IDX);
             TYP_TYPE(TYP_WORK_IDX)      = Structure;
             TYP_LINEAR(TYP_WORK_IDX)    = Structure_Type;
             TYP_IDX(TYP_WORK_IDX)       = attr_idx;
             ATT_TY_IDX(attr_idx)        = ntr_derived_type_tbl();
+
             TBL_REALLOC_CK(pdg_type_tbl, 1);/*need to enlarge pdg_type_tbl */
-
-            if (curr_scp_idx==ATT_SCP_IDX(attr_idx))
-                   nested_attr = FALSE;
-            else 
-                   nested_attr= TRUE;
-
-            send_derived_type(ATT_TY_IDX(attr_idx),nested_attr);
-        } 
-
+            send_derived_type(ATT_TY_IDX(attr_idx)); 
+        }
       goto EXIT; 
                
    case Namelist_Grp:

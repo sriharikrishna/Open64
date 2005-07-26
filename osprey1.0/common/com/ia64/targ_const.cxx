@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: targ_const.c
- * $Revision: 1.6 $
- * $Date: 2005-06-14 16:53:57 $
+ * $Revision: 1.5 $
+ * $Date: 2005-02-01 00:39:11 $
  *
  * Revision history:
  *  12-Jun-91 - Original Version
@@ -2934,7 +2934,7 @@ Str_To_TCONFlags (const char* str)
  */
 
 char *
-Targ_Print ( const char *fmt, TCON c )
+Targ_Print ( char *fmt, TCON c )
 {
    INT slen,i;
    char *bytes;

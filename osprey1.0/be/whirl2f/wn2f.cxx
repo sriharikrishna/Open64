@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.22 $
- * $Date: 2005-05-23 20:38:24 $
- * $Author: fzhao $
+ * $Revision: 1.20 $
+ * $Date: 2004-07-27 21:40:35 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
  *
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.22 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.20 $";
 #endif
 
 #include <alloca.h>
@@ -271,8 +271,7 @@ static const WN2F_OPR_HANDLER WN2F_Opr_Handler_List[] =
    {OPR_CASEGOTO,&WN2F_casegoto},
    {OPR_NULLIFY,&WN2F_nullify_stmt},
    {OPR_ARRAY_CONSTRUCT,&WN2F_ar_construct},
-   {OPR_IMPLIED_DO,&WN2F_noio_implied_do},
-   {OPR_IDNAME, &WN2F_idname}
+   {OPR_IMPLIED_DO,&WN2F_noio_implied_do}
    
 }; /* WN2F_Opr_Handler_List */
 
@@ -836,6 +835,7 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	  * is already set up correctly to handle the combined offsets.
 	  */
 
+         WN_OFFSET offset = WN2F_Sum_Offsets(addr);
          WN_OFFSET tmp = WN2F_Sum_Offsets(addr);
 
          if (tmp < TY_size(TY_pointed(addr_ty)))

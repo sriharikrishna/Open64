@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.38 $
- * $Date: 2005-07-26 20:05:15 $
+ * $Revision: 1.33 $
+ * $Date: 2004-06-28 21:02:39 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.38 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.33 $";
 #endif
 
 #include <alloca.h>
@@ -1254,7 +1254,6 @@ public:
      int  lens = strlen(scope_name);
      char *stbasename = ST_name(stbase);
      BOOL nomodulevar;
-     PU_IDX current_PU=ST_pu(Scope_tab[Current_scope].st);
 
 
      char *stname = ST_name(st);
@@ -1285,13 +1284,18 @@ public:
          return;
        }
   
-     if (ST_class(st)==CLASS_TYPE) {
-        if (ST_pu(ST_base(st)) == current_PU)
+     if (ST_class(st)==CLASS_TYPE &&
+            ST_is_in_module(st) )
+        if (!TY_is_external(ST_type(st))){
+            Append_F77_Indented_Newline(tokens,
+                                        lines_between_decls, NULL/*label*/);
+
             ST2F_decl_translate(tokens,  st);
-        else   
-            Set_TY_is_translated_to_c(ST_type(st)); 
-        return;
-      }
+             return;
+         }
+        else
+            return;
+
 
      if (!BE_ST_w2fc_referenced(st) && !ST_has_nested_ref(st)
             && !ST_is_in_module(st)   
@@ -1385,26 +1389,6 @@ public:
     } 
 } ;
 
-struct set_derived_ty_based_on_st {
-private:
-  PU_IDX current_PU;
-
-public:
-  set_derived_ty_based_on_st(PU_IDX c_PU):current_PU(c_PU) {}
-  void operator()(UINT32, ST* st) const {
-    if ((ST_class(st)==CLASS_TYPE) &&  //derived type
-        (ST_pu(ST_base(st)) == current_PU) ) {
-         Reset_TY_is_translated_to_c(ST_type(st));
-       }
-    if ((ST_sclass(st) == SCLASS_COMMON) &&   //common block
-         (ST_pu(ST_base(st)) == current_PU) ) {
-           Reset_TY_is_translated_to_c(ST_type(st));
-//           Set_BE_ST_w2fc_referenced(st);
-       }
-
-    }
-};
-
 static void
 WN2F_Append_Symtab_Vars(TOKEN_BUFFER tokens,
 			SYMTAB_IDX   symtab,
@@ -1440,32 +1424,15 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
 {
   SYMTAB_IDX   symtab;
   TOKEN_BUFFER decl_tokens;
-  PU &    pu         = Get_Current_PU();
-  PU_IDX  current_PU =  ST_pu(Scope_tab[CURRENT_SYMTAB].st);
-
-  /* 
-   * set all derived type entries with 
-   *   Set_TY_is_translated_to_c()
-   * ---FMZ
-   */
-   for (TY_IDX ty = 1; ty < TY_Table_Size(); ty++) {
-       if (TY_kind(ty<<8)==KIND_STRUCT) 
-            Set_TY_is_translated_to_c(ty<<8);
-       }
-   /*
-    * reset the derived type table entry "translated_to_c(f)" 
-    * defined in "this" PU.
-    * ---FMZ 
-    */
-  For_all(St_Table,GLOBAL_SYMTAB,set_derived_ty_based_on_st(current_PU));
+  PU &  pu = Get_Current_PU();
 
   /* Declare constants */
+
   decl_tokens = New_Token_Buffer();
   WN2F_Append_Symtab_Consts(decl_tokens, CURRENT_SYMTAB, 1/*Newlines*/);
-  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens)) {
+  if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens))
     WHIRL2F_Append_Comment(tokens, "**** Constants ****", 1, 1);
   Append_And_Reclaim_Token_List(tokens, &decl_tokens);
-   }
 
   /* Declare variables and reset the "referenced" flag */
 
@@ -1474,9 +1441,9 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
 
   WN2F_Append_Symtab_Vars(decl_tokens, GLOBAL_SYMTAB, 1); 
 
-   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens)) 
+   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens))
         WHIRL2F_Append_Comment(tokens,
-                  "**** Global Variables & Derived Type Definitions ****", 1, 1);
+                           "**** Global Variables ****", 1, 1);
   Append_And_Reclaim_Token_List(tokens, &decl_tokens);
 
   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(param_tokens)) {
@@ -1489,15 +1456,13 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
   decl_tokens = New_Token_Buffer();
   WN2F_Append_Symtab_Vars(decl_tokens, symtab, 1/*Newlines*/);
   Stab_Reset_Referenced_Flag(symtab);
-
   Stab_Reset_Referenced_Flag(GLOBAL_SYMTAB);
 
   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(decl_tokens)) 
-     {
         WHIRL2F_Append_Comment(tokens, 
-			   "**** Local Variables and Functions ****", 1, 1);
+			   "**** Local Variables and functions ****", 1, 1);
     Append_And_Reclaim_Token_List(tokens, &decl_tokens); 
-     }
+
   /* Declare pseudo registers and other temporary variables after
    * regular variables, since the declaration of these may create
    * more temporary variables (e.g. to handle implied do-loops
@@ -1505,7 +1470,7 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
    */
 
   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(PUinfo_local_decls))
-    WHIRL2F_Append_Comment(tokens, "**** Temporary Variables ****",1,1);
+    WHIRL2F_Append_Comment(tokens, "**** Temporary variables ****",1,1);
   Append_And_Reclaim_Token_List(tokens, &PUinfo_local_decls);
 
 
@@ -1518,7 +1483,7 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
 
   if (!W2F_Purple_Emission && !Is_Empty_Token_Buffer(PUinfo_pragmas))
     WHIRL2F_Append_Comment(tokens, 
-			   "**** Top Level Pragmas ****", 1, 1);
+			   "**** top level pragmas ****", 1, 1);
   Append_And_Reclaim_Token_List(tokens, &PUinfo_pragmas);
 
 
@@ -1539,7 +1504,7 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
   /* Append the statements to the tokens */
 
   if (!W2F_Purple_Emission)
-    WHIRL2F_Append_Comment(tokens, "**** Statements ****", 1, 1);
+    WHIRL2F_Append_Comment(tokens, "**** statements ****", 1, 1);
   Append_And_Reclaim_Token_List(tokens, stmts);
 
   if (W2F_Purple_Emission && 
@@ -1655,7 +1620,7 @@ WN2F_Append_Block_Data(TOKEN_BUFFER  tokens)
       if (!Is_Empty_Token_Buffer(Data_Stmt_Tokens)) 
 	{
 
-	  WHIRL2F_Append_Comment(tokens, "**** Statements ****", 1, 1);
+	  WHIRL2F_Append_Comment(tokens, "**** statements ****", 1, 1);
 	  Append_And_Reclaim_Token_List(tokens, &Data_Stmt_Tokens);
 	}
 
@@ -3250,7 +3215,6 @@ WN2F_STATUS
 WN2F_nullify_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
  {
    int k ;
-   WN* kidwn;
 
    const char *st_name;
 
@@ -3260,27 +3224,21 @@ WN2F_nullify_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
      Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(tokens, "NULLIFY (");
 
-     for(k=0;k< WN_kid_count(wn);k++ ) {
+     for(k=0;k< WN_kid_count(wn);k++ )
+
+       { st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(wn,k)));
+        Set_BE_ST_w2fc_referenced(WN_st(WN_kid(wn,k)));
         if (k==0)
            ;
         else
           Append_Token_String(tokens,",");
-
-        kidwn=WN_kid(wn,k);
-
-        while (( WN_operator(kidwn)==OPR_ARRAY) ||
-              (WN_operator(kidwn)==OPR_ARRSECTION)) {
-            kidwn = WN_kid0(kidwn); //skip array scripts part
-         }
-
-        (void)WN2F_translate(tokens,kidwn,context);
+          Append_Token_String(tokens,st_name);
 
        }
-
       Append_Token_Special(tokens,')' );
 
      return EMPTY_WN2F_STATUS;
- } //WN2F_nullify_stmt
+ } //WN2F_namelist_stmt
 
 //**********************************************
 WN2F_STATUS
@@ -3574,20 +3532,7 @@ WN2F_noio_implied_do(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    Append_Token_Special(tokens,')');
    return EMPTY_WN2F_STATUS;
-} //WN2F_noio_implied_do
 
-WN2F_STATUS
-WN2F_idname(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
-{ 
-  const char *st_name;
-  ASSERT_DBG_FATAL(WN_operator(wn) == OPR_IDNAME,
-                 (DIAG_W2F_UNEXPECTED_OPC, "WN2F_idname"));
-   st_name = W2CF_Symtab_Nameof_St(WN_st(wn));
-   Append_Token_String(tokens,st_name);
-   Set_BE_ST_w2fc_referenced(WN_st(wn));
-   return EMPTY_WN2F_STATUS;
-
-} //WN2F_idname
-
+}
 
 

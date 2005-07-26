@@ -891,7 +891,7 @@ it must be a LOOP\_INFO that gives additional information about the loop.
 \index{DO\_WHILE}%
 DO\_WHILE \hfill [VH--H]
 
-A do-while loop. Kid 0 is a boolean expression. Kid 1 is a
+A while loop. Kid 0 is a boolean expression. Kid 1 is a
 \index{BLOCK}%
 BLOCK node
 representing the block of statements that is executed while kid
@@ -1804,14 +1804,13 @@ if the object is a register.
 \index{ILOAD}%
 ILOAD res=i,f,z,Mdesc=all \hfill [VH--VL]
 
-A load or dereference is performed from the address in bytes given by
-adding the offset field to the address computed by Kid 0. This node
-contains two ty\_idx's, one giving the high level type of the pointer
-through which the indirection is performed (use WN\_load\_addr\_ty),
-and the other giving the high level type of the item being loaded
-(i.e., the referenced object; use WN\_ty). If the loaded object is a
-field in a struct, field\_id identifies the exact field.  Type M is
-allowed only in VH and H WHIRL.
+A load or dereference is performed from the address in bytes given
+by adding the offset field to the address computed by Kid 0. This
+node contains two ty\_idx's, one giving the high level type of the
+pointer through which the indirection is performed, and the other
+giving the high level type of the item being loaded. If the loaded
+object is a field in a struct, field\_id identifies the exact field.
+Type M is allowed only in VH and H WHIRL. 
 
 \item
 \index{ILOADX}%
@@ -3210,8 +3209,7 @@ Return - ((Kid 1 * Kid 2) - Kid 0).
 \index{ARRAY}%
 ARRAY res=A4,A8 \hfill [VH--H]
 
-This operator uses array addressing rules (row-major, zero-based) to
-return an address.
+This operator uses array addressing rules to return an address.
 The number of dimensions of the array, n, is inferred from kid-count
 shifted right
 by 1. An internal field, element\_size, gives the size of

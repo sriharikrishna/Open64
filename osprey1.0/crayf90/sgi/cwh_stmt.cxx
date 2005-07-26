@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.28 $
- * $Date: 2005-06-17 21:46:29 $
- * $Author: fzhao $
+ * $Revision: 1.26 $
+ * $Date: 2004-12-14 17:34:47 $
+ * $Author: eraxxon $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -454,6 +454,8 @@ fei_pstore ( TYPE result_type )
   TY_IDX  ty;
   TY_IDX  ts;
 
+item_class ffmm; //Sept test
+
   FLD_det det ;
 
   if (cwh_stk_get_class() == STR_item) {
@@ -478,6 +480,8 @@ fei_pstore ( TYPE result_type )
       cwh_stk_pop_whatever() ;
       return ;
     }
+
+   ffmm = cwh_stk_get_class(); //test Sept
 
     switch(cwh_stk_get_class()) {
     case WN_item:
@@ -564,6 +568,7 @@ fei_store ( TYPE result_type )
   WN * wd;
   TY_IDX ts1;
   TY_IDX ts2;
+ enum item_class fm;
  
   FLD_det det ;
 
@@ -590,6 +595,7 @@ fei_store ( TYPE result_type )
       return ;
     }
 
+ fm = cwh_stk_get_class();
 
     switch(cwh_stk_get_class()) {
     case WN_item:
@@ -3167,6 +3173,13 @@ fei_concat(INT32 numops)
 
   cwh_stk_push_STR(rsz,wwnn,ty,WN_item);
 
+/* when free memory as this sequence,malloc will issue seg
+ * fault when the wwnn apperance as a parameter in io stmt
+ * this only occurs on mapy--fzhao
+ */
+//  free(sz);
+//  free(wn);
+
   free(va);
   free(wn);
   free(sz);
@@ -4796,58 +4809,30 @@ fei_nullify(INT32 listnum)
    ST     * st  ;
    WN     * wn  ;
    WN     * wa  ;
-   int    i ; 
-   FLD_det det  ;
+   int    i ;
+
 
    opc = OPCODE_make_op(OPR_NULLIFY,MTYPE_V,MTYPE_V);
-   wn  =  WN_Create(opc,listnum); 
+
+   wn  =  WN_Create(opc,listnum);
 
    for (i=listnum-1; i>=0; i--)
     {
-
     switch(cwh_stk_get_class()) {
-     case FLD_item:
      case ST_item: 
-     case ST_item_whole_array:
-        wa = cwh_expr_operand(NULL);
-        break;
-#if 0
         st = cwh_stk_pop_ST();
-        wa = WN_CreateIdname ( 0, st);
+        WN_kid(wn,i) = WN_CreateIdname ( 0, st);
         break;
-#endif
      case WN_item:
         wa = cwh_stk_pop_WN();
         break;
-#if 0
-     case FLD_item:
-         det = cwh_addr_offset();
-         if (cwh_stk_get_class() == ST_item ||
-            cwh_stk_get_class() == ST_item_whole_array) {
-             st  = cwh_stk_pop_ST();
-	     wa  = cwh_addr_ldid(st,det.off,det.type);
-          } else {
-             wa = cwh_stk_pop_WHIRL();
-             wa = cwh_expr_bincalc(OPR_ADD,wa,WN_Intconst(Pointer_Mtype,det.off));
-             wa = F90_Wrap_ARREXP(wa);
-          }
-        break;
-#endif
-      case STR_item:
-          cwh_stk_pop_STR();
-          cwh_stk_pop_WN();
-          cwh_stk_get_TY();
-          wa  = cwh_stk_pop_WN();
-          wa = cwh_expr_extract_arrayexp(wa,DELETE_ARRAYEXP_WN);
-        break;
-
      default:
         cwh_stk_pop_whatever() ;
         wa = NULL;
         break;
     }
 
-    WN_kid(wn,i) = wa ;
+     WN_kid(wn,i) = wa ;
    }
    cwh_block_append(wn);
    return;
@@ -4897,6 +4882,7 @@ fei_array_construct(INT32 nlist,TYPE ty)
    WN *par;
    WN ** lists;
    TY_IDX ty_idx;
+   enum item_class fm;
    int i;
 
    lists = (WN **) malloc(nlist*sizeof(WN *));
@@ -4934,12 +4920,16 @@ fei_array_construct(INT32 nlist,TYPE ty)
     }
   }
 
+   fm = cwh_stk_get_class();
+
    opc = OPCODE_make_op(OPR_ARRAY_CONSTRUCT,TY_mtype(ty_idx),MTYPE_V);
    par  =  WN_Create(opc,nlist); 
    for (i=0;  i < nlist; i++) 
       WN_kid(par,i) = lists[i];
 
    cwh_stk_push(par,WN_item) ;
+
+   fm = cwh_stk_get_class();
 
 }
 
@@ -4952,6 +4942,7 @@ fei_noio_implied_do()
     WN ** kids;
     INT32 numkids = 5;
     INT32 i;
+    enum item_class fm;
 
     kids = (WN **)malloc(numkids*sizeof(WN *));
 
@@ -4959,9 +4950,11 @@ fei_noio_implied_do()
     switch(cwh_stk_get_class()) {
     case STR_item:
       cwh_stk_pop_STR();
+      fm = cwh_stk_get_class();
 
       wa =cwh_stk_pop_WN();
 
+      fm = cwh_stk_get_class();
      if (cwh_stk_get_class()==ST_item) {
         wa = cwh_expr_operand(NULL);
         kids[i] = wa;

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.37 $
- * $Date: 2005-06-30 16:24:18 $
- * $Author: fzhao $
+ * $Revision: 1.33 $
+ * $Date: 2004-11-29 16:16:20 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.37 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.33 $";
 #endif
 
 #include <ctype.h>
@@ -227,7 +227,6 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
    }
 
   base = ST_base(st);
-
 
 //  if (ST_sclass(st)==SCLASS_DGLOBAL && Stab_Is_Common_Block(base))
 //	goto INITPRO;
@@ -1090,9 +1089,11 @@ ST2F_func_header(TOKEN_BUFFER tokens,
        Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
        Append_Token_String(header_tokens, "use");
        Append_Token_String(header_tokens, st_name);
-
-       if (WN_kid_count(stmt)>0)
-               Append_Token_String(header_tokens, ",only:");
+       if (WN_rtype(stmt) == 1)
+           Append_Token_String(header_tokens, ",only:");
+       else
+          if (WN_kid_count(stmt)>0)
+               Append_Token_String(header_tokens, ",");
 
        for(k=0;k< WN_kid_count(stmt);k=k+2 ) {
 
@@ -1132,10 +1133,11 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       for (param = first_param; param < num_params -implicit_parms; param++) {
 
 	 Append_F77_Indented_Newline(param_tokens, 1, NULL/*label*/);
-	 if (params[param] )  {
+	 if (params[param] ) 
+   
             if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
 
-	      ST2F_decl_translate(param_tokens, params[param]);
+	     ST2F_decl_translate(param_tokens, params[param]);
 
              if (ST_is_optional_argument( params[param])) {
                 Append_F77_Indented_Newline(param_tokens, 1, NULL/*label*/);
@@ -1164,7 +1166,6 @@ ST2F_func_header(TOKEN_BUFFER tokens,
              if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
                      ST2F_decl_translate(param_tokens, params[param]);
        }
-   }
 
 #if 0
 //must issue scalar args first,then issue array args---fzhao
@@ -1325,9 +1326,9 @@ ST2F_Declare_Return_Type(TOKEN_BUFFER tokens,TY_IDX return_ty, const char *name)
 
 	if (TY_Is_Pointer(return_ty))
 	  TY2F_translate(decl_tokens, Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-	else  {
-              TY2F_translate(decl_tokens, return_ty);
-         }
+	else
+	  TY2F_translate(decl_tokens, return_ty);
+
 	TY2F_Prepend_Structures(decl_tokens);
 	Append_And_Reclaim_Token_List(tokens, &decl_tokens);
     }

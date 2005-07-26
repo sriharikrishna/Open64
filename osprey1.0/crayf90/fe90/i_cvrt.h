@@ -950,21 +950,12 @@ extern INT32 fei_get_dist_info            ( INT32 seg_idx,
 extern INT32 fei_get_redist               ( INT32 arg_syx );
 extern void  fei_user_type                ( char  *name_string,
                                             INT32 nbr_components,
+                                            INT32 first_idx,
                                             INT64 size,
                                             INT32 sequence,
                                             INT32 st_idx,
                                             INT32 alignment,
-					    INTPTR modst_idx,
-                                            INT32 definition_in_module );
-extern INT32 fei_imported_type		 ( char *name_string,
-					   INTPTR modst_idx);
-extern TYPE fei_get_pdg_type		 ( INT32 ty_idx,
-					   INT32 table_type,
-					   INT32 basic_type,
-					   INT32 nbr_components);
-extern void fei_gen_st_for_type 	 (  char *name_string ,
-				 	    TYPE type_idx ,
-					    INTPTR  modst_idx );	
+                                            INT32 external );
 extern TYPE  fei_descriptor               ( INT32 flag_matrix,
                                             INT32 table_type,
                                             INTPTR table_index,
@@ -1097,8 +1088,7 @@ extern INTPTR fei_object          	  ( char  *name_string,
                                  	    INT32 distr_idx,
                                  	    INT32 node_1,
                                  	    INT32 node_2,
-                                 	    INT32 line_num,
-					    INTPTR modst_idx );
+                                 	    INT32 line_num );
 
 extern void fei_rename_list(char *name_string);
 

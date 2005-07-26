@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.26 $
- * $Date: 2005-06-08 22:15:56 $
+ * $Revision: 1.25 $
+ * $Date: 2004-01-28 23:01:41 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.26 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.25 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -938,8 +938,7 @@ fei_object(char * name_string,
 	   INT32       distr_idx,
 	   INT32       node_1,
 	   INT32       node_2,
-	   INT32       lineno,
-	   INTPTR      modst_idx)
+	   INT32       lineno)
 {
   TY_IDX  ty ;
   TY_IDX  tr_idx;
@@ -950,14 +949,12 @@ fei_object(char * name_string,
   BOOL hosted ;
   BOOL eq     ;
   BOOL in_common ;
-  BOOL derived_type_or_imported_var=FALSE;
   INT64 off   ;
   SYMTAB_IDX st_level;
   
   STB_pkt *p;
   STB_pkt *o;
   STB_pkt *b;
-  STB_pkt *modp;
   
 
   OBJECT_SYM  sym_class;
@@ -966,6 +963,8 @@ fei_object(char * name_string,
 
   ty = cast_to_TY(t_TY(type));
   p  = cast_to_STB(storage_idx);
+
+
 /* need to seperate two cases:interface & contained pu */
 
  if (!interface_pu) 
@@ -979,6 +978,8 @@ fei_object(char * name_string,
  else 
     hosted = FALSE;
 
+ if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE))
+       hosted = FALSE; //contained in a module
 
   /* ignore hosted args w/o inner ref/defs because don't    */
   /* want duplicates in symbol table for debug info (only   */
@@ -1037,9 +1038,6 @@ fei_object(char * name_string,
 	}
       }
 
-      st1 = Scope_tab[CURRENT_SYMTAB].st;
-      if (ST_is_in_module(st1))  //current PU is moudel
-        Set_ST_base(sl,st1);
       o = cwh_stab_packet(sl,is_ST);
       return(cast_to_int(o));
     }
@@ -1097,24 +1095,6 @@ fei_object(char * name_string,
     }
   }
 
-  /*
-   * keep derived types and module variables have single 
-   * global ST entries ---FMZ
-   *
-   */
-
-  derived_type_or_imported_var = modst_idx ? TRUE: FALSE;
-
-  if (derived_type_or_imported_var) {
-      modp  = cast_to_STB(modst_idx);
-      st = cwh_stab_seen_derived_type_or_imported_var(cast_to_ST(modp->item)
-                                                     ,name_string);
-   if (st) {
-      o = cwh_stab_packet(st,is_ST);
-      return(cast_to_int(o));
-     }
-  }
-
   /* figure out which symbol table this object goes in           */
   /* ie: is it in COMMON somehow perhpas via CRI_Pointer as base */
 
@@ -1133,9 +1113,6 @@ fei_object(char * name_string,
        st_level = HOST_LEVEL ;
   }
 
- if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE))
-        st_level = GLOBAL_SYMTAB ;
-
   st = New_ST(st_level);
   cwh_auxst_clear(st);
 
@@ -1151,18 +1128,12 @@ fei_object(char * name_string,
      Set_ST_is_not_used (st);
   }
 
- if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE) ) {
-    if (!PU_is_nested_func(Pu_Table[ST_pu(Scope_tab[CURRENT_SYMTAB].st)]))  {
-        st1 = Scope_tab[CURRENT_SYMTAB].st;
-        cwh_auxst_add_item(st1,st,l_TYMDLIST) ;
-     } else st1 = st;
-
-     if (hosted)
-        cwh_stab_enter_hosted(st);
-  Set_ST_base(st,st1);
-
-  }
+ if (test_flag(flag_bits, FEI_OBJECT_IN_MODULE) &&
+          !PU_is_nested_func(Pu_Table[ST_pu(Scope_tab[CURRENT_SYMTAB].st)])) 
+     st1 = Scope_tab[CURRENT_SYMTAB].st;
+ else st1 = st;
     
+  Set_ST_base(st,st1);
   Set_ST_ofst(st, off);
 
   cwh_stab_set_linenum(st,lineno);  
@@ -1503,11 +1474,6 @@ fei_object(char * name_string,
   if (test_flag(flag_bits, FEI_OBJECT_EXTERNAL))
     Set_ST_is_external(st);  
 
-  if (modst_idx) { /* this variable imported  by use stmt */
-      modp  = cast_to_STB(modst_idx);
-      Set_ST_base(st, cast_to_ST(modp->item));
-      cwh_auxst_add_item(ST_base(st),st,l_TYMDLIST) ;
-   }
 
   if (test_flag(flag_bits, FEI_OBJECT_ASSUMED_SIZE)) {
     Set_ST_auxst_is_assumed_size(st, TRUE) ;
@@ -2812,6 +2778,7 @@ cwh_stab_module_ST(char *name,INT64 size, mUINT16 al)
   ST * st ;
 
   st = New_ST(GLOBAL_SYMTAB);
+//  st = New_ST(CURRENT_SYMTAB);
   cwh_auxst_clear(st);
   ST_Init(st, Save_Str(name), CLASS_VAR, SCLASS_MODULE, EXPORT_PREEMPTIBLE,
           cwh_types_mk_module_TY(size,al));
@@ -3419,22 +3386,6 @@ cwh_stab_seen_common_element(ST *c, INT64 offset, char* name)
   return NULL ;
 }
 
-/*===================================================
- *===================================================*/
-ST *
-cwh_stab_seen_derived_type_or_imported_var(ST *c, char* name)
- {
-  ITEM * el = NULL;
-  ST *   st ;
-
-  while ((el = cwh_auxst_next_element(c,el,l_TYMDLIST)) != NULL ) {
-    st = I_element(el);
-    if (ST_pu(c) == ST_pu(ST_base(st)))
-      if (strcmp(ST_name(st),name) == 0)
-        return st ;
-  }
-  return NULL ;
- }
 /*===================================================
  *
  * cwh_stab_mk_fn_0args

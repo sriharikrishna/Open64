@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.32 $
- * $Date: 2005-07-15 19:16:01 $
- * $Author: fzhao $
+ * $Revision: 1.29 $
+ * $Date: 2004-11-29 16:16:21 $
+ * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
  * Revision history:
@@ -935,6 +935,7 @@ TY2F_Equivalence(TOKEN_BUFFER tokens,
    Append_Token_String(tokens, equiv_name); /* equiv_name at given offset */
    Append_Token_Special(tokens, '(');
 //   Append_Token_String(tokens, Number_as_String(fld_ofst+1, "%lld"));
+/*June */
    Append_Token_String(tokens, Number_as_String(fld_ofst, "%lld"));
    Append_Token_Special(tokens, ')');
    Append_Token_Special(tokens, ',');
@@ -1096,8 +1097,8 @@ TY2F_Translate_Structure(TY_IDX ty)
                 else
                   TY2F_translate(fld_tokens, FLD_type(fld));
               }
-             else 
-                    TY2F_translate(fld_tokens, FLD_type(fld));
+             else
+               TY2F_translate(fld_tokens, FLD_type(fld));
 
 	     Append_And_Reclaim_Token_List(struct_tokens, &fld_tokens);
 
@@ -1121,23 +1122,20 @@ TY2F_Translate_Structure(TY_IDX ty)
    Decrement_Indentation();
 
    Append_F77_Indented_Newline(struct_tokens, 1, NULL/*label*/);
-
    if (WN2F_F90_pu) {
       Append_Token_String(struct_tokens, "END TYPE");
    } else {
       Append_Token_String(struct_tokens, "END STRUCTURE");
    }
-
    Append_F77_Indented_Newline(struct_tokens, 1, NULL/*label*/);
    
    if (TY2F_Structure_Decls == NULL)
-       TY2F_Structure_Decls = New_Token_Buffer();
-
-   Append_F77_Indented_Newline(TY2F_Structure_Decls, 1, NULL/*label*/);
+      TY2F_Structure_Decls = New_Token_Buffer();
 
    Set_Current_Indentation(current_indent);
-   Append_And_Reclaim_Token_List(TY2F_Structure_Decls, &struct_tokens);
 
+if (!TY_is_external(ty)) //August,2002
+   Append_And_Reclaim_Token_List(TY2F_Structure_Decls, &struct_tokens);
 
 } /* TY2F_Translate_Structure */
 
@@ -1217,9 +1215,9 @@ TY2F_Declare_Common_Flds(TOKEN_BUFFER tokens,
 	  TY2F_translate(decl_tokens, FLD_type(fld));
 	  Append_And_Reclaim_Token_List(tokens, &decl_tokens);
 	}
+//      Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
 
     } while (!FLD_last_field (fld_iter++)) ;
-//      Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
 } /* TY2F_Declare_Common_Flds */
 
 static void
@@ -1473,12 +1471,11 @@ TY2F_array(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
        * the corresponding integral type instead.  We do not expect
        * such pointers to be dereferenced anywhere.
        */
-
       if (TY_Is_Pointer(TY_AR_etype(ty)))
 	 TY2F_translate(decl_tokens,
 			Stab_Mtype_To_Ty(TY_mtype(TY_AR_etype(ty))));
-      else  
-         TY2F_translate(decl_tokens, TY_AR_etype(ty));
+      else
+	 TY2F_translate(decl_tokens, TY_AR_etype(ty));
 
  if (ARB_co_dimension(arb_base)<=0){
      co_dim=0;
@@ -1595,9 +1592,8 @@ TY2F_array_for_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
       if (TY_Is_Pointer(TY_AR_etype(ty)))
          TY2F_translate(decl_tokens,
                         Stab_Mtype_To_Ty(TY_mtype(TY_AR_etype(ty))));
-      else {
+      else
          TY2F_translate(decl_tokens, TY_AR_etype(ty));
-       }
 
  if (ARB_co_dimension(arb_base)<=0){
      co_dim=0;
@@ -1672,8 +1668,8 @@ TY2F_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty)
 
   if (!TY_is_translated_to_c(ty))
     {
-      Set_TY_is_translated_to_c(ty); /* Really, translated to Fortran, not C */
       TY2F_Translate_Structure(ty);
+      Set_TY_is_translated_to_c(ty); /* Really, translated to Fortran, not C */
     }
 
   if (!WN2F_F90_pu) {
@@ -1704,8 +1700,8 @@ TY2F_2_struct(TOKEN_BUFFER decl_tokens, TY_IDX ty)
 
   if (!TY_is_translated_to_c(ty))
     {
-      Set_TY_is_translated_to_c(ty); /* Really, translated to Fortran, not C */
       TY2F_Translate_Structure(ty);
+      Set_TY_is_translated_to_c(ty); /* Really, translated to Fortran, not C */
     }
 
 } /* TY2F_2_struct */
@@ -1992,7 +1988,6 @@ TY2F_Prepend_Structures(TOKEN_BUFFER tokens)
 {
    if (TY2F_Structure_Decls != NULL)
       Prepend_And_Reclaim_Token_List(tokens, &TY2F_Structure_Decls);
-
 } /* TY2F_Prepend_Structures */
 
 

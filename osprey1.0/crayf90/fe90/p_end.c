@@ -3286,8 +3286,7 @@ static void end_type_blk(boolean	err_call)
 # endif
 
       ATT_CHAR_SEQ(CURR_BLK_NAME)	 = !ATT_NUMERIC_CPNT(CURR_BLK_NAME) &&
-                                           !ATT_POINTER_CPNT(CURR_BLK_NAME) &&
-                                            ATT_SEQUENCE_SET(CURR_BLK_NAME);
+                                           !ATT_POINTER_CPNT(CURR_BLK_NAME);
 
       ATT_DCL_NUMERIC_SEQ(CURR_BLK_NAME) = !ATT_POINTER_CPNT(CURR_BLK_NAME) &&
                                            !ATT_CHAR_CPNT(CURR_BLK_NAME) &&

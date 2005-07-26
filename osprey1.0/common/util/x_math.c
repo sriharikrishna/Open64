@@ -1,4 +1,4 @@
-/* $Id: x_math.c,v 1.3 2005-03-24 21:56:35 eraxxon Exp $ */
+/* $Id: x_math.c,v 1.2 2004-02-28 21:05:05 eraxxon Exp $ */
 /* -*-Mode: C;-*- */
 /* * BeginRiceCopyright *****************************************************
  * 
@@ -20,14 +20,8 @@
  * cf. common/com/ia64/targ_const.cxx 
  */
 #ifdef _SOLARIS_SOLARIS
-/* eraxxon: Use static instead of inline because Sun cc 5.6 skips the
-   inline and leaves a reference to an externed hypotf, resulting in a
-   link error. */
-static /* inline */
-float hypotf(float x, float y) { return (float)hypot(x, y); }
-
-static /* inline */
-long double hypotl(long double x, long double y) 
+inline float hypotf(float x, float y) { return (float)hypot(x, y); }
+inline long double hypotl(long double x, long double y) 
   { return hypot((double)x, (double)y); }
 #endif
 
