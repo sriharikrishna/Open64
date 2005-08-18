@@ -2630,7 +2630,7 @@ void    pe_array_dim_resolution(int        attr_idx)
       }
    }
 
-/* fzhao May   if (BD_ARRAY_CLASS(bd_idx) == Assumed_Size ) { */
+/* fzhao if (BD_ARRAY_CLASS(bd_idx) == Assumed_Size ) { */
 
    if (BD_ARRAY_CLASS(bd_idx) != Assumed_Size ) {
        PRINTMSG(AT_DEF_LINE(attr_idx),1576,Error,
@@ -4909,7 +4909,7 @@ void	decl_semantics(void)
       }
    }
 
-# if 0 /* fzhao May get rid of "start_pes" call */
+# if 0 /* fzhao get rid of "start_pes" call */
 # ifdef COARRAY_FORTRAN
 
 # if ! defined(_TARGET_OS_MAX)
@@ -4937,7 +4937,7 @@ void	decl_semantics(void)
 # endif
 # endif
 
-# endif /* fzhao add*/
+# endif /* fzhao */
 
    if (SCP_DARG_LIST(curr_scp_idx) != NULL_IDX) {
       free_attr_list(SCP_DARG_LIST(curr_scp_idx));
@@ -5656,7 +5656,7 @@ static	void	attr_semantics(int	attr_idx,
             /* Do not generate entry code for block data program units.  */
             /* It is meaningless and PVP codegen blows up.               */
 
-/* fzhao May            gen_entry_dope_code(attr_idx); */
+/* fzhao          gen_entry_dope_code(attr_idx); */
          }
 
          if (end_entry_sh_idx == NULL_IDX) {
@@ -7702,7 +7702,7 @@ static	void	insert_sh_after_entries(int		attr_idx,
 
             SH_PREV_IDX(next_sh_idx)       = entry_sh_idx;
             SH_NEXT_IDX(entry_sh_idx)      = next_sh_idx;
-# if 0 /*fzhao Jan*/
+# if 0 /*fzhao */
             if (AT_OPTIONAL(attr_idx)) {
                gen_present_ir(attr_idx, 
                               SH_NEXT_IDX(ATP_FIRST_SH_IDX(entry_attr_idx)), 
@@ -7836,7 +7836,7 @@ static	void	insert_sh_after_entries(int		attr_idx,
       }
    }
    else if (AT_OPTIONAL(attr_idx)) {
-# if 0 /*fzhao Jan*/
+# if 0 /*fzhao */
       gen_present_ir(attr_idx, 
                      SH_NEXT_IDX(start_sh_idx), 
                      curr_stmt_sh_idx);
@@ -8598,7 +8598,7 @@ int	create_equiv_stor_blk(int		attr_idx,
 
    SB_EQUIVALENCED(sb_idx) = TRUE;
    SB_MODULE(sb_idx) = SB_MODULE(SCP_SB_STATIC_IDX(curr_scp_idx));
-/* fzhao add  June */
+/* fzhao add   */
 
    TRACE (Func_Exit, "create_equiv_stor_blk", NULL);
 

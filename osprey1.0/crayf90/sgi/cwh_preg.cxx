@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_preg.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:09 $
+ * $Revision: 1.2.8.1 $
+ * $Date: 2005-08-18 16:05:40 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_preg.cxx,v $
  *
@@ -56,7 +56,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_preg.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_preg.cxx,v $ $Revision: 1.2.8.1 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -124,7 +124,7 @@ cwh_preg_temp_save(char * name, WN  * expr )
   
   bt = WNRTY(expr);
   pr = Create_Preg(bt,Index_To_Str(Save_Str(name)));
-  cwh_addr_store_ST(MTYPE_To_PREG(bt), pr, NULL, expr);
+  cwh_addr_store_ST(MTYPE_To_PREG(bt), pr, 0, expr);
 
   wn = WN_LdidPreg(bt,pr);
   return wn;

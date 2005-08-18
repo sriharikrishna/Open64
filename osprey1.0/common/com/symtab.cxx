@@ -2263,7 +2263,7 @@ ST::Print (FILE *f, BOOL verbose) const
 
     switch (sym_class) {
     case CLASS_VAR:
-    case CLASS_TYPE: //FMZ 
+    case CLASS_TYPE: 
 	ty_idx = u2.type;
 	break;
 
@@ -2432,7 +2432,6 @@ TY::Print (FILE *f) const
     fprintf (f, "%-14s:",
 	     name_idx ? &Str_Table[name_idx] : "(anon)");
 
-/*FMZH    fprintf (f, " (f: 0x%04x", flags);*/
     fprintf (f, " (f: 0x%08x", flags);
     if (flags) {
         const char* flgstr = TY_FLAGS_To_Str(flags);

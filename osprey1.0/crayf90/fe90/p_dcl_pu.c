@@ -2105,7 +2105,11 @@ static int start_new_subpgm(pgm_unit_type	pgm_type,
       PUSH_BLK_STK(Module_Proc_Blk);
       type_of_obj	= (pgm_type == Function) ? Obj_Module_Func :
                                                    Obj_Module_Subr;
-        proc_type		= Intern_Proc;
+# ifdef SOURCE_TO_SOURCE 
+         proc_type		= Intern_Proc;
+# else
+         proc_type		= Module_Proc;
+#endif
 
 
    }

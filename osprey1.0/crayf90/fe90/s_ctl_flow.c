@@ -185,10 +185,6 @@ void allocate_stmt_semantics (void)
    list_idx = IR_IDX_L(ir_idx);
 
 
-/*    while (list_idx != NULL_IDX && FALSE) {           June */
-/* still need go through semantics for allocate stmts        */
-/* at least need keep "expr_semantics"                       */
-/* will think about keep other semantics later  --fzhao      */
    while (list_idx != NULL_IDX ) { 
 
       COPY_OPND(opnd, IL_OPND(list_idx));
@@ -1533,7 +1529,6 @@ void deallocate_stmt_semantics (void)
 
    list_idx = IR_IDX_L(ir_idx);
 
-/*   while (list_idx != NULL_IDX && FALSE) { fzhao Jun*/
    while (list_idx != NULL_IDX ) {
 
       COPY_OPND(opnd, IL_OPND(list_idx));
@@ -1606,7 +1601,7 @@ void deallocate_stmt_semantics (void)
          }
          else {
 ; 
-# if 0 /*fzhao Janu */
+# if 0 /*fzhao */
             find_opnd_line_and_column(&opnd, &line, &col);
             PRINTMSG(line, 626, Internal, col,
                      "Dv_Deref_Opr", "deallocate_stmt_semantics");
@@ -5693,7 +5688,7 @@ void where_stmt_semantics (void)
 
       save_where_ir_idx = where_ir_idx;
 
-# if 0 /*fzhao Oct*/
+# if 0 /*fzhao */
       mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd,
                                  Intent_In, FALSE, TRUE);
       if (where_ir_idx > 0) {
@@ -5711,7 +5706,7 @@ void where_stmt_semantics (void)
       }
       else {
 
-# if 0 /*fzhao Oct */
+# if 0 /*fzhao  */
          COPY_OPND(opnd, mask_expr_opnd);
 # endif 
            ;
@@ -5762,7 +5757,7 @@ void where_stmt_semantics (void)
 
       /* set up control mask */
 
-# if 0 /*fzhao Oct*/
+# if 0 /*fzhao */
       mask_expr_tmp = create_tmp_asg(&opnd, &exp_desc, &mask_expr_opnd, 
                                      Intent_In, FALSE, TRUE);
 
@@ -5794,7 +5789,7 @@ void where_stmt_semantics (void)
       COPY_OPND(IL_OPND(list_idx), opnd);
 
       /* set up pending mask */
-# if 0 /*fzhao Oct*/
+# if 0 /*fzhao */
       gen_opnd(&opnd, 
                gen_ir(OPND_FLD(mask_expr_opnd), OPND_IDX(mask_expr_opnd),
                   Not_Opr, exp_desc.type_idx, line, col,
@@ -10903,7 +10898,7 @@ boolean check_where_conformance(expr_arg_type	*exp_desc)
 
 /* We keep the original mask or logical expression
  * instead of generating array types temporary variables
- * especially for avoiding "deferred shape" logical arrays
+ * especially  unwanted  "deferred shape" logical arrays
  * such as  "LOGICAL($) t$1(:,:,:)" ---fzhao
  */
 

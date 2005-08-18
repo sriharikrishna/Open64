@@ -2311,7 +2311,6 @@ boolean expr_sem (opnd_type       *result_opnd,
             case Kwd_Opr              :
    
                /* must be error in array spec */
-
                PRINTMSG(IR_LINE_NUM(ir_idx), 197, Error, IR_COL_NUM(ir_idx),
                         ", or )", "=");
                ok = FALSE;
