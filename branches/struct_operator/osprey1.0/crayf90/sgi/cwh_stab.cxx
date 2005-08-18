@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.26 $
- * $Date: 2005-06-08 22:15:56 $
+ * $Revision: 1.26.2.1 $
+ * $Date: 2005-08-18 16:05:40 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.26 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.26.2.1 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -363,9 +363,9 @@ fei_proc_def(char         *name_string,
 
   PU_IDX pu_idx = ST_pu(st);
   PU& pu = Pu_Table[pu_idx];
-  pu.lexical_level =CURRENT_SYMTAB;   /*"interface" declared in nested PU  gave a wrong
-                                       * PU level;must reset the PU level for "later" defintion
-                                       * ----fzhao
+  pu.lexical_level =CURRENT_SYMTAB; /*"interface" declared in nested PU  gave a wrong
+                                       * PU level;must reset the PU level for "later" 
+                                       * defintion ---fzhao
                                        */
 
   Set_PU_prototype (pu, ty);
@@ -386,7 +386,8 @@ fei_proc_def(char         *name_string,
     Set_PU_is_mainpu(pu);
     Set_PU_no_inline(pu);
 
-# if 0 /*fzhao:don't generate this extra symbal table entry for main pgrogam !*/
+# if 0
+ /*fzhao:don't generate this extra symbal table entry for main pgrogam !*/
     Main_ST = NULL;
 
     if (strcmp(crayf90_def_main,ST_name(st)) != 0) {
@@ -453,8 +454,7 @@ fei_proc_def(char         *name_string,
     cwh_stab_pu_has_globals = FALSE;
 
 /* Since we need use this function to get interface block information   */
-/* we have to keep blocks un_initialize when we get PUs in interface    */
-/* fzhao@rice.edu							*/
+/* we have to keep blocks un_initialize when we get PUs by interface    */
 
     if (!test_flag(flags,FEI_PROC_IN_INTERFACE))
            cwh_block_init_pu();
@@ -1122,7 +1122,7 @@ fei_object(char * name_string,
                                 (test_flag(flag_bits, FEI_OBJECT_IN_MODULE))) {
 
 /* add test_flag(flag_bits, FEI_OBJECT_IN_MODULE) to keep the initial  *
- * variables in module still to be in global ST table --fzhao@rice.edu */
+ * variables in module still to be in global ST table --fzhao          */
 
      st_level = GLOBAL_SYMTAB ;
 
@@ -1237,7 +1237,7 @@ fei_object(char * name_string,
 
       /* does ABI require fn result in regs - see cwh_defines.h */
 
-# if 0 /* don't understand why we need this piece of code---fzhao */
+# if 0
       if (STRUCT_BY_VALUE(ty)) {
 
       Set_ST_sclass(st, SCLASS_AUTO);
@@ -1363,7 +1363,7 @@ fei_object(char * name_string,
       cwh_auxst_cri_pointee(base_st, st);
 
     } else {
-      b = cast_to_STB(offset);
+      b = cast_to_STB((UINTPS) offset);
       base_st = cast_to_ST(b->item);
     }
 

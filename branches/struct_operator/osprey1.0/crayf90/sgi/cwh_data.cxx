@@ -35,9 +35,9 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.4 $
- * $Date: 2003-12-11 22:10:42 $
- * $Author: eraxxon $
+ * $Revision: 1.4.4.1 $
+ * $Date: 2005-08-18 16:05:39 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $
  *
  * Description: This static data initialization
@@ -49,7 +49,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.cxx,v $ $Revision: 1.4.4.1 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -125,8 +125,8 @@ fei_static_base(INTPTR sym_idx)
 
 
    if (ST_base(base) != base && (ST_sclass(ST_base(base))!=SCLASS_TEXT)) {
-/* Since for PU is module,we change base_idx point to the PU_st      */
-/* have to keep data initializer's st point to st instead of base_st */
+// Since for PU is module,we change base_idx point to the PU_st  
+// have to keep data initializer's st point to st instead of base_st
 
 //      offset += ST_ofst(base); set all initializers in common block have 
 // themselves INITO entry,such must set offset always is 0
@@ -279,7 +279,7 @@ static INT32 get_TCON_size(TCON_IDX tc)
 {
    TYPE_ID t;
    INT32 esize;
-   if (tc == NULL) {
+   if (tc == 0) {
       /* Must be doing an init of a symbol, rather than 
        * a constant. Return Pointer_Size.
        */
@@ -477,9 +477,9 @@ static INITV_IDX create_initv(INITO_IDX ino, INT32 repeat, TCON_IDX tc,
 			    b_and_o *bo)
 {
    if (tc) {
-      return (Irb_Init_Val(ino, NULL, repeat, tc));
+      return (Irb_Init_Val(ino, 0, repeat, tc));
    } else {
-      return (Irb_Init_Symoff(ino, NULL, repeat, bo->base, bo->offset));
+      return (Irb_Init_Symoff(ino, 0, repeat, bo->base, bo->offset));
    }
 }
 
@@ -576,7 +576,7 @@ void fei_static_simple_reloc_init  ( INT64 bit_offset,
    DevAssert((value.base),("NULL base found"));
    cwh_expr_set_flags(value.base,f_T_SAVED);
    
-   static_simple_init_helper(dup_count,stride,NULL,&value);
+   static_simple_init_helper(dup_count,stride,0,&value);
 }
 
 
@@ -632,9 +632,9 @@ static void emit_inits_for_symbol(ST_IDX st_idx, ST *st)
      // Do we need to pad before? 
      pad_size = offset - pos;
      if (pad_size > 0) {
-       pad = Irb_Init_Pad(NULL,prev_initv,pad_size);
+       pad = Irb_Init_Pad(0,prev_initv,pad_size);
        if (prev_initv == 0) {
-	 prev_initv = Irb_Init_Block(inito,NULL,1);
+	 prev_initv = Irb_Init_Block(inito,0,1);
 	 Set_INITV_blk(prev_initv,pad);
        } else {
 	 Set_INITV_next(prev_initv,pad);
@@ -649,7 +649,7 @@ static void emit_inits_for_symbol(ST_IDX st_idx, ST *st)
       
      // Add the initv to the chain
      if (prev_initv == 0) {
-       prev_initv = Irb_Init_Block(inito,NULL,1);
+       prev_initv = Irb_Init_Block(inito,0,1);
        Set_INITV_blk(prev_initv,initv);
      } else {
        Set_INITV_next(prev_initv,initv);
@@ -661,7 +661,7 @@ static void emit_inits_for_symbol(ST_IDX st_idx, ST *st)
    // Do we need to pad the end? 
    pad_size = TY_size(ST_type(st)) - pos;
    if (pad_size > 0) {
-      pad = Irb_Init_Pad(NULL,prev_initv,pad_size);
+      pad = Irb_Init_Pad(0,prev_initv,pad_size);
    }
 
    // Delete the structure

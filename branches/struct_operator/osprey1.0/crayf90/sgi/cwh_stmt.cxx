@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.28 $
- * $Date: 2005-06-17 21:46:29 $
+ * $Revision: 1.28.2.1 $
+ * $Date: 2005-08-18 16:05:41 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -1122,8 +1122,10 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
 
 
   if (ST_sclass(st) != SCLASS_FORMAL) {
-
-     opc = OPCODE_make_op(OPR_CALL,TY_mtype(ts),MTYPE_V);
+     if (TY_kind(ts)==KIND_ARRAY)
+        opc = OPCODE_make_op(OPR_CALL,TY_mtype(TY_etype(ts)),MTYPE_V);
+     else
+        opc = OPCODE_make_op(OPR_CALL,TY_mtype(ts),MTYPE_V);
      wn  = WN_Create(opc,nargs);
      WN_st_idx(wn) = ST_st_idx(st);
 
@@ -2218,8 +2220,18 @@ fei_new_select(INT32 num_cases,
      cwh_stmt_select_char(num_cases, default_label_idx);
 
   } else {
-     
-     expr = cwh_expr_operand(NULL);
+    if (cwh_stk_get_class()==WN_item) {
+        expr = cwh_stk_pop_WN(); 
+        if (WN_operator(expr) == OPR_STRCTFLD  ||
+            (WN_operator(expr) == OPR_ILOAD && 
+             WN_operator(WN_kid0(expr))==OPR_STRCTFLD ) )
+               ;
+        else {
+             cwh_stk_push(expr,WN_item);
+             expr = cwh_expr_operand(NULL);
+        }
+     } else 
+        expr = cwh_expr_operand(NULL);
 
      if ( num_cases > 0) {
 
@@ -4501,9 +4513,11 @@ cwh_stmt_conformance_checks_walk (WN *tree, WN *stmt, WN *block, WN ** sizes, IN
        for (i=0; i < numkids; i++) {
 	 cwh_stmt_conformance_checks_walk (WN_kid(tree,i), stmt, block, NULL, NULL);
        }
+#if 0
        if (sizes) {
-//fzhao    F90_Size_Walk(tree,ndim,sizes);
+         F90_Size_Walk(tree,ndim,sizes);
        }
+#endif
        break;
 
      default:

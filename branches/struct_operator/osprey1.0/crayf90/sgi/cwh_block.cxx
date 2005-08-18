@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_block
- * $Revision: 1.3 $
- * $Date: 2003-11-04 16:18:12 $
- * $Author: eraxxon $
+ * $Revision: 1.3.4.1 $
+ * $Date: 2005-08-18 16:05:39 $
+ * $Author: fzhao $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -239,7 +239,7 @@ cwh_block_add_to_enclosing_regions(WN_PRAGMA_ID id, ST * st)
 			    id,
 			    st,
 			    0,
-			    (int)NULL,
+			    0,
 			    FALSE);
 }
 
@@ -434,7 +434,7 @@ cwh_block_append_given_block(WN *wn, WN* block)
     if (cwh_block_add_debug_line) 
       WN_Set_Linenum (wn, USRCPOS_srcpos(current_srcpos) );
     else
-      WN_Set_Linenum (wn, NULL);
+      WN_Set_Linenum (wn, 0);
   }
 
   WN_INSERT_BlockLast(block,wn)   ;
@@ -455,7 +455,7 @@ cwh_block_insert_after(WN *wn, WN*in)
   if (cwh_block_add_debug_line) 
     WN_Set_Linenum (in, USRCPOS_srcpos(current_srcpos) );
   else
-    WN_Set_Linenum (in, NULL);
+    WN_Set_Linenum (in, 0);
 
 
   WN_INSERT_BlockAfter(cwh_block_current_inline(), wn, in);

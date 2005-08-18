@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_stk
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:10 $
+ * $Revision: 1.2.8.1 $
+ * $Date: 2005-08-18 16:05:40 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -63,7 +63,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stk.cxx,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stk.cxx,v $ $Revision: 1.2.8.1 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -104,7 +104,7 @@ static INT32 top = STK_EMPTY ;
 extern void
 cwh_stk_push( void * item, enum item_class Class)
 {
-  cwh_stk_push_typed(item,Class,NULL) ;
+  cwh_stk_push_typed(item,Class,0) ;
 
   return ;
 }
@@ -125,7 +125,7 @@ cwh_stk_push( void * item, enum item_class Class)
 extern void
 cwh_stk_push_typed( void * item, enum item_class Class, TY_IDX ty)
 {
-  if (ty != NULL) {
+  if (ty != 0) {
     DevAssert(((Class == ADDR_item) || 
 	       (Class == WN_item)   || 
 	       (Class == WN_item_whole_array) ||
@@ -579,7 +579,7 @@ cwh_stk_dump(void)
 
     }
 
-    if (stk[i].it_ty == NULL)
+    if (stk[i].it_ty == 0)
       printf("%s\n",str_name[j]);
     else 
       printf("%s    TY = 0x%x \n",str_name[j],stk[i].it_ty) ;

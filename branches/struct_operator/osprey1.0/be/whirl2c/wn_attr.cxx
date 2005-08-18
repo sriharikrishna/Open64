@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn_attr.c
- * $Revision: 1.8 $
- * $Date: 2004-08-12 22:00:08 $
+ * $Revision: 1.8.2.1 $
+ * $Date: 2005-08-18 16:05:29 $
  *
  * Revision history:
  *  07-Mar-95 - Original Version
@@ -426,6 +426,7 @@ WN_Tree_Type(const WN *wn)
 	  * WN2C_array()).
 	  */
 	 ty = WN_Tree_Type(WN_kid0(wn));
+#if 0 //FMZ Aug 2005
 	 if (!TY_Is_Pointer(ty))
 	 {
 	    /* Create a pointer to be treated as an array when also used
@@ -439,6 +440,7 @@ WN_Tree_Type(const WN *wn)
 	 {
 	    ty = Stab_Pointer_To(TY_AR_etype(TY_pointed(ty)));
 	 }
+#endif
 	 break;
 
       case OPR_TAS:
@@ -602,6 +604,10 @@ WN_Tree_Type(const WN *wn)
 
       case OPR_ALLOCA:
          ty = WN_ty(wn);
+         break;
+
+      case OPR_STRCTFLD:
+	 ty = WN_Tree_Type(WN_kid0(wn));
          break;
 
       default:

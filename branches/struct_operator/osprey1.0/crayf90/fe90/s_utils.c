@@ -6378,8 +6378,7 @@ void set_shape_for_deferred_funcs(expr_arg_type         *exp_desc,
                      IR_COL_NUM(call_idx));
 
              break; 
-/* fzhao
-
+#if 0  /*fzhao*/
             for (i = 0; i < BD_RANK(bd_idx); i++) {
 
                NTR_IR_TBL(ir_idx);
@@ -6401,7 +6400,7 @@ void set_shape_for_deferred_funcs(expr_arg_type         *exp_desc,
                SHAPE_WILL_FOLD_LATER(exp_desc->shape[i]) = FALSE;
             }
             break;
-*/
+#endif
    
       }
    }
@@ -8244,7 +8243,7 @@ int cast_typeless_constant(int		cn_idx,
    since there is only problem for integer(8) or larger
    rank interger (occupy 2 or more than two words) and
    now we only accept up to 8 bytes integer,we only need
-   swap the two words----FMZH
+   swap the two words----FMZ
 */
 # if defined(_TARGET_LITTLE_ENDIAN)
     if (new_word_size == 2) {

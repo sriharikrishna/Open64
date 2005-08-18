@@ -1495,13 +1495,16 @@ inline char *
 FLD_name (FLD_HANDLE fld)		{ return &Str_Table[fld.Entry()->name_idx]; }
 
 inline TY_IDX
-//FLD_type (FLD_HANDLE fld)		{ return fld.Entry()->type; }
+#if 0
+FLD_type (FLD_HANDLE fld)		{ return fld.Entry()->type; }
+#endif
 FLD_type (FLD_HANDLE fld)		
 {
    if (TY_is_f90_pointer(fld.Entry()->type))
      return TY_pointed(fld.Entry()->type);
    else 
      return fld.Entry()->type; }
+
 inline void
 Set_FLD_type (FLD_HANDLE fld, TY_IDX ty){ fld.Entry()->type = ty; }
 

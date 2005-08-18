@@ -671,8 +671,13 @@ boolean call_list_semantics(opnd_type     *result_opnd,
              ATP_IN_INTERFACE_BLK(IL_IDX(list_idx)) ||
              AT_IS_INTRIN(IL_IDX(list_idx)) ||
              ATP_SCP_ALIVE(IL_IDX(list_idx)) ||
-             ATP_PROC(IL_IDX(list_idx)) == Module_Proc) {
-
+#ifndef  SOURCE_TO_SOURCE
+             ATP_PROC(IL_IDX(list_idx)) == Module_Proc
+#else
+             (ATP_PROC(IL_IDX(list_idx))== Intern_Proc) &&
+             AT_USE_ASSOCIATED(IL_IDX(list_idx)) 
+#endif
+             ) {
             arg_info_list[i].pgm_unit = TRUE;
 
             if (ATP_PGM_UNIT(IL_IDX(list_idx)) == Pgm_Unknown) {
@@ -3082,7 +3087,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
  */
       if (! AT_IS_INTRIN(spec_idx)         &&
           dummy != NULL_IDX                &&
-          AT_OBJ_CLASS(dummy) == Data_Obj  && /*fzhao Jan*/
+          AT_OBJ_CLASS(dummy) == Data_Obj  && 
           IR_OPR(dummy) != Call_Opr )  {
 
          /* check for auxiliary match */

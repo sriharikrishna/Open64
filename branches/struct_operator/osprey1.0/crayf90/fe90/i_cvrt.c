@@ -1392,7 +1392,6 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
                 int                     ro_idx ;
                 int                     bonly        = 0;
                 INTPTR      oldpdgatidx;
-		int bootry;
                 int                      listnum = 0;
 
    TRACE (Func_Entry, "cvrt_exp_to_pdg", NULL);
@@ -4939,7 +4938,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
    case Whole_Substring_Opr : 
    case Substring_Opr :
-        whole_substring = IR_OPR(ir_idx) == Whole_Substring_Opr;
+        whole_substring = IR_OPR(ir_idx) == Whole_Substring_Opr; 
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx), 
                         IR_FLD_L(ir_idx));
         whole_substring = FALSE;
@@ -5769,18 +5768,6 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 # endif
         break;
 
-
-
-
-
-
-
-
-
-
-
-
-
    case Struct_Opr :
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                         IR_FLD_L(ir_idx));
@@ -5795,12 +5782,24 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
            break;
         }
 
+        if (IR_FLD_L(ir_idx)==AT_Tbl_Idx )
+             type_idx = ATD_TYPE_IDX(IR_IDX_L(ir_idx));
+        else
+             type_idx = IR_TYPE_IDX(IR_IDX_L(ir_idx));
+
+        basic = get_basic_type(type_idx,0, NULL_IDX);
+
         PDG_DBG_PRINT_START
         PDG_DBG_PRINT_C("fei_field_dot");
         PDG_DBG_PRINT_END
 
 # ifdef _ENABLE_FEI
+# if 0 
         fei_field_dot(null_type);
+# else
+        fei_field_dot(basic);
+# endif
+
 # endif
 
         break;
@@ -7058,9 +7057,6 @@ CONTINUE:
            number_actual_args = IR_LIST_CNT_R(ir_idx);
         }
  
-        bootry = ATP_PGM_UNIT(IR_IDX_L(ir_idx)) == Subroutine;
-        bootry = ATP_EXTRA_DARG(IR_IDX_L(ir_idx));
-
         if (ATP_PGM_UNIT(IR_IDX_L(ir_idx)) == Subroutine ) {  /*  || */
 /*            ATP_EXTRA_DARG(IR_IDX_L(ir_idx))) */
            type_desc = pdg_type_void;

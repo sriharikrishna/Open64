@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.10 $
- * $Date: 2003-12-11 22:06:00 $
- * $Author: eraxxon $
+ * $Revision: 1.10.4.1 $
+ * $Date: 2005-08-18 16:05:39 $
+ * $Author: fzhao $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -155,6 +155,7 @@ fei_seq_subscr( TYPE result_type ,INT32 kidsnum)
   WN *ar  ;
   WN *ad  ;
   WN *wt  ;
+  WN *top_wn;
   ST *st  ;
   TY_IDX ty  ;
 
@@ -162,8 +163,6 @@ fei_seq_subscr( TYPE result_type ,INT32 kidsnum)
   BOOL    sect ;
   BOOL    trip ;
   TY_IDX  ta   ;
-
-enum item_class fm;
 
   OPCODE  op   ;
   FLD_det det  ;
@@ -183,17 +182,35 @@ enum item_class fm;
   array_val = sect || trip ;
   op = array_val ? opc_section : opc_array ;
 
- fm = cwh_stk_get_class();
-
   switch(cwh_stk_get_class()) {
+
   case ADDR_item:
-  case WN_item:
     ta = cwh_stk_get_TY();
+    ar = cwh_expr_address(f_NONE);
+    /* ar had better be an ARRAY or ARRSECTION node */
+    if (array_val)
+      if (cwh_addr_is_array(ar))
+        WN_set_opcode(ar, opc_section) ;
+                                                                                
+    cwh_addr_insert_bounds_check(bounds_assertion,ar);
+    ar = cwh_addr_add_bound(ar,ex,sb);
+    cwh_stk_push_typed(ar,WN_item,ta);
+    break  ;
+
+  case WN_item: 
+    ta = cwh_stk_get_TY();
+    top_wn = cwh_stk_pop_WN();
+    cwh_stk_push_typed(top_wn,WN_item,ta);
     ar = cwh_expr_address(f_NONE);    
     /* ar had better be an ARRAY or ARRSECTION node */
     if (array_val) 
       if (cwh_addr_is_array(ar))
 	WN_set_opcode(ar, opc_section) ; 
+
+   if (WN_operator(top_wn)==OPR_STRCTFLD ||
+         WN_operator(top_wn)==OPR_ILOAD &&
+         WN_operator(WN_kid0(top_wn))==OPR_STRCTFLD ) 
+             ar = cwh_addr_array1(op,ar,ta,kidsnum);
 
     cwh_addr_insert_bounds_check(bounds_assertion,ar);
     ar = cwh_addr_add_bound(ar,ex,sb);
@@ -222,6 +239,16 @@ enum item_class fm;
     ar = cwh_addr_add_bound(ar,ex,sb);
     cwh_stk_push(ar,WN_item);
     break ;
+
+  case DEREF_item: 
+    ty = cwh_stk_get_TY();
+    ad = cwh_expr_address(f_NONE);
+    ar = cwh_addr_array1(op,ad,ty,kidsnum);
+    cwh_addr_insert_bounds_check(bounds_assertion,ar);
+    ar = cwh_addr_add_bound(ar,ex,sb);
+    cwh_stk_push(ar,WN_item);
+    break  ;
+
 
   case ST_item_whole_array:
     st = cwh_stk_pop_ST();
@@ -875,10 +902,6 @@ cwh_addr_array(OPCODE op, WN * addr, TY_IDX ty)
 
   TY& t = Ty_Table[aty];
   nkids = 2 * TY_AR_ndims(t) +1 ;
-
-/*since co_array's co_rank could be not appearing,we cannot */
-/*use TY_AR_ndims as kids number,have to use kids number    */
-/* from Cray IR -----June                                   */
 
   wn = WN_Create ( op, nkids );
   WN_element_size(wn) = TY_size(TY_etype(t));
@@ -1699,10 +1722,10 @@ cwh_addr_istore(WN * lhs, OFFSET_64 off, TY_IDX ty, WN * rhs)
      lhs = cwh_expr_bincalc(OPR_ADD,lhs,WN_Intconst(Pointer_Mtype,off));
      off = 0;
   }
-/* July  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
+/*  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
  * for SOURCE_TO_SOURCE level WHIRL we can keep
  * the different types in an expression without
- *explictly add OPR_CVT 
+ * OPR_CVT  added
  *---fzhao
  */
   op  = Store_Opcode [TY_mtype(ty)];
@@ -2103,7 +2126,7 @@ cwh_addr_store_WN(WN * lhs, OFFSET_64 off, TY_IDX dty, WN * rhs)
     wn = NULL;
     break;
   }
-if (wn!=NULL) //fzhao Oct
+if (wn!=NULL) 
   cwh_block_append(wn) ;
 } 
 
@@ -2610,7 +2633,7 @@ cwh_addr_substr_util(OFFSET_64 off, TY_IDX dty )
   W_node r;
   
   ty = dty ;
-
+ 
   if (cwh_stk_get_class() == ST_item || cwh_stk_get_class() == ST_item_whole_array) {
 
     st = cwh_stk_pop_ST();
@@ -3017,10 +3040,12 @@ cwh_addr_f90_pointer_reference(WN * addr)
        if (ST_class(st) == CLASS_VAR) {
 	  return (ST_auxst_is_f90_pointer(st));
        }
-#endif
+#else
        return (FALSE);
+#endif
        
     case OPR_ILOAD:
+    case OPR_STRCTFLD: 
        if (TY_is_f90_pointer(WN_load_addr_ty(addr)) || 
 	   TY_is_f90_pointer(TY_pointed(WN_load_addr_ty(addr)))) {
 	  return (TRUE);
@@ -3045,6 +3070,76 @@ cwh_addr_f90_pointer_reference(WN * addr)
 extern void
 fei_field_dot(TYPE type)
 {
-   /* Doesn't do anything right now */
+   /* Doesn't do anything right now--old comments  */
+   /* we need to generate a new operator for field of 
+      structure--FMZ */
+     OPCODE	opc;
+     WN *	wn ;
+     WN *	kid0 = NULL;
+     FLD_det 	det ;
+     ST * 	st;
+     FLD_HANDLE fld ;
+     TY_IDX	ty1,ty2;
+     FLD_IDX    fld_idx;
+     TYPE_ID    rt, dt;
+     UINT       field_id = 1;
+     
+     fld_idx = cwh_stk_pop_FLD(); 
+     fld=FLD_HANDLE(fld_idx);
+     det.off  = FLD_ofst(fld);
+     det.type = FLD_type(fld);
+     ty1 = det.type;
+     ty2 = cast_to_TY(t_TY(type));
+
+     dt = MTYPE_U8;
+     rt = MTYPE_U8;
+
+     switch(cwh_stk_get_class()) {
+        case WN_item:
+            kid0 = cwh_stk_pop_WN();
+            break;
+        case ST_item:
+        case ST_item_whole_array:
+            st  = cwh_stk_pop_ST();
+            kid0 = cwh_addr_address_ST(st,0,ty1);
+            break;
+        default:
+           cwh_stk_pop_whatever() ;
+       }
+
+//get field_id by ty2 and fld_idx
+ {
+   FLD_HANDLE fld1;
+   fld1 = TY_fld(ty2);
+   while (fld1.Idx() != fld_idx && !FLD_last_field(fld1)){
+          field_id++;
+          fld1 = FLD_next(fld1);
+    }
+  }
+     
+     opc = OPCODE_make_op(OPR_STRCTFLD,rt,dt); 
+     wn = WN_Create(opc,1);
+     WN_set_ty(wn,ty1);
+     WN_set_load_addr_ty(wn,ty2);
+     WN_set_field_id(wn, field_id);
+
+
+     WN_kid0(wn) = kid0; 
+
+/* if ty1 is a pointer, generate an "ILOAD" to be the parent of STRCTFLD */ 
+     ty2 = fld.Entry()->type;
+     if (TY_is_f90_pointer(ty2)){
+          kid0 = wn;
+          ty2=TY_pointed(ty2);
+          if (TY_is_f90_deferred_shape(ty2))
+                 ty2 = TY_etype(ty2);
+           opc = Load_Opcode[MTYPE_U8]; /* using MTYPE_U8 for pointer */
+           wn = WN_CreateIload(opc,0,ty2,ty2,kid0); 
+        }
+
+     cwh_stk_push_typed(wn,WN_item,ty1);
+
    return;
 }
+
+

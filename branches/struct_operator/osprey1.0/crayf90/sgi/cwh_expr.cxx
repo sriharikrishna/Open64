@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_expr
- * $Revision: 1.7 $
- * $Date: 2003-05-23 16:05:38 $
+ * $Revision: 1.7.4.1 $
+ * $Date: 2005-08-18 16:05:40 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.7.4.1 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -946,13 +946,13 @@ cwh_expr_operand(WN **arrexp)
 
   case DEREF_item:
     wn = cwh_stk_pop_DEREF();
-    wn = cwh_addr_load_WN(wn,0,NULL);
+    wn = cwh_addr_load_WN(wn,0,0);
     break ;
 
   case ST_item:
   case ST_item_whole_array:
     st  = cwh_stk_pop_ST();
-    wn  = cwh_addr_load_ST(st,0,NULL);
+    wn  = cwh_addr_load_ST(st,0,0);
     break ;
 
   case FLD_item:
@@ -1155,12 +1155,12 @@ fei_islg(TYPE type)
    arg2 = cwh_expr_operand(NULL);
    cwh_stk_push(WN_COPY_Tree(arg2),WN_item);
    cwh_stk_push(WN_COPY_Tree(arg1),WN_item);
-   cwh_expr_compare(OPR_LT,NULL);
+   cwh_expr_compare(OPR_LT,0);
 
    r1 = cwh_expr_operand(NULL);
    cwh_stk_push(arg2,WN_item);
    cwh_stk_push(arg1,WN_item);
-   cwh_expr_compare(OPR_GT,NULL);
+   cwh_expr_compare(OPR_GT,0);
 
    r2 = cwh_expr_operand(NULL);
    cwh_stk_push(r1,WN_item);

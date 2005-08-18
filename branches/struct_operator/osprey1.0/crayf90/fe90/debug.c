@@ -5833,8 +5833,6 @@ static void dump_at_ntry (FILE		*out_file,
                  "ATT_SEQUENCE_SET", boolean_str[ATT_SEQUENCE_SET(at_idx)],
                  "ATT_UNIQUE_ID", ATT_UNIQUE_ID(at_idx));
 
-         fprintf(out_file, "  %-16s= %-8d \n","ATT_TY_IDX",ATT_TY_IDX(at_idx)); /*fzhao-working*/
-
          if (ATT_STRUCT_BIT_LEN_IDX(at_idx) != NULL_IDX) {
             sprintf(str, "(%10s)",
                  convert_to_string(&CN_CONST(ATT_STRUCT_BIT_LEN_IDX(at_idx)),

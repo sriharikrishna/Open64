@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.37 $
- * $Date: 2005-06-30 16:24:18 $
+ * $Revision: 1.37.2.1 $
+ * $Date: 2005-08-18 16:05:30 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.37 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.37.2.1 $";
 #endif
 
 #include <ctype.h>
@@ -234,11 +234,7 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
 
    /* Declare the variable */
 
-/* don't output ST_sclass(st) == SCLASS_DGLOBAL as common block      */
-/* keep only st sclass is SCLASS_COMMON as common block output June  */
-
  if (Stab_Is_Common_Block(st))
-//  if (ST_sclass(st) == SCLASS_COMMON) 
    {
       /* Declare a common block */
       TY2F_Translate_Common(decl_tokens, st_name, ST_type(st));
@@ -407,8 +403,8 @@ INITPRO:
      else {
       if (ST_is_initialized(st) && 
        !Stab_No_Linkage(st)  )
-//       (!TY_Is_Structured(ST_type(st)) ||  //structure also can be initialized---fzhao
-//	(Stab_Is_Common_Block(st)       || 
+//     (!TY_Is_Structured(ST_type(st)) ||  /*structure can be initialized--FMZ*/
+//	(Stab_Is_Common_Block(st)      || 
 //	Stab_Is_Equivalence_Block(st))) 
        {
           inito = Find_INITO_For_Symbol(st);

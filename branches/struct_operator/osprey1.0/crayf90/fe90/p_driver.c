@@ -1296,7 +1296,6 @@ void init_parse_prog_unit()
       BD_USED_NTRY(idx)		= TRUE;
       BD_NTRY_SIZE(idx)		= 1;
       BD_GLOBAL_IDX(idx)	= idx;
-      BD_GLOBAL_IDX(idx)        = NULL;
    }
 
    PRINT_INTRIN;	/* If -u intrin and DEBUG compiler, print intrin tbl */

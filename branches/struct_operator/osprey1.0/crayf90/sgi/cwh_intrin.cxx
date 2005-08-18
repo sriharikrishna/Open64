@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_intrin
- * $Revision: 1.6 $
- * $Date: 2003-02-20 01:51:31 $
+ * $Revision: 1.6.8.1 $
+ * $Date: 2005-08-18 16:05:40 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -56,7 +56,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_intrin.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_intrin.cxx,v $ $Revision: 1.6.8.1 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -247,7 +247,7 @@ cwh_intrin_wrap_ref_parm(WN *wa, TY_IDX ty)
   WN * wn  ;
 
 
-  if (ty == NULL) 
+  if (ty == 0) 
     ty = cwh_types_WN_TY(wa,TRUE);
 
   wn = WN_CreateParm (Pointer_Mtype,
@@ -2205,7 +2205,7 @@ cwh_intrin_sync_intrin(INTRINSIC i4intrin, INTRINSIC i8intrin, TYPE_ID rtype, IN
 	    wn = cwh_expr_operand(NULL);
 	    atype = WNRTY(wn);
 	    st = cwh_stab_temp_ST(Be_Type_Tbl(atype),"synctmp");
-	    cwh_addr_store_ST(st,0,NULL,wn);
+	    cwh_addr_store_ST(st,0,0,wn);
 	    args[i] = cwh_addr_address_ST(st,0);
 	    cwh_expr_set_flags(st,f_T_PASSED);
 	 }

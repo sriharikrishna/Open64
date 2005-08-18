@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_directive
- * $Revision: 1.4 $
- * $Date: 2004-12-14 17:34:46 $
- * $Author: eraxxon $
+ * $Revision: 1.4.2.1 $
+ * $Date: 2005-08-18 16:05:39 $
+ * $Author: fzhao $
  *
  * Description: contains routines to support directives, converting
  *              from Cray IR to WHIRL. Entry points from
@@ -352,7 +352,7 @@ cwh_region(REGION_KIND kind)
 			     pragmas,
 			     exits,
 			     -1, 
-			     NULL);
+			     0);
   cwh_block_append(region);
 
   /* push the region on the block stack and   */
@@ -2798,7 +2798,7 @@ cwh_directive_load_value_pragma(INT32 item, WN_PRAGMA_ID pragma, BOOL is_omp)
     p = cast_to_STB(item);
     DevAssert((p->form == is_ST),("Odd item"));
 
-    wn1 = cwh_addr_load_ST((ST *)p->item, 0, NULL);
+    wn1 = cwh_addr_load_ST((ST *)p->item, 0, 0);
     cwh_stmt_add_xpragma(pragma,is_omp,wn1);
   }
 }
@@ -2831,7 +2831,7 @@ fei_copyin_bound(INTPTR sym_idx)
       !ST_auxst_xpragma_copyin(st)) {
 
     wn = WN_CreateXpragma ( WN_PRAGMA_COPYIN_BOUND, (ST_IDX) NULL, 1 );
-    WN_kid0(wn) = cwh_addr_load_ST(st,0,NULL);
+    WN_kid0(wn) = cwh_addr_load_ST(st,0,0);
     cwh_block_append(wn);
     Set_ST_auxst_xpragma_copyin(st,TRUE);
   }
