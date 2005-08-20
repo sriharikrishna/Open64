@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.28.2.1 $
- * $Date: 2005-08-18 16:05:41 $
+ * $Revision: 1.28.2.2 $
+ * $Date: 2005-08-20 04:06:20 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -590,6 +590,9 @@ fei_store ( TYPE result_type )
       return ;
     }
 
+//FMZ August 2005 
+   if (WN_operator(rhs)==OPR_STRCTFLD)
+       rhs = addr_gen_iload_for_strctfld(rhs);
 
     switch(cwh_stk_get_class()) {
     case WN_item:
