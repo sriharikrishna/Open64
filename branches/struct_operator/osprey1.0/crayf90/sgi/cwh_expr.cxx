@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_expr
- * $Revision: 1.7.4.1 $
- * $Date: 2005-08-18 16:05:40 $
+ * $Revision: 1.7.4.2 $
+ * $Date: 2005-08-20 17:05:43 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.7.4.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.7.4.2 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -428,6 +428,13 @@ cwh_expr_binop(OPERATOR op,TY_IDX  result_ty)
 
   rhs = cwh_expr_operand(&ae);
   lhs = cwh_expr_operand(&ae);
+
+//FMZ August 2005
+  if (WN_operator(rhs)==OPR_STRCTFLD)
+       rhs = addr_gen_iload_for_strctfld(rhs);
+
+  if (WN_operator(lhs)==OPR_STRCTFLD)
+       lhs = addr_gen_iload_for_strctfld(lhs);
 
   ot  = cwh_get_highest_type(rhs,lhs);
   if (result_ty) {
