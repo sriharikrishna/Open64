@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.10.4.1 $
- * $Date: 2005-08-18 16:05:39 $
+ * $Revision: 1.10.4.2 $
+ * $Date: 2005-08-20 04:06:20 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -3143,3 +3143,15 @@ fei_field_dot(TYPE type)
 }
 
 
+extern  WN*
+addr_gen_iload_for_strctfld(WN * wn)
+{
+  OPCODE opc;
+  WN *wni;
+  TY_IDX ty;
+  ty = WN_ty(wn);
+  opc = Load_Opcode[TY_mtype(ty)];
+  wni= WN_CreateIload(opc,0,ty,ty,wn);
+  return wni;
+
+}

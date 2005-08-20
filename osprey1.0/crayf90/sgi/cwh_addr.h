@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_addr.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:07 $
+ * $Revision: 1.2.8.1 $
+ * $Date: 2005-08-20 04:06:20 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_addr.h,v $
  *
@@ -55,7 +55,7 @@
 #define CWH_ADDR_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_addr.h,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_addr.h,v $ $Revision: 1.2.8.1 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Offset field as 64 bits - translate into 32 later ***FIX */
@@ -106,6 +106,7 @@ extern OPCODE opc_sint;
 extern TYPE_ID   cwh_addr_char_len_typeid;
 extern TYPE_ID   cwh_bound_int_typeid;
 extern TYPE_ID   cwh_doloop_typeid;
+extern WN * addr_gen_iload_for_strctfld(WN *);
 
 #define IS_ALTENTRY_TEMP(s) ((ST_class(s) == CLASS_VAR)     && \
 	                     (ST_base_idx(s) != ST_st_idx(s)) && \
