@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_expr
- * $Revision: 1.7.4.2 $
- * $Date: 2005-08-20 17:05:43 $
+ * $Revision: 1.7.4.3 $
+ * $Date: 2005-08-22 20:55:55 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.7.4.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.7.4.3 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1311,11 +1311,24 @@ fei_paren(TYPE type,INT processing_call)
 
   TY_IDX  ty ;
   TYPE_ID t;
+  WN*     wni;
+  TY_IDX  tyi ;
 
   ty = cast_to_TY(t_TY(type));
   ty = cwh_types_scalar_TY(ty);
   t = TY_mtype(ty);
-  
+
+  if (processing_call)
+   { 
+    if (cwh_stk_get_class()==WN_item){
+        wni  = cwh_stk_pop_WN();
+        if (WN_operator(wni)==OPR_STRCTFLD)   
+           wni = addr_gen_iload_for_strctfld(wni);
+        tyi = WN_ty(wni);
+        cwh_stk_push_typed(wni,WN_item,tyi);
+      }
+   }
+
   if (MTYPE_is_float(t) || MTYPE_is_complex(t) || 
        processing_call) { 
      cwh_expr_unop(OPR_PAREN,ty);
