@@ -1802,7 +1802,7 @@ if the object is a register.
 
 \item
 \index{ILOAD}%
-ILOAD res=i,f,z,Mdesc=all \hfill [VH--VL]
+ILOAD res=i,f,z,M desc=all \hfill [VH--VL]
 
 A load or dereference is performed from the address in bytes given by
 adding the offset field to the address computed by Kid 0. This node
@@ -2675,6 +2675,47 @@ struct, field\_id identifies the exact field. This operator can be
 viewed as computing the l-value of an
 \index{ILOAD}%
 ILOAD that has the same contents and kid.
+
+
+\item
+\index{STRCTFLD}%
+STRCTFLD res=A4,A8 desc=A4,A8 \hfill [VH]
+
+This operator represents a source-level selection operator, except
+that instead of taking a value (a whole structure) and returning a
+value (a field in the structure), it takes the address of the
+structure given by Kid 0 and returns the address of the field
+reference identified by field\_id .  (Note that the field\_id refers
+to the {\em unflattend} structure layout; see below.) Thus, the
+operator really is semantic sugar for some pointer arithimetic; it
+performs no loads (ILOADS or LDAs).  The operator contains two
+ty\_idx's, one giving the type of the structure (WN\_load\_addr\_ty)
+and the other the type of the field (WN\_ty).
+
+Originally, even in VH WHIRL, the representation of structure field
+accesses (i.e., {\tt x.y} in C or {\tt x\%y} in Fortran) was acutely
+inconvenient for source-to-source compiling (e.g., transformations and
+unparsing).  First, field references were usually represented using
+either the offset or field\_id entries of one of the WHIRL load or store
+operators -- but not always.  For example, to access a field in an
+array element, actual OPR\_ADD nodes appeared in the AST because
+OPR\_ARRAY has no offset field.  Second, even when structure
+references were represented in WHIRL load operators, they were
+difficult to understand from a source-level perspective.  Consider an
+access to the first field in a structure.  If the front-end did not
+set the field\_id (a la the Fortran front end), then the offset
+of the first field would be 0 and the only way to detect the presence
+of the field-selection operator was by comparing the type of the
+loaded object and the type of base pointer.  Consider a second example
+where the source code references a field in a nested structure, that
+is, a structure within a structure.  Because the typical semantics of
+a WHIRL load assumed {\em flattened} structures, the unparsers had to
+do a lot of work to reconstruct the multiple field-selection operators
+that actually appeared at the source-code level.
+
+We designed this operator so that writing a pass to lower it to the
+original implicit plus flattened representation would be very eady.
+
 
 \index{EXTRACT\_BITS}%
 \item  EXTRACT\_BITS res= I4,I8,U4,U8 \hfill [VH--VL]
