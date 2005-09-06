@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.38.2.1 $
- * $Date: 2005-08-18 16:05:31 $
+ * $Revision: 1.38.2.2 $
+ * $Date: 2005-09-06 21:05:34 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.38.2.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.38.2.2 $";
 #endif
 
 #include <alloca.h>
@@ -1261,6 +1261,9 @@ public:
      BOOL variabledefinemodule = !strcmp(stbasename,scope_name);
 
        nomodulevar = !ST_is_in_module(st)||strcmp(stbasename,scope_name);
+
+    if (ST_is_deleted(st)) /*CFC works on AST coulde delete some STs*/
+          return;
  
      if (ST_class(st)==CLASS_PARAMETER)
        {
