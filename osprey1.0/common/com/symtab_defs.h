@@ -179,7 +179,8 @@ enum ST_EXT_FLAGS
     ST_ONE_PER_PU 	       = 0x4000,               // Only 1 instance per pu
     ST_COPY_CONSTRUCTOR_ST     = 0x8000,    // ST is copy constructor function
     ST_INITV_IN_OTHER_ST       = 0x10000,    // ST is being used as an initianliation offset by other symbol
-    ST_IS_INITIALIZED_IN_F90    =0x20000
+    ST_IS_INITIALIZED_IN_F90    =0x20000,
+    ST_IS_DELETED 		=0x40000
   
  }; // ST_EXT_FLAGS
 

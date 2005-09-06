@@ -370,6 +370,13 @@ inline void
 Clear_ST_is_reshaped (ST& s)		{ s.flags &= ~ST_IS_RESHAPED; }
 
 inline BOOL
+ST_is_deleted (const ST& s)		{ return s.flags_ext & ST_IS_DELETED; }
+inline void
+Set_ST_is_deleted (ST& s)		{ s.flags_ext |= ST_IS_DELETED; }
+inline void
+Clear_ST_is_deleted (ST& s)		{ s.flags_ext &= ~ST_IS_DELETED; }
+
+inline BOOL
 ST_emit_symbol (const ST& s)		{ return s.flags & ST_EMIT_SYMBOL;}
 inline void
 Set_ST_emit_symbol (ST& s)		{ s.flags |= ST_EMIT_SYMBOL; }
