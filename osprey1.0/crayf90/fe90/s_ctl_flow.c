@@ -1577,10 +1577,12 @@ void deallocate_stmt_semantics (void)
       if (ATD_ALLOCATABLE(attr_idx) &&
           ATD_PE_ARRAY_IDX(attr_idx) != NULL_IDX) {
           has_pe_ref = TRUE;
+          has_normal_ref = FALSE;
 
       }
       else {
-         has_normal_ref = TRUE;
+        if (!has_pe_ref)
+            has_normal_ref = TRUE;
       }
 
       while (OPND_FLD(opnd) == IR_Tbl_Idx &&
