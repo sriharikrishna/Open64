@@ -1641,8 +1641,14 @@ void	array_dim_resolution(int 	attr_idx,
       
 
       for (dim = 1; dim <= BD_RANK(bd_idx); dim++) {
+#if 0  
+/* need to keep deferred shape array with lower bound unknown 
+ * FMZ */
            BD_LB_FLD(bd_idx,dim)       = CN_Tbl_Idx;
            BD_LB_IDX(bd_idx, dim)  = CN_INTEGER_ONE_IDX;
+#else
+           BD_LB_FLD(bd_idx,dim)       = NO_Tbl_Idx;
+#endif 
            BD_UB_FLD(bd_idx, dim)      = NO_Tbl_Idx;
            BD_XT_FLD(bd_idx, dim)      = NO_Tbl_Idx;
            
