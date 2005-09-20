@@ -1036,7 +1036,7 @@ boolean expr_semantics (opnd_type       *result_opnd,
 
   operator_type   fm2;
   fld_type  fm1; 
-
+  
    TRACE (Func_Entry, "expr_semantics", NULL);
 
    save_check_type_conversion   = check_type_conversion;
@@ -2503,7 +2503,6 @@ boolean  gen_whole_subscript (opnd_type *opnd, expr_arg_type *exp_desc)
    int		trip_idx;
    enum fld_values ffmm;
 
-
    TRACE (Func_Entry, "gen_whole_subscript", NULL);
 
    attr_idx = find_base_attr(opnd, &line, &col);
@@ -2889,6 +2888,9 @@ boolean  gen_whole_substring (opnd_type *opnd,
    int          sub_idx;
    boolean      ok = TRUE;
 
+#ifdef OPENADNOCONVERSIONS
+   return(ok);
+#endif
 
    TRACE (Func_Entry, "gen_whole_substring", NULL);
 
