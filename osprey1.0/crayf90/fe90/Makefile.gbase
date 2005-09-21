@@ -246,6 +246,10 @@ endif
 CF90CATPATH = '"'$(PWD)/../sgi/cf90.cat'"'  # put it in targ dir
 CFLAGS += -DCF90CATPATHNAME=$(CF90CATPATH)
 
+ifdef OPENAD_BUILD
+CFLAGS += -DOPENADNOCONVERSIONS
+endif 
+
 #----------------------------------------------------------------------
 #  Define target
 #----------------------------------------------------------------------
