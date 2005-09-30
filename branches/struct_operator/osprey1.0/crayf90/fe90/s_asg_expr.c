@@ -2311,6 +2311,7 @@ boolean expr_sem (opnd_type       *result_opnd,
             case Kwd_Opr              :
    
                /* must be error in array spec */
+
                PRINTMSG(IR_LINE_NUM(ir_idx), 197, Error, IR_COL_NUM(ir_idx),
                         ", or )", "=");
                ok = FALSE;
@@ -3658,6 +3659,8 @@ void	add_substring_length(int	sub_idx)
    IL_NEXT_LIST_IDX(end_idx)  = list_idx;
    IR_LIST_CNT_R(sub_idx)++;
 
+/*do not generate MAX---FMZ Sept 2005*/
+#if !defined(SOURCE_TO_SOURCE)
    NTR_IR_TBL(max_idx);
    IR_OPR(max_idx)		= Max_Opr;
    IR_TYPE_IDX(max_idx)		= CG_INTEGER_DEFAULT_TYPE;
@@ -3680,6 +3683,7 @@ void	add_substring_length(int	sub_idx)
    NTR_IR_LIST_TBL(IL_NEXT_LIST_IDX(list2_idx));
    IL_PREV_LIST_IDX(IL_NEXT_LIST_IDX(list2_idx)) = list2_idx;
    list2_idx = IL_NEXT_LIST_IDX(list2_idx);
+#endif
 
    NTR_IR_TBL(plus_idx);
    IR_OPR(plus_idx) = Plus_Opr;
@@ -3687,8 +3691,13 @@ void	add_substring_length(int	sub_idx)
    IR_LINE_NUM(plus_idx) = line;
    IR_COL_NUM(plus_idx)  = col;
 
+#if !defined(SOURCE_TO_SOURCE)
    IL_FLD(list2_idx) = IR_Tbl_Idx;
    IL_IDX(list2_idx) = plus_idx;
+#else
+   IL_FLD(list_idx) = IR_Tbl_Idx;
+   IL_IDX(list_idx) = plus_idx;
+#endif
 
    NTR_IR_TBL(minus_idx);
    IR_OPR(minus_idx) = Minus_Opr;
@@ -10861,7 +10870,7 @@ static boolean triplet_opr_handler(opnd_type		*result_opnd,
 
 
    exp_desc_l.rank = 0;
-   list_idx = IL_NEXT_LIST_IDX(list_idx);
+   list_idx = IL_NEXT_LIST_IDX(list_idx); 
    COPY_OPND(opnd, IL_OPND(list_idx));
    ok &= expr_sem(&opnd, &exp_desc_l);
    COPY_OPND(IL_OPND(list_idx), opnd);
