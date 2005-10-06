@@ -103,7 +103,7 @@ static	boolean	symbolic_constant_expr;
 static	int    	processing_call;
 static	int    	io_ctl_list; 
 static	int    	is_subscript; 
-static  int     nested_array;
+static  int     nested_array = 0 ;
 static	int    	curr_sh;
 static	int	io_type;
 static  int     case_cmic_vpr_idx;
@@ -6217,13 +6217,9 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
    case Whole_Subscript_Opr :
    case Section_Subscript_Opr:
    case Subscript_Opr :
-        if (is_subscript)
-               nested_array=TRUE;
-        else
-          {
-	   is_subscript = TRUE;
-	   nested_array = FALSE;
-           }
+	nested_array++;
+        if (!is_subscript)
+	     is_subscript = TRUE;
 
         whole_subscript = IR_WHOLE_ARRAY(ir_idx);
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
@@ -6252,8 +6248,8 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
        if (IR_OPR(ir_idx) == Whole_Subscript_Opr &&
     		       processing_call) {
              is_subscript = FALSE; 
-             nested_array = FALSE;
-             break;  /* fzhao */
+             nested_array = 0;
+             break; 
         }
      
         attr_idx = find_base_attr(&IR_OPND_L(ir_idx), &line, &col);
@@ -6671,15 +6667,12 @@ CONTINUE:
            fei_static_subscripts(static_subscripts);
 # endif
         }
-        if (nested_array)
-             nested_array = FALSE;
-        else
-	     is_subscript = FALSE;
+
+	nested_array--;
+        if (!nested_array)
+	    is_subscript = FALSE;
+
         break;
-
-
-
-
 
    case Present_Opr :
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
