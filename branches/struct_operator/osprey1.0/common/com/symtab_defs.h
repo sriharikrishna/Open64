@@ -112,7 +112,8 @@ enum ST_EXPORT
 					// non-preemptible. 
     EXPORT_PREEMPTIBLE	= 5,		// Exported and preemptible.
     EXPORT_OPTIONAL	= 6,		// STO_OPTIONAL case in "sys/elf.h"
-    EXPORT_COUNT	= 7		// Must be last for consistency
+    EXPORT_INTRINSIC    = 7,            // FORTRAN 90 intrinsic function
+    EXPORT_COUNT	= 8		// Must be last for consistency
 					// checking 
 }; // ST_EXPORT
 

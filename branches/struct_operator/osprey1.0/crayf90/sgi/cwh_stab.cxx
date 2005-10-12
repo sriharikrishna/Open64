@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.26.2.1 $
- * $Date: 2005-08-18 16:05:40 $
+ * $Revision: 1.26.2.2 $
+ * $Date: 2005-10-12 21:58:38 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.26.2.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.26.2.2 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -637,13 +637,19 @@ fei_proc_imp(INT32 lineno,
 
       INT32  level = HOST_LEVEL ;
 
-      if (Class == PDGCS_Proc_Intern_Ref ||
-          Class == PDGCS_Proc_SrcIntrin )
-     {                              /*add PDGCS_Proc_SrcIntrin for intrinsics*/
+      if (Class == PDGCS_Proc_Intern_Ref) 
+      {     
 	level  = INTERNAL_LEVEL;
 	eclass = EXPORT_LOCAL_INTERNAL;
         
       }
+
+    if (Class == PDGCS_Proc_SrcIntrin)  /* FMZ add for keep intrinsic as call */
+      {
+	level = INTERNAL_LEVEL;
+        eclass = EXPORT_INTRINSIC; 
+      }
+
     while (map < NUM_INAMEMAP &&
                (strcmp(Iname_Map[map].oldname,name_string)))
         ++map;
