@@ -1568,6 +1568,7 @@ EnumToStr_t STExportToNameTbl[EXPORT_COUNT] = {
   EnumToStr_t(EXPORT_PROTECTED,      "X_PROTECTED"),
   EnumToStr_t(EXPORT_PREEMPTIBLE,    "X_PREEMPTIBLE"),
   EnumToStr_t(EXPORT_OPTIONAL,       "X_OPTIONAL"),
+  EnumToStr_t(EXPORT_INTRINSIC,       "X_INTRINSIC"),
 };
 
 EnumToStr_t TYKindToNameTbl[KIND_LAST] = {
@@ -1816,7 +1817,8 @@ FlagToStr_t STEXTFLAGS_ToStrTbl[] = {
   STEXTFLAGS_ToStrTblENTRY(ST_ONE_PER_PU),
   STEXTFLAGS_ToStrTblENTRY(ST_COPY_CONSTRUCTOR_ST),
   STEXTFLAGS_ToStrTblENTRY(ST_INITV_IN_OTHER_ST),
-  STEXTFLAGS_ToStrTblENTRY(ST_IS_INITIALIZED_IN_F90)
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_INITIALIZED_IN_F90),
+  STEXTFLAGS_ToStrTblENTRY(ST_IS_DELETED),
 };
 
 const UINT STEXTFLAGS_ToStrTblSZ = 
@@ -1965,10 +1967,9 @@ FlagToStr_t PUFLAGS_ToStrTbl[] = {
   PUFLAGS_ToStrTblENTRY(PU_IS_THUNK),
   PUFLAGS_ToStrTblENTRY(PU_DECL_VIEW),
   PUFLAGS_ToStrTblENTRY(PU_NEED_UNPARSED),
-  PUFLAGS_ToStrTblENTRY(PU_NEEDS_MANUAL_UNWINDING)
+  PUFLAGS_ToStrTblENTRY(PU_NEEDS_MANUAL_UNWINDING),
 #ifdef TARG_X8664
-  ,
-  PUFLAGS_ToStrTblENTRY(PU_FF2C_ABI
+  PUFLAGS_ToStrTblENTRY(PU_FF2C_ABI)
 #endif
 };
 
@@ -2263,7 +2264,7 @@ ST::Print (FILE *f, BOOL verbose) const
 
     switch (sym_class) {
     case CLASS_VAR:
-    case CLASS_TYPE: //FMZ 
+    case CLASS_TYPE: 
 	ty_idx = u2.type;
 	break;
 
@@ -2432,7 +2433,6 @@ TY::Print (FILE *f) const
     fprintf (f, "%-14s:",
 	     name_idx ? &Str_Table[name_idx] : "(anon)");
 
-/*FMZH    fprintf (f, " (f: 0x%04x", flags);*/
     fprintf (f, " (f: 0x%08x", flags);
     if (flags) {
         const char* flgstr = TY_FLAGS_To_Str(flags);
@@ -2536,7 +2536,7 @@ PU::Print (FILE *f) const
 	     "\tlexical level %d, LANG 0x%02x, TARGET_INFO %d\n",
 	     flags, lexical_level, src_lang, target_idx); 
     if (flags & PU_DECL_VIEW) {
-        fprintf(f,"Attention!!!: this pu represents only information for a  declaration !");
+        fprintf(f,"Attention!!!: Declaration only (PU_DECL_VIEW)!");
         fprintf(f,"\n");
     }
 

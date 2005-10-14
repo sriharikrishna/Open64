@@ -2113,16 +2113,7 @@ typedef enum {
   OPC_I16IMPLIED_DO  = OPR_IMPLIED_DO + RTYPE(MTYPE_I16) + DESC(MTYPE_V),
   OPC_U16IMPLIED_DO  = OPR_IMPLIED_DO + RTYPE(MTYPE_U16) + DESC(MTYPE_V),
 
-
-//  OPCODE_LAST            = 0x3FFFF
-//  OPCODE_LAST            = 0x40017
-//  OPCODE_LAST            = 0x4002F
-//  OPCODE_LAST            = 0x40030
-//  OPCODE_LAST            = 0x40031
-//  OPCODE_LAST            = 0x40032
-//  OPCODE_LAST            = 0x40038
-//  OPCODE_LAST            = 0x4003A
-  OPCODE_LAST            = 0x4005C
+  OPCODE_LAST            = 0x3FFFF
 
 } OPCODE;
 
