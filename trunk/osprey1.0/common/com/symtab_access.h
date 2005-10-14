@@ -370,6 +370,13 @@ inline void
 Clear_ST_is_reshaped (ST& s)		{ s.flags &= ~ST_IS_RESHAPED; }
 
 inline BOOL
+ST_is_deleted (const ST& s)		{ return s.flags_ext & ST_IS_DELETED; }
+inline void
+Set_ST_is_deleted (ST& s)		{ s.flags_ext |= ST_IS_DELETED; }
+inline void
+Clear_ST_is_deleted (ST& s)		{ s.flags_ext &= ~ST_IS_DELETED; }
+
+inline BOOL
 ST_emit_symbol (const ST& s)		{ return s.flags & ST_EMIT_SYMBOL;}
 inline void
 Set_ST_emit_symbol (ST& s)		{ s.flags |= ST_EMIT_SYMBOL; }
@@ -1495,13 +1502,16 @@ inline char *
 FLD_name (FLD_HANDLE fld)		{ return &Str_Table[fld.Entry()->name_idx]; }
 
 inline TY_IDX
-//FLD_type (FLD_HANDLE fld)		{ return fld.Entry()->type; }
+#if 0
+FLD_type (FLD_HANDLE fld)		{ return fld.Entry()->type; }
+#endif
 FLD_type (FLD_HANDLE fld)		
 {
    if (TY_is_f90_pointer(fld.Entry()->type))
      return TY_pointed(fld.Entry()->type);
    else 
      return fld.Entry()->type; }
+
 inline void
 Set_FLD_type (FLD_HANDLE fld, TY_IDX ty){ fld.Entry()->type = ty; }
 
