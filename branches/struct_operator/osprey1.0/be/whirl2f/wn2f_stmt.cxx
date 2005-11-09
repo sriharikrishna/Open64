@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.38.2.2 $
- * $Date: 2005-09-06 21:05:34 $
+ * $Revision: 1.38.2.3 $
+ * $Date: 2005-11-09 17:03:49 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.38.2.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.38.2.3 $";
 #endif
 
 #include <alloca.h>
@@ -3453,11 +3453,38 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 //add "use w2f__types" to include kind-of-types definition
      Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(header_tokens, "use w2f__types");
-
-//add type declaration of the function 
-          if (add_rsl_decl){
-            TOKEN_BUFFER temp_tokens = New_Token_Buffer();
-            Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
+                                                                                 
+      // add "use mm"
+      TyIdxToStIdxMap::iterator currpos;
+                                                                                 
+      // set "module st " with "BE_ST_w2fc_referenced"
+      // to prevent multiple "use" stmt
+      for (currpos=tyidx_modidx.begin();
+           currpos != tyidx_modidx.end();
+           currpos++)
+            Set_BE_ST_w2fc_referenced(currpos->second);
+                                                                                 
+      for (param = 0; param < num_params; param++) {
+            TY_IDX parmty= ST_type(param_st[param]);
+            ST_IDX currmod;
+            if (TY_kind(parmty) == KIND_STRUCT) {
+                currpos=tyidx_modidx.find(parmty);
+                if (currpos !=tyidx_modidx.end()) {
+                   currmod = currpos->second;
+                   if (BE_ST_w2fc_referenced(currmod)) {
+                      Clear_BE_ST_w2fc_referenced(currmod);
+                      Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
+                      Append_Token_String(header_tokens,"use ");
+                      Append_Token_String(header_tokens,
+                            W2CF_Symtab_Nameof_St(&St_Table[currmod]));
+                    }
+                }
+           }
+       }
+                                                                                 
+       if (add_rsl_decl){
+              TOKEN_BUFFER temp_tokens = New_Token_Buffer();
+              Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
 	
             if (TY_Is_Pointer(return_ty))
                 TY2F_translate(temp_tokens,

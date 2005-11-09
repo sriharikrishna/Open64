@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.11 $
- * $Date: 2005-06-30 16:24:18 $
+ * $Revision: 1.11.2.1 $
+ * $Date: 2005-11-09 17:03:49 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.11 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.11.2.1 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -174,6 +174,7 @@ WN_MAP *W2F_Construct_Map = NULL;    /* Construct id mapping for prompf */
 WN_MAP  W2F_Frequency_Map = WN_MAP_UNDEFINED; /* Frequency mapping */
 Unparse_Target *W2X_Unparse_Target = NULL;
 
+TyIdxToStIdxMap tyidx_modidx;
 
 /* ====================================================================
  *
@@ -614,6 +615,18 @@ struct enter_st
     }
 };
 
+struct build_type_mod_map
+{
+  void operator() (UINT32, ST* st)const {
+       if ((ST_class(st)==CLASS_TYPE) &&
+           (ST_is_in_module(ST_base(st))))
+       {
+         tyidx_modidx.insert(std::make_pair(ST_type(st),ST_base_idx(st)));
+         Set_BE_ST_w2fc_referenced(ST_base_idx(st));
+       }
+   }
+
+};
 
 static void
 W2F_Enter_Global_Symbols(void)
@@ -645,6 +658,8 @@ W2F_Enter_Global_Symbols(void)
 	(void)W2CF_Symtab_Nameof_St(st);
    }
 #endif
+
+   For_all(St_Table,GLOBAL_SYMTAB,build_type_mod_map());
 
 
 } /* W2F_Enter_Global_Symbols */
