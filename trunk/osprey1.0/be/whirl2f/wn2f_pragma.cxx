@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_pragma.c
- * $Revision: 1.5 $
- * $Date: 2005-02-02 22:09:52 $
- * $Author: eraxxon $
+ * $Revision: 1.6 $
+ * $Date: 2005-12-09 16:19:42 $
+ * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $
  *
  * Revision history:
@@ -56,7 +56,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_pragma.cxx,v $ $Revision: 1.6 $";
 #endif
 
 #include "alloca.h"
@@ -1997,6 +1997,23 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
       WN2F_Directive_Newline(tokens, "C$OPENAD XXX", WN_Get_Linenum(apragma));
       Append_Token_Special(tokens, ' ');
       Append_ST_String(tokens, apragma);
+      break;
+   }
+
+   case WN_PRAGMA_OPENAD_DEPENDENT: {
+      WN2F_Directive_Newline(tokens, "C$OPENAD DEPENDENT(", WN_Get_Linenum(apragma));
+      ST* st = WN_st(apragma);
+      const char* name = ST_name(st);
+      Append_Token_String(tokens,name);
+      Append_Token_Special(tokens, ')');
+      break;
+   }
+   case WN_PRAGMA_OPENAD_INDEPENDENT: {
+      WN2F_Directive_Newline(tokens, "C$OPENAD INDEPENDENT(", WN_Get_Linenum(apragma));
+      ST* st = WN_st(apragma);
+      const char* name = ST_name(st);
+      Append_Token_String(tokens,name);
+      Append_Token_Special(tokens, ')');
       break;
    }
       
