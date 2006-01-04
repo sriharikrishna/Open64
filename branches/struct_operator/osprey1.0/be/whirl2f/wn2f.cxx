@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.22.2.1 $
- * $Date: 2005-08-18 16:05:30 $
+ * $Revision: 1.22.2.2 $
+ * $Date: 2006-01-04 18:11:28 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.22.2.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.22.2.2 $";
 #endif
 
 #include <alloca.h>
@@ -272,7 +272,8 @@ static const WN2F_OPR_HANDLER WN2F_Opr_Handler_List[] =
    {OPR_ARRAY_CONSTRUCT,&WN2F_ar_construct},
    {OPR_IMPLIED_DO,&WN2F_noio_implied_do},
    {OPR_IDNAME, &WN2F_idname},
-   {OPR_STRCTFLD, &WN2F_strctfld}
+   {OPR_STRCTFLD, &WN2F_strctfld},
+   {OPR_COMMA, &WN2F_comma}
    
 }; /* WN2F_Opr_Handler_List */
 

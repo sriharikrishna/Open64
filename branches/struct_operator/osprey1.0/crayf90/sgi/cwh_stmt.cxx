@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.28.2.2 $
- * $Date: 2005-08-20 04:06:20 $
+ * $Revision: 1.28.2.3 $
+ * $Date: 2006-01-04 18:11:33 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -877,25 +877,31 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   TYPE_ID   rbtype2;
   OPCODE    opc;
 
-  BOOL        forward_barrier = FALSE;
-  BOOL        backward_barrier = FALSE;
-  WN * barrier_wn;
-  WN * len;
-  INT32 association;
+  BOOL       forward_barrier = FALSE;
+  BOOL       backward_barrier = FALSE;
+  WN *       barrier_wn;
+  WN *       len;
+  INT32      association;
+  ST *       keyword;
+  INT32      number_of_kwd=0;
 
 #if 0 // eraxxon: allow NULL parameter nodes
   INT32 num_null_args = 0;
 #endif
 
   /* figure # of args, including character lengths, clear return temp ST */
-
+#ifdef SOURCE_TO_SOURCE
+  nargs  = num_args + cwh_stk_count_STRs(2*num_args) ; 
+#else
   nargs  = num_args + cwh_stk_count_STRs(num_args) ; 
+#endif
+
   clen   = nargs;
   rt     = NULL;
 
   args = (WN **) malloc(nargs*sizeof(WN *));
 
-  for (k = num_args -1 ; k >= 0  ; k --) {
+  for (k = num_args -1; k >= 0  ; k --) {
 
     switch(cwh_stk_get_class()) {
     case STR_item:
@@ -960,7 +966,6 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
       ta = cwh_stk_get_TY();
       keepty = ta;
       wa = cwh_expr_operand(NULL);
-//      wa = cwh_intrin_wrap_value_parm(wa);
       wa = cwh_intrin_wrap_ref_parm(wa,ta);
       if (keepty)
          WN_set_ty(wa,keepty); 
@@ -976,7 +981,28 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
     default:
       DevAssert((0),("Odd call actual")) ; 
     }
-    
+
+#ifdef SOURCE_TO_SOURCE
+    if (args[k])
+        args[k]->u3.ty_fields.ty = 0;
+
+    switch(cwh_stk_get_class()) { //pop out the keyword item
+      case WN_item:
+          cwh_stk_pop_WN();
+	  break;
+
+      case STR_item:
+          cwh_stk_pop_STR();
+          cwh_stk_pop_WN(); /* pop out length of the keyword*/
+          keyword = cwh_stk_pop_ST();
+          args[k]->u3.ty_fields.ty = ST_st_idx(keyword);
+          number_of_kwd++;
+          break ;
+
+    default:
+          DevAssert((0),("Odd call key word")) ; 
+     } 
+#endif
     
     /* set the dummy-actual arguments association flags */
     association = arg_association_info.top(); 
@@ -1022,9 +1048,16 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
             break;
       }
     }
+
   }
 
-
+  if (number_of_kwd) { //move lengths forword
+      if (nargs > (num_args + number_of_kwd))
+         for (k=num_args; k< nargs; k++)
+               args[k]= args[k + number_of_kwd];
+      nargs -= number_of_kwd;
+   }
+      
 #if 0 // eraxxon: allow NULL parameter nodes
   /* eraxxon: adjust argument count if we have a NULL WN as an argument */
   if (num_null_args > 0) {

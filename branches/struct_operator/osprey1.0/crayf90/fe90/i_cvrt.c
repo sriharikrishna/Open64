@@ -101,6 +101,7 @@ static	boolean	whole_substring;
 static  boolean stack_data_constant;
 static	boolean	symbolic_constant_expr;
 static	int    	processing_call;
+static	int    	user_call;
 static	int    	io_ctl_list; 
 static	int    	is_subscript; 
 static  int     nested_array = 0 ;
@@ -1686,14 +1687,29 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
    case IL_Tbl_Idx :
    
       while (ir_idx != NULL_IDX){   
-         cvrt_exp_to_pdg(IL_IDX(ir_idx), 
-                         IL_FLD(ir_idx));
+        int keep_user_call;
+        keep_user_call  = user_call;
+#ifdef SOURCE_TO_SOURCE
+        if (user_call) {
+          if  (IL_FLD(ir_idx) == IR_Tbl_Idx &&
+               IR_OPR(IL_IDX(ir_idx))==Kwd_Opr) {
+                    ;
+               }
+          else {
+           fei_null_expr();
+           }
+        }
+#endif
+       user_call = 0 ;
+       cvrt_exp_to_pdg(IL_IDX(ir_idx), 
+                       IL_FLD(ir_idx));
+       user_call = keep_user_call;
 
-         if (processing_call)
+       if (processing_call)
             fei_arg_associate(IL_ARG_MULTI_FLAGS(ir_idx));
 
          ir_idx = IL_NEXT_LIST_IDX(ir_idx);
-      }
+       }
 
       break;
 
@@ -1868,6 +1884,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
 
 
    case IR_Tbl_Idx :
+
 # if 0  
 # ifdef _DEBUG 
       if (IR_TYPE_IDX(ir_idx) == NULL_IDX) {
@@ -1928,7 +1945,6 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
 # endif
 
 # endif 
-
       switch (IR_OPR(ir_idx)) { 
 
       case Stmt_Expansion_Opr:
@@ -5768,6 +5784,15 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 # endif
         break;
 
+   case Kwd_Opr:  /*FMZ August 2005 */
+#ifdef SOURCE_TO_SOURCE
+        cvrt_exp_to_pdg(IR_IDX_L(ir_idx),  /* Kwd */
+		         IR_FLD_L(ir_idx));
+#endif
+        cvrt_exp_to_pdg(IR_IDX_R(ir_idx),  /* argument */
+		         IR_FLD_R(ir_idx));
+        break;
+
    case Struct_Opr :
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                         IR_FLD_L(ir_idx));
@@ -5810,6 +5835,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 
 
    case Triplet_Opr :
+
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                         IR_FLD_L(ir_idx));
 
@@ -6222,6 +6248,7 @@ basic = get_basic_type(IR_TYPE_IDX(ir_idx),0, NULL_IDX);
 	     is_subscript = TRUE;
 
         whole_subscript = IR_WHOLE_ARRAY(ir_idx);
+
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                         IR_FLD_L(ir_idx));
 
@@ -7033,14 +7060,15 @@ CONTINUE:
 
    case Call_Opr :
         processing_call = processing_call + 1;
-
         cvrt_exp_to_pdg(IR_IDX_L(ir_idx), 
                         IR_FLD_L(ir_idx));
 
         if (IR_IDX_R(ir_idx) != NULL_IDX &&
             IR_LIST_CNT_R(ir_idx) > 0) {
+           user_call = 1;
            cvrt_exp_to_pdg(IR_IDX_R(ir_idx), 
                            IR_FLD_R(ir_idx));
+           user_call = 0;
         }
 
         if (IR_IDX_R(ir_idx) == NULL_IDX) {

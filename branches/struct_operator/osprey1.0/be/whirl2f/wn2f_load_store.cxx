@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.23.4.1 $
- * $Date: 2005-08-18 16:05:30 $
+ * $Revision: 1.23.4.2 $
+ * $Date: 2006-01-04 18:11:29 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.23.4.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.23.4.2 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -2609,3 +2609,10 @@ WN2F_strctfld(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    return EMPTY_WN2F_STATUS;
 }
 
+
+WN2F_STATUS 
+WN2F_comma(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
+ {
+    WN2F_translate(tokens,WN_kid1(wn),context);
+    return EMPTY_WN2F_STATUS;
+ }
