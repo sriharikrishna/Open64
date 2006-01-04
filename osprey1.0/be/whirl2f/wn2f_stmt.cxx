@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.38.2.3 $
- * $Date: 2005-11-09 17:03:49 $
+ * $Revision: 1.38.2.4 $
+ * $Date: 2006-01-04 18:11:29 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.38.2.3 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.38.2.4 $";
 #endif
 
 #include <alloca.h>
@@ -1400,13 +1400,14 @@ public:
         (ST_pu(ST_base(st)) == current_PU) ) {
          Reset_TY_is_translated_to_c(ST_type(st));
        }
+
     if ((ST_sclass(st) == SCLASS_COMMON) &&   //common block
          (ST_pu(ST_base(st)) == current_PU) ) {
            Reset_TY_is_translated_to_c(ST_type(st));
 //           Set_BE_ST_w2fc_referenced(st);
        }
-
-    }
+  }
+    
 };
 
 static void
@@ -2789,7 +2790,7 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       * arguments ---FMZ
       */
 
-     if (strcmp(ST_name(WN_st(wn)),"SYSTEM_CLOCK") != 0) {
+     if (strcmp(ST_name(WN_st(wn)),"SYSTEM_CLOCK") != 0 || TRUE) { //don't need it anymore FMZ
        
        for (arg_idx = first_arg_idx, implicit_args = 0; 
             arg_idx <= last_arg_idx - implicit_args; 
@@ -2850,6 +2851,13 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
                has_stat = FALSE;
              
              first_nonemptyarg = TRUE;
+
+             if (WN_kid(wn, cur_idx)->u3.ty_fields.ty) {  //keyword  FMZ 
+	        ST2F_output_keyword(call_tokens,
+                     &St_Table[WN_kid(wn, cur_idx)->u3.ty_fields.ty]);
+                Append_Token_Special(call_tokens,'=');
+               } 
+
              WN2F_String_Argument(call_tokens,
                                   WN_kid(wn, cur_idx), /* string base */
                                   WN_kid(wn, len_idx), /* string length */
@@ -2932,6 +2940,7 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
          }
        }
      } /*not system_clock*/
+#if 0 
      else { /* here for system clock*/
        arg_idx = 0;  
        if (WN_kid(wn, arg_idx)!=NULL) {
@@ -2958,6 +2967,7 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
        }
        
      }
+#endif
      
      reset_WN2F_CONTEXT_no_parenthesis(context);
      reset_WN2F_CONTEXT_has_no_arr_elmt(context);
@@ -3289,7 +3299,7 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    INT           first_param;
    TY_IDX        return_ty;
    TOKEN_BUFFER  header_tokens;
-   INT           implicit = 0 ;
+   INT           implicit  ;
    BOOL          add_rsl_decl = 0;
 
 
@@ -3299,10 +3309,9 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
     ASSERT_DBG_FATAL(WN_operator(wn) == OPR_INTERFACE,
                      (DIAG_W2F_UNEXPECTED_OPC, "WN2F_interface_blk"));
-   if (ST_is_external(WN_st(wn)))
-    {
-      ;
-     } else {
+
+     if (ST_is_external(WN_st(wn)))
+         return EMPTY_WN2F_STATUS;
 
      Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(tokens, "interface ");
@@ -3333,141 +3342,122 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
          Append_Token_Special(tokens,')');
  
      Append_Token_Special(tokens, '\n');
- 
      Increment_Indentation();
-     for(k=0;k< WN_kid_count(wn);k++ )  // each kid is OPR_FUNC_ENTRY wn
+
+     for(k=0;k< WN_kid_count(wn);k++ ) 
+                 /* each kid is a WN with "OPR_FUNC_ENTRY" */
       {
+	implicit = 0;
         add_rsl_decl = 0;
         header_tokens =  New_Token_Buffer();
         num_params = WN_kid_count(WN_kid(wn,k));
         param_st = (ST **)alloca((num_params + 1) * sizeof(ST *));
         for (param = 0; param < num_params; param++)
-             {
-                    param_st[param] = WN_st(WN_formal(WN_kid(wn,k), param));
-              }
-
+          {
+                 param_st[param] = WN_st(WN_formal(WN_kid(wn,k), param)); 
+// if a type of a dummy argument is user defined type "mtype"
+// get the ST entry of the module "m1", add "use m1"
+           }
+        param_st[num_params]=NULL; /* terminate the list with NULL */
         st = &St_Table[WN_entry_name(WN_kid(wn,k))];
         TY_IDX       funtype = ST_pu_type(st);
 
         return_ty = W2X_Unparse_Target->Func_Return_Type(funtype);
 
-     if (ST_is_in_module(st) ) {
-          Append_Token_String(header_tokens,"module procedure ");
-          Append_Token_String(header_tokens, W2CF_Symtab_Nameof_St(st));     
-       }
-     else {
-      if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
-
-        {
-          Append_Token_String(header_tokens, "FUNCTION");
-
-          if (PU_recursive(Get_Current_PU())) 
-              Prepend_Token_String(header_tokens, "RECURSIVE");
-
-       /* Note that we cannot have functions returning pointer types
-        * in Fortran, so we use the corresponding integral type
-        * instead.
-        */
-
-          add_rsl_decl = 1;
-#if 0
-          if (TY_Is_Pointer(return_ty))
-             TY2F_translate(header_tokens,
-                         Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-          else {
-                 if (TY_kind(return_ty)==KIND_ARRAY && !TY_is_character(return_ty))
-                   TY2F_translate(header_tokens,TY_AR_etype(return_ty));
-                 else
-                   TY2F_translate(header_tokens, return_ty);
-               }
-#endif
-
-
+        if (ST_is_in_module(st) ) {
+             Append_Token_String(header_tokens,"module procedure ");
+             Append_Token_String(header_tokens, W2CF_Symtab_Nameof_St(st));     
           }
-       else /* subroutine */
-         {
-           Append_Token_String(header_tokens, "SUBROUTINE");
-         }
-
-        Append_Token_String(header_tokens, W2CF_Symtab_Nameof_St(st));
-
-   /* Emit the parameter name-list, if one is present, and skip any
-    * implicit "length" parameters associated with character strings.
-    * Such implicit parameters should be at the end of the parameter list.
-    */
-
-       first_param = ST2F_FIRST_PARAM_IDX(funtype);
-       BOOL isFirstArg = TRUE; /* become FALSE after first argument has been emitted */
-                               /* (radu@par.univie.ac.at) */
-      if (param_st[first_param] != NULL)
-         {
-          Append_Token_Special(header_tokens, '(');
-          for (param = first_param;
-               param < num_params;
-               param++)
-          {
-              if (implicit){
-                  param_st[param] = NULL;
-                  implicit = 0;
-               }
-              else {
-                 if (STAB_PARAM_HAS_IMPLICIT_LENGTH(param_st[param])) 
-                       implicit = 1;
-                 if (!ST_is_return_var(param_st[param])) {
-		   /* separate argument with a comma, if not the first one */
-                   /* (radu@par.univie.ac.at) */
-		       if(isFirstArg == FALSE)
-                            Append_Token_Special(header_tokens, ',');
-                       else
-                            isFirstArg = FALSE;
-                       Append_Token_String(header_tokens,
-                                           W2CF_Symtab_Nameof_St(param_st[param]));
-
-                       /* Bug: next and last param may be implicit */
-                       /* this causes the argument list to end with a comma (radu@par.univie.ac.at) */
-                       /* if (param+1 < num_params) */
-			  /*     Append_Token_Special(header_tokens, ','); */
-                   }else
-                      rslt = param_st[param];
-
-               }
-           }
-           Append_Token_Special(header_tokens, ')');
-       }
-     else 
-       {
-          /* Use the "()" notation for "no parameters" */
-        Append_Token_Special(header_tokens, '(');
-        Append_Token_Special(header_tokens, ')');
-     }
+        else {
+         if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
+                        /* function */
+           {
+             Append_Token_String(header_tokens, "FUNCTION");
    
-      if (rslt !=NULL && strcasecmp(W2CF_Symtab_Nameof_St(st), W2CF_Symtab_Nameof_St(rslt)) != 0) {
-	/* append the RESULT option only if it is different from the function name */
-        /* (radu@par.univie.ac.at) */
-               Append_Token_String(header_tokens,"result(");
-               Append_Token_String( header_tokens,
-                                    W2CF_Symtab_Nameof_St(rslt));
-               Append_Token_Special(header_tokens, ')');
-         }
+             if (PU_recursive(Get_Current_PU())) 
+                 Prepend_Token_String(header_tokens, "RECURSIVE");
+             add_rsl_decl = 1;
+             }
+          else         /* subroutine */
+            {
+              Append_Token_String(header_tokens, "SUBROUTINE");
+            }
+   
+           Append_Token_String(header_tokens, W2CF_Symtab_Nameof_St(st));
 
-//add "use w2f__types" to include kind-of-types definition
-     Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
-     Append_Token_String(header_tokens, "use w2f__types");
-                                                                                 
-      // add "use mm"
+
+      /* Emit the parameter name-list, if one is present, and skip any
+       * implicit "length" parameters associated with character strings.
+       * Such implicit parameters should be at the end of the parameter list.
+       */
+   
+          first_param = ST2F_FIRST_PARAM_IDX(funtype);
+          BOOL isFirstArg = TRUE; 
+                /* become FALSE after first argument has been emitted */
+                                  /* (radu@par.univie.ac.at) */
+         if (param_st[first_param] != NULL)
+            {
+             Append_Token_Special(header_tokens, '(');
+             for (param = first_param;
+                  param < num_params-implicit;
+                  param++)
+                {
+                  if (STAB_PARAM_HAS_IMPLICIT_LENGTH(param_st[param])) 
+                          implicit++;
+                  if (!ST_is_return_var(param_st[param])) {
+		      /* separate argument with a comma, if not the first one */
+                      /* (radu@par.univie.ac.at) */
+		          if(isFirstArg == FALSE)
+                               Append_Token_Special(header_tokens, ',');
+                          else
+                               isFirstArg = FALSE;
+                          Append_Token_String(header_tokens,
+                                              W2CF_Symtab_Nameof_St(param_st[param]));
+   
+                          /* Bug: next and last param may be implicit */
+                          /* this causes the argument list to end with a comma */
+                          /* (radu@par.univie.ac.at) */
+                     }else
+                         rslt = param_st[param];
+   
+              }
+              Append_Token_Special(header_tokens, ')');
+           }
+         else 
+           {
+             /* Use the "()" notation for "no parameters" */
+            Append_Token_Special(header_tokens, '(');
+            Append_Token_Special(header_tokens, ')');
+            }
+      
+        if (rslt !=NULL     && 
+             strcasecmp(W2CF_Symtab_Nameof_St(st), W2CF_Symtab_Nameof_St(rslt)) != 0)
+         {
+	   /* append the RESULT option only if it is different from the function name */
+           /* (radu@par.univie.ac.at) */
+           Append_Token_String(header_tokens,"result(");
+           Append_Token_String( header_tokens,
+                                W2CF_Symtab_Nameof_St(rslt));
+           Append_Token_Special(header_tokens, ')');
+          }
+   
+        Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
+        Append_Token_String(header_tokens, "use w2f__types");
+
+      // add "use mm" 
       TyIdxToStIdxMap::iterator currpos;
-                                                                                 
-      // set "module st " with "BE_ST_w2fc_referenced"
+
+      // set "module st " with "BE_ST_w2fc_referenced" 
       // to prevent multiple "use" stmt
       for (currpos=tyidx_modidx.begin();
            currpos != tyidx_modidx.end();
            currpos++)
             Set_BE_ST_w2fc_referenced(currpos->second);
-                                                                                 
-      for (param = 0; param < num_params; param++) {
+
+      for (param = 0; param < num_params; param++){
             TY_IDX parmty= ST_type(param_st[param]);
             ST_IDX currmod;
-            if (TY_kind(parmty) == KIND_STRUCT) {
+            if (TY_kind(parmty) == KIND_STRUCT) { 
                 currpos=tyidx_modidx.find(parmty);
                 if (currpos !=tyidx_modidx.end()) {
                    currmod = currpos->second;
@@ -3475,85 +3465,80 @@ WN2F_interface_blk(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
                       Clear_BE_ST_w2fc_referenced(currmod);
                       Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
                       Append_Token_String(header_tokens,"use ");
-                      Append_Token_String(header_tokens,
+                      Append_Token_String(header_tokens, 
                             W2CF_Symtab_Nameof_St(&St_Table[currmod]));
                     }
                 }
            }
-       }
-                                                                                 
-       if (add_rsl_decl){
-              TOKEN_BUFFER temp_tokens = New_Token_Buffer();
-              Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
-	
-            if (TY_Is_Pointer(return_ty))
-                TY2F_translate(temp_tokens,
-                         Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-             else {
-                  if (TY_kind(return_ty)==KIND_ARRAY && !TY_is_character(return_ty))
-                   TY2F_translate(temp_tokens,TY_AR_etype(return_ty));
-                 else
-                   TY2F_translate(temp_tokens, return_ty);
-                  }
+      }   
 
-             Append_Token_String(temp_tokens, W2CF_Symtab_Nameof_St(st));
-             Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
-
-           }
-  
-      if (num_params) 
-	    ReorderParms(param_st,num_params);
-
-      for (param = first_param; param < num_params ; param++)
    
-         if (param_st[param] != NULL) {
-            Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-           ST2F_decl_translate(header_tokens, param_st[param]);
-         if (ST_is_optional_argument(param_st[param])) {
-           Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-           Append_Token_String(header_tokens,"OPTIONAL ");
-           Append_Token_String(header_tokens,
-                              W2CF_Symtab_Nameof_St(param_st[param]));
+        if (add_rsl_decl){
+           TOKEN_BUFFER temp_tokens = New_Token_Buffer();
+           Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
+           if (TY_Is_Pointer(return_ty))
+               TY2F_translate(temp_tokens,
+                        Stab_Mtype_To_Ty(TY_mtype(return_ty)));
+            else {
+                 if (TY_kind(return_ty)==KIND_ARRAY && !TY_is_character(return_ty))
+                  TY2F_translate(temp_tokens,TY_AR_etype(return_ty));
+                else
+                  TY2F_translate(temp_tokens, return_ty);
+                 }
+            Append_Token_String(temp_tokens, W2CF_Symtab_Nameof_St(st));
+            Append_And_Reclaim_Token_List(header_tokens, &temp_tokens);
           }
-        if (ST_is_intent_in_argument(param_st[param])) {
-           Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-           Append_Token_String(header_tokens,"INTENT(in) ");
-           Append_Token_String(header_tokens,
-                              W2CF_Symtab_Nameof_St(param_st[param]));
-          }
-       if (ST_is_intent_out_argument(param_st[param])) {
-           Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
-           Append_Token_String(header_tokens,"INTENT(out) ");
-           Append_Token_String(header_tokens,
-                              W2CF_Symtab_Nameof_St(param_st[param]));
-          }
-        }
+     
+        if (num_params) 
+	      ReorderParms(param_st,num_params-implicit);
 
-      Append_Token_Special(header_tokens, '\n');
+        for (param = first_param; param < num_params-implicit ; param++)
+             if (param_st[param] != NULL) {
+                Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                ST2F_decl_translate(header_tokens, param_st[param]);
+                if (ST_is_optional_argument(param_st[param])) {
+                   Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                   Append_Token_String(header_tokens,"OPTIONAL ");
+                   Append_Token_String(header_tokens,
+                                     W2CF_Symtab_Nameof_St(param_st[param]));
+                  }
+                if (ST_is_intent_in_argument(param_st[param])) {
+                   Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                   Append_Token_String(header_tokens,"INTENT(in) ");
+                   Append_Token_String(header_tokens,
+                                      W2CF_Symtab_Nameof_St(param_st[param]));
+                  }
+                if (ST_is_intent_out_argument(param_st[param])) {
+                   Append_F77_Indented_Newline(header_tokens, 1, NULL/*label*/);
+                   Append_Token_String(header_tokens,"INTENT(out) ");
+                   Append_Token_String(header_tokens,
+                                      W2CF_Symtab_Nameof_St(param_st[param]));
+                  }
+               }
 
-      Append_F77_Indented_Newline(header_tokens, 0, NULL);
-
-      if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
-              Append_Token_String(header_tokens, "END FUNCTION");
-      else /* subroutine */
-              Append_Token_String(header_tokens, "END SUBROUTINE");
-    }
-
-       Append_Token_Special(header_tokens, '\n');
-       Append_F77_Indented_Newline(tokens, 0, NULL);
-       Append_And_Reclaim_Token_List(tokens, &header_tokens);
+        Append_Token_Special(header_tokens, '\n');
+        Append_F77_Indented_Newline(header_tokens, 0, NULL);
+   
+        if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) != KIND_VOID)
+             /* function */
+             Append_Token_String(header_tokens, "END FUNCTION");
+        else /* subroutine */
+                Append_Token_String(header_tokens, "END SUBROUTINE");
+         }
   
- }
+        Append_Token_Special(header_tokens, '\n');
+        Append_F77_Indented_Newline(tokens, 0, NULL);
+        Append_And_Reclaim_Token_List(tokens, &header_tokens);
+       }
      Decrement_Indentation();
-
      Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(tokens, "end interface ");
      Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
-
-   }
-
      return EMPTY_WN2F_STATUS;
- } //WN2F_interface_blk
+
+} //WN2F_interface_blk
+
+
 
 WN2F_STATUS
 WN2F_ar_construct(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)

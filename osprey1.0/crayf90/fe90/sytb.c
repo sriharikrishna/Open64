@@ -4610,12 +4610,24 @@ boolean	kind_to_linear_type(opnd_type		*opnd,
    linear_type_type	linear_type	= Err_Res;
    basic_type_type	type;
    int			type_idx;
+#ifdef SOURCE_TO_SOURCE
+   opnd_type	 	*kwd_c;
+#endif
 
 
    TRACE (Func_Entry, "kind_to_linear_type", NULL);
 
    type	= TYP_TYPE(ATD_TYPE_IDX(attr_idx));
 
+#ifdef SOURCE_TO_SOURCE
+   if (OPND_FLD((*opnd)) == IR_Tbl_Idx &&
+          IR_OPR(OPND_IDX((*opnd))) == Kwd_Opr) {
+       kwd_c = opnd;
+       opnd = &((IR_OPND_R(OPND_IDX((*opnd)))));
+    }
+       
+#endif
+   
    if (OPND_FLD((*opnd)) != CN_Tbl_Idx ||
        TYP_TYPE(CN_TYPE_IDX(OPND_IDX((*opnd)))) != Integer) {
 

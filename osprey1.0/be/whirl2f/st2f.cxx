@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.37.2.1 $
- * $Date: 2005-08-18 16:05:30 $
+ * $Revision: 1.37.2.2 $
+ * $Date: 2006-01-04 18:11:28 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.37.2.1 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.37.2.2 $";
 #endif
 
 #include <ctype.h>
@@ -956,7 +956,7 @@ ST2F_func_header(TOKEN_BUFFER tokens,
 	    {
 	      if (ST_is_value_parm(params[param]) && ST_is_value_parm(params[param+1])) 
 	      {
-		if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) == KIND_VOID ||TRUE) 
+		if (return_ty != (TY_IDX) 0 && TY_kind(return_ty) == KIND_VOID ) 
 		{
 		  param ++ ;
 		  params[param] = NULL; 
@@ -989,7 +989,8 @@ ST2F_func_header(TOKEN_BUFFER tokens,
  * name,if it does,don't declare the result variable
  */
   
-    if (rslt !=NULL && strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st))) { 
+    if (rslt !=NULL       && 
+         strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st))) { 
         has_result = 1;
         Append_Token_String(header_tokens,"result(");
         Append_Token_String(header_tokens,
@@ -1016,36 +1017,10 @@ ST2F_func_header(TOKEN_BUFFER tokens,
      if (PU_recursive(Get_Current_PU())) 
        Prepend_Token_String(header_tokens, "RECURSIVE");
        
-       /* Note that we cannot have functions returning pointer types
-	* in Fortran, so we use the corresponding integral type
-	* instead.
-	*/
-
-#if 0
-       if (has_result)
-           has_result = 0; 
-       else {
-          if (TY_Is_Pointer(return_ty))
-	      TY2F_translate(header_tokens, 
-			Stab_Mtype_To_Ty(TY_mtype(return_ty)));
-           else { 
-                 if (TY_kind(return_ty)==KIND_ARRAY)  {
-                       if (TY_is_character(TY_AR_etype(return_ty))) 
-                             ;
-                       else
-                          TY2F_translate(header_tokens,TY_AR_etype(return_ty));
-                  }
-                 else
-	           TY2F_translate(header_tokens, return_ty);
-            }
-	}
-#endif
-
       if (!has_result && (TY_kind(return_ty)!= KIND_ARRAY ||
 	                        !TY_is_character(TY_AR_etype(return_ty))))
               add_rsl_type=1;
-             
-     }
+      }
    }
    else /* subroutine */
    {
@@ -1161,46 +1136,6 @@ ST2F_func_header(TOKEN_BUFFER tokens,
                      ST2F_decl_translate(param_tokens, params[param]);
        }
    }
-
-#if 0
-//must issue scalar args first,then issue array args---fzhao
-      for (param = first_param; param < num_params -implicit_parms; param++) {
-
-         Append_F77_Indented_Newline(param_tokens, 1, NULL/*label*/);
-         if (params[param] && TY_kind(ST_type(params[param]))==KIND_POINTER)
-  
-            if (strcasecmp(W2CF_Symtab_Nameof_St(params[param]),W2CF_Symtab_Nameof_St(st))) {
-
-             ST2F_decl_translate(param_tokens, params[param]);
-
-             if (ST_is_optional_argument( params[param])) {
-                Append_F77_Indented_Newline(param_tokens, 1, NULL/*label*/);
-                Append_Token_String(param_tokens,"OPTIONAL ");
-                Append_Token_String(param_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-             }
-             if (ST_is_intent_in_argument( params[param])) {
-                TOKEN_BUFFER temp_tokens = New_Token_Buffer();
-                Append_F77_Indented_Newline(temp_tokens, 1, NULL/*label*/);
-                Append_Token_String(temp_tokens,"INTENT(IN) ");
-                Append_Token_String(temp_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-                Append_And_Reclaim_Token_List(param_tokens, &temp_tokens);
-
-              }
-             if (ST_is_intent_out_argument( params[param])) {
-                 Append_F77_Indented_Newline(param_tokens, 1, NULL/*label*/);
-                 Append_Token_String(param_tokens,"INTENT(OUT) ");
-                 Append_Token_String(param_tokens,
-                              W2CF_Symtab_Nameof_St(params[param]));
-             }
-
-           }
-        else
-             if (!strcasecmp(W2CF_Symtab_Nameof_St(rslt),W2CF_Symtab_Nameof_St(st)))
-                     ST2F_decl_translate(param_tokens, params[param]);
-       }
-#endif
 
     }
     
@@ -1328,5 +1263,27 @@ ST2F_Declare_Return_Type(TOKEN_BUFFER tokens,TY_IDX return_ty, const char *name)
 	Append_And_Reclaim_Token_List(tokens, &decl_tokens);
     }
   }
+}
+
+void
+ST2F_output_keyword(TOKEN_BUFFER tokens, ST * st)
+{
+  TCON 		strcon = STC_val(st);
+  INT32 	strlen ;
+  INT32 	stridx ;
+  const char	*strbase;
+  char 		*keyword;
+
+  strlen  = Targ_String_Length(strcon);
+  strbase = Targ_String_Address(strcon);
+  keyword = (char *) alloca(strlen +1);
+  for (stridx = 0; stridx<strlen;stridx++)
+       keyword[stridx] = strbase[stridx];
+  keyword[stridx] = '\0';
+  Append_Token_String(tokens,keyword);
+#if 0 
+     TCON2F_trans_to_keyword(tokens, STC_val(st));
+#endif
+     
 }
 

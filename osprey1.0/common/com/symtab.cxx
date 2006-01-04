@@ -2536,7 +2536,7 @@ PU::Print (FILE *f) const
 	     "\tlexical level %d, LANG 0x%02x, TARGET_INFO %d\n",
 	     flags, lexical_level, src_lang, target_idx); 
     if (flags & PU_DECL_VIEW) {
-        fprintf(f,"Attention!!!: this pu represents only information for a  declaration !");
+        fprintf(f,"Attention!!!: Declaration only (PU_DECL_VIEW)!");
         fprintf(f,"\n");
     }
 
