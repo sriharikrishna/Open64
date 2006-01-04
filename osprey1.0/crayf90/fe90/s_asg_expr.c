@@ -3660,14 +3660,9 @@ void	add_substring_length(int	sub_idx)
    IL_PREV_LIST_IDX(list_idx) = end_idx;
    IL_NEXT_LIST_IDX(end_idx)  = list_idx;
    IR_LIST_CNT_R(sub_idx)++;
-<<<<<<< s_asg_expr.c
-/*do not generate MAX---FMZ Sept 2005*/
-#if !defined(SOURCE_TO_SOURCE)
-=======
 
 /*do not generate MAX---FMZ Sept 2005*/
 #if !defined(SOURCE_TO_SOURCE)
->>>>>>> 1.10.4.2
    NTR_IR_TBL(max_idx);
    IR_OPR(max_idx)		= Max_Opr;
    IR_TYPE_IDX(max_idx)		= CG_INTEGER_DEFAULT_TYPE;
