@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.20 $
- * $Date: 2004-11-29 16:16:21 $
+ * $Revision: 1.21 $
+ * $Date: 2006-01-06 16:07:57 $
  * $Author: eraxxon $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.20 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.21 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -404,19 +404,19 @@ static const CONV_OP Conv_Op_Map[] =
    /* Only consider conversion to ptr sized unsigned numbers 
     * valid in Fortran.
     */
-   {MTYPE_I1, MTYPE_U4, "JZEXT"},
-   {MTYPE_I2, MTYPE_U4, "JZEXT"},
-   {MTYPE_I4, MTYPE_U4, "JZEXT"},
-   {MTYPE_I8, MTYPE_U4, "JZEXT"},
+   {MTYPE_I1, MTYPE_U4, ""}, // eraxxon: was JZEXT
+   {MTYPE_I2, MTYPE_U4, ""},
+   {MTYPE_I4, MTYPE_U4, ""},
+   {MTYPE_I8, MTYPE_U4, ""},
    /*{MTYPE_U1, MTYPE_U4, ""},*/
    /*{MTYPE_U2, MTYPE_U4, ""},*/
    /*{MTYPE_U4, MTYPE_U4, ""},*/
-   {MTYPE_U8, MTYPE_U4, "JZEXT"},
+   {MTYPE_U8, MTYPE_U4, ""},
 
-   {MTYPE_I1, MTYPE_U8, "KZEXT"},
-   {MTYPE_I2, MTYPE_U8, "KZEXT"},
-   {MTYPE_I4, MTYPE_U8, "KZEXT"},
-   {MTYPE_I8, MTYPE_U8, "KZEXT"},
+   {MTYPE_I1, MTYPE_U8, ""}, // eraxxon: was KZEXT
+   {MTYPE_I2, MTYPE_U8, ""},
+   {MTYPE_I4, MTYPE_U8, ""},
+   {MTYPE_I8, MTYPE_U8, ""},
    /*{MTYPE_U1, MTYPE_U8, ""},*/
    /*{MTYPE_U2, MTYPE_U8, ""},*/
    /*{MTYPE_U4, MTYPE_U8, ""},*/
