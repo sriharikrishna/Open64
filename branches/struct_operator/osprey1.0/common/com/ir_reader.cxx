@@ -880,11 +880,15 @@ ir_put_parm_keyword(ST * st)
                                                                                        
   strlen  = Targ_String_Length(strcon);
   strbase = Targ_String_Address(strcon);
-  keyword = (char *) alloca(strlen +1);
+
+  keyword = (char *) malloc((strlen+1)* sizeof(char));
+  FmtAssert (keyword,("No more memory for holding keyword."));
+
   for (stridx = 0; stridx<strlen;stridx++)
        keyword[stridx] = strbase[stridx];
   keyword[stridx] = '\0';
   fprintf(ir_ofile, keyword);
+  free(keyword);
  }
 
 /*
