@@ -618,6 +618,7 @@ void parse_function_stmt (void)
    int			defer_msg;
    boolean		err_fnd		= FALSE;
    token_type		save_token;
+   boolean              is_coarray_concurrent = FALSE;
 
 
    TRACE (Func_Entry, "parse_function_stmt", NULL);
@@ -625,7 +626,11 @@ void parse_function_stmt (void)
    if (curr_stmt_category > Sub_Func_Stmt_Cat) {
       err_fnd			= TRUE;
       iss_blk_stk_err();
-   }
+   } 
+
+   /* FMZ */    
+   if (strncmp(token.token_str.string,"COFUNCTI",8)==0) 
+      is_coarray_concurrent = TRUE;
 
    if (!MATCHED_TOKEN_CLASS(Tok_Class_Id)) {
       parse_err_flush(Find_Lparen, "function-name");
@@ -679,6 +684,9 @@ void parse_function_stmt (void)
    }
 
    set_function_rslt(attr_idx, FALSE);
+
+   if (is_coarray_concurrent)
+      ATP_COARRAY_CONCURRENT(attr_idx)=TRUE; 
 
    if (LA_CH_VALUE != EOS) {
       parse_err_flush(Find_EOS, EOS_STR);
@@ -1406,7 +1414,8 @@ static	void	parse_prefix_spec (void)
    elemental_set	= ATP_ELEMENTAL(AT_WORK_IDX);
    pure_set		= ATP_PURE(AT_WORK_IDX);
 
-   if (TOKEN_VALUE(token) == Tok_Kwd_Subroutine) {
+   if (TOKEN_VALUE(token) == Tok_Kwd_Subroutine ||
+       TOKEN_VALUE(token) == Tok_Kwd_CoSubroutine) {
       stmt_type					= Subroutine_Stmt;
       SH_STMT_TYPE(curr_stmt_sh_idx)		= Subroutine_Stmt;
       parse_subroutine_stmt();
@@ -1414,7 +1423,8 @@ static	void	parse_prefix_spec (void)
       ATP_ELEMENTAL(SCP_ATTR_IDX(curr_scp_idx))	= elemental_set;
       ATP_PURE(SCP_ATTR_IDX(curr_scp_idx))	= pure_set;
    }
-   else if (TOKEN_VALUE(token) == Tok_Kwd_Function) {
+   else if (TOKEN_VALUE(token) == Tok_Kwd_Function ||
+            TOKEN_VALUE(token) == Tok_Kwd_CoFunction) {
       stmt_type					= Function_Stmt;
       SH_STMT_TYPE(curr_stmt_sh_idx)		= Function_Stmt;
       parse_function_stmt();
@@ -1530,8 +1540,10 @@ void parse_subroutine_stmt (void)
 
 {
    int		attr_idx;
-   int		defer_msg;
+   int		defer_msg; 
    boolean	err_fnd		= FALSE;
+   boolean      is_coarray_concurrent = FALSE;
+
 
 
    TRACE (Func_Entry, "parse_subroutine_stmt", NULL);
@@ -1539,7 +1551,12 @@ void parse_subroutine_stmt (void)
    if (curr_stmt_category > Sub_Func_Stmt_Cat) {
       iss_blk_stk_err();
       err_fnd			= TRUE;
-   }
+   } 
+   
+   /* FMZ */    
+   if (strncmp(token.token_str.string,"COSUBROUTI",10)==0) 
+      is_coarray_concurrent = TRUE;
+
 
    if (!MATCHED_TOKEN_CLASS(Tok_Class_Id)) {
       parse_err_flush(Find_Lparen, "subroutine-name");
@@ -1588,7 +1605,10 @@ void parse_subroutine_stmt (void)
 
    if (LA_CH_VALUE != EOS) {
       parse_err_flush(Find_EOS, EOS_STR);
-   }
+   } 
+
+   if (is_coarray_concurrent)
+      ATP_COARRAY_CONCURRENT(attr_idx)=TRUE;
 
    NEXT_LA_CH;
     

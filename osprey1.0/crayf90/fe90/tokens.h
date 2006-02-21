@@ -201,7 +201,11 @@ enum	token_values {
 		Tok_Kwd_Volatile,	/* VOLATILE			      */
 		Tok_Kwd_Where,		/* WHERE     ELSEWHERE, ENDWHERE      */
 		Tok_Kwd_While,		/* WHILE			      */
-		Tok_Kwd_Write,		/* WRITE			      */
+		Tok_Kwd_Write,		/* WRITE			      */ 
+
+		/* FMZ add for co-array fortran	 Feb 15,2006 */
+                Tok_Kwd_CoSubroutine,   /* CoSubroutine                       */
+                Tok_Kwd_CoFunction,     /* CoFunction                         */
 
                 /* NOTE -> If a new Tok_Dir is added, directive_str in */
                 /*         main.h needs to be updated.                 */
@@ -636,8 +640,8 @@ enum	token_values {
 
 		Tok_Unknown,		/* ?	     unknown symbol	      */
 		Tok_EOS,		/* EOS ;     end-of-statement	      */
-		Tok_EOF,		/* EOF	     end-of-file - end parse  */
-
+		Tok_EOF,		/* EOF	     end-of-file - end parse  */ 
+ 
 		Tok_LAST };		/* THIS MUST BE THE LAST ENUM ENTRY   */
 
 /******************************************************************************/

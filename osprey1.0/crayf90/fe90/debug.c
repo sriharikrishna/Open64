@@ -5534,7 +5534,12 @@ static void dump_at_ntry (FILE		*out_file,
             fprintf(out_file, "  %-16s= %-7s %-16s= %-7s %-16s= %-8s\n",
                     "ATP_TASK_SHARED",boolean_str[ATP_TASK_SHARED(at_idx)],
                     "ATP_USES_EREGS",boolean_str[ATP_USES_EREGS(at_idx)],
-                    "ATP_VFUNCTION",boolean_str[ATP_VFUNCTION(at_idx)]);
+                    "ATP_VFUNCTION",boolean_str[ATP_VFUNCTION(at_idx)]); 
+
+             /* FMZ added for cosubroutine cofunction  */
+             fprintf(out_file, "  %-22s= %-7s \n", "ATP_COARRAY_CONCURRENT",
+                       boolean_str[ATP_COARRAY_CONCURRENT(at_idx)]); 
+
          }
          else {  /* MODULE */
 

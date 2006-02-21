@@ -143,9 +143,12 @@ static	kwd_type		kwd[] = {
 				"BACKSPACE",	     Tok_Kwd_Backspace,
 				"BUFFER",	     Tok_Kwd_Buffer,
 				"BLOCK",	     Tok_Kwd_Block,
-				"BYTE",		     Tok_Kwd_Byte,
+				"BYTE",		     Tok_Kwd_Byte, 
 
 				"CHARACTER",	     Tok_Kwd_Character,
+				"COFUNCTION",        Tok_Kwd_CoFunction,
+				"COSUBROUTINE",      Tok_Kwd_CoSubroutine,
+
 				"CONTAINS",	     Tok_Kwd_Contains,
 				"CONTINUE",	     Tok_Kwd_Continue,
 				"COMPLEX",	     Tok_Kwd_Complex,
@@ -246,7 +249,7 @@ static	kwd_type		kwd[] = {
 				"WHERE",	     Tok_Kwd_Where,
 				"WHILE",	     Tok_Kwd_While,
 				"WRITE",	     Tok_Kwd_Write,
-
+ 
 				"",		     Tok_LAST };
 
 static	int			kwd_idx[27];

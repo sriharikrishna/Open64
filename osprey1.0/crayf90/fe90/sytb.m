@@ -2691,7 +2691,20 @@ March # ifdef _DEBUG
 		[IDX].fld.flag4
 # else
 # define ATP_VFUNCTION(IDX)		attr_tbl[IDX].fld.flag4
-# endif
+# endif 
+
+/* add a flag for coarray fortran "cosubroutine" and "cofunction" */
+# ifdef _DEBUG 
+# define ATP_COARRAY_CONCURRENT(IDX)				               \
+	((AT_OBJ_CLASS(IDX) == Pgm_Unit) ?				       \
+		attr_tbl : sytb_var_error("ATP_COARRAY_CONCURRENT", IDX))      \
+		[IDX].fld.is_concurrent
+# else
+# define ATP_COARRAY_CONCURRENT(IDX)	attr_tbl[IDX].fld.is_concurrent
+# endif 
+
+
+
 
 
 /* Symbol table definitions for statement functions. */

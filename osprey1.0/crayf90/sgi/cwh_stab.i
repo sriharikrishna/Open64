@@ -770,7 +770,8 @@ static INTPTR fei_proc_def     ( char          *name_string,
                                  TYPE          result_type,
                                  INT32         cmcs_node,
                                  INT32         st_idx,
-                                 INT64	       flags );
+                                 INT64	       flags,
+                                 INT32         coarray_concurrent );
 
 static INTPTR fei_proc_interface     ( char          *name_string,
                                  INT32         lineno,
@@ -785,7 +786,8 @@ static INTPTR fei_proc_interface     ( char          *name_string,
                                  TYPE          result_type,
                                  INT32         cmcs_node,
                                  INT32         st_idx,
-                                 INT64         flags );
+                                 INT64         flags,
+				 INT32         coarray_concurrent);
 
 
 static INTPTR fei_proc_imp     ( INT32         lineno,
