@@ -434,11 +434,11 @@ Clear_ST_is_my_pointer (ST& s)          { s.flags_ext &= ~ST_IS_POINTER; }
 
 
 inline BOOL
-ST_is_allocatable (const ST& s)          { return s.flags & ST_IS_ALLOCATABLE;}
+ST_is_allocatable (const ST& s)          { return s.flags_ext & ST_IS_ALLOCATABLE;}
 inline void
-Set_ST_is_allocatable (ST& s)            { s.flags |= ST_IS_ALLOCATABLE; }
+Set_ST_is_allocatable (ST& s)            { s.flags_ext |= ST_IS_ALLOCATABLE; }
 inline void
-Clear_ST_is_allocatable (ST& s)          { s.flags &= ~ST_IS_ALLOCATABLE; }
+Clear_ST_is_allocatable (ST& s)          { s.flags_ext &= ~ST_IS_ALLOCATABLE; }
 
 inline BOOL
 ST_is_in_module (const ST& s)          { return s.flags_ext & ST_IS_IN_MODULE;}
@@ -460,6 +460,14 @@ inline void
 Set_ST_is_external (ST& s)            { s.flags_ext |= ST_IS_EXTERNAL; }
 inline void
 Clear_ST_is_external (ST& s)          { s.flags_ext &= ~ST_IS_EXTERNAL; }
+
+inline BOOL
+ST_is_coarray_concurrent (const ST& s) { return s.flags_ext & ST_IS_COARRAY_CONCURRENT;}
+inline void
+Set_ST_is_coarray_concurrent (ST& s)  { s.flags_ext |= ST_IS_COARRAY_CONCURRENT; }
+inline void
+Clear_ST_is_coarray_concurrent (ST& s) { s.flags_ext &= ~ST_IS_COARRAY_CONCURRENT; } 
+
 
 inline BOOL
 ST_is_M_imported (const ST& s)          { return s.flags_ext & ST_IS_M_IMPORTED;}

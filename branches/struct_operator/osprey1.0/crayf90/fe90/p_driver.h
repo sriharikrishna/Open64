@@ -282,11 +282,13 @@ static stmt_type_type		token_to_stmt_type [] = {
 				Volatile_Stmt,        /* Tok_Kwd_Volatile     */
 				Where_Cstrct_Stmt,    /* Tok_Kwd_Where	      */
 				Assignment_Stmt,      /* Tok_Kwd_While	      */
-				Write_Stmt };	      /* Tok_Kwd_Write	      */
+				Write_Stmt,	      /* Tok_Kwd_Write	      */ 
+                                Subroutine_Stmt,      /* Tok_Kwd_CoSubroutine */
+                                Function_Stmt };      /* Tok_Kwd_CoFunction   */
 
-/******************************************************************************/
-/*			stmt_parsers  TABLE				      */
-/*									      */
+/******************************************************************************/ 
+/*                      stmt_parsers  TABLE                                   */
+/*                                                                            */
 /* This table defines an array-of-pointers-to-functions-returning boolean     */
 /* and is indexed by an object of type stmt_type_type which is the reason for */
 /* the following dependency:						      */

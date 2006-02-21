@@ -12601,7 +12601,11 @@ static void  send_procedure(int			attr_idx,
                                    type_desc,
                                    PDG_AT_IDX(attr_idx),
                                    flag3,
-				   in_interface);
+				   in_interface, 
+    /* since no flag bit for coarray concurrent, we need
+       to add this one more argument---FMZ 
+     */
+                                    ATP_COARRAY_CONCURRENT(attr_idx));
 # endif
 
    PDG_DBG_PRINT_START

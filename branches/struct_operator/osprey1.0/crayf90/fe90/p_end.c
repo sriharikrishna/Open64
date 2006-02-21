@@ -417,7 +417,8 @@ void parse_end_stmt (void)
 
       if (CURR_BLK == Contains_Blk && 
           (keyword == Tok_Kwd_Module   || keyword == Tok_Kwd_Program    ||
-           keyword == Tok_Kwd_Function || keyword == Tok_Kwd_Subroutine ||
+           keyword == Tok_Kwd_Function || keyword == Tok_Kwd_Subroutine || 
+           keyword == Tok_Kwd_CoFunction || keyword == Tok_Kwd_CoSubroutine || 
            keyword == Tok_Kwd_Block)) {
 
          /* Because a contains may happen in a BLOCKDATA unit (an error is    */
@@ -514,6 +515,8 @@ void parse_end_stmt (void)
 
 
 	 case Tok_Kwd_Subroutine:
+	 case Tok_Kwd_CoSubroutine:
+
             stmt_type			    = End_Subroutine_Stmt;
             SH_STMT_TYPE(curr_stmt_sh_idx)  = End_Subroutine_Stmt;
 
@@ -538,6 +541,7 @@ void parse_end_stmt (void)
 
 
 	 case Tok_Kwd_Function:
+	 case Tok_Kwd_CoFunction:
             stmt_type			    = End_Function_Stmt;
             SH_STMT_TYPE(curr_stmt_sh_idx)  = End_Function_Stmt;
 
