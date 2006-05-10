@@ -5534,7 +5534,12 @@ static void dump_at_ntry (FILE		*out_file,
             fprintf(out_file, "  %-16s= %-7s %-16s= %-7s %-16s= %-8s\n",
                     "ATP_TASK_SHARED",boolean_str[ATP_TASK_SHARED(at_idx)],
                     "ATP_USES_EREGS",boolean_str[ATP_USES_EREGS(at_idx)],
-                    "ATP_VFUNCTION",boolean_str[ATP_VFUNCTION(at_idx)]);
+                    "ATP_VFUNCTION",boolean_str[ATP_VFUNCTION(at_idx)]); 
+
+             /* FMZ added for cosubroutine cofunction  */
+             fprintf(out_file, "  %-22s= %-7s \n", "ATP_COARRAY_CONCURRENT",
+                       boolean_str[ATP_COARRAY_CONCURRENT(at_idx)]); 
+
          }
          else {  /* MODULE */
 
@@ -5832,8 +5837,6 @@ static void dump_at_ntry (FILE		*out_file,
                  "ATT_SCP_IDX", ATT_SCP_IDX(at_idx),
                  "ATT_SEQUENCE_SET", boolean_str[ATT_SEQUENCE_SET(at_idx)],
                  "ATT_UNIQUE_ID", ATT_UNIQUE_ID(at_idx));
-
-         fprintf(out_file, "  %-16s= %-8d \n","ATT_TY_IDX",ATT_TY_IDX(at_idx)); /*fzhao-working*/
 
          if (ATT_STRUCT_BIT_LEN_IDX(at_idx) != NULL_IDX) {
             sprintf(str, "(%10s)",

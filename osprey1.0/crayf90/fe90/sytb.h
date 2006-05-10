@@ -386,7 +386,8 @@ union	attr_tbl_entry	{
 
 				 Uint			orig_module_idx	: 20;
 				 boolean		module_object	:  1;
-				 Uint			unused		: 11;
+				 boolean                is_concurrent   :  1;
+				 Uint			unused		: 10;
 				 Uint			unused1		:  8; 
 				 Uint			field7		: 24;
 
@@ -484,7 +485,6 @@ union	attr_tbl_entry	{
 			         Uint			field32_12	: 32;
 			         Uint			field32_13	: 32;
 			         Uint			field32_14	: 32;
-/*added by fzhao*/
 			         Uint			field32_15	: 32;
 			         Uint			field32_16	: 32;
                                 } fldd;

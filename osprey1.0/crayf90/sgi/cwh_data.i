@@ -47,7 +47,7 @@ static INT64 current_bytesize;
 static INT32 current_pos; /* position in the array to initialize (0 based, byte indexed) */
 static INT32 array_pos; /* position in the current array */
 static BOOL is_struct_or_array; /* TRUE if initilaizing an array */
-static INITO_IDX current_inito = NULL;
+static INITO_IDX current_inito = 0;
 
 /* for pulling apart bases and offsets */
 typedef struct {
@@ -91,9 +91,9 @@ struct data_element_s {
   INITV_IDX create_initv()
   {
     if (is_b_and_o) {
-      return (Irb_Init_Symoff(NULL, NULL, 1, val.bo.base, val.bo.offset));
+      return (Irb_Init_Symoff(0, 0, 1, val.bo.base, val.bo.offset));
     } else {
-      return (Irb_Init_Val(NULL, NULL, val.tc_val.repeat_count, val.tc_val.tc));
+      return (Irb_Init_Val(0, 0, val.tc_val.repeat_count, val.tc_val.tc));
     }
   }
 

@@ -188,7 +188,6 @@ boolean call_list_semantics(opnd_type     *result_opnd,
    int                 spec_count;
    int                 spec_idx;
    int		       type_idx;
-   int fm;
 
 # if defined(GENERATE_WHIRL)
    int		       false_list_idx 		= NULL_IDX;
@@ -575,13 +574,27 @@ boolean call_list_semantics(opnd_type     *result_opnd,
             ok = FALSE;
          }
          arg_info_list[i].kwd = IR_IDX_L(IL_IDX(list_idx));
+#ifndef  SOURCE_TO_SOURCE /*keep Kwd_Opr--FMZ*/
          COPY_OPND(IL_OPND(list_idx),IR_OPND_R(IL_IDX(list_idx)));
+#endif
       }
       else {
          arg_info_list[i].kwd = NULL_IDX;
       }
 
-      COPY_OPND(opnd, IL_OPND(list_idx));
+
+#ifdef SOURCE_TO_SOURCE  /*FMZ August 2005*/
+      if (IL_FLD(list_idx) == IR_Tbl_Idx &&
+          IR_OPR(IL_IDX(list_idx)) == Kwd_Opr) {
+                  COPY_OPND(opnd, IR_OPND_R(IL_IDX(list_idx)));
+      }
+      else {
+               COPY_OPND(opnd, IL_OPND(list_idx));
+           }
+#else
+               COPY_OPND(opnd, IL_OPND(list_idx));
+#endif
+
 
 # ifdef COARRAY_FORTRAN
       if (cmd_line_flags.co_array_fortran) {
@@ -609,7 +622,16 @@ boolean call_list_semantics(opnd_type     *result_opnd,
       arg_info_list[i].line           = opnd_line;
       arg_info_list[i].col            = opnd_column;
 
+#ifdef SOURCE_TO_SOURCE /*FMZ August*/
+      if (IL_FLD(list_idx) == IR_Tbl_Idx &&
+          IR_OPR(IL_IDX(list_idx)) == Kwd_Opr) {
+                COPY_OPND(IR_OPND_R(IL_IDX(list_idx)),opnd);
+       }
+      else 
+          COPY_OPND(IL_OPND(list_idx), opnd);
+#else
       COPY_OPND(IL_OPND(list_idx), opnd);
+#endif
 
       xref_state = save_xref_state;
       
@@ -671,8 +693,13 @@ boolean call_list_semantics(opnd_type     *result_opnd,
              ATP_IN_INTERFACE_BLK(IL_IDX(list_idx)) ||
              AT_IS_INTRIN(IL_IDX(list_idx)) ||
              ATP_SCP_ALIVE(IL_IDX(list_idx)) ||
-             ATP_PROC(IL_IDX(list_idx)) == Module_Proc) {
-
+#ifndef  SOURCE_TO_SOURCE
+             ATP_PROC(IL_IDX(list_idx)) == Module_Proc
+#else
+             (ATP_PROC(IL_IDX(list_idx))== Intern_Proc) &&
+             AT_USE_ASSOCIATED(IL_IDX(list_idx)) 
+#endif
+             ) {
             arg_info_list[i].pgm_unit = TRUE;
 
             if (ATP_PGM_UNIT(IL_IDX(list_idx)) == Pgm_Unknown) {
@@ -955,7 +982,7 @@ boolean call_list_semantics(opnd_type     *result_opnd,
                                             arg_attr,
                                             IL_OPND(list_idx),
                                             info_idx,
-                                            spec_count)) {
+                                            spec_count) ) {
 
                if (spec_count == 0) {  /* Comparing darg and actual arg */
                   ok = FALSE;          /* An error was issued.          */
@@ -1126,17 +1153,59 @@ EXIT:
             }
          }
      
-fm = AT_OBJ_CLASS(spec_idx);  
 
          if (ATP_PROC(spec_idx) == Intrin_Proc) {
 
-
             if (ATP_INTRIN_ENUM(spec_idx) != Unknown_Intrinsic) {
+#ifdef SOURCE_TO_SOURCE
+              int                 tmp_cnt;
+              int                 tmp_list_idx;
+              opnd_type	          tmp_result_opnd = null_opnd ;
+
+              copy_subtree(result_opnd, &tmp_result_opnd);
+
+              tmp_list_idx = IR_IDX_R(OPND_IDX(tmp_result_opnd));
+
+               while (tmp_list_idx != NULL_IDX)
+                {
+                  if (IL_FLD(tmp_list_idx) == IR_Tbl_Idx &&
+                        IR_OPR(IL_IDX(tmp_list_idx)) == Kwd_Opr) {
+                        COPY_OPND(IL_OPND(tmp_list_idx),IR_OPND_R(IL_IDX(tmp_list_idx)));
+                 }
+                   tmp_list_idx = IL_NEXT_LIST_IDX(tmp_list_idx);
+                }
+#endif
+
                ATP_INTERFACE_IDX(spec_idx) = gen_idx;
+
+#ifdef SOURCE_TO_SOURCE
+               (*(void (*)())intrinsic_semantics[ATP_INTRIN_ENUM(spec_idx)]) 
+                                                 (&tmp_result_opnd, 
+                                                  res_exp_desc,
+                                                  &spec_idx);
+
+             if (OPND_FLD(tmp_result_opnd) == CN_Tbl_Idx ||
+                 (ATP_INTRIN_ENUM(spec_idx)==Min0_Intrinsic)  ||
+                 (ATP_INTRIN_ENUM(spec_idx)==Max0_Intrinsic)  || 
+                 (ATP_INTRIN_ENUM(spec_idx)==Max_Intrinsic)   ||
+                 (ATP_INTRIN_ENUM(spec_idx)==Max1_Intrinsic)  ||
+                 (ATP_INTRIN_ENUM(spec_idx)==Min_Intrinsic)   ||
+                 (ATP_INTRIN_ENUM(spec_idx)==Amax0_Intrinsic) ||
+                 (ATP_INTRIN_ENUM(spec_idx)==Amax1_Intrinsic) ||
+                 (ATP_INTRIN_ENUM(spec_idx)==Dmax1_Intrinsic) ||
+                 (ATP_INTRIN_ENUM(spec_idx)==Cmplx_Intrinsic) )
+               {
+                 /* if intrinsic is a constant, change the result_opnd to 
+                    be  the new one, otherwise keep the old form */
+                    copy_subtree(&tmp_result_opnd, result_opnd);
+              }
+#else
                (*(void (*)())intrinsic_semantics[ATP_INTRIN_ENUM(spec_idx)]) 
                                                  (result_opnd, 
                                                   res_exp_desc,
                                                   &spec_idx);
+#endif
+
 if ((ATP_INTRIN_ENUM(spec_idx)!=Kind_Intrinsic) &&
 # if 0
     (ATP_INTRIN_ENUM(spec_idx)!=Min0_Intrinsic) &&
@@ -2692,8 +2761,17 @@ boolean final_arg_work(opnd_type	*list_opnd,
                PRINTMSG(opnd_line, 786, Error, opnd_column);
                ok = FALSE;
             }
-            else {
+            else { 
+#ifdef SOURCE_TO_SOURCE  /*FMZ August 2005*/
+        if (IL_FLD(list_idx) == IR_Tbl_Idx &&
+            IR_OPR(IL_IDX(list_idx)) == Kwd_Opr) {
+                  COPY_OPND(opnd, IR_OPND_R(IL_IDX(list_idx)));
+        } else {
                COPY_OPND(opnd, IL_OPND(list_idx));
+                }
+#else
+               COPY_OPND(opnd, IL_OPND(list_idx));
+#endif
                attr_idx = find_left_attr(&opnd);
 
                if (AT_OBJ_CLASS(attr_idx) == Data_Obj &&
@@ -2954,7 +3032,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
           d_type = Unknown_Dummy;
       }
 
- # if 0 /* March */
+ # if 0 
 
       if (IL_FLD(list_idx) == IR_Tbl_Idx &&
           IR_OPR(IL_IDX(list_idx)) == Null_Intrinsic_Opr) {
@@ -3068,7 +3146,7 @@ boolean final_arg_work(opnd_type	*list_opnd,
          }
       }
 
-# endif /* March */
+# endif 
 
       a_type = get_act_arg_type(&arg_info_list[info_idx].ed);
 
@@ -6497,7 +6575,6 @@ void flatten_function_call(opnd_type     *result)
    elemental_exp_desc.type_idx    = type_idx;
    elemental_exp_desc.type        = TYP_TYPE(type_idx);
    elemental_exp_desc.linear_type = TYP_LINEAR(type_idx);
-
    COPY_OPND(opnd, IR_OPND_R(ir_idx));
   ok = final_arg_work(&opnd, IR_IDX_L(ir_idx), num_args, &elemental_exp_desc); 
    COPY_OPND(IR_OPND_R(ir_idx), opnd);

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: PUinfo.c
- * $Revision: 1.8 $
- * $Date: 2005-06-30 15:57:28 $
+ * $Revision: 1.9 $
+ * $Date: 2006-05-10 19:30:56 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
@@ -67,7 +67,7 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.8 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.9 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>
@@ -1354,7 +1354,7 @@ PUinfo_Get_ReturnPreg(TY_IDX return_ty)
    RETURN_PREG * const return_preg_ptr = &return_preg;
    PREG_NUM            preg_num1, preg_num2;
 
-   if (WHIRL_Return_Info_On) {
+   if (WHIRL_Return_Info_On ) {
 
       RETURN_INFO return_info = Get_Return_Info (return_ty,
 						 Use_Simulated);
@@ -1368,12 +1368,9 @@ PUinfo_Get_ReturnPreg(TY_IDX return_ty)
       }
 
       else {
-         printf(" the RETURN_INFO_count(return_info) is %d ---FMZ \n",RETURN_INFO_count(return_info) );  //FMZ test
-
 	 Fail_FmtAssertion ("PUinfo_Get_ReturnPreg: more than 2 return registers");  
   }
    }
-
    else {
      /* Get the mtypes of the return registers */
      Get_Return_Mtypes(return_ty,                               /* in */

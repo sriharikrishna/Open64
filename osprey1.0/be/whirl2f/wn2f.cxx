@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f.c
- * $Revision: 1.22 $
- * $Date: 2005-05-23 20:38:24 $
+ * $Revision: 1.23 $
+ * $Date: 2006-05-10 19:30:57 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
@@ -67,7 +67,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.22 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.23 $";
 #endif
 
 #include <alloca.h>
@@ -145,7 +145,6 @@ static WN2F_STATUS
  */
 #define NUMBER_OF_OPERATORS (OPERATOR_LAST + 1)
 static WN2F_HANDLER_FUNC WN2F_Handler[NUMBER_OF_OPERATORS];
-
 
 typedef struct WN2F_Opr_Handler
 {
@@ -272,7 +271,9 @@ static const WN2F_OPR_HANDLER WN2F_Opr_Handler_List[] =
    {OPR_NULLIFY,&WN2F_nullify_stmt},
    {OPR_ARRAY_CONSTRUCT,&WN2F_ar_construct},
    {OPR_IMPLIED_DO,&WN2F_noio_implied_do},
-   {OPR_IDNAME, &WN2F_idname}
+   {OPR_IDNAME, &WN2F_idname},
+   {OPR_STRCTFLD, &WN2F_strctfld},
+   {OPR_COMMA, &WN2F_comma}
    
 }; /* WN2F_Opr_Handler_List */
 
@@ -348,7 +349,35 @@ public:
   }
 
   void WN2F_Find_And_Mark_Nested_Address(WN * addr);
+#ifdef FMZDBG
+  void debugpathinfo(void);
+#endif
 };
+
+#ifdef FMZDBG
+void LOC_INFO::
+debugpathinfo(void)
+{
+	 FLD_PATH_INFO *fld_path_test;
+         fld_path_test = _flds_left;
+	 printf("****In the file LOC_INFO::debugpathinf******\n");
+         while (fld_path_test)
+          {
+           printf("\t***Field name in the path is :: %s\n",
+                        FLD_name(fld_path_test->fld));
+           if (fld_path_test->arr_wn)
+             printf("\t***WN opr is %d \n",
+                        WN_operator(fld_path_test->arr_wn)); 
+           else 
+             printf("\t***no WN find in the path\n");
+
+           fld_path_test = fld_path_test->next; 
+
+          }
+
+        printf("****Out of the file LOC_INFO::debugpathinf******\n");
+}
+#endif
 
 void LOC_INFO::
 WN2F_Find_And_Mark_Nested_Address(WN * addr)
@@ -366,21 +395,18 @@ WN2F_Find_And_Mark_Nested_Address(WN * addr)
   /* processed, however if the lowest ARRAY node is not a   */
   /* fld, and belongs to the address ST, then return that   */
   /* ARRAY.                                                 */
-
   switch (WN_operator(addr))
   {
   case OPR_ARRAY: 
-  case OPR_ARRAYEXP: 
   case OPR_ARRSECTION:
     {
      WN * kid;     
-
+#if 0 
      if (WN_operator(addr)==OPR_ARRAYEXP)
         addr = WN_kid0(addr);
-
+#endif
       kid = WN_kid0(addr);
       WN2F_Find_And_Mark_Nested_Address(kid);
-
       if ((_flds_left && _flds_left->arr_elt) &&
 	  (!(_base_is_array)))
       {
@@ -395,6 +421,13 @@ WN2F_Find_And_Mark_Nested_Address(WN * addr)
     break;
 
 
+  case OPR_ARRAYEXP: 
+     WN * kid;     
+     kid = WN_kid0(addr);
+     WN2F_Find_And_Mark_Nested_Address(kid);
+      _base_is_array = FALSE;
+    break;
+
   case OPR_ADD:
     {
       WN * cnst = WN_kid0(addr);
@@ -407,7 +440,6 @@ WN2F_Find_And_Mark_Nested_Address(WN * addr)
       }
       WN2F_Find_And_Mark_Nested_Address(othr);
       _off = WN_const_val(cnst);
-      _flds_left = TY2F_Point_At_Path(_flds_left,_off);
       _base_is_array = FALSE;
     }
     break;
@@ -423,9 +455,9 @@ WN2F_Find_And_Mark_Nested_Address(WN * addr)
   case OPR_LDA:
     _off = WN_lda_offset(addr);
     _nested_addr = addr;
-    _flds_left = TY2F_Point_At_Path(_flds_left,_off);
-    _base_is_array = ((TY_kind(WN_ty(addr)) == KIND_POINTER) && 
-		      (TY_kind(TY_pointed(WN_ty(addr))) == KIND_ARRAY));
+    _base_is_array = ((TY_kind(WN_ty(addr)) == KIND_POINTER) &&
+		      (TY_kind(TY_pointed(WN_ty(addr))) == KIND_ARRAY ||
+                        TY_is_f90_deferred_shape(TY_pointed(WN_ty(addr)))));
     break;
 
   case OPR_ILOAD:
@@ -437,6 +469,7 @@ WN2F_Find_And_Mark_Nested_Address(WN * addr)
     break;
 
   default:
+
     ASSERT_WARN((0),
 		(DIAG_W2F_UNEXPECTED_OPC,"WN2F_Find_And_Mark_Nested_Address"));
 
@@ -459,16 +492,11 @@ WN2F_Sum_Offsets(WN *addr)
     case OPR_ARRAY: 
     case OPR_ARRAYEXP:
     case OPR_ARRSECTION:
-   if (WN_operator(addr)==OPR_ARRAYEXP)
-       addr = WN_kid0(addr);
-
     sum += WN2F_Sum_Offsets(WN_kid0(addr));
     break;
 
     case OPR_ADD:
-#if 0 
     sum += WN2F_Sum_Offsets(WN_kid0(addr));
-#endif
     sum += WN2F_Sum_Offsets(WN_kid1(addr));
     break;
 
@@ -540,7 +568,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
 #if 0
       offset += Stab_Full_Split_Offset(st);  /* offset of split common now zero. */
 #endif
-      Clear_BE_ST_w2fc_referenced(st);       /* don't put out split base, just user COMMON */
+      Clear_BE_ST_w2fc_referenced(st); 
       st = ST_full(st);
       Set_BE_ST_w2fc_referenced(st);
       base_ty = ST_type(st);
@@ -548,7 +576,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
       if (TY_is_Pointer(base_ty))
          base_ty = TY_pointed(base_ty);
 
-      if (TY_is_f90_pointer(base_ty)) //Sept
+      if (TY_is_f90_pointer(base_ty))
          base_ty = TY_pointed(base_ty);
 
       addr_ty = Stab_Pointer_To(base_ty);
@@ -579,6 +607,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
        * into one of the objects.  Simply generate a reference to
        * the symbol.
        */
+
       ASSERT_WARN(offset==0, (DIAG_W2F_UNEXPEXTED_OFFSET,
 			      offset, "WN2F_Offset_Symref"));
 
@@ -605,7 +634,6 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
       else
       {
 	 translate_var_ref(tokens, st);
-//Sept	 TY2F_Translate_ArrayElt(tokens, base_ty, offset);
       if (!WN2F_CONTEXT_has_no_arr_elmt(context)) {
 	   TY2F_Translate_ArrayElt(tokens, base_ty, offset);
            reset_WN2F_CONTEXT_has_no_arr_elmt(context);
@@ -614,6 +642,9 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
    }
    else /* incompatible base and object types */
    {
+
+#if 0    //we use OPR_STRCTFLD to get the fld_path--FMZ August 2005
+/* we add OPR_STRCTFLD for X%Y, fld_path calculate no longer needed */
       FLD_PATH_INFO *fld_path;
 
       
@@ -663,7 +694,7 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
       }
       else
       {
-//Sept	 if (!Stab_Is_Common_Block(st) && !Stab_Is_Equivalence_Block(st))
+//	 if (!Stab_Is_Common_Block(st) && !Stab_Is_Equivalence_Block(st))
 	 {
 	    /* Base the path at the st object, and separate it from 
 	     * the remainder of the path with the field selection 
@@ -692,6 +723,10 @@ WN2F_Offset_Symref(TOKEN_BUFFER tokens,
 
 	 TY2F_Free_Fld_Path(fld_path);
       } /* if (the field was found) */
+#else  
+	 (void)translate_var_ref(tokens, st);
+#endif
+
    } /* if (base-type is compatible with object-type */
    
    return EMPTY_WN2F_STATUS;
@@ -732,7 +767,6 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 
    /* Prepare to dereference the base-address expression */
    set_WN2F_CONTEXT_deref_addr(context);
-   fld_type_z = 0;
 
    if (WN2F_Is_Address_Preg(addr,addr_ty))
    {
@@ -750,7 +784,16 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
    }
    else 
    {
+
      TY_IDX base_ty = TY_pointed(addr_ty);
+
+
+// deferred shape or f90 pointer
+// base_ty and object_ty not proper set in some cases
+    if (TY_Is_Array(base_ty) &&
+        TY_is_f90_deferred_shape(base_ty) &&
+        !TY_Is_Array(object_ty) )
+          base_ty = TY_AR_etype(base_ty);
 
      if (WN2F_Can_Assign_Types(base_ty, object_ty))
      {
@@ -759,6 +802,16 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
        * of translation.
        */
 
+/* Since we do not generate dope vector for pointer, we could have 
+   this kind of situation: such as ---FMZ
+         type mytype
+            integer i
+            type(mytpe),pointer:: next
+         end type mytype
+         type(mytype) pv1,pv2
+         pv1%next=pv2
+
+*/
       ASSERT_WARN(offset==0, (DIAG_W2F_UNEXPEXTED_OFFSET,
 			      offset, "WN2F_Offset_Memref"));
 
@@ -778,11 +831,7 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	    Append_Token_String(tokens, "ichar");
 	    Append_Token_Special(tokens, '(');
 # endif
-
 	    (void)WN2F_translate(tokens, addr, context); /* String lvalue */
-
-           if (!WN2F_CONTEXT_has_no_arr_elmt(context))
-	          TY2F_Translate_ArrayElt(tokens, base_ty, offset);
 # if 0
 	    Append_Token_Special(tokens, ')');
 # endif
@@ -791,11 +840,6 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	 else
 	 {
 	    (void)WN2F_translate(tokens, addr, context); /* Array lvalue */
-
-            if (!WN2F_CONTEXT_has_no_arr_elmt(context))
-	          TY2F_Translate_ArrayElt(tokens, base_ty, offset);
-             else
-                  reset_WN2F_CONTEXT_has_no_arr_elmt(context);
 	 }
        }
 
@@ -842,15 +886,31 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
              offset += tmp;
          else 
              offset = tmp;
-       
-         WN_OFFSET offset_add = (WN_operator(addr)==OPR_ADD)?   \
-                                 WN_const_val(WN_kid1(addr)):0;
+      
+         if (WN_operator(addr)==OPR_ARRAYEXP) 
+               addr = WN_kid0(addr); 
 
-          if (fld_type_z && WN_operator(addr)==OPR_ADD) {
- 	       offset_add = WN_const_val(WN_kid1(WN_kid1(addr)));
-          
-          } else
-              fld_path = TY2F_Get_Fld_Path(base_ty, object_ty, offset);
+          fld_path = TY2F_Get_Fld_Path(base_ty, object_ty, offset);
+
+#ifdef FMZDBG
+  {
+	 FLD_PATH_INFO *fld_path_test;
+         fld_path_test = fld_path;
+         while (fld_path_test)
+          {
+           printf("\t***Field name in the path is :: %s\n",
+                        FLD_name(fld_path_test->fld));
+           if (fld_path_test->arr_wn)
+             printf("\t***WN opr is %d \n",
+                        WN_operator(fld_path_test->arr_wn)); 
+           else 
+             printf("\t***no WN found in the path\n");
+
+           fld_path_test = fld_path_test->next; 
+
+          }
+   }
+#endif
 
 	 ASSERT_DBG_WARN(fld_path != NULL,
 			 (DIAG_W2F_NONEXISTENT_FLD_PATH, 
@@ -862,50 +922,67 @@ WN2F_Offset_Memref(TOKEN_BUFFER tokens,
 	 /* by the WN2F_array processing, but the others        */
 	 /* are field references with array components.         */
 
-      if (!fld_type_z){
 	 LOC_INFO det(fld_path);
+#ifdef FMZDBG
+         det.debugpathinfo();
+#endif
 	 det.WN2F_Find_And_Mark_Nested_Address(addr);
-	 addr = det._nested_addr;
-       }
+#ifdef FMZDBG
+         det.debugpathinfo();
+#endif
+	 addr = det._nested_addr; 
 	 /* Get the base expression to precede the path */
 
 	 (void)WN2F_translate(tokens, addr, context);
 
 	 /* Append the path-name, perhaps w/o array subscripts. */
-  
+#if 0 
           if (fld_type_z &&  offset_add) {
                  fld_path = TY2F_Get_Fld_Path(fld_type_z, fld_type_z, offset_add);
               } 
+#endif
 
-         if (fld_path != NULL )
+#ifdef FMZDBG
+  {
+	 FLD_PATH_INFO *fld_path_test;
+         fld_path_test = fld_path;
+         while (fld_path_test)
+          {
+           printf("\t***Field name in the path is :: %s\n",
+                        FLD_name(fld_path_test->fld));
+           if (fld_path_test->arr_wn)
+             printf("\t***WN opr is %d \n",
+                        WN_operator(fld_path_test->arr_wn)); 
+           else 
+             printf("\t***no WN find in the path\n");
+
+	   fld_path_test = fld_path_test->next; 
+          }
+  }
+#endif
+
+         if (fld_path != NULL) 
              {
-             if (fld_type_z && offset_add){
-	         TY2F_Fld_Separator(tokens);
-                 Append_Token_String(tokens,
-                           TY2F_Fld_Name(fld_path->fld,FALSE,FALSE));
-             }else {
-               if (!offset_add && fld_type_z 
-                               && TY_kind(fld_type_z) == KIND_STRUCT){
 	          TY2F_Fld_Separator(tokens);
 	          TY2F_Translate_Fld_Path(tokens, 
 				   fld_path, 
 				   deref_fld, 
 				   FALSE/*common*/,
 				   FALSE/*as_is*/,
-				   context);
+ 				   context);
+#if 0 
 	         }				 
               }
              fld_type_z = FLD_type(fld_path->fld);
+#endif
 	     TY2F_Free_Fld_Path(fld_path);
 	   }
-  #if 0
 	   else
            {
 	     Append_Token_String(tokens, 
 			       Number_as_String(offset, 
 						"<field-at-offset=%lld>"));
 	  }
-  #endif        
 
        } /* if (neither common-block nor equivalence field-access */
 

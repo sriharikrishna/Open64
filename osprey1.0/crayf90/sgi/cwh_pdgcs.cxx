@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_pdgcs
- * $Revision: 1.5 $
- * $Date: 2003-12-11 22:07:22 $
- * $Author: eraxxon $
+ * $Revision: 1.6 $
+ * $Date: 2006-05-10 19:31:01 $
+ * $Author: fzhao $
  * $Source: 
  *
  * Revision history:
@@ -59,7 +59,7 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.5 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -303,7 +303,6 @@ PDGCS_new_proc(INT32  ir_count,
   PU_Info *pp;
   STB_pkt *p ;
   ST      *fn;
-  int     fm1,fm2;
 
 
   p  = cast_to_STB(func_st_idx);
@@ -316,8 +315,6 @@ PDGCS_new_proc(INT32  ir_count,
 
   cwh_stab_set_symtab(fn);
 
-  fm1 = CURRENT_SYMTAB;
-  fm2 = INTERNAL_LEVEL;
   if ( IN_NESTED_PU ) {
 
     /* internal, allocate parent's PU info too  */

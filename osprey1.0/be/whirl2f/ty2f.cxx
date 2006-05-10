@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.32 $
- * $Date: 2005-07-15 19:16:01 $
+ * $Revision: 1.33 $
+ * $Date: 2006-05-10 19:30:57 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -1310,12 +1310,15 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
   	   case MTYPE_I1:
             kind_spec = "(w2f__i1)";
              break;
+
   	   case MTYPE_I2:
             kind_spec = "(w2f__i2)";
              break;
+
   	   case MTYPE_I4:
             kind_spec = "(w2f__i4)";
              break;
+
   	   case MTYPE_I8:
             kind_spec = "(w2f__i8)";
              break;
@@ -1338,11 +1341,13 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
        base_name = "INTEGER";
        kind_spec = "(w2f__i2)"; 
        break;
+
      case MTYPE_U4:
      case MTYPE_I4:
        base_name = "INTEGER";
        kind_spec = "(w2f__i4)"; 
        break;
+
      case MTYPE_U8:
      case MTYPE_I8:
        base_name = "INTEGER";
@@ -1368,10 +1373,12 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
        base_name = "COMPLEX";
        kind_spec = "(w2f__4)"; 
        break;
+
      case MTYPE_C8:
        base_name = "COMPLEX";
        kind_spec = "(w2f__8)";
        break;
+
      case MTYPE_CQ:
        base_name = "COMPLEX";
        kind_spec = "(w2f__16)";
@@ -1926,7 +1933,7 @@ TY2F_Translate_Common(TOKEN_BUFFER tokens, const char *name, TY_IDX ty_idx)
    * can be emitted as is without a call to W2CF_Symtab_Nameof_Ty().
    */
 
-# if 0 //June
+# if 0
 
   Append_Token_String(decl_tokens, "COMMON");
   if (name != NULL && *name != '\0')

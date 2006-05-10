@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_expr.c
- * $Revision: 1.21 $
- * $Date: 2006-01-06 16:07:57 $
- * $Author: eraxxon $
+ * $Revision: 1.22 $
+ * $Date: 2006-05-10 19:30:58 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.21 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.22 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1989,11 +1989,18 @@ WN2F_parm(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_PARM, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_parm"));
 
+   if ( wn->u3.ty_fields.ty){  //ST_IDX point to key word FMZ August 2005
+         ST2F_output_keyword(tokens,&St_Table[wn->u3.ty_fields.ty]);
+         Append_Token_Special(tokens,'=');
+      } 
+
+
    if (WN_Parm_Copy_In(wn) && 
        WN_kid0(wn)         && 
        WN_operator(WN_kid0(wn)) !=OPR_PAREN)
           Append_Token_Special(tokens,'(');
 
+    
    if ( TY_is_logical(Ty_Table[WN_ty(wn)]) || 
             WN2F_CONTEXT_is_logical_arg(context)) //fzhao Jan
       {

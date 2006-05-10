@@ -153,7 +153,8 @@ COMMON_COM_CXX_SRC =	\
 	wutil.cxx	\
 	xstats.cxx	\
 	upc_symtab_utils.cxx	\
-	upc_wn_util.cxx
+	upc_wn_util.cxx	\
+	intrn_info.cxx
 
 
 

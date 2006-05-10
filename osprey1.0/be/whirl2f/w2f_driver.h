@@ -42,9 +42,9 @@ extern "C" {
  * ====================================================================
  *
  * Module: w2f_driver.h
- * $Revision: 1.3 $
- * $Date: 2004-11-29 16:14:13 $
- * $Author: eraxxon $
+ * $Revision: 1.4 $
+ * $Date: 2006-05-10 19:30:57 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.h,v $
  *
  * Description:
@@ -295,6 +295,9 @@ extern void W2F_Outfile_Translate_Pu(WN *pu);
 extern void W2F_Outfile_Fini(void);
 
 extern void W2F_Cleanup(void);
+
+typedef map<TY_IDX, ST_IDX> TyIdxToStIdxMap;
+extern TyIdxToStIdxMap tyidx_modidx;
 
 #ifdef __cplusplus
 }

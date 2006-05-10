@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.27 $
- * $Date: 2005-10-14 21:07:51 $
+ * $Revision: 1.28 $
+ * $Date: 2006-05-10 19:31:01 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.27 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.28 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -196,7 +196,8 @@ fei_proc(char         *name_string,
 	 TYPE          result_type,
 	 INT32         proc_idx,
          INT64         flags,
-         INT32         in_interface )
+         INT32         in_interface,
+         INT32         coarray_concurrent )
 {
   INTPTR p;
 
@@ -214,7 +215,8 @@ fei_proc(char         *name_string,
                       result_type,
                       0,
                       proc_idx,
-                      flags);
+                      flags, 
+                      coarray_concurrent);
   }
 
   if (test_flag(flags, FEI_PROC_IN_INTERFACE)) {
@@ -231,7 +233,8 @@ fei_proc(char         *name_string,
                       result_type,
                       0,
                       proc_idx,
-                      flags);
+                      flags, 
+                      coarray_concurrent);
    }
 
 
@@ -300,7 +303,8 @@ fei_proc_def(char         *name_string,
 	     TYPE          result_type,
 	     INT32         cmcs_node,
 	     INT32         proc_idx,
-             INT64         flags )
+             INT64         flags ,
+             INT32         coarray_concurrent)
 {
   ST * st    ;
   TY_IDX  ty    ;
@@ -370,7 +374,7 @@ fei_proc_def(char         *name_string,
 
   Set_PU_prototype (pu, ty);
   Set_PU_f90_lang (pu);
-  Set_PU_need_unparsed(pu);
+  Set_PU_need_unparsed(pu); 
 
   if (is_inline_func)
      Set_PU_is_inline_function(pu);
@@ -465,7 +469,12 @@ fei_proc_def(char         *name_string,
 
   if ((Class == PDGCS_Proc_Extern) || 
       (Class == PDGCS_Proc_Intern)) 
-    cwh_stab_adjust_name(st);
+    cwh_stab_adjust_name(st); 
+
+  // cosubroutien or cofunction ---FMZ
+  if ( coarray_concurrent ) 
+      Set_ST_is_coarray_concurrent(st); 
+
 
   st_for_distribute_temp=NULL;
   preg_for_distribute.preg=-1;
@@ -491,7 +500,8 @@ fei_proc_interface(char         *name_string,
 	     TYPE          result_type,
 	     INT32         cmcs_node,
 	     INT32         proc_idx,
-             INT64         flags )
+             INT64         flags,
+	     INT32         coarray_concurrent )
 {
   ST * st    ;
   TY_IDX  ty    ;
@@ -562,6 +572,11 @@ fei_proc_interface(char         *name_string,
      if (test_flag(flags, FEI_PROC_HAS_ALT_ENTRY)) 
            Set_PU_has_altentry(pu);
   }
+
+
+  // cosubroutien or cofunction ---FMZ
+  if ( coarray_concurrent ) 
+      Set_ST_is_coarray_concurrent(st);  
 
 
   st_for_distribute_temp=NULL;
