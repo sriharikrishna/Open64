@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.28 $
- * $Date: 2005-06-17 21:46:29 $
+ * $Revision: 1.29 $
+ * $Date: 2006-05-10 19:31:02 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -590,6 +590,9 @@ fei_store ( TYPE result_type )
       return ;
     }
 
+//FMZ August 2005 
+   if (WN_operator(rhs)==OPR_STRCTFLD)
+       rhs = addr_gen_iload_for_strctfld(rhs);
 
     switch(cwh_stk_get_class()) {
     case WN_item:
@@ -874,25 +877,31 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
   TYPE_ID   rbtype2;
   OPCODE    opc;
 
-  BOOL        forward_barrier = FALSE;
-  BOOL        backward_barrier = FALSE;
-  WN * barrier_wn;
-  WN * len;
-  INT32 association;
+  BOOL       forward_barrier = FALSE;
+  BOOL       backward_barrier = FALSE;
+  WN *       barrier_wn;
+  WN *       len;
+  INT32      association;
+  ST *       keyword;
+  INT32      number_of_kwd=0;
 
 #if 0 // eraxxon: allow NULL parameter nodes
   INT32 num_null_args = 0;
 #endif
 
   /* figure # of args, including character lengths, clear return temp ST */
-
+#ifdef SOURCE_TO_SOURCE
+  nargs  = num_args + cwh_stk_count_STRs(2*num_args) ; 
+#else
   nargs  = num_args + cwh_stk_count_STRs(num_args) ; 
+#endif
+
   clen   = nargs;
   rt     = NULL;
 
   args = (WN **) malloc(nargs*sizeof(WN *));
 
-  for (k = num_args -1 ; k >= 0  ; k --) {
+  for (k = num_args -1; k >= 0  ; k --) {
 
     switch(cwh_stk_get_class()) {
     case STR_item:
@@ -957,7 +966,6 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
       ta = cwh_stk_get_TY();
       keepty = ta;
       wa = cwh_expr_operand(NULL);
-//      wa = cwh_intrin_wrap_value_parm(wa);
       wa = cwh_intrin_wrap_ref_parm(wa,ta);
       if (keepty)
          WN_set_ty(wa,keepty); 
@@ -973,7 +981,28 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
     default:
       DevAssert((0),("Odd call actual")) ; 
     }
-    
+
+#ifdef SOURCE_TO_SOURCE
+    if (args[k])
+        args[k]->u3.ty_fields.ty = 0;
+
+    switch(cwh_stk_get_class()) { //pop out the keyword item
+      case WN_item:
+          cwh_stk_pop_WN();
+	  break;
+
+      case STR_item:
+          cwh_stk_pop_STR();
+          cwh_stk_pop_WN(); /* pop out length of the keyword*/
+          keyword = cwh_stk_pop_ST();
+          args[k]->u3.ty_fields.ty = ST_st_idx(keyword);
+          number_of_kwd++;
+          break ;
+
+    default:
+          DevAssert((0),("Odd call key word")) ; 
+     } 
+#endif
     
     /* set the dummy-actual arguments association flags */
     association = arg_association_info.top(); 
@@ -1019,9 +1048,16 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
             break;
       }
     }
+
   }
 
-
+  if (number_of_kwd) { //move lengths forword
+      if (nargs > (num_args + number_of_kwd))
+         for (k=num_args; k< nargs; k++)
+               args[k]= args[k + number_of_kwd];
+      nargs -= number_of_kwd;
+   }
+      
 #if 0 // eraxxon: allow NULL parameter nodes
   /* eraxxon: adjust argument count if we have a NULL WN as an argument */
   if (num_null_args > 0) {
@@ -1122,8 +1158,10 @@ cwh_stmt_call_helper(INT32 num_args, TY_IDX ty, INT32 inline_state, INT64 flags)
 
 
   if (ST_sclass(st) != SCLASS_FORMAL) {
-
-     opc = OPCODE_make_op(OPR_CALL,TY_mtype(ts),MTYPE_V);
+     if (TY_kind(ts)==KIND_ARRAY)
+        opc = OPCODE_make_op(OPR_CALL,TY_mtype(TY_etype(ts)),MTYPE_V);
+     else
+        opc = OPCODE_make_op(OPR_CALL,TY_mtype(ts),MTYPE_V);
      wn  = WN_Create(opc,nargs);
      WN_st_idx(wn) = ST_st_idx(st);
 
@@ -2218,8 +2256,18 @@ fei_new_select(INT32 num_cases,
      cwh_stmt_select_char(num_cases, default_label_idx);
 
   } else {
-     
-     expr = cwh_expr_operand(NULL);
+    if (cwh_stk_get_class()==WN_item) {
+        expr = cwh_stk_pop_WN(); 
+        if (WN_operator(expr) == OPR_STRCTFLD  ||
+            (WN_operator(expr) == OPR_ILOAD && 
+             WN_operator(WN_kid0(expr))==OPR_STRCTFLD ) )
+               ;
+        else {
+             cwh_stk_push(expr,WN_item);
+             expr = cwh_expr_operand(NULL);
+        }
+     } else 
+        expr = cwh_expr_operand(NULL);
 
      if ( num_cases > 0) {
 
@@ -4501,9 +4549,11 @@ cwh_stmt_conformance_checks_walk (WN *tree, WN *stmt, WN *block, WN ** sizes, IN
        for (i=0; i < numkids; i++) {
 	 cwh_stmt_conformance_checks_walk (WN_kid(tree,i), stmt, block, NULL, NULL);
        }
+#if 0
        if (sizes) {
-//fzhao    F90_Size_Walk(tree,ndim,sizes);
+         F90_Size_Walk(tree,ndim,sizes);
        }
+#endif
        break;
 
      default:

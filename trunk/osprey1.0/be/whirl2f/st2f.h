@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: st2f.h
- * $Revision: 1.4 $
- * $Date: 2003-12-08 15:45:41 $
+ * $Revision: 1.5 $
+ * $Date: 2006-05-10 19:30:57 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.h,v $
  *
@@ -114,6 +114,9 @@ extern void ST2F_Use_Preg(TOKEN_BUFFER tokens,
 			  PREG_IDX     preg_idx);
 
 extern void ST2F_Declare_Tempvar(TY_IDX ty, UINT idx);
+
+extern void ST2F_output_keyword(TOKEN_BUFFER tokens,
+			        ST            *st);
 
 //-------------------------------------
 

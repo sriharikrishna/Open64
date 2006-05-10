@@ -39,8 +39,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.h
- * $Revision: 1.3 $
- * $Date: 2004-02-09 16:55:45 $
+ * $Revision: 1.4 $
+ * $Date: 2006-05-10 19:30:58 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.h,v $
  *
@@ -95,6 +95,10 @@ extern WN2F_STATUS
    WN2F_src_triplet(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
  extern WN2F_STATUS
    WN2F_where(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
+extern WN2F_STATUS 
+   WN2F_strctfld(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
+extern WN2F_STATUS
+   WN2F_comma(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context);
 
 
 extern void

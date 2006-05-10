@@ -258,8 +258,9 @@ typedef enum {
   OPR_INTERFACE = 146,
   OPR_ARRAY_CONSTRUCT = 147,
   OPR_IMPLIED_DO =148,
+  OPR_STRCTFLD   =149,
 
-  OPERATOR_LAST = 148
+  OPERATOR_LAST = 149
 } OPERATOR;
 
 /* Definition of type OPCODE */
@@ -2112,13 +2113,12 @@ typedef enum {
   OPC_C16IMPLIED_DO  = OPR_IMPLIED_DO + RTYPE(MTYPE_C16) + DESC(MTYPE_V),
   OPC_I16IMPLIED_DO  = OPR_IMPLIED_DO + RTYPE(MTYPE_I16) + DESC(MTYPE_V),
   OPC_U16IMPLIED_DO  = OPR_IMPLIED_DO + RTYPE(MTYPE_U16) + DESC(MTYPE_V),
-
+  OPC_U8U8STRCTFLD          = OPR_STRCTFLD + RTYPE(MTYPE_U8) + DESC(MTYPE_U8),
   OPCODE_LAST            = 0x3FFFF
 
 } OPCODE;
 
 /* typedef UINT32 OPCODE; */
-
 
 /* operators, types, and attributes of the operators */
 /* eraxxon (2005.01): Re-implement table and routines to support b2a

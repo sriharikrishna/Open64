@@ -847,7 +847,6 @@ extern "C" UINT16 LNOGetVertex(WN *);
 extern "C" BOOL LnoDependenceEdge(WN *, WN *, mUINT16 *, DIRECTION *, BOOL *, BOOL *);
 #endif
 
-
 /* 
  * little routine to print TY's and their attributes, since otherwise they aren't visible
  */
@@ -869,6 +868,29 @@ ir_put_ty(TY_IDX ty)
    fprintf(ir_ofile, ">");
 }
 
+
+static void
+ir_put_parm_keyword(ST * st)
+{
+    TCON          strcon = STC_val(st);
+  INT32         strlen ;
+  INT32         stridx ;
+  const char    *strbase;
+  char          *keyword;
+                                                                                       
+  strlen  = Targ_String_Length(strcon);
+  strbase = Targ_String_Address(strcon);
+
+  keyword = (char *) malloc((strlen+1)* sizeof(char));
+  FmtAssert (keyword,("No more memory for holding keyword."));
+
+  for (stridx = 0; stridx<strlen;stridx++)
+       keyword[stridx] = strbase[stridx];
+  keyword[stridx] = '\0';
+  fprintf(ir_ofile, keyword);
+  free(keyword);
+ }
+
 /*
  *  Write an WN * in ascii form on an individual line.
  */ 
@@ -879,7 +901,7 @@ static void ir_put_wn(WN * wn, INT indent)
     if (wn == NULL) {
     	/* null statement */
 //    	fprintf(ir_ofile, "### error: null WN pointer\n");
-    	fprintf(ir_ofile, "### attention: null WN pointer\n");
+    	fprintf(ir_ofile, "### attention: null WN pointer, place holder\n");
    	return;
     } else {
 	if (IR_dump_wn_addr) {
@@ -1144,8 +1166,14 @@ static void ir_put_wn(WN * wn, INT indent)
 	if (flag & WN_PARM_MAKE_NEW_DV) fprintf(ir_ofile, "MAKE_NEW_DV ");
 	if (flag & WN_PARM_PASS_SECTION_ADDRESS) fprintf(ir_ofile, "PASS_SECTION_ADDRESS ");
 	if (flag & WN_PARM_CHECK_CONTIG_FLAG) fprintf(ir_ofile, "CHECK_CONTIG_FLAG ");
-        
-    }
+        /* ST_IDX point to the keyword of the parameter */
+        if ( wn->u3.ty_fields.ty) { 
+           ST * kwrd = &St_Table[wn->u3.ty_fields.ty];
+           fprintf(ir_ofile, "Keyword: ");
+           ir_put_parm_keyword(kwrd);
+          }
+    
+     }
 
     if (IR_dump_map_info) {
 	fprintf(ir_ofile, " # <id %d:%d>", OPCODE_mapcat(opcode),

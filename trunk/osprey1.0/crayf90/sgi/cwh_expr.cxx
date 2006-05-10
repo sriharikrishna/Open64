@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_expr
- * $Revision: 1.7 $
- * $Date: 2003-05-23 16:05:38 $
+ * $Revision: 1.8 $
+ * $Date: 2006-05-10 19:31:01 $
  * $Author: fzhao $
  * $Source: 
  *
@@ -66,7 +66,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.7 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_expr.cxx,v $ $Revision: 1.8 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -428,6 +428,13 @@ cwh_expr_binop(OPERATOR op,TY_IDX  result_ty)
 
   rhs = cwh_expr_operand(&ae);
   lhs = cwh_expr_operand(&ae);
+
+//FMZ August 2005
+  if (WN_operator(rhs)==OPR_STRCTFLD)
+       rhs = addr_gen_iload_for_strctfld(rhs);
+
+  if (WN_operator(lhs)==OPR_STRCTFLD)
+       lhs = addr_gen_iload_for_strctfld(lhs);
 
   ot  = cwh_get_highest_type(rhs,lhs);
   if (result_ty) {
@@ -946,13 +953,13 @@ cwh_expr_operand(WN **arrexp)
 
   case DEREF_item:
     wn = cwh_stk_pop_DEREF();
-    wn = cwh_addr_load_WN(wn,0,NULL);
+    wn = cwh_addr_load_WN(wn,0,0);
     break ;
 
   case ST_item:
   case ST_item_whole_array:
     st  = cwh_stk_pop_ST();
-    wn  = cwh_addr_load_ST(st,0,NULL);
+    wn  = cwh_addr_load_ST(st,0,0);
     break ;
 
   case FLD_item:
@@ -1155,12 +1162,12 @@ fei_islg(TYPE type)
    arg2 = cwh_expr_operand(NULL);
    cwh_stk_push(WN_COPY_Tree(arg2),WN_item);
    cwh_stk_push(WN_COPY_Tree(arg1),WN_item);
-   cwh_expr_compare(OPR_LT,NULL);
+   cwh_expr_compare(OPR_LT,0);
 
    r1 = cwh_expr_operand(NULL);
    cwh_stk_push(arg2,WN_item);
    cwh_stk_push(arg1,WN_item);
-   cwh_expr_compare(OPR_GT,NULL);
+   cwh_expr_compare(OPR_GT,0);
 
    r2 = cwh_expr_operand(NULL);
    cwh_stk_push(r1,WN_item);
@@ -1304,11 +1311,24 @@ fei_paren(TYPE type,INT processing_call)
 
   TY_IDX  ty ;
   TYPE_ID t;
+  WN*     wni;
+  TY_IDX  tyi ;
 
   ty = cast_to_TY(t_TY(type));
   ty = cwh_types_scalar_TY(ty);
   t = TY_mtype(ty);
-  
+
+  if (processing_call)
+   { 
+    if (cwh_stk_get_class()==WN_item){
+        wni  = cwh_stk_pop_WN();
+        if (WN_operator(wni)==OPR_STRCTFLD)   
+           wni = addr_gen_iload_for_strctfld(wni);
+        tyi = WN_ty(wni);
+        cwh_stk_push_typed(wni,WN_item,tyi);
+      }
+   }
+
   if (MTYPE_is_float(t) || MTYPE_is_complex(t) || 
        processing_call) { 
      cwh_expr_unop(OPR_PAREN,ty);

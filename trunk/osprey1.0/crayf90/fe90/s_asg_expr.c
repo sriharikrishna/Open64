@@ -2277,7 +2277,6 @@ boolean expr_sem (opnd_type       *result_opnd,
                break;
 
             case Triplet_Opr          :
-
                ok = triplet_opr_handler(result_opnd, exp_desc);
                break;
 
@@ -2311,10 +2310,13 @@ boolean expr_sem (opnd_type       *result_opnd,
             case Kwd_Opr              :
    
                /* must be error in array spec */
-
+#if 0 /* FMZ August 2005 */
                PRINTMSG(IR_LINE_NUM(ir_idx), 197, Error, IR_COL_NUM(ir_idx),
                         ", or )", "=");
                ok = FALSE;
+#else
+               ok = TRUE;
+#endif
                break;
 
             case Stmt_Func_Call_Opr   :
@@ -10740,12 +10742,9 @@ static boolean triplet_opr_handler(opnd_type		*result_opnd,
    exp_desc_l.rank = 0;
    ok = expr_sem(&opnd, &exp_desc_l);
    COPY_OPND(IL_OPND(list_idx), opnd);
-
    IL_CONSTANT_SUBSCRIPT(list_idx) = exp_desc_l.foldable;
-
    exp_desc->has_constructor = exp_desc_l.has_constructor;
    exp_desc->has_symbolic = exp_desc_l.has_symbolic;
-
    if (IL_FLD(list_idx) != NO_Tbl_Idx) {
 
       if (exp_desc_l.linear_type == Long_Typeless) {
@@ -10801,7 +10800,6 @@ static boolean triplet_opr_handler(opnd_type		*result_opnd,
       }
    }
 
-
    list_idx = IL_NEXT_LIST_IDX(list_idx);
    exp_desc_l.rank = 0;
    COPY_OPND(opnd, IL_OPND(list_idx));
@@ -10812,7 +10810,6 @@ static boolean triplet_opr_handler(opnd_type		*result_opnd,
 
    exp_desc->has_symbolic |= exp_desc_l.has_symbolic;
    exp_desc->has_constructor |= exp_desc_l.has_constructor;
-
    if (IL_FLD(list_idx) != NO_Tbl_Idx) {
 
       if (exp_desc_l.linear_type == Long_Typeless) {
@@ -10867,7 +10864,6 @@ static boolean triplet_opr_handler(opnd_type		*result_opnd,
 
       }
    }
-
 
    exp_desc_l.rank = 0;
    list_idx = IL_NEXT_LIST_IDX(list_idx); 
@@ -10943,7 +10939,6 @@ static boolean triplet_opr_handler(opnd_type		*result_opnd,
 
    IR_TYPE_IDX(ir_idx)      = exp_desc->type_idx;
    IR_RANK(ir_idx)          = exp_desc->rank;
-
 
    TRACE (Func_Exit, "triplet_opr_handler", NULL);
 

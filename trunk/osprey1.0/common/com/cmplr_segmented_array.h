@@ -356,8 +356,7 @@ private:
 
 public:
 
-  RELATED_SEGMENTED_ARRAY(MEM_POOL *m = Malloc_Mem_Pool) :
-    pool (m), map(m) {
+  RELATED_SEGMENTED_ARRAY(MEM_POOL *m = Malloc_Mem_Pool) : map(m), pool(m) {
       size = max_size = next_block_size = 0;
       block_base = -1;
       block = 0;
@@ -418,7 +417,7 @@ public:
     virtual void Delete_last () {
       size--;
       Decrease_kids_size();
-      if (size == block_base)
+      if (size == (UINT)block_base)
 	Pop_Map ();
     }
 

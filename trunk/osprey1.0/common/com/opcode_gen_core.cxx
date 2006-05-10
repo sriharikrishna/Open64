@@ -1215,6 +1215,15 @@ struct OPERATOR_info_struct OPERATOR_info[OPERATOR_LAST+1] = {
 		       OPERATOR_MAPCAT_OEXP /* mapcat */,
 		       OPERATOR_PROPERTY_expression),
 
+  OPERATOR_info_struct(OPR_STRCTFLD,
+                       "OPR_STRCTFLD",
+                       1 /* nkids */,
+                       OPERATOR_MAPCAT_LDST /* mapcat */,
+                       OPERATOR_PROPERTY_expression           |
+		       OPERATOR_PROPERTY_load                 |
+                       OPERATOR_PROPERTY_2ty              |
+                       OPERATOR_PROPERTY_field_id),
+
 };
 
 static BOOL
@@ -2483,6 +2492,12 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
                                              || desc == MTYPE_U4))
                 || ((rtype == MTYPE_U8) && (desc == MTYPE_U8));
         break;
+
+      case OPR_STRCTFLD: 
+        // [RTYPE]: U8  [DESC]: U8
+        valid =  (rtype == MTYPE_U8) && (desc == MTYPE_U8);
+        break;
+
       default:
         valid = FALSE;
         break;
@@ -2704,6 +2719,7 @@ OPCODE_name (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
 
     case OPR_ILOAD:
     case OPR_LDID:
+    case OPR_STRCTFLD: 
       // [RTYPE] : f,i,M,p,z [DESC] : bs,f,i,M,p,s,z
       sprintf (buffer, "OPC_%s%s%s", MTYPE_name(rtype), MTYPE_name(desc), &OPERATOR_info [opr]._name [4]);
       break;

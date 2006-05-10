@@ -215,7 +215,7 @@ private:
 
 public:
 
-  SEGMENTED_ARRAY(MEM_POOL *m = Malloc_Mem_Pool) : pool (m), map (m) {
+  SEGMENTED_ARRAY(MEM_POOL *m = Malloc_Mem_Pool) : map (m), pool (m) {
     size_ = max_size_ = next_block_size = 0;
     block_base = -1;
     block = 0;

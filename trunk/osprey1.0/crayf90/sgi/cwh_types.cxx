@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_types.c
- * $Revision: 1.21 $
- * $Date: 2005-07-18 17:25:56 $
+ * $Revision: 1.22 $
+ * $Date: 2006-05-10 19:31:02 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $
  *
@@ -67,7 +67,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.21 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_types.cxx,v $ $Revision: 1.22 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -306,7 +306,7 @@ fei_array_dimen(INT32  flag_bits,
 
   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_LB)) {
 
-    b = cast_to_STB(low_bound) ;
+    b = cast_to_STB((UINTPS) low_bound) ;
     Is_True((b->form == is_ST),("Odd lbound"));
 
     st = cast_to_ST(b->item);
@@ -329,7 +329,7 @@ fei_array_dimen(INT32  flag_bits,
   
   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_UB)) {
 
-    b = cast_to_STB(upper_bound) ;
+    b = cast_to_STB((UINTPS) upper_bound) ;
     if (b != NULL) {
       Is_True((b->form == is_ST),("Odd extent"));
       
@@ -359,7 +359,7 @@ fei_array_dimen(INT32  flag_bits,
 
   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_EXT)) {
 
-    b = cast_to_STB(extent) ;
+    b = cast_to_STB((UINTPS) extent) ;
     if (b != NULL) {
       Is_True((b->form == is_ST),("Odd extent"));
       
@@ -493,7 +493,7 @@ fei_co_array_dimen(INT32  flag_bits,
 
   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_LB)) {
 
-    b = cast_to_STB(low_bound) ;
+    b = cast_to_STB((UINTPS) low_bound) ;
     Is_True((b->form == is_ST),("Odd lbound"));
 
     st = cast_to_ST(b->item);
@@ -516,7 +516,7 @@ fei_co_array_dimen(INT32  flag_bits,
   
   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_UB)) {
 
-    b = cast_to_STB(upper_bound) ;
+    b = cast_to_STB((UINTPS) upper_bound) ;
     if (b != NULL) {
       Is_True((b->form == is_ST),("Odd extent"));
       
@@ -546,7 +546,7 @@ fei_co_array_dimen(INT32  flag_bits,
 
   if (test_flag(flag_bits,FEI_ARRAY_DIMEN_VARY_EXT)) {
 
-    b = cast_to_STB(extent) ;
+    b = cast_to_STB((UINTPS) extent) ;
     if (b != NULL) {
       Is_True((b->form == is_ST),("Odd extent"));
       
@@ -777,7 +777,8 @@ fei_user_type(char         *name_string,
      currscp = Scope_tab[CURRENT_SYMTAB].st;
 
  if (size==0)
-    size =32; /*default shape array or pointer set is 4bytes i.e 32 bits*/
+       size =64; /*default shape array or pointer 
+                   is 8bytes i.e 64 bits, */
   sequence = (FORT_SEQUENCE) sequence_arg;
 
   ty_idx = cast_to_TY(cr_ty_idx);
@@ -1378,8 +1379,7 @@ if (co_top_decl_bounds != ANULL) {
   if ( const_str && size!=0) 
         Set_TY_size(ty_idx, size);
   else 
-        Set_TY_size(ty_idx, TY_size(base_idx)); //pointer in derived type
-                                                //get the size of the pointee
+        Set_TY_size(ty_idx, 8); //pointer get 8-bytes
 
 /*
  * move the function call "cwh_types_unique_TY" to fei_descriptor

@@ -261,8 +261,7 @@ static boolean init_whole_array(int		 whole_sub_ir_idx,
             if (sb_idx == NULL_IDX ||
 /*                (!SB_MODULE(sb_idx) && !SB_IS_COMMON(sb_idx))) {    */
 
-/*  try to keep SB_MODULE variable keep similiar form with subroutine */
-/* fzhao June  */
+/* keep SB_MODULE variable keep similiar form with subroutine */
 
                  !SB_IS_COMMON(sb_idx)) {    
 

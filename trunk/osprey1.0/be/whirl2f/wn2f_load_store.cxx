@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.23 $
- * $Date: 2004-02-09 16:55:45 $
+ * $Revision: 1.24 $
+ * $Date: 2006-05-10 19:30:58 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.23 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.24 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -875,27 +875,42 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    TOKEN_BUFFER  lhs_tokens;
    TOKEN_BUFFER  rhs_tokens;
    TY_IDX        base_ty;
+   TY_IDX        object_ty;
    
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_ISTORE, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_istore"));
 
    /* Get the base address into which we are storing a value */
    base_ty = WN_Tree_Type(WN_kid1(wn));
+   object_ty = TY_pointed(WN_ty(wn));
+
    if (!TY_Is_Pointer(base_ty))
       base_ty = WN_ty(wn);
+
+//For pointer PP(:,...,:)
+   if (TY_kind(TY_pointed(base_ty))==KIND_POINTER &&
+        TY_is_f90_deferred_shape(TY_pointed(base_ty))) 
+            base_ty = TY_pointed(base_ty);
+
+   if (TY_kind(object_ty)==KIND_POINTER &&
+        TY_is_f90_deferred_shape(object_ty)) 
+            object_ty = TY_pointed(object_ty);
 
    /* Get the lhs of the assignment (dereference address) */
    lhs_tokens = New_Token_Buffer();
    if (WN_operator(WN_kid1(wn)) == OPR_LDA ||
        WN_operator(WN_kid1(wn)) == OPR_LDID )
             set_WN2F_CONTEXT_has_no_arr_elmt(context);
-
+#if 0 
    WN2F_Offset_Memref(lhs_tokens, 
 		      WN_kid1(wn),           /* base-symbol */
 		      base_ty,               /* base-type */
-		      TY_pointed(WN_ty(wn)), /* object-type */
+		      object_ty, /* object-type */
 		      WN_store_offset(wn),   /* object-ofst */
 		      context);
+#else 
+      WN2F_translate(lhs_tokens, WN_kid1(wn), context);
+#endif
 
     reset_WN2F_CONTEXT_has_no_arr_elmt(context); 
 
@@ -913,15 +928,15 @@ WN2F_istore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* See if we need to apply a "char" conversion to the rhs
     */
+#if 0 
    if (TY_Is_Character_String(W2F_TY_pointed(WN_ty(wn), "ISTORE lhs")) &&
        TY_Is_Integral(WN_Tree_Type(WN_kid0(wn))))
    {
-#if 0 /*fzhao August 2002*/
       Prepend_Token_Special(rhs_tokens, '(');
       Prepend_Token_String(rhs_tokens, "char");
       Append_Token_Special(rhs_tokens, ')');
-#endif
    }
+#endif
 
    /* Assign the rhs to the lhs.
     */
@@ -996,12 +1011,17 @@ WN2F_mstore(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* Get the lhs of the assignment (dereference address) */
    lhs_tokens = New_Token_Buffer();
+#if 0  
    WN2F_Offset_Memref(lhs_tokens, 
 		      WN_kid1(wn),           /* base-symbol */
 		      base_ty,               /* base-type */
 		      TY_pointed(WN_ty(wn)), /* object-type */
 		      WN_store_offset(wn),   /* object-ofst */
 		      context);
+#else
+   WN2F_translate(lhs_tokens, WN_kid1(wn), context);
+#endif 
+   
    
    /* The rhs */
    rhs_tokens = New_Token_Buffer();
@@ -1033,6 +1053,9 @@ WN2F_stid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
    TOKEN_BUFFER lhs_tokens, rhs_tokens;
    const BOOL parenthesize = !WN2F_CONTEXT_no_parenthesis(context);
+   TY_IDX base_ty;
+   TY_IDX object_ty;
+
     if (parenthesize)
        set_WN2F_CONTEXT_no_parenthesis(context);
    
@@ -1057,10 +1080,22 @@ WN2F_stid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    }
    else
    {
+      base_ty = ST_type(WN_st(wn));
+      if (TY_kind(base_ty)==KIND_POINTER &&
+          TY_is_f90_pointer(base_ty)) 
+         ;
+      else
+          base_ty = Stab_Pointer_To(base_ty);
+
+      object_ty = WN_ty(wn);
+      if ((TY_kind(object_ty)==KIND_POINTER) &&
+          ( TY_is_f90_pointer(object_ty)))
+           object_ty = TY_pointed(object_ty);
+   
       WN2F_Offset_Symref(lhs_tokens, 
 			 WN_st(wn),                        /* base-symbol */
-			 Stab_Pointer_To(ST_type(WN_st(wn))),/* base-type */
-			 WN_ty(wn),                        /* object-type */
+                         base_ty,                          /* base_type   */
+			 object_ty,                        /* object-type */
 			 WN_store_offset(wn),              /* object-ofst */
 			 context);
    }
@@ -1200,11 +1235,18 @@ WN2F_STATUS
 WN2F_iload(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
    TY_IDX base_ty;
+   TY_IDX object_ty;
    
    /* Note that we handle this just like we do the lhs of an ISTORE.
     */
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_ILOAD, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_iload"));
+
+  
+   if (WN_operator(WN_kid0(wn))==OPR_STRCTFLD){ //place-hold for pointer field
+         WN2F_translate(tokens, WN_kid0(wn), context);   
+         return EMPTY_WN2F_STATUS;
+     }
 
    /* Special case for Purple (address values have no meaning, so emit
     * symbolic values for them).
@@ -1219,20 +1261,34 @@ WN2F_iload(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
    /* Get the type of the base from which we are loading */
    base_ty = WN_Tree_Type(WN_kid0(wn));
+   object_ty = TY_pointed(WN_load_addr_ty(wn));
+
    if (!TY_Is_Pointer(base_ty))
       base_ty = WN_load_addr_ty(wn);
     
-   /* Get the object to be loaded (dereference address) */
+    /*For pointer PP(:,...,:) */
+   if (TY_kind(TY_pointed(base_ty))==KIND_POINTER &&
+        TY_is_f90_deferred_shape(TY_pointed(base_ty))) 
+            base_ty = TY_pointed(base_ty);
 
+   if (TY_kind(object_ty)==KIND_POINTER &&
+        TY_is_f90_deferred_shape(object_ty)) 
+            object_ty = TY_pointed(object_ty);
+    
+   /* Get the object to be loaded (dereference address) */
    if (WN_opc_operator(WN_kid0(wn)) == OPR_LDA ||
        WN_opc_operator(WN_kid0(wn)) == OPR_LDID)
           set_WN2F_CONTEXT_has_no_arr_elmt(context);
+#if 0 
    WN2F_Offset_Memref(tokens, 
 		      WN_kid0(wn),                     /* base-symbol */
 		      base_ty,                         /* base-type */
-		      TY_pointed(WN_load_addr_ty(wn)), /* object-type */
+		      object_ty,                       /* object-type */
 		      WN_load_offset(wn),              /* object-ofst */
 		      context);
+#else 
+         WN2F_translate(tokens, WN_kid0(wn), context);   
+#endif
     reset_WN2F_CONTEXT_has_no_arr_elmt(context);
 
    /* See if there is any prefetch information with this load, and 
@@ -1425,7 +1481,16 @@ WN2F_ldid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	  * in WN2F_Offset_Symref().
 	  */
 	 object_ty = WN_ty(wn);
-	 base_ptr_ty = Stab_Pointer_To(ST_type(WN_st(wn)));
+         if ((TY_kind(object_ty)==KIND_POINTER) &&
+              (TY_is_f90_pointer(object_ty)))
+                  object_ty = TY_pointed(object_ty);
+
+         base_ptr_ty = ST_type(WN_st(wn));
+         if ((TY_kind(base_ptr_ty)==KIND_POINTER) &&
+              (TY_is_f90_pointer(base_ptr_ty)))
+                 ;
+         else 
+	     base_ptr_ty = Stab_Pointer_To(base_ptr_ty);
       }
 
       if (!deref && STAB_IS_POINTER_REF_PARAM(WN_st(wn)))
@@ -1504,11 +1569,8 @@ WN2F_lda(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
          ty_1= TY_pointed(ST_type(st));
     else
          ty_1= ST_type(st);
-
      ty =  Stab_Pointer_To(ty_1);
 
-//    ty = Stab_Pointer_To(ST_type(st));
-       
    set_WN2F_CONTEXT_has_no_arr_elmt(context);
     WN2F_Offset_Symref(tokens, 
 		       WN_st(wn),                           /* base-symbol */
@@ -1525,9 +1587,10 @@ WN2F_lda(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
  WN2F_STATUS
  WN2F_arrayexp(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 {
-WN    * kid;
+ WN    * kid;
  kid    = WN_kid0(wn);
-WN2F_translate(tokens, kid, context);
+ WN2F_translate(tokens, kid, context);
+
 return EMPTY_WN2F_STATUS;
 }
 
@@ -1755,7 +1818,13 @@ WN2F_arrsection(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    /* Get the array or, for ptr-as-array types, the element type */
 
    kid    = WN_kid0(wn);
+   if (WN_operator(kid) == OPR_ILOAD  &&
+       WN_operator(WN_kid0(kid)) == OPR_STRCTFLD) 
+          kid = WN_kid0(kid) ;
+
    ptr_ty = WN_Tree_Type(kid);
+
+        
 
    if (WN2F_Is_Address_Preg(kid,ptr_ty))
    {
@@ -1766,15 +1835,16 @@ WN2F_arrsection(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 
      WN2F_translate(tokens, kid, context);
      WN2F_Arrsection_Slots(tokens,wn,ptr_ty,context,TRUE);
-/* need example to test how to set this TY_IDX argument---fzhao*/
    }
    else
    {
 
-     array_ty = W2F_TY_pointed(ptr_ty, "base of OPC_ARRAY");
+     if (WN_operator(kid)==OPR_STRCTFLD)
+          array_ty = WN_ty(kid);
+     else
+          array_ty = W2F_TY_pointed(ptr_ty, "base of OPC_ARRAY");
     
      if (WN_opc_operator(kid) == OPR_LDID       &&
-
          ST_sclass(WN_st(kid)) == SCLASS_FORMAL &&
          !ST_is_value_parm(WN_st(kid))          &&
          WN_element_size(wn) == TY_size(array_ty)       &&
@@ -1880,6 +1950,11 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    /* Get the array or, for ptr-as-array types, the element type */
 
    kid    = WN_kid0(wn);
+
+   if (WN_operator(kid)==OPR_ILOAD &&
+          WN_operator(WN_kid0(kid))==OPR_STRCTFLD ) //F90 pointer
+        kid = WN_kid0(kid);
+
    ptr_ty = WN_Tree_Type(kid);
 
    if (WN2F_Is_Address_Preg(kid,ptr_ty))
@@ -1938,15 +2013,16 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 	   /* Get the base of the object to be indexed into, still using
 	    * WN2F_CONTEXT_deref_addr(context).
 	    */
-     if (WN_operator(kid) == OPR_ADD || WN_operator(kid)==OPR_ARRAY)
+//     if (WN_operator(kid) == OPR_ADD || WN_operator(kid)==OPR_ARRAY)
+     if (WN_operator(kid) == OPR_ADD)
       {
 
      STAB_OFFSET offset =(WN_operator(kid) == OPR_ADD)?WN_const_val(WN_kid1(kid)):0; 
 
        WN2F_translate(tokens,WN_kid0(kid),context);
 
+#if 0 
        FLD_PATH_INFO *fld_path;
-
        if (!fld_type_z)
             fld_type_z = array_ty; 
        fld_path = TY2F_Get_Fld_Path(fld_type_z,fld_type_z, offset);
@@ -1969,19 +2045,16 @@ WN2F_array(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
           Append_Token_String(tokens,
                                Number_as_String(offset,
                                                 "<field-at-offset=%lld>"));
+#endif 
 
         }
      else {
            WN2F_translate(tokens, kid, context);
-           fld_type_z = TY_etype(array_ty);
           }
 
        reset_WN2F_CONTEXT_deref_addr(context);
        WN2F_array_bounds(tokens,wn,array_ty,context);
      }
-
-//     if (!deref)
-//        Append_Token_Special(tokens, ')');
    }
    return EMPTY_WN2F_STATUS;
 } /* WN2F_array */
@@ -2010,7 +2083,7 @@ WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,TY_IDX array_ty,WN2F_CONTEXT c
 
   ttyy = array_ty;
 
-  if (TY_Is_Pointer(ttyy))  //Sept temp use
+  if (TY_Is_Pointer(ttyy))  
      ttyy=TY_pointed(ttyy);
   if (TY_is_f90_pointer(ttyy))
      ttyy = TY_pointed(ttyy);
@@ -2032,16 +2105,13 @@ WN2F_Arrsection_Slots(TOKEN_BUFFER tokens, WN *wn,TY_IDX array_ty,WN2F_CONTEXT c
        }
 
 
-   if (WN_opc_operator(WN_array_index(wn, WN_num_dim(wn)-1))==OPR_SRCTRIPLET) 
-      kid = WN_kid2(WN_array_index(wn, WN_num_dim(wn)-1));
-
 if (array_dim>0) {
   if (parens)
   {
     Append_Token_Special(tokens, '(');
     set_WN2F_CONTEXT_no_parenthesis(context);
   }
-# if 0 /* original code without thinking about co_array */
+# if 0 /* add co_array dimensions */
   for (dim = WN_num_dim(wn)-1; dim >= 0; dim--)
   {
     if (WN_opc_operator(WN_array_index(wn, dim))==OPR_SRCTRIPLET) {
@@ -2225,7 +2295,7 @@ WN2F_arrsection_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT
       /* We handle the case when an array is declared to have more
        * dimensions than that given by this array addressing expression.
        */
-# if 0 //we don't need this think about co_array
+# if 0 //could be co_array object
 
       if (TY_AR_ndims(array_ty) > WN_num_dim(wn))
         {
@@ -2265,7 +2335,7 @@ WN2F_array_bounds(TOKEN_BUFFER tokens, WN *wn, TY_IDX array_ty,WN2F_CONTEXT cont
 //  set_WN2F_CONTEXT_no_parenthesis(context);
 
    if (TY_is_f90_pointer(array_ty))
-        array_ty = TY_pointed(array_ty); //Sept
+        array_ty = TY_pointed(array_ty); 
 
   if (TY_Is_Array(array_ty) && TY_AR_ndims(array_ty) >= WN_num_dim(wn) || TRUE) 
     {
@@ -2337,7 +2407,6 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
     * is the first argument and the length is the second argument.
     */
    WN   *base = WN_Skip_Parm(base_parm);
-   WN   *base1 = WN_Skip_Parm(base_parm);
    WN   *lower_bnd;
    WN   *length_new;
    WN   *arg_expr;
@@ -2393,7 +2462,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
    else 
    {
      /* A regular address expression as base */
-
+#if 0
       WN2F_Get_Substring_Info(&base, &str_ty, &lower_bnd,&length_new);
 
       /* Was this a character component of an array of derived type? */
@@ -2445,15 +2514,7 @@ WN2F_String_Argument(TOKEN_BUFFER  tokens,
 	WN2F_translate(tokens, base, context);
 	reset_WN2F_CONTEXT_deref_addr(context);
       }
-# if 0
- /* need to take a look see when we need dump out substring--fzhao Jan*/ 
 
- if (WN_operator(base) != OPR_CALL &&
-     WN_operator(base) != OPR_LDA &&
-      (WN_operator(base1) != OPR_ARRAY ||
-        WN_operator(base1)==OPR_ARRAY &&
-        WN_operator(base)==OPR_ARRAY ))
-# endif
 if (length_new != WN2F_INTCONST_ZERO && !WN2F_CONTEXT_has_no_arr_elmt(context))
       WN2F_Substring(tokens, 
 		     str_length,
@@ -2461,7 +2522,34 @@ if (length_new != WN2F_INTCONST_ZERO && !WN2F_CONTEXT_has_no_arr_elmt(context))
 //		     WN_Skip_Parm(length),
 		     length_new,
 		     context);
-// fzhao Feb#endif
+#else
+
+  {
+    WN * base1;
+       if (WN_operator(base)==OPR_ARRAY)
+               base1 = WN_kid0(base);
+       else 
+       if (WN_operator(base)==OPR_ARRAYEXP   &&
+           WN_operator(WN_kid0(base))==OPR_ARRAY)
+               base1 = WN_kid0(WN_kid0(base));
+       else 
+               base1 = base;
+
+	WN2F_translate(tokens, base1, context);
+   } 
+
+        WN2F_Get_Substring_Info(&base, &str_ty, &lower_bnd,&length_new);
+        str_length = TY_size(str_ty);
+
+   if (length_new != WN2F_INTCONST_ZERO && !WN2F_CONTEXT_has_no_arr_elmt(context))
+          WN2F_Substring(tokens, 
+		         str_length,
+		         lower_bnd,
+		         length_new,
+		         context);
+   else 
+        reset_WN2F_CONTEXT_has_no_arr_elmt(context);
+#endif
       return ;
    }
 } /* WN2F_String_Argument */
@@ -2484,3 +2572,47 @@ WN2F_Block(TOKEN_BUFFER tokens, ST * st, STAB_OFFSET offset,WN2F_CONTEXT context
       Append_Token_String(tokens, Number_as_String(offset, "%lld"));
   }
 }
+
+
+WN2F_STATUS 
+WN2F_strctfld(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
+{
+   TY_IDX ty1,ty2;
+   char * fld_name;
+   FLD_HANDLE  fld;
+   UINT       field_id ;
+
+   ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_STRCTFLD, 
+		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_strctfld"));
+
+ if (!WN_kid0(wn))
+    Append_Token_String(tokens,"Null kid here");
+ else 
+    WN2F_translate(tokens,WN_kid0(wn),context);
+
+    ty2 = WN_load_addr_ty(wn);
+    Is_True (TY_kind(ty2) == KIND_STRUCT, ("expecting KIND_STRUCT"));
+    field_id = WN_field_id(wn);
+    fld = TY_fld(ty2); 
+    field_id--;
+    while (field_id && !FLD_last_field(fld)) {
+        --field_id ;
+        fld = FLD_next(fld);
+    }
+   
+//TODO: add assertion about field_id ? Must be resonable value based
+//      on the structure and field type 
+    fld_name = FLD_name(fld);
+    Append_Token_Special(tokens,'%'); 
+    Append_Token_String(tokens,fld_name); 
+
+   return EMPTY_WN2F_STATUS;
+}
+
+
+WN2F_STATUS 
+WN2F_comma(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
+ {
+    WN2F_translate(tokens,WN_kid1(wn),context);
+    return EMPTY_WN2F_STATUS;
+ }
