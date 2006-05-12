@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.33 $
- * $Date: 2006-05-10 19:30:57 $
+ * $Revision: 1.34 $
+ * $Date: 2006-05-12 20:22:24 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -1749,18 +1749,22 @@ TY2F_pointer(TOKEN_BUFFER decl_tokens, TY_IDX ty)
       } 
       else
       {
-	/* avoid recursive type declarations */
 
+	/* avoid recursive type declarations */
+#if 0
 	if (TY_kind(TY_pointed(ty)) == KIND_STRUCT)
 	{
-#if 0
+/*
 	  Prepend_Token_String(decl_tokens,",POINTER ::");
 	  Prepend_Token_String(decl_tokens,W2CF_Symtab_Nameof_Ty(TY_pointed(ty)));
-#endif
- 	  TY2F_translate(decl_tokens,Be_Type_Tbl(Pointer_Mtype));
+*/
+         //this cause misunpared scalar pointer  
+ 	  TY2F_translate(decl_tokens,Be_Type_Tbl(Pointer_Mtype)); 
 
-	} else
-	  TY2F_translate(decl_tokens,TY_pointed(ty));
+	} else 
+#endif
+	  TY2F_translate(decl_tokens,TY_pointed(ty)); 
+
       }
    }
 } /* TY2F_pointer */
