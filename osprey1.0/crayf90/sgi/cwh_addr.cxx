@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_addr
- * $Revision: 1.11 $
- * $Date: 2006-05-10 19:31:01 $
+ * $Revision: 1.12 $
+ * $Date: 2006-05-12 19:13:32 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -1643,7 +1643,8 @@ cwh_addr_stid(ST *st, OFFSET_64 off, TY_IDX ty , WN * rhs)
   TYPE_ID bt;
   OPCODE  op;
 
-  rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
+ if (!(TY_kind(ty)== KIND_POINTER))  //left hand is pointer skip this
+      rhs = cwh_convert_to_ty(rhs, TY_mtype(ty)); 
 
   if (BIG_OFFSET(off)) {
     wn = cwh_addr_lda(st,off,ty);

@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_io.c
- * $Revision: 1.10 $
- * $Date: 2005-06-14 19:24:46 $
+ * $Revision: 1.11 $
+ * $Date: 2006-05-12 19:13:32 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_io.cxx,v $
  *
@@ -57,7 +57,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-  static char *rcs_id = " $Id: cwh_io.cxx,v 1.10 2005-06-14 19:24:46 fzhao Exp $ ";
+  static char *rcs_id = " $Id: cwh_io.cxx,v 1.11 2006-05-12 19:13:32 fzhao Exp $ ";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -2348,10 +2348,12 @@ cwh_io_analyse_expr(WN *tree, IMPDO_INFO *impdo_set, int mode)
    ST *st;
    BOOL visited;
    INT32 i;
-  
+ 
+#if 0 
    if ((WNOPR(tree) == OPR_ILOAD) || ( OPCODE_has_aux(WN_opcode(tree))))
       if (is_f90_pointer(tree))
-         return TRUE;
+         return TRUE; 
+#endif 
 
    if ( OPCODE_has_aux(WN_opcode(tree))) {
      st = cwh_io_ST_base(WN_st(tree));
