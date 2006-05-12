@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_io.c
- * $Revision: 1.11 $
- * $Date: 2006-05-12 19:13:32 $
+ * $Revision: 1.12 $
+ * $Date: 2006-05-12 20:56:04 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_io.cxx,v $
  *
@@ -57,7 +57,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-  static char *rcs_id = " $Id: cwh_io.cxx,v 1.11 2006-05-12 19:13:32 fzhao Exp $ ";
+  static char *rcs_id = " $Id: cwh_io.cxx,v 1.12 2006-05-12 20:56:04 fzhao Exp $ ";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -2180,6 +2180,8 @@ cwh_io_analyse_io_item(WN *tree, IMPDO_INFO *impdo_set, int mode)
    BOOL visited;
    INT32 i;
    INT32 nd;
+
+   return  FALSE; //right now for source-to-source, do not do split IO
 
    item = WN_intrinsic(tree);
    
