@@ -38,8 +38,8 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.29 $
- * $Date: 2006-05-10 19:31:02 $
+ * $Revision: 1.30 $
+ * $Date: 2006-05-23 17:38:50 $
  * $Author: fzhao $
  *
  * Revision history:
@@ -3421,9 +3421,13 @@ fei_dowhile(void)
  *
  * For parallel loops, we calculate the user index var based on the
  * normalized index var if the loop is canonlicalized.
+ * 
+ * for source-to-source translation we don't do any manipulation
+ * on the loop variable and strid,ub,lb--fzhao
  *
  *================================================================
  */
+
 void
 fei_doloop(INT32	line)
 {
@@ -3465,6 +3469,7 @@ fei_doloop(INT32	line)
    BOOL is_top_pdo=FALSE;	/* is this the outermost loop of a PDO? */
    BOOL is_innermost=FALSE;	/* is innermost loop of a nest (if true if not
 				   nested) */
+   BOOL source_to_source = TRUE;
 
    if ((nested_do_descriptor.type == WN_PRAGMA_PDO_BEGIN ||
         nested_do_descriptor.type == WN_PRAGMA_PARALLEL_DO)  &&
@@ -3535,7 +3540,7 @@ fei_doloop(INT32	line)
       doloop_ty = lcv_t;
    }
 
-   if (WNOPR(stride) != OPR_INTCONST && ! is_top_pdo) {
+   if (WNOPR(stride) != OPR_INTCONST && ! is_top_pdo && !source_to_source) {
        /* do not canonicalize the PDO loops, to avoid emitting unvalid code (radu@par.univie.ac.at) */
        /* (e.g. PDO region which does not start with a DO loop) */
        /* if they are to be canonicalized, the code introduced must be moved outside the region */
@@ -3545,7 +3550,7 @@ fei_doloop(INT32	line)
        /* do not canonicalize the PDO loops, to avoid emitting unvalid code (radu@par.univie.ac.at) */
        /* (e.g. PDO region which does not start with a DO loop) */
        /* if they are to be canonicalized, the code introduced must be moved outside the region */
-       ! is_top_pdo) {
+       ! is_top_pdo && !source_to_source) {
       stride_in_loop = cwh_preg_temp_save("doloop_stride",stride);
    } else {
       stride_in_loop = WN_COPY_Tree(stride);
@@ -3555,7 +3560,7 @@ fei_doloop(INT32	line)
        /* do not canonicalize the PDO loops, to avoid emitting unvalid code (radu@par.univie.ac.at) */
        /* (e.g. PDO region which does not start with a DO loop) */
        /* if they are to be canonicalized, the code introduced must be moved outside the region */
-       ! is_top_pdo) {
+       ! is_top_pdo && !source_to_source) {
       ubcomp = cwh_preg_temp_save("doloop_ub",ub);
    } else {
       ubcomp = WN_COPY_Tree(ub);
@@ -3576,7 +3581,7 @@ fei_doloop(INT32	line)
      }
    }
 
-   if (canonicalize) {
+   if (canonicalize) { 
 
      /* Initialize lcv  - it needs a temp */
 
