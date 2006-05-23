@@ -80,10 +80,8 @@ static boolean	forall_mask_needs_tmp(opnd_type *);
 static void	process_attr_links(opnd_type *);
 static int	gen_forall_derived_type(int, int, int, int);
 
-# ifndef _HIGH_LEVEL_DO_LOOP_FORM
 static int	calculate_iteration_count (int, int, int, int, int);
 static int	convert_to_do_var_type (int, int); 
-# endif
 
 /***************************************\
 |* Static variables used in this file. *|
@@ -2033,7 +2031,6 @@ void do_stmt_semantics (void)
             cdir_switches.paralleldo_omp_sh_idx = NULL_IDX;
          }
 
-
          label_idx = gen_internal_lbl(stmt_start_line);
          NTR_IR_TBL(ir_idx);
          IR_OPR(ir_idx)              = Label_Opr;
@@ -2056,7 +2053,7 @@ void do_stmt_semantics (void)
 
          ATL_DEF_STMT_IDX(label_idx) = SH_PREV_IDX(curr_stmt_sh_idx);
 
-         set_directives_on_label(label_idx);
+         set_directives_on_label(label_idx); 
 # endif
 
          if (AT_DCL_ERR(do_var_idx)) {
@@ -2201,7 +2198,6 @@ void do_stmt_semantics (void)
 
                if (IR_FLD_L(SH_IR_IDX(do_sh_idx)) == SH_Tbl_Idx  &&
                    ! SH_ERR_FLG(IR_IDX_L(SH_IR_IDX(do_sh_idx)))) {
-
                      if (do_var_idx != NULL_IDX) {
                         ATD_LIVE_DO_VAR(do_var_idx) = TRUE;
                      }
@@ -3029,7 +3025,7 @@ CLEAR_CDIR_SWITCHES:
          semantics_ok = TRUE;
 
 # ifdef _HIGH_LEVEL_DO_LOOP_FORM
-
+#if 0  /* do not generate unused label & continue stmt--FMZ */
          label_idx = gen_internal_lbl(stmt_start_line);
          NTR_IR_TBL(ir_idx);
          IR_OPR(ir_idx)              = Label_Opr;
@@ -3052,7 +3048,7 @@ CLEAR_CDIR_SWITCHES:
          ATL_DEF_STMT_IDX(label_idx) = SH_PREV_IDX(curr_stmt_sh_idx);
 
          set_directives_on_label(label_idx);
-
+#endif 
          il_idx = IL_IDX(loop_control_il_idx);
          COPY_OPND(temp_opnd, IL_OPND(il_idx));
 
@@ -6576,13 +6572,13 @@ static boolean	 do_loop_expr_semantics (int	 	 expr_il_idx,
    int			line;
    boolean		result		= TRUE;
    int			save_next_sh_idx;
-
-# ifndef _HIGH_LEVEL_IF_FORM
    int			idx;
    int			ir_idx;
    opnd_type		opnd;
-   int			tmp_idx;
-# endif
+   int			tmp_idx;  
+
+   int                  preamble_end_sh_idx; 
+   int                  preamble_start_sh_idx;
  
 
    TRACE (Func_Entry, "do_loop_expr_semantics", NULL);
@@ -6670,12 +6666,11 @@ static boolean	 do_loop_expr_semantics (int	 	 expr_il_idx,
       /*     of the expression.						      */
 
       if (result) {
-
-# ifdef _HIGH_LEVEL_DO_LOOP_FORM
-
+/*  # ifdef _HIGH_LEVEL_DO_LOOP_FORM 
+         --we need to have temporary for high level loop format --FMZ
          COPY_OPND(IL_OPND(expr_il_idx), *expr_opnd);
-
-# else
+# else 
+*/
 
          if (OPND_FLD((*expr_opnd)) == CN_Tbl_Idx) {
             IL_FLD(expr_il_idx) = CN_Tbl_Idx;
@@ -6697,7 +6692,7 @@ static boolean	 do_loop_expr_semantics (int	 	 expr_il_idx,
             /* Generate an assignment statement to freeze the expression in   */
             /* a temp.  						      */
 
-            gen_sh(After, Assignment_Stmt, stmt_start_line, stmt_start_col,
+            gen_sh(Before, Assignment_Stmt, stmt_start_line, stmt_start_col,
                    FALSE, FALSE, TRUE);
 
             GEN_COMPILER_TMP_ASG(ir_idx,
@@ -6710,7 +6705,7 @@ static boolean	 do_loop_expr_semantics (int	 	 expr_il_idx,
 
             COPY_OPND(IR_OPND_R(ir_idx), *expr_opnd);
 
-            SH_IR_IDX(curr_stmt_sh_idx) = ir_idx;
+            SH_IR_IDX(SH_PREV_IDX(curr_stmt_sh_idx)) = ir_idx;
 
             /* Make the Asg IR result type is the same as the DO variable.    */
             /* Set the result temp to the type of the DO variable unless the  */
@@ -6761,7 +6756,7 @@ static boolean	 do_loop_expr_semantics (int	 	 expr_il_idx,
             IL_IDX(expr_il_idx) = tmp_idx;
          } 
 
-# endif 
+/* # endif  */
 
       }
    }
@@ -6777,7 +6772,7 @@ static boolean	 do_loop_expr_semantics (int	 	 expr_il_idx,
 
 
 
-# ifndef _HIGH_LEVEL_DO_LOOP_FORM
+/* # ifndef _HIGH_LEVEL_DO_LOOP_FORM */
 
 /******************************************************************************\
 |*									      *|
@@ -7254,7 +7249,7 @@ static int convert_to_do_var_type(int		do_var_type_idx,
 
 }  /* convert_to_do_var_type */
 
-# endif
+/*  # endif */
 
 
 
