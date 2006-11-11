@@ -40,8 +40,8 @@
  * ====================================================================
  *
  * Module: strtab.h
- * $Revision: 1.3 $
- * $Date: 2003-02-17 23:49:53 $
+ * $Revision: 1.4 $
+ * $Date: 2006-11-11 22:26:50 $
  *
  * Description:
  *
@@ -150,7 +150,7 @@ private:
       return idx1 < idx2;
     }};
   
-  typedef map<STR_IDX, STR_IDX, STR_IDX_compare, mempool_allocator<STR_IDX> > 
+  typedef map<STR_IDX, STR_IDX, STR_IDX_compare, mempool_allocator<pair<const STR_IDX,STR_IDX> > > 
     rep_type;
 
   rep_type rep;  

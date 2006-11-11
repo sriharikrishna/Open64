@@ -525,8 +525,8 @@ LCXXINCS := $(LCINCS)
 #----------------------------------------------------------------------
 LCOPTS += $(STD_COMPILE_OPTS)
 ifneq ($(BUILD_COMPILER), VENDOR)
-  LCOPTS += -fwritable-strings
-  LC++OPTS += -fwritable-strings
+  LCOPTS += 
+  LC++OPTS += 
 endif
 LCDEFS = $(HOSTDEFS) $(TARGDEFS)
 

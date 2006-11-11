@@ -258,7 +258,7 @@ CFLAGS += -DCF90CATPATHNAME=$(CF90CATPATH)
 
 LIBRARIES = $(ARITH_TARG_DIR)/arith.a $(LIBCIF_TARG_DIR)/libcif.a
 
-LLDLIBS += $(LIBRARIES) -lftn -lu  -lm
+LLDLIBS += $(LIBRARIES) -lftn -lu  -lm 
 
 default: depends $(TARGETS) last
 

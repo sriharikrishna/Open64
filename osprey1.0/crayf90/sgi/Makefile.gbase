@@ -80,7 +80,7 @@ ifeq ($(BUILD_COMPILER), VENDOR)
     HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE # for compilation with -ansi
   endif
 else
-  CVERSION  =  -ansi -fwritable-strings
+  CVERSION  =  -ansi 
   HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE 
 endif
 
@@ -338,7 +338,7 @@ ifeq ($(BUILD_ARCH), IA32)
   LLDLIBS += -L/usr/ia32-sgi-linux/bin
 endif
 ifeq ($(BUILD_OS), LINUX)
-  LLDLIBS += -lc -lg2c /usr/lib/libm.a # somehow -lm doesn't work #
+  LLDLIBS += -lc -lg2c -lm -lgfortran 
   ifeq ($(BUILD_HOST), IA64)
     LDFLAGS += -Wl,-relax
   endif

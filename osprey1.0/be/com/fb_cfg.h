@@ -38,8 +38,8 @@
 // ====================================================================
 //
 // Module: fb_cfg.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:31 $
+// $Revision: 1.2 $
+// $Date: 2006-11-11 22:26:50 $
 //
 // Description:
 //
@@ -223,11 +223,11 @@ private:
   } ;
 
   map< LABEL_IDX, FB_NODEX, LABEL_IDX_ss_compare,  
-    mempool_allocator< pair<LABEL_IDX,FB_NODEX> > > _lblx_to_nx;
+    mempool_allocator< pair<const LABEL_IDX,FB_NODEX> > > _lblx_to_nx;
 
 #else
   hash_map< LABEL_IDX, FB_NODEX, hash<LABEL_IDX>, equal_to<LABEL_IDX>,
-    mempool_allocator< pair<LABEL_IDX,FB_NODEX> > > _lblx_to_nx;
+    mempool_allocator< pair<const LABEL_IDX,FB_NODEX> > > _lblx_to_nx;
 
 #endif
   
