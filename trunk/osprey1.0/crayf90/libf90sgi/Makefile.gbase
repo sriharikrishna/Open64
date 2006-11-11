@@ -254,7 +254,7 @@ ifeq ($(BUILD_OS), IRIX)
 endif
 
 ifeq ($(BUILD_OS), LINUX)
-  LCDEFS += -fwritable-strings -D_LITTLE_ENDIAN
+  LCDEFS += -D_LITTLE_ENDIAN
   LCDEFS += -DTARG_IA64 -D__NLS_INTERNALS -D_SGI_SOURCE
   LF77OPTS = $(LCDEFS) -ansi $(LCINCS)
 endif

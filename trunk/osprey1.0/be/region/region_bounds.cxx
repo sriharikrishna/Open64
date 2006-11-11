@@ -37,8 +37,8 @@
 //============================================================================
 //
 // Module: region_bounds.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:53 $
+// $Revision: 1.2 $
+// $Date: 2006-11-11 22:26:50 $
 //
 // Revision history:
 //  1-MAY-97 dahl - Original Version
@@ -667,7 +667,7 @@ void Generate_region_boundaries(WN *wn, ALIAS_MANAGER *am)
 // used to avoid duplicates in boundary sets
 // NOTE: this involves linear search and should be improved
 //       (it is isolated here for your rewriting convenience)
-BOOL REGION_search_preg_set(PREG_LIST *pset, PREG_NUM pr)
+extern "C" BOOL REGION_search_preg_set(PREG_LIST *pset, PREG_NUM pr)
 {
   PREG_LIST *ptmp;
   for (ptmp = pset; ptmp; ptmp = PREG_LIST_rest(ptmp)) {

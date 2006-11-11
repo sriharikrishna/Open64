@@ -45,7 +45,7 @@ ifeq ($(BUILD_COMPILER), VENDOR)
     WOFF = -fullwarn -woff 1209,1174
   endif
 else
-  CVERSION = -fwritable-strings -ansi -DTARG_IA64 -I. -I/usr/include -I$(BUILD_TOT)/clibinc
+  CVERSION = -ansi -DTARG_IA64 -I. -I/usr/include -I$(BUILD_TOT)/clibinc
   LCOPTS  += $(STD_COMPILE_OPTS)
 endif
 

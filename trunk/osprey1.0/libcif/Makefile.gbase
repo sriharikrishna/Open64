@@ -44,7 +44,7 @@ ifeq ($(BUILD_COMPILER), VENDOR)
     CVERSION = -xansi -OPT:Olimit=3500
   endif
 else
-  CVERSION = -ansi -fwritable-strings
+  CVERSION = -ansi 
 endif
 
 LCOPTS = $(STD_COMPILE_OPTS)

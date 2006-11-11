@@ -71,5 +71,8 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+RETURN_INFO Get_Return_Info (TY_IDX rtype, Mtype_Return_Level level);
+
 #endif /* targ_sim_INCLUDED */
 
