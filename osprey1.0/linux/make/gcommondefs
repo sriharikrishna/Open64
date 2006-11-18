@@ -33,7 +33,7 @@
 #
 #
 
-#ident "$Revision: 1.5 $"
+#ident "$Revision: 1.6 $"
 # 
 # This file has been heavily hacked for building on Linux
 #
@@ -104,8 +104,14 @@ ifeq ($(BUILD_COMPILER), GNU)
   ASNAME = gcc
   CCNAME = gcc
   C++NAME = g++
-  F77 = g77	# Some machines don't have g77 installation
-  F90 = g77	# GNU f90 is not available yet
+  MAJOR_VERSION = $(shell $(CC) -dumpversion | awk -F. '{print $$1}')
+  ifeq ($(MAJOR_VERSION),3)
+    F77 = g77	# Some machines don't have g77 installation
+    F90 = g77	# GNU f90 is not available yet
+  else
+    F77 = gfortran
+    F90 = gfortran
+  endif 
 endif
 
 ifeq ($(BUILD_COMPILER), SGI)
