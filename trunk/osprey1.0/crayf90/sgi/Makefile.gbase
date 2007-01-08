@@ -80,7 +80,8 @@ ifeq ($(BUILD_COMPILER), VENDOR)
     HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE # for compilation with -ansi
   endif
 else
-  CVERSION  =  -ansi 
+#  CVERSION  =  -ansi -fwritable-strings
+  CVERSION  =  -ansi
   HOSTDEFS += -D_LONGLONG -D_SVR4_SOURCE 
 endif
 
@@ -337,14 +338,9 @@ endif
 ifeq ($(BUILD_ARCH), IA32)
   LLDLIBS += -L/usr/ia32-sgi-linux/bin
 endif
-ifeq ($(BUILD_OS), LINUX)
-  LLDLIBS += -lc -lm
-  MAJOR_VERSION = $(shell $(CC) -dumpversion | awk -F. '{print $$1}')
-  ifeq ($(MAJOR_VERSION),3)
-    LLDLIBS += -lg2c
-  else
-    LLDLIBS += -lgfortran
-  endif
+ifeq ($(BUILD_OS), LINUX) #need to based on the platform to set path FMZ
+#  LLDLIBS += -lc -lg2c /usr/lib/libm.a # somehow -lm doesn't work #
+  LLDLIBS += /usr/lib64/libc.a  -lg2c /usr/lib64/libm.a # somehow -lm doesn't work #
   ifeq ($(BUILD_HOST), IA64)
     LDFLAGS += -Wl,-relax
   endif
