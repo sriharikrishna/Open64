@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: cwh_dst.c
- * $Revision: 1.4 $
- * $Date: 2004-05-25 02:52:45 $
+ * $Revision: 1.5 $
+ * $Date: 2007-01-08 21:48:42 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 static char *source_file = __FILE__;
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $ $Revision: 1.4 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dst.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */
@@ -1834,7 +1834,7 @@ DST_set_assoc_idx(INT32 dummy,
    DST_ASSOC_INFO *assoc;
    mINT32	  level, index;
    ST_IDX         st;
-   
+#if 0 // buggy code--FMZ
    if (DST_IS_assoc_fe(flag))
    {  
       /* Set the ASSOC_INFO_st_level && ASSOC_INFO_st_index fields 
@@ -1953,6 +1953,7 @@ DST_set_assoc_idx(INT32 dummy,
       DST_SET_assoc_idx(DST_INFO_flag(node));
       DST_RESET_assoc_fe(DST_INFO_flag(node));
    }
+#endif
 
    return dummy;
 }

@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.28 $
- * $Date: 2006-05-10 19:31:01 $
+ * $Revision: 1.29 $
+ * $Date: 2007-01-08 21:48:42 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.28 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.29 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1076,9 +1076,9 @@ fei_object(char * name_string,
     off = bit_to_byte(offset);
 
     if (p->form == is_SCLASS)
-      if ((cast_to_SCLASS(p->item) != SCLASS_COMMON) &&
-          (cast_to_SCLASS(p->item) != SCLASS_MODULE) &&
-          (cast_to_SCLASS(p->item) != SCLASS_DGLOBAL))
+      if ((cast_to_SCLASS((long)p->item) != SCLASS_COMMON) &&
+          (cast_to_SCLASS((long)p->item) != SCLASS_MODULE) &&
+          (cast_to_SCLASS((long)p->item) != SCLASS_DGLOBAL))
 	off = 0 ;
   }
 
@@ -1163,7 +1163,7 @@ fei_object(char * name_string,
   ST_Init(st, 
 	  Save_Str(name_string), 
 	  object_map[sym_class],
-          cast_to_SCLASS(p->item), 
+          cast_to_SCLASS((long)p->item), 
 	  EXPORT_LOCAL, 
 	  ty);
  if (test_flag(flag_bits,FEI_OBJECT_IN_COMMON))
@@ -1376,7 +1376,7 @@ fei_object(char * name_string,
   /* it is to look at the base and use its SYMTAB       */
 
   
-  if (p->form == is_SCLASS && (cast_to_SCLASS(p->item) == SCLASS_BASED)) {
+  if (p->form == is_SCLASS && (cast_to_SCLASS((long)p->item) == SCLASS_BASED)) {
 
     if (sym_class == CRI_Pointee) {
       b = cast_to_STB(ptr_st_idx);
