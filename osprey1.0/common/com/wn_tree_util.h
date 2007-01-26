@@ -204,10 +204,10 @@ public:
   void Set_wn(WHIRL wn2)                           { _wn = wn2;}
   void Set_parent(const WN_STACK& parent2)	   {_parent = parent2;}
 
+  INT  Get_kid_index(void) const {  return (_parent.back()).second;}          
+
 protected:
   // Utility functions 
-
-  INT  Get_kid_index(void) const {  return (_parent.back()).second;}          
   void Set_kid_index(INT i)      {  (_parent.back()).second = i;}    
   INT  Inc_kid_index(void)       {  return (++((_parent.back()).second));}
 
