@@ -1714,7 +1714,7 @@ Is_MTYPE_f_i_M_z [MTYPE_LAST+1] = {
   0, /* MTYPE_I2      */
   1, /* MTYPE_I4      */
   1, /* MTYPE_I8      */
-  0, /* MTYPE_U1      */
+  1, /* MTYPE_U1      */
   0, /* MTYPE_U2      */
   1, /* MTYPE_U4      */
   1, /* MTYPE_U8      */
