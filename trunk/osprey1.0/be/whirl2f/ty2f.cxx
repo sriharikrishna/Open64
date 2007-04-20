@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: ty2f.c
- * $Revision: 1.34 $
- * $Date: 2006-05-12 20:22:24 $
+ * $Revision: 1.35 $
+ * $Date: 2007-04-20 16:12:23 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.cxx,v $
  *
@@ -248,8 +248,10 @@ TY2F_Append_Array_Bnd_Ph(TOKEN_BUFFER decl_tokens,
      Append_Token_String(decl_tokens, ST_name(arbnd));
   else{
    wn= PU_Body;
-   if (!GetTmpVarTransInfo(decl_tokens,arbnd,wn))
-          Append_Token_String(decl_tokens, ST_name(arbnd));
+   if (!GetTmpVarTransInfo(decl_tokens,arbnd,wn)) {
+          Append_Token_String(decl_tokens, "1");
+//          Append_Token_String(decl_tokens, ST_name(arbnd));
+   }
   }
 } /* TY2F_Append_Array_Bnd_Ph */
 
