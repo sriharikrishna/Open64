@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.39 $
- * $Date: 2006-05-10 19:30:58 $
+ * $Revision: 1.40 $
+ * $Date: 2007-06-13 20:54:02 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.39 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.40 $";
 #endif
 
 #include <alloca.h>
@@ -2875,7 +2875,9 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
                implicit_args++;
              /*parser always generate an extra arg for concat operator*/
              
-             if (WN_kid(wn, arg_idx)!=NULL) {
+             if (WN_kid(wn, arg_idx)!=NULL   && 
+                 WN_kid0(WN_kid(wn,arg_idx)) &&
+                 WN_operator(WN_kid0(WN_kid(wn,arg_idx)))!= OPR_IMPLICIT_BND) {
                if (first_nonemptyarg && !has_stat)
                  Append_Token_Special(call_tokens, ','); 
                else
