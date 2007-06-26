@@ -467,6 +467,7 @@ INPUT                  = $(OPEN64_BASE)/osprey1.0/include \
                          $(OPEN64_BASE)/osprey1.0/ir_tools \
                          $(OPEN64_BASE)/osprey1.0/be/com \
                          $(OPEN64_BASE)/osprey1.0/be/be \
+                         $(OPEN64_BASE)/osprey1.0/be/whirl2f \
                          $(OPEN64_BASE)/osprey1.0/targ_ia32_ia64_linux/include
 
 # If the value of the INPUT tag contains directories, you can use the 
