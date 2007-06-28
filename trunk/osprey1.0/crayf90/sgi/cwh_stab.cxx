@@ -36,8 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.29 $
- * $Date: 2007-01-08 21:48:42 $
+ * $Revision: 1.30 $
+ * $Date: 2007-06-28 20:05:09 $
  * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
@@ -70,7 +70,7 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.29 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.30 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -1126,7 +1126,7 @@ fei_object(char * name_string,
 
   derived_type_or_imported_var = modst_idx ? TRUE: FALSE;
 
-  if (derived_type_or_imported_var) {
+  if (derived_type_or_imported_var && !in_common) {
       modp  = cast_to_STB(modst_idx);
       st = cwh_stab_seen_derived_type_or_imported_var(cast_to_ST(modp->item)
                                                      ,name_string);
@@ -1167,7 +1167,6 @@ fei_object(char * name_string,
 	  EXPORT_LOCAL, 
 	  ty);
  if (test_flag(flag_bits,FEI_OBJECT_IN_COMMON))
-
   if (sym_class == Name) {
      Set_ST_is_not_used (st);
   }
@@ -1614,28 +1613,21 @@ fei_seg (char        * name_string,
 
   seg_type = (SEGMENT_TYPE) Seg_type_arg;
 
-  if ((seg_type == Seg_Common ) ) { // June ||
-// June      (seg_type == Seg_Module )) {
+  if ((seg_type == Seg_Common ) ) {
 
     BOOL is_duplicate = test_flag(flag_bits,FEI_SEG_DUPLICATE);
 
-     st = NULL; 
+     st = cwh_stab_common_ST(name_string, block_length,0);
 
-
-    if (st == NULL) {
-     if (seg_type == Seg_Common)
-      st = cwh_stab_common_ST(name_string, block_length,0);
-     else
-      st = cwh_stab_module_ST(name_string, block_length,0);  
-
-      if (test_flag(flag_bits,FEI_SEG_THREADPRIVATE)) {
+     if (test_flag(flag_bits,FEI_SEG_THREADPRIVATE)) {
 	Set_ST_is_thread_private(st);
         Set_ST_not_gprel(st);
-      }
+     }
 
-      if (test_flag(flag_bits,FEI_SEG_MODULE)) 
+     if (test_flag(flag_bits,FEI_SEG_MODULE)) 
 	Set_ST_auxst_is_module_data(st,TRUE);
-      if (test_flag(flag_bits,FEI_SEG_EXTERNAL))
+
+     if (test_flag(flag_bits,FEI_SEG_EXTERNAL))
         Set_ST_is_external(st);   
 
       cwh_auxst_add_to_list(&Commons_Already_Seen,st,FALSE); 
@@ -1645,79 +1637,77 @@ fei_seg (char        * name_string,
       if (test_flag(flag_bits,FEI_SEG_VOLATILE))
        Set_TY_is_volatile(ty);
 
-    } else {  /* found common from earlier PU. Check?/set flags */
+#if 0
+    else {  /* found common from earlier PU. Check?/set flags */
 
       if (test_flag(flag_bits,FEI_SEG_THREADPRIVATE)) {
 	Set_ST_is_thread_private(st);
         Set_ST_not_gprel(st);
       }
     }
+#endif
 
     /* add to list of COMMONs requiring DST info */
 
-  cwh_auxst_add_item(Procedure_ST,st,l_DST_COMLIST);
+    cwh_auxst_add_item(Procedure_ST,st,l_DST_COMLIST);
 
     p = cwh_stab_packet(st,is_ST);
 
-  } else if (test_flag(flag_bits,FEI_SEG_EQUIVALENCED)) { 
+    } else if (test_flag(flag_bits,FEI_SEG_EQUIVALENCED)) { 
 
     /* if saw hosted equiv from internal procedure, use that */
+      st = cwh_stab_earlier_hosted(name_string);
+      if (st == NULL) {
+         SYMTAB_IDX level = CURRENT_SYMTAB;
 
-    st = cwh_stab_earlier_hosted(name_string);
+         if (seg_type == Seg_Non_Local_Stack)
+	    level = HOST_LEVEL ;
 
-    if (st == NULL) {
+         st = New_ST(level);  
+         cwh_auxst_clear(st);
+         ST_Init(st, Save_Str(name_string), CLASS_VAR, SCLASS_AUTO, EXPORT_LOCAL,0);
 
-      SYMTAB_IDX level = CURRENT_SYMTAB;
+         if (test_flag(flag_bits,FEI_SEG_MODULE)) //June
+                 st1 = Scope_tab[CURRENT_SYMTAB].st;
+         else st1 = st;
 
-      if (seg_type == Seg_Non_Local_Stack)
-	level = HOST_LEVEL ;
+         Set_ST_base(st, st1);
 
-      st = New_ST(level);  
-      cwh_auxst_clear(st);
-      ST_Init(st, Save_Str(name_string), CLASS_VAR, SCLASS_AUTO, EXPORT_LOCAL,0);
-if (test_flag(flag_bits,FEI_SEG_MODULE)) //June
-      st1 = Scope_tab[CURRENT_SYMTAB].st;
-else st1 = st;
-      Set_ST_base(st, st1);
+         Set_ST_ofst(st, 0);
 
-      Set_ST_ofst(st, 0);
-
-      if (test_flag(flag_bits,FEI_SEG_SAVED) || (seg_type == Seg_Static_Local)) 
-	Set_ST_sclass(st, SCLASS_PSTATIC);
-      else
-	Set_ST_is_temp_var(st);
+         if (test_flag(flag_bits,FEI_SEG_SAVED) || (seg_type == Seg_Static_Local)) 
+	      Set_ST_sclass(st, SCLASS_PSTATIC);
+         else
+	      Set_ST_is_temp_var(st);
       
-      if (seg_type == Seg_Non_Local_Stack) {
+         if (seg_type == Seg_Non_Local_Stack) {
+	   cwh_stab_enter_hosted(st);
+	   Set_ST_has_nested_ref(st);
+          } 
 
-	cwh_stab_enter_hosted(st);
-	Set_ST_has_nested_ref(st);
-      } 
+         Set_ST_type(st, cwh_types_mk_equiv_TY(block_length));
 
-      Set_ST_type(st, cwh_types_mk_equiv_TY(block_length));
+         if (test_flag(flag_bits,FEI_SEG_MODULE)){
+              Set_ST_auxst_is_module_data(st,TRUE);
+              Set_ST_is_in_module(st);
+         }  
 
-      if (test_flag(flag_bits,FEI_SEG_MODULE)){
-        Set_ST_auxst_is_module_data(st,TRUE);
-        Set_ST_is_in_module(st);
-      }  
+         if (test_flag(flag_bits,FEI_SEG_EXTERNAL))
+             Set_ST_is_external(st);   
+             cwh_stab_to_list_of_equivs(st,seg_type == Seg_Non_Local_Stack);
+          }
+         if (test_flag(flag_bits,FEI_SEG_EXTERNAL)){
+             Set_ST_is_external(st);   
+          }
 
-      if (test_flag(flag_bits,FEI_SEG_EXTERNAL))
-           Set_ST_is_external(st);   
+         p = cwh_stab_packet(st,is_ST);
 
-      cwh_stab_to_list_of_equivs(st,seg_type == Seg_Non_Local_Stack);
+     } else {  /* get SCLASS */
+       rt = cast_to_int(segment_map[seg_type]);
+       p = cwh_stab_packet(cast_to_void(rt),is_SCLASS);
     }
-        if (test_flag(flag_bits,FEI_SEG_EXTERNAL)){
-           Set_ST_is_external(st);   
-        }
 
-    p = cwh_stab_packet(st,is_ST);
-
-  } else {  /* get SCLASS */
-
-    rt = cast_to_int(segment_map[seg_type]);
-    p = cwh_stab_packet(cast_to_void(rt),is_SCLASS);
-  }
-
-  return (cast_to_int(p));
+    return (cast_to_int(p));
 }
 
 
