@@ -1454,9 +1454,11 @@ static void ir_put_stmt(WN * wn, INT indent)
       }
       ir_put_marker("END_ASM_INPUTS", indent);
       break;
-    case OPC_USE:
-     ir_put_marker("USE!!!!!", indent); // Feb
- 
+
+    case OPC_VUSE:
+    case OPC_BUSE:
+      ir_put_marker("USE!!!!!", indent); // VUSE is plain USE. BUSE is USE::ONLY
+      break; 
 
     default: 
       {

@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.41 $
- * $Date: 2007-06-28 20:03:42 $
- * $Author: fzhao $
+ * $Revision: 1.42 $
+ * $Date: 2007-07-30 18:52:48 $
+ * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.41 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.42 $";
 #endif
 
 #include <alloca.h>
@@ -3128,28 +3128,28 @@ WN2F_use_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
      Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
      Append_Token_String(tokens, "use");
      Append_Token_String(tokens, st_name);
-     if (WN_rtype(wn) == 1)
-        Append_Token_String(tokens, ",only:");
-     else 
-        Append_Token_String(tokens, ",");
+     if ( WN_kid_count(wn) ) { 
+       if (WN_rtype(wn) == MTYPE_B) // signals presence of the ONLY predicate
+         Append_Token_String(tokens, ",only:");
+       else
+         Append_Token_String(tokens, ",");
+     }
 
-     for(k=0;k< WN_kid_count(wn);k=k+2 )
-
-       { st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(wn,k)));
-         st_name1= W2CF_Symtab_Nameof_St(WN_st(WN_kid(wn,k+1)));
-        if (k==0)
-           ;
-        else
-          Append_Token_String(tokens,","); 
-        if (strcmp(st_name,st_name1)) {
-          Append_Token_String(tokens,st_name);
-          Append_Token_String(tokens,"=>"); 
-          Append_Token_String(tokens, st_name1);
-        }
-        else 
-          Append_Token_String(tokens,st_name);
-        
+     for(k=0;k< WN_kid_count(wn);k=k+2 ) { 
+       st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(wn,k)));
+       st_name1= W2CF_Symtab_Nameof_St(WN_st(WN_kid(wn,k+1)));
+       if (k==0)
+	 ;
+       else
+	 Append_Token_String(tokens,","); 
+       if (strcmp(st_name,st_name1)) {
+	 Append_Token_String(tokens,st_name);
+	 Append_Token_String(tokens,"=>"); 
+	 Append_Token_String(tokens, st_name1);
        }
+       else 
+	 Append_Token_String(tokens,st_name);
+     }
      
 //     (void)WN2F_translate(tokens, WN_kid0(wn), context);
 # endif

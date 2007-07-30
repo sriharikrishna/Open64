@@ -1389,9 +1389,9 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
    		int			mask_idx;
                 int			proc_idx;
    		int			rhs_idx;
-                int                     rename_only_num           = 0;
+                int                     rename_only_num         = 0;
                 int                     ro_idx ;
-                int                     bonly        = 0;
+                int                     onlyPredicate           = 0;
                 INTPTR      oldpdgatidx;
                 int                      listnum = 0;
 
@@ -9329,9 +9329,9 @@ CONTINUE:
        cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                         IR_FLD_L(ir_idx));
        if (ATP_USE_TYPE(IR_IDX_L(ir_idx)) == Use_Only && rename_only_num)
-           bonly = 1;
+           onlyPredicate = 1;
 
-        fei_use(rename_only_num,bonly);
+        fei_use(rename_only_num,onlyPredicate);
 
 # if defined(_MODULE_TO_DOT_o)
         if (!on_off_flags.module_to_mod &&

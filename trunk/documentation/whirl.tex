@@ -1457,6 +1457,20 @@ offset field gives the name of the pragma. st\_idx, if not 0, gives
 the symbol associated with the directive. 
 
 \item
+\index{USE}%
+USE \hfill [VH--VL]
+
+This operator represents a Fortran USE statement. 
+ st\_idx gives
+the module name.
+If the USE statement has an ONLY predicate the 
+rType is set to MTYPE\_B, otherwise it is MTYPE\_V. 
+If they are kids, they come in pairs. A pair signifies 
+a potential rename. If a pair contains two identical nodes there 
+is no actual rename, just a reference to a particular module symbol in conjunction 
+with the ONLY predicate.
+
+\item
 \index{PREFETCH}%
 PREFETCH \hfill \hfill [H--VL]
 

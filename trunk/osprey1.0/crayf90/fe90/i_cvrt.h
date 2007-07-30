@@ -923,7 +923,7 @@ extern void  fei_call                     ( INT32 num_args,
                                  	    INT32 alt_return_flag,  
                                  	    INT32 inline_setting,
                                             INT64 flags );
-extern void  fei_use           ( INT32 rename_only_num,INT32 bonly); 
+extern void  fei_use           ( INT32 rename_only_num, INT32 onlyPredicate); 
 extern void  fei_arg_associate (INT32 association);
 extern void  fei_brtrue                	  ( INT32 lbl_idx );
 extern void  fei_if			  ( void );

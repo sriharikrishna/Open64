@@ -38,9 +38,9 @@
  * ====================================================================
  *
  * Module: cwh_stmt
- * $Revision: 1.30 $
- * $Date: 2006-05-23 17:38:50 $
- * $Author: fzhao $
+ * $Revision: 1.31 $
+ * $Date: 2007-07-30 18:52:50 $
+ * $Author: utke $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -4815,7 +4815,7 @@ cwh_stmt_conformance_checks(WN *tree)
  *===============================================*/
 
 extern void
-fei_use(INT32 rename_only_num,INT32 bonly)
+fei_use(INT32 rename_only_num, INT32 onlyPredicate)
  {
    OPCODE    opc;
    ST     * st  ;
@@ -4826,12 +4826,14 @@ fei_use(INT32 rename_only_num,INT32 bonly)
 
    st = cwh_stk_pop_ST();
 
-   opc = OPCODE_make_op(OPR_USE,MTYPE_V,MTYPE_V);
-   
+   if (onlyPredicate) 
+     // we use the MTYPE_B rtype to signal the presence of 
+     // the ONLY predicate
+     opc = OPCODE_make_op(OPR_USE,MTYPE_B,MTYPE_V);
+   else
+     opc = OPCODE_make_op(OPR_USE,MTYPE_V,MTYPE_V);
+
    wn  =  WN_Create(opc,rename_only_num);
-   // eraxxon: OPC_USE is only valid with MTYPE_V,MTYPE_V.  Why change
-   // 'rtype' when it can lead to bogus OPCODEs?
-   //wn->common.rtype = bonly; // only?
 
    WN_st_idx(wn) = ST_st_idx(st);
    for (i=rename_only_num-1; i>=0; i--)

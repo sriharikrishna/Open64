@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.38 $
- * $Date: 2006-05-10 19:30:56 $
- * $Author: fzhao $
+ * $Revision: 1.39 $
+ * $Date: 2007-07-30 18:52:48 $
+ * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.38 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.39 $";
 #endif
 
 #include <ctype.h>
@@ -1061,26 +1061,30 @@ ST2F_func_header(TOKEN_BUFFER tokens,
        Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
        Append_Token_String(header_tokens, "use");
        Append_Token_String(header_tokens, st_name);
-
-       if (WN_kid_count(stmt)>0)
-               Append_Token_String(header_tokens, ",only:");
-
+       if ( WN_kid_count(stmt) ) { 
+	 if (WN_rtype(stmt) == MTYPE_B) // signals presence of the ONLY predicate
+	   Append_Token_String(header_tokens, ",only:");
+	 else
+	   Append_Token_String(header_tokens, ",");
+       }
+       
        for(k=0;k< WN_kid_count(stmt);k=k+2 ) {
-
-             st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(stmt,k)));
-             st_name1= W2CF_Symtab_Nameof_St(WN_st(WN_kid(stmt,k+1)));
-             if (k==0)
-                ;
-             else
-             Append_Token_String(header_tokens,",");
-             if (strcmp(st_name,st_name1)) {
-                       Append_Token_String(header_tokens,st_name);
-                       Append_Token_String(header_tokens,"=>");
-                       Append_Token_String(header_tokens, st_name1);
-             } else
-       Append_Token_String(header_tokens,st_name);
-       } /*for*/
-     }
+	 
+	 st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(stmt,k)));
+	 st_name1= W2CF_Symtab_Nameof_St(WN_st(WN_kid(stmt,k+1)));
+	 if (k==0)
+	   ;
+	 else
+	   Append_Token_String(header_tokens,",");
+	 if (strcmp(st_name,st_name1)) {
+	   Append_Token_String(header_tokens,st_name);
+	   Append_Token_String(header_tokens,"=>");
+	   Append_Token_String(header_tokens, st_name1);
+	 } 
+	 else
+	   Append_Token_String(header_tokens,st_name);
+       } 
+      }
       stmt = WN_next(stmt);
     }  /*while*/
 

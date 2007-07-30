@@ -2197,7 +2197,6 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       case OPR_ASM_STMT:
       case OPR_ASM_INPUT:
       case OPR_GOTO_OUTER_BLOCK:
-      case OPR_USE: 
       case OPR_NAMELIST:
       case OPR_IMPLICIT_BND: 
       case OPR_NULLIFY:
@@ -2205,6 +2204,11 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
 
         // [RTYPE] : V [DESC] : V
         valid = rtype == MTYPE_V && desc == MTYPE_V;
+        break;
+
+      case OPR_USE: 
+        // [RTYPE] : V,B [DESC] : V
+        valid = (rtype == MTYPE_V || rtype == MTYPE_B) && desc == MTYPE_V;
         break;
 
       case OPR_ARRAY:
@@ -2587,7 +2591,6 @@ OPCODE_name (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
     case OPR_ASM_STMT:
     case OPR_ASM_INPUT:
     case OPR_GOTO_OUTER_BLOCK:
-    case OPR_USE:  
     case OPR_NAMELIST:
     case OPR_IMPLICIT_BND: 
     case OPR_NULLIFY:
@@ -2597,6 +2600,7 @@ OPCODE_name (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       sprintf (buffer, "OPC_%s", &OPERATOR_info [opr]._name [4]);
       break;
 
+    case OPR_USE:  
     case OPR_ARRAY:
     case OPR_ARRSECTION:
     case OPR_LDA:
