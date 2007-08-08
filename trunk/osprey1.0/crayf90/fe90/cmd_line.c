@@ -146,11 +146,11 @@ int process_cmd_line(int   argc,
 /*    To add a new commandline option to the compiler, you must add the letter*/
 /*    to opt_string.  Any letter you add must go in the list alphabetically.  */
 /*    Those that have args must have a colon follwing.  Those that do not have*/
-/*    args must NOT have a colon following.  Currently they are -g, -V and -Z */
+/*    args must NOT have a colon following. Currently they are -g, -V, -z, -Z */
 /* 									      */
 /******************************************************************************/
 
-   char	*opt_string="a:b:d:e:f:ghi:k:m:p:q:r:s:t:u:v:x:"
+   char	*opt_string="a:b:d:e:f:ghi:k:m:p:q:r:s:t:u:v:x:z"
                     "A:C:D:FG:I:J:M:N:O:P:R:S:T:U:Y:X:VZ";
 
    char	 str[7];
@@ -338,6 +338,11 @@ int process_cmd_line(int   argc,
             dump_flags.fmm1			= TRUE;
           break;
 # endif
+
+	 case 'z':					/* cleanup whirl      */
+	    cmd_line_flags.cleanUpWhirl=1;
+	    break;
+
 
 	 default:     /* Command line has an invalid option. */
 
@@ -6854,7 +6859,7 @@ static	void	process_J_option(char	*optargs)
  * add -help option to dump out all possible opstions of
  * Open64 frontend
  * there are
- * a,b,d,e,f,g,i,k,m,o,p,q,r,R,s,S,t,u,v,A,C,D,x,F,G,I,J,M,
+ * a,b,d,e,f,g,i,k,m,o,p,q,r,R,s,S,t,u,v,z,A,C,D,x,F,G,I,J,M,
  * N,P,U,V,X,Y,Z options
 \*************************************************************/
 
@@ -6951,6 +6956,7 @@ static void dump_options(void)
     "         typ              Dump the Type table.",
     "         cnout            Dump constants as binary to stdout.",
     "-v: pdgcs debug option",
+    "-z: clean up whirl (used for OpenAnalysis and OpenAD)",
     "-A: add use names to the files path tables for implicit use",
     "-C: CIF file output is requested via the -C option",
     "-D: define a preprocessing id",

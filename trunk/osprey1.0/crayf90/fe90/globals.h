@@ -1797,7 +1797,7 @@ struct	cmd_line_flags_entry {
 	Uint		pad_amount		: 16;		/* -a  padn   */
 	boolean		taskcommon		: 1;		/*-ataskcommon*/
 	boolean		binary_output		: 1;		/* -b  TRUE   */
-	boolean		reserved_c		: 1;		/*	      */
+	boolean		reserved_c		: 1;		/*            */
 	boolean		off_options		: 1;		/* -d  flags  */
 	boolean		on_options		: 1;		/* -e  flags  */
 	src_form_type	src_form		: 2;		/* -f  fixed  */
@@ -1840,7 +1840,7 @@ struct	cmd_line_flags_entry {
         /* eraxxon: OpenAD directive */
 	boolean         disregard_all_openads   : 1;            /* -x  openad */
 	boolean		reserved_y		: 1;		/*	      */
-	boolean		reserved_z		: 1;		/*	      */
+	boolean		cleanUpWhirl            : 1;		/* -z  FALSE  */
 	int		implicit_use_idx;
 	boolean		reserved_B		: 1;		/*	      */
 	boolean		cif_flags		: 1;		/* -C cif     */
