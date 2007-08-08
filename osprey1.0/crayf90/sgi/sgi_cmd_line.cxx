@@ -94,6 +94,7 @@ BOOL  global_chunk_pragma_set = FALSE;
 
 INT32 global_schedtype_pragma_val;
 BOOL global_schedtype_pragma_set = FALSE;
+BOOL cleanUpWhirl = FALSE; 
 
 BOOL process_cri_mp_pragmas=FALSE;
 
@@ -717,6 +718,12 @@ void Process_Command_Line (INT argc, char ** argv)
 	       }
 	       pass_option = FALSE;
 	       break;
+	    case 'z':
+	      if (*cp=='\0') { 
+		pass_option = TRUE; 
+		cleanUpWhirl = TRUE; 
+	      }
+	      break;
 	    } /* switch */
 	    if (pass_option) {
 	       add_cray_args(argv[i]);

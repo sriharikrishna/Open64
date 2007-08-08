@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: sgi_cmd_line.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:10 $
- * $Author: fzhao $ 
+ * $Revision: 1.3 $
+ * $Date: 2007-08-08 18:58:15 $
+ * $Author: utke $ 
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/sgi_cmd_line.h,v $
  *
  * Revision history:
@@ -55,7 +55,7 @@
 #define SGI_CMD_LINE_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/sgi_cmd_line.h,v $ $Revision: 1.2 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/sgi_cmd_line.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 extern char *FE_command_line;
@@ -82,6 +82,7 @@ extern INT32 global_chunk_pragma_value;
 
 extern INT32 global_schedtype_pragma_val; /* From the -mp_schedtype command line option */
 extern BOOL global_schedtype_pragma_set;
+extern BOOL cleanUpWhirl; 
 
 extern BOOL process_cri_mp_pragmas;
 

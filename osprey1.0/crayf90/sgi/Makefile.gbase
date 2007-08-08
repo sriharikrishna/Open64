@@ -171,6 +171,7 @@ TRANS_SRCS = \
 	make_depend.cxx 
 
 COMMON_COM_CXX_SRCS =	\
+  cleanUpWhirl.cxx	\
   config.cxx		\
   const.cxx		\
   controls.cxx		\

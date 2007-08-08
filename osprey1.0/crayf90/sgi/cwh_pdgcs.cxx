@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_pdgcs
- * $Revision: 1.6 $
- * $Date: 2006-05-10 19:31:01 $
- * $Author: fzhao $
+ * $Revision: 1.7 $
+ * $Date: 2007-08-08 18:58:15 $
+ * $Author: utke $
  * $Source: 
  *
  * Revision history:
@@ -59,7 +59,7 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.6 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 
@@ -77,6 +77,7 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include <sys/types.h>
 #include "ir_reader.h"
 #include "ir_bwrite.h"
+#include "cleanUpWhirl.h"
 #include "file_util.h"
 #include "tracing.h"
 #include "x_libgen.h"           /* for dirname() */
@@ -469,6 +470,8 @@ PDGCS_do_proc(void)
 
   cwh_stk_verify_empty();
   Verify_SYMTAB (CURRENT_SYMTAB);
+  if (cleanUpWhirl)
+    cleanUpPUInfoTree(pu);
   Write_PU_Info (pu);
 
 #if 0
