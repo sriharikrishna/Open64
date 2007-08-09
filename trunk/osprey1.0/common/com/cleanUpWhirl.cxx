@@ -27,6 +27,7 @@ void cleanUpPUInfo(PU_Info* aPUInfo_p) {
   STPtoWNPmap tempMap; 
   bool skipKids=false;
   WN* thePU_WN_p = PU_Info_tree_ptr(aPUInfo_p);
+  xDEBUG(DEB_CleanUpWhirl, printf("cleanUpWhirl: doing %s\n",ST_name(WN_st(thePU_WN_p))););
   WN* parentWN_p=0;
   WN_TREE_CONTAINER<PRE_ORDER> aWNPtree(thePU_WN_p);
   WN_TREE_CONTAINER<PRE_ORDER>::iterator aWNPtreeIterator=aWNPtree.begin();
@@ -61,22 +62,28 @@ void cleanUpPUInfo(PU_Info* aPUInfo_p) {
 	ST* tempST_p=WN_st(curWN_p);
 	STPtoWNPmap::iterator mapIter=tempMap.find(tempST_p);
 	if (mapIter==tempMap.end()) { //not found
-	  // this shouldn't happen since we expect to have all of the definitions
+	  // This shouldn't happen with local temporaries 
+	  // but some temporaries are  not local. For instance 
+	  // if we are in contained PU using an array from a containing PU 
+	  // then the array size comes down in a temporary defined in the 
+	  // containing PU
 	  const char* tmpName = ST_name(tempST_p); 
 	  ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
 	  const char* puName = ST_name(puST_p);
-	  Fatal_Error("cleanUpWhirl: no definition for temporary %s in %s\n",tmpName,puName);
+	  xDEBUG(DEB_CleanUpWhirl, printf("cleanUpWhirl: no (local) definition for temporary %s in %s, probably defined in enclosing PU\n",tmpName,puName););
 	}
-	// make sure the parent is set by now
-	if (!aWNPtreeIterator.Get_parent_wn())
+	else { 
+	  // make sure the parent is set by now
+	  if (!aWNPtreeIterator.Get_parent_wn())
 	  Fatal_Error("cleanUpWhirl: no parent set");
-	// replace the current node within the parent
-	WN_kid(aWNPtreeIterator.Get_parent_wn(),aWNPtreeIterator.Get_kid_index()) = WN_COPY_Tree((*mapIter).second);
-	skipKids=true;
-	const char* tmpName = ST_name(tempST_p); 
-	ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
-	const char* puName = ST_name(puST_p);
-	xDEBUG(DEB_CleanUpWhirl, printf("cleanUpWhirl: subsituted temporary %s in %s\n",tmpName, puName););
+	  // replace the current node within the parent
+	  WN_kid(aWNPtreeIterator.Get_parent_wn(),aWNPtreeIterator.Get_kid_index()) = WN_COPY_Tree((*mapIter).second);
+	  skipKids=true;
+	  const char* tmpName = ST_name(tempST_p); 
+	  ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
+	  const char* puName = ST_name(puST_p);
+	  xDEBUG(DEB_CleanUpWhirl, printf("cleanUpWhirl: subsituted temporary %s in %s\n",tmpName, puName););
+	}
       }
     } 
     // advance the iterator
@@ -90,13 +97,11 @@ void cleanUpPUInfo(PU_Info* aPUInfo_p) {
   } // end while
 }
 
-// the C wrapper with proper traversal
+// the C wrapper 
 extern "C" void cleanUpPUInfoTree(PU_Info* aPUInfoTree_p) { 
   if (!aPUInfoTree_p) { return; }
   cleanUpPUInfo(aPUInfoTree_p);
-  for (PU_Info *aPUInfosubtree_p = PU_Info_child(aPUInfoTree_p); 
-       aPUInfosubtree_p != NULL; 
-       aPUInfosubtree_p = PU_Info_next(aPUInfosubtree_p)) {
-    cleanUpPUInfo(aPUInfosubtree_p);
-  }
+  // we cannot recur on the children because 
+  // they are written *before* the parents and their 
+  // Whirl rep is deallocated
 }
