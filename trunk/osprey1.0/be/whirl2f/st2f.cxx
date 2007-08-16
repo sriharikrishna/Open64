@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.39 $
- * $Date: 2007-07-30 18:52:48 $
+ * $Revision: 1.40 $
+ * $Date: 2007-08-16 19:06:20 $
  * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.39 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.40 $";
 #endif
 
 #include <ctype.h>
@@ -476,18 +476,7 @@ ST2F_decl_parameter(TOKEN_BUFFER tokens, ST *st)
     Append_Token_String(decl_tokens,"PARAMETER (");
     Append_Token_String(decl_tokens,st_name);
     Append_Token_Special(decl_tokens, '=' );
-    if(!TY_is_logical(ST_type(st)))
-        if (TCON_ty(Tcon_Table[base->u1.tcon]) == MTYPE_I8)
-           Append_Token_String(decl_tokens,Targ_Print("%1lld_w2f__i8",Tcon_Table[base->u1.tcon]));
-        else
-          Append_Token_String(decl_tokens,Targ_Print(NULL,Tcon_Table[base->u1.tcon]));
-    else{
-        if (Targ_To_Host(Tcon_Table[base->u1.tcon]))
-          Append_Token_String(decl_tokens,".TRUE.");
-        else
-          Append_Token_String(decl_tokens,".FALSE.");
-     }
-
+    TCON2F_translate(decl_tokens,STC_val(base),TY_is_logical(ST_type(st)));
     Append_Token_Special(decl_tokens, ')'); 
     
     Append_Token_Special(tokens, '\n');
