@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.42 $
- * $Date: 2007-07-30 18:52:48 $
- * $Author: utke $
+ * $Revision: 1.43 $
+ * $Date: 2007-09-25 16:04:24 $
+ * $Author: fzhao $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.42 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.43 $";
 #endif
 
 #include <alloca.h>
@@ -1403,8 +1403,8 @@ public:
 
     if ((ST_sclass(st) == SCLASS_COMMON) &&   //common block
          (ST_pu(ST_base(st)) == current_PU) ) {
-           //Reset_TY_is_translated_to_c(ST_type(st));
-           Set_BE_ST_w2fc_referenced(st);
+           Reset_TY_is_translated_to_c(ST_type(st));
+           //Set_BE_ST_w2fc_referenced(st);
        }
   }
     
