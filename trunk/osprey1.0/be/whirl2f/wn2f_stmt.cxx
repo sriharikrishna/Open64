@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_stmt.c
- * $Revision: 1.43 $
- * $Date: 2007-09-25 16:04:24 $
- * $Author: fzhao $
+ * $Revision: 1.44 $
+ * $Date: 2007-10-04 15:49:07 $
+ * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $
  *
  * Revision history:
@@ -64,7 +64,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.43 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.cxx,v $ $Revision: 1.44 $";
 #endif
 
 #include <alloca.h>
@@ -2317,6 +2317,14 @@ WN2F_return(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       WN2F_Next_ReturnSite = RETURNSITE_next(WN2F_Next_ReturnSite);
       return EMPTY_WN2F_STATUS;
    
+   }
+   // if this is called with the openad flag omit final returns
+   if (W2F_OpenAD && // flag is set 
+       WN_kid_count(wn) == 0 && // no kids 
+       WN_last(WN_kid(PUinfo_current_func,WN_kid_count(PUinfo_current_func)-1))==wn) {  
+       // it is the last statement in the last block directly under the FUNCENTRY
+     WN2F_Next_ReturnSite = RETURNSITE_next(WN2F_Next_ReturnSite);
+     return EMPTY_WN2F_STATUS;
    }
    /* Save off the return-value, unless there is no return-value or
     * it already resides where we expect it to be.
