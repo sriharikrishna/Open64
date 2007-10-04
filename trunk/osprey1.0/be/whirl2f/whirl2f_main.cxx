@@ -79,7 +79,7 @@ Usage (char *progname)
 	   "USAGE: in EBNF notation, where '|' indicates choice and '['\n"
 	   "indicates an optional item:\n"
 	   "\n"
-	   "\t%s [-FLIST:<opts>] [-TARG:<t>] [-TENV:<e>] <inp_files>\n"
+	   "\t%s [-FLIST:<opts>] [-TARG:<t>] [-TENV:<e>] [-openad] <inp_files>\n"
 	   "\n"
 	   "\t<inp_files> ::= [-fB,<Whirl_File_Name>] <File_Name>\n"
 	   "\t<opts> ::= <single_opt>[:<opts>]\n"
@@ -90,6 +90,8 @@ Usage (char *progname)
 	   "denote either a (Fortran) source filename or a WHIRL file.\n"
 	   "In the abscense of a -fB option, the <Whirl_File_Name> will be\n"
 	   "derived from the <File_Name>\n" 
+	   "-openad is to be used within the OpenAD tool pipeline, see \n"
+	   "        http://www.mcs.anl.gov/OpenAD .\n" 
 	   "\n",
 	   progname);
    
