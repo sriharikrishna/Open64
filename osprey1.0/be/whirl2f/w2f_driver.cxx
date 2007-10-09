@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.12 $
- * $Date: 2006-05-10 19:30:57 $
- * $Author: fzhao $
+ * $Revision: 1.13 $
+ * $Date: 2007-10-09 22:01:10 $
+ * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
  * Revision history:
@@ -61,7 +61,7 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.12 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.13 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
@@ -1193,7 +1193,7 @@ W2F_Outfile_Init(void)
       return; /* Already initialized */
 
    W2F_Outfile_Initialized = TRUE;
-   if (W2F_Verbose)
+   if (W2F_Verbose && !W2F_OpenAD)
    {
       if (W2F_Prompf_Emission || W2F_File_Name[W2F_LOC_FILE] == NULL)
 	 fprintf(stderr, 
@@ -1222,28 +1222,29 @@ W2F_Outfile_Init(void)
    Begin_New_Locations_File();
    Open_W2f_Output_File(W2F_FTN_FILE);
 
-   /* Write out a header-comment into the whirl2f generated 
-    * source file.
-    */
-   systime = time(NULL);
-   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
-		"C ********************************************"
-		"***************\n"
-		"C Fortran file translated from WHIRL ");
-   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
-		((systime != (time_t)-1)? 
-		 ctime(&systime) : "at unknown time\n"));
-   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
-		"C **********************************************"
-		"*************\n");
-
-   if (W2F_Old_F77)
-   {
-      Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
-		   "C Include builtin operators "
-		   "(TODO: add missing ones into this included file)\n"
-		   "#include <whirl2f.h>\n\n");
+   if (!W2F_OpenAD) { 
+     /* Write out a header-comment into the whirl2f generated 
+      * source file.
+      */
+     systime = time(NULL);
+     Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		  "C ********************************************"
+		  "***************\n"
+		  "C Fortran file translated from WHIRL ");
+     Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		  ((systime != (time_t)-1)? 
+		   ctime(&systime) : "at unknown time\n"));
+     Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		  "C **********************************************"
+		  "*************\n");
    }
+   if (W2F_Old_F77)
+     {
+       Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		    "C Include builtin operators "
+		    "(TODO: add missing ones into this included file)\n"
+		    "#include <whirl2f.h>\n\n");
+     }
 
    W2F_Outfile_Initialized = TRUE;
 
@@ -1288,9 +1289,11 @@ W2F_Outfile_Init(void)
                 "	end module w2f__types\n");
 #endif
 
-   Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
-                "C **********************************************"
-                "*************\n");
+   if (!W2F_OpenAD) { 
+     Write_String(W2F_File[W2F_FTN_FILE], W2F_File[W2F_LOC_FILE],
+		  "C **********************************************"
+		  "*************\n");
+   }
 
 
 } /* W2F_Outfile_Init */
