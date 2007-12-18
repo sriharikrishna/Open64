@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: cwh_directive
- * $Revision: 1.5 $
- * $Date: 2006-05-10 19:31:01 $
- * $Author: fzhao $
+ * $Revision: 1.6 $
+ * $Date: 2007-12-18 23:53:38 $
+ * $Author: utke $
  *
  * Description: contains routines to support directives, converting
  *              from Cray IR to WHIRL. Entry points from
@@ -147,8 +147,8 @@ static int task_affinity_count; /* number of indexes in AFFINITY */
  *
  *===============================================
  */ 
-extern int
-fei_task_var( INT32	sym_idx,
+extern INTPTR
+fei_task_var( INTPTR    sym_idx,
 	      INT32	context)
 {
   STB_pkt *p;
