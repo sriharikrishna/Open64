@@ -1164,7 +1164,7 @@ extern INT32 fei_guard           	  ( INT32 guard_num, INT32 lineno );
 extern void  fei_endguard       	  ( INT32 task_x,
                                  	    INT32 guard_num,
                                  	    INT32 lineno );
-extern INT32 fei_task_var        	  ( INT32 sym_idx, INT32 context );
+extern INTPTR fei_task_var                ( INTPTR sym_idx, INT32 context );
 extern INT32 fei_task_wait       	  ( INT32 point, INT32 span );
 extern INT32 fei_task_send       	  ( INT32 point, INT32 task_if_idx );
 extern INT32 fei_mpp_master      	  ( INT32 lineno );
