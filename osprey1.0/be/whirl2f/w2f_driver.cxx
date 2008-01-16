@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: w2f_driver.c
- * $Revision: 1.13 $
- * $Date: 2007-10-09 22:01:10 $
+ * $Revision: 1.14 $
+ * $Date: 2008-01-16 19:09:45 $
  * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $
  *
@@ -61,13 +61,14 @@
  */
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.13 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.cxx,v $ $Revision: 1.14 $";
 #endif
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
 #include <time.h>
 #include <errno.h>          /* For sys_errlist */
 #include "whirl2f_common.h" /* For defs.h, config.h, erglob.h, etc. */
+#include "config_opt.h"     /* for common config options */
 #include "config_flist.h"   /* For FLIST command line parameters */
 #include "config_list.h"    /* For List_Cite */
 #include "w2cf_parentize.h" /* For W2CF_Parent_Map and W2FC_Parentize */
@@ -209,6 +210,7 @@ Process_Command_Line (INT argc, char **argv)
         case 'o':
 	  if ( strcmp( cp, "penad") == 0 ) {
 	    W2F_OpenAD = TRUE;
+	    Show_OPT_Warnings= FALSE;
 	  }
 	  break;
 	}
