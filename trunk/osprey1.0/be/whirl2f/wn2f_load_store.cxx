@@ -37,9 +37,9 @@
  * ====================================================================
  *
  * Module: wn2f_load_store.c
- * $Revision: 1.24 $
- * $Date: 2006-05-10 19:30:58 $
- * $Author: fzhao $
+ * $Revision: 1.25 $
+ * $Date: 2008-01-18 23:17:46 $
+ * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $
  *
  * Revision history:
@@ -58,7 +58,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.24 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.cxx,v $ $Revision: 1.25 $";
 #endif
 
 #include "whirl2f_common.h"
@@ -1056,11 +1056,17 @@ WN2F_stid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    TY_IDX base_ty;
    TY_IDX object_ty;
 
+
     if (parenthesize)
        set_WN2F_CONTEXT_no_parenthesis(context);
    
    ASSERT_DBG_FATAL(WN_opc_operator(wn) == OPR_STID, 
 		    (DIAG_W2F_UNEXPECTED_OPC, "WN2F_stid"));
+
+   if (W2F_OpenAD 
+       && 
+       ST_is_temp_var(WN_st(wn)))
+    return EMPTY_WN2F_STATUS;
 
    /* Get the lhs of the assignment */
    lhs_tokens = New_Token_Buffer();
