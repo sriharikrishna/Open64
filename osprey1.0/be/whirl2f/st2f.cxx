@@ -37,8 +37,8 @@
  * ====================================================================
  *
  * Module: st2f.c
- * $Revision: 1.40 $
- * $Date: 2007-08-16 19:06:20 $
+ * $Revision: 1.41 $
+ * $Date: 2008-03-13 15:43:00 $
  * $Author: utke $
  * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
@@ -86,7 +86,7 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.40 $";
+static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.41 $";
 #endif
 
 #include <ctype.h>
@@ -1023,8 +1023,11 @@ ST2F_func_header(TOKEN_BUFFER tokens,
       else
       if (ST_is_block_data(st))
          Prepend_Token_String(header_tokens, "BLOCK DATA");
-      else
+      else { 
 	 Prepend_Token_String(header_tokens, "SUBROUTINE");
+         if (PU_recursive(Get_Current_PU()))
+           Prepend_Token_String(header_tokens, "RECURSIVE");
+      }
    }
 
   
