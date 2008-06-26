@@ -685,12 +685,12 @@ WN2F_Infix_Op(TOKEN_BUFFER tokens,
 	 if (WN_operator(wn0) == OPR_CALL) {
 	    kid0_ty = TY_ret_type(ST_pu_type(WN_st(wn0)));
 	 } 
-	 else if (OPERATOR_has_1ty(WN_operator(wn0))) {
+	 else if (OPERATOR_has_1ty(WN_operator(wn0)) || OPERATOR_is_boolean(WN_operator(wn0))) {
 	    kid0_ty = WN_ty(wn0);
 	 }
 	 if (WN_operator(wn1) == OPR_CALL) {
 	    kid1_ty = TY_ret_type(ST_pu_type(WN_st(wn1)));
-	 } else if (OPERATOR_has_1ty(WN_operator(wn1))) {
+	 } else if (OPERATOR_has_1ty(WN_operator(wn1)) || OPERATOR_is_boolean(WN_operator(wn0))) {
 	    kid1_ty = WN_ty(wn1);
 	 }
       }
