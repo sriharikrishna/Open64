@@ -1,2 +1,0 @@
-#!/bin/bash
-cp libf90caf.a /local/Research/CAF/lib/
