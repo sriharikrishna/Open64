@@ -1,6 +1,0 @@
-This directory is from pathscale new C frontend
-but looks like this is older one.
-(pathscale doesn't work on 64-bit machine)
-So keep it as "old" one and get a new directory 
-from the gcc331 ia64 configuration.
-----fzhao May,2004
