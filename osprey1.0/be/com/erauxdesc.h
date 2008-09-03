@@ -46,7 +46,6 @@ static char *eraux_desc_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/O
 #endif /* _KEEP_RCS_ID */
 
 #include "erbe.desc"		/* Compiler code gen error codes */
-#include "ercg.desc"		/* Compiler code gen error codes */
 
 #ifdef __cplusplus
 }

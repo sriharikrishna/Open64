@@ -50,57 +50,16 @@ INCLUDE_SUBDIRS = \
 LIBRARY_SUBDIRS = \
 	arith \
 	libcif \
-	libcmplrs \
-	libcomutil \
-
-
-#
-#  Finally, the compiler tools (components) are built.
-#
-#  Note that be_driver must come last since it depends on other components
-#  being built first.
-#
-#TOOL_SUBDIRS = \
-#	be \
-#	cg \
-#	crayf90/libf90sgi \
-#	crayf90/fe90 \
-#	crayf90/sgi \
-#	driver \
-#	dwarfdump \
-#	elfdump \
-#	fec_238 \
-#	g++fe \
-#	gccfe \
-#	ipa \
-#	ipl \
-#	ir_tools \
-#	lno \
-#	lw_inline \
-#	medusa \
-#	whirl2c \
-#	whirl2f \
-#	wopt \
-#	gdb \
-#	be_driver \
-#	libf90caf
-
-#	ld64
+	libcomutil 
 
 TOOL_SUBDIRS = \
         be \
         crayf90/libf90sgi \
         crayf90/fe90 \
         crayf90/sgi \
-        driver \
-        gccfe \
-	gccfe/gnu\
         ir_tools \
         whirl2f \
-        whirl2c \
-        libf90caf
-                                                                                                      
-#       ld64
+        whirl2c 
 
 
 
