@@ -216,24 +216,6 @@ static void WN_TREE_put_stmt(WN *, INT); // fwd declaration
 
 static BOOL dump_parent_before_children = FALSE;
 
-#ifdef BACK_END
-/*
-**  declaration is problematic, as the ALIAS_MANAGER is not exposed
-**  to consumers of ir_reader.h
-*/
-extern void fdump_dep_tree(FILE *, const WN *, struct ALIAS_MANAGER *);
-
-/*  Suppress warning if not resolved at link-time. */
-/* CG_Dump_Region is defined in cg.so, only call if cg.so is loaded */
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
-  extern void (*CG_Dump_Region_p) (FILE*, WN*);
-# define CG_Dump_Region (*CG_Dump_Region_p)
-#else
-# pragma weak CG_Dump_Region
-#endif // __linux__
-
-#endif /* BACK_END */
-
 BOOL IR_dump_map_info = FALSE;
 BOOL IR_dump_region = FALSE;
 BOOL IR_DUMPDEP_info = FALSE;
@@ -842,10 +824,6 @@ ir_put_st (ST_IDX st_idx)
   }
 }
 
-#ifdef BACK_END
-extern "C" UINT16 LNOGetVertex(WN *);
-extern "C" BOOL LnoDependenceEdge(WN *, WN *, mUINT16 *, DIRECTION *, BOOL *, BOOL *);
-#endif
 
 /* 
  * little routine to print TY's and their attributes, since otherwise they aren't visible
@@ -950,13 +928,6 @@ static void ir_put_wn(WN * wn, INT indent)
 
     case OPR_REGION:
       fprintf(ir_ofile, " %d", WN_region_id(wn));
-#ifdef BACK_END
-      {
-	RID *rid = REGION_get_rid(wn);
-	if (rid != NULL)
-	  fprintf(ir_ofile, " %d", RID_id(rid));
-      }
-#endif /* BACK_END */
       fprintf(ir_ofile, " (kind=%d)",WN_region_kind(wn));
       break;
 
@@ -1191,11 +1162,6 @@ static void ir_put_wn(WN * wn, INT indent)
 		break;
 	    }
 	}
-#ifdef BACK_END
-	if (UINT16 vertex = LNOGetVertex(wn)) {
-	    fprintf(ir_ofile, " <lno vertex %d>", vertex);
-	}
-#endif
     }
 
     if (IR_dump_line_numbers &&
@@ -1207,12 +1173,6 @@ static void ir_put_wn(WN * wn, INT indent)
 	fprintf(ir_ofile, " {line: %d}", USRCPOS_linenum(srcpos));
     }
 
-#ifdef BACK_END
-    if (IR_dump_alias_info(WN_opcode(wn))) {
-      fprintf(ir_ofile, " [alias_id: %d%s]", WN_MAP32_Get(IR_alias_map, wn),
-	      IR_alias_mgr && IR_alias_mgr->Safe_to_speculate(wn) ? ",fixed" : "");
-    }
-#endif
 
     if (IR_freq_map != WN_MAP_UNDEFINED && (OPCODE_is_scf(WN_opcode(wn)) ||
 					    OPCODE_is_stmt(WN_opcode(wn)))) {
@@ -1324,28 +1284,6 @@ static void ir_put_stmt(WN * wn, INT indent)
       ir_put_marker("END_BLOCK", indent);
       break;
 
-    case OPC_REGION:
-      ir_put_marker("REGION EXITS", indent);
-      ir_put_stmt(WN_region_exits(wn), indent+1);
-
-      ir_put_marker("REGION PRAGMAS", indent);
-      ir_put_stmt(WN_region_pragmas(wn), indent+1);
-
-      ir_put_marker("REGION BODY", indent);
-      ir_put_stmt(WN_region_body(wn), indent+1);
-
-      /* check to make sure cg.so is loaded first */
-      /* IR_dump_region will be NULL if it is not */
-#ifdef BACK_END
-      if (IR_dump_region)
-	CG_Dump_Region(ir_ofile, wn);
-#endif /* BACK_END */
-      { char str[20];
-	sprintf(str,"END_REGION %d", WN_region_id(wn));
-	ir_put_marker(str, indent);
-      }
-      break;
-      
     case OPC_LABEL:
       ir_put_wn(wn, indent);
       if ( WN_label_loop_info(wn) != NULL ) {
@@ -1495,84 +1433,6 @@ static void ir_put_stmt(WN * wn, INT indent)
     ir_put_wn(wn, indent);
 }
 
-#ifdef BACK_END
-
-static void fdump_DUMPDEP(FILE *f, DUMPDEPp head, struct ALIAS_MANAGER *alias)
-{
-    DUMPDEPp	p,q;
-
-    fprintf(f, "\nDUMP DEPENDENCY DUMP: == SAME_LOCATION, != NOT_ALIASED, ? POSSIBLY ALIASED\n");
-    fprintf(f, "LNO dependency edges are <id: distance is_must direction>\n");
-
-    for(p= head; p; p= DUMPDEP_next(p))
-    {
-	WN		*node= DUMPDEP_node(p);
-
-	if (OPCODE_is_load(WN_opcode(node)))
-	    continue;
-	if (OPCODE_is_store(WN_opcode(node)))
-	{
-	    fprintf(f, "STORE[%d] ", DUMPDEP_id(p));
-	}
-	else if (WN_operator(node) == OPR_PARM)
-	{
-	    fprintf(f, "PARM[%d] ", DUMPDEP_id(p));
-	}
-	if (Valid_alias(alias, node))
-	{
-	    fprintf(f, "\t== {");
-	    for(q= head; q; q= DUMPDEP_next(q))
-	    {
-		WN *wn =	DUMPDEP_node(q);
-		if (Valid_alias(alias, wn) &&
-		    SAME_LOCATION == Aliased(alias, node, wn))
-		    fprintf(f, "%d,", DUMPDEP_id(q));
-	    }
-	    fprintf(f, "}\n\t\t!= {");
-
-	    for(q= head; q; q= DUMPDEP_next(q))
-	    {
-		WN *wn =	DUMPDEP_node(q);
-		if (Valid_alias(alias, wn) &&
-		    NOT_ALIASED == Aliased(alias, node, wn))
-		    fprintf(f, "%d,", DUMPDEP_id(q));
-	    }
-
-	    fprintf(f, "}\n\t\t? {");
-	    for(q= head; q; q= DUMPDEP_next(q))
-	    {
-		WN *wn =	DUMPDEP_node(q);
-		if (Valid_alias(alias, wn) &&
-		    POSSIBLY_ALIASED == Aliased(alias, node, wn))
-		    fprintf(f, "%d,", DUMPDEP_id(q));
-	    }
-	    fprintf(f, "}\n");
-	}
-
-	/*
-	*  lno dependence information
-	*/
-	fprintf(f, "\t\t== LNO {");
-	for(q= head; q; q= DUMPDEP_next(q))
-	{
-	    mUINT16		dist;
-	    DIRECTION	dir;
-	    BOOL		is_must, ok;
-
-
-	    if (LnoDependenceEdge( node, DUMPDEP_node(q), &dist, &dir, &is_must, &ok))
-	    {
-		fprintf(f, "<%d: %d, %s",
-			DUMPDEP_id(q), dist, is_must ? "MUST " : "");
-		DIRECTION_Print(dir, f);
-		fprintf(f, ">, ");
-	    }
-	}
-	fprintf(f, "}\n");
-    }
-}
-#endif /* BACK_END */
-
 /*
  *  Write an WN * with OPC_FUNC_ENTRY.
  */
@@ -1628,12 +1488,6 @@ extern void dump_tree(WN *wn)
    fdump_tree(stdout,wn);
 }
 
-#ifdef BACK_END
-extern void dump_dep_tree(WN *wn, struct ALIAS_MANAGER *alias)
-{
-   fdump_dep_tree(stdout, wn, alias);
-}
-#endif /* BACK_END */
 
 extern void dump_region_tree(WN *wn)
 {
@@ -1869,28 +1723,6 @@ static void WN_TREE_put_stmt(WN * wn, INT indent)
       ir_put_marker("END_BLOCK", indent);
       break;
 
-    case OPC_REGION:
-      ir_put_marker("REGION EXITS", indent);
-      WN_TREE_put_stmt(WN_region_exits(wn), indent+1);
-
-      ir_put_marker("REGION PRAGMAS", indent);
-      WN_TREE_put_stmt(WN_region_pragmas(wn), indent+1);
-
-      ir_put_marker("REGION BODY", indent);
-      WN_TREE_put_stmt(WN_region_body(wn), indent+1);
-
-      /* check to make sure cg.so is loaded first */
-      /* IR_dump_region will be NULL if it is not */
-#ifdef BACK_END
-      if (IR_dump_region)
-	CG_Dump_Region(ir_ofile, wn);
-#endif /* BACK_END */
-      { char str[20];
-	sprintf(str,"END_REGION %d", WN_region_id(wn));
-	ir_put_marker(str, indent);
-      }
-      break;
-      
     case OPC_LABEL:
       ir_put_wn(wn, indent);
       if ( WN_label_loop_info(wn) != NULL ) {
@@ -2062,31 +1894,6 @@ extern void WN_TREE_dump_tree(WN *wn)
 
 
 #ifdef BACK_END
-extern void fdump_dep_tree( FILE *f, WN *wn, struct ALIAS_MANAGER *alias)
-{
-  if (alias)
-  {
-    BOOL   save= IR_dump_map_info;
-
-    L_Save();
-    IR_dump_map_info= TRUE;
-    IR_DUMPDEP_info = TRUE;
-    IR_DUMPDEP_head= NULL;;
-
-    fdump_tree( f, (WN *)wn );
-    fdump_DUMPDEP(f, IR_DUMPDEP_head, alias); 
-
-
-    L_Free();
-    IR_DUMPDEP_head= NULL;;
-    IR_DUMPDEP_info = FALSE;
-    IR_dump_map_info = save;
-  }
-  else
-  {
-    fprintf(f, "\talias manager not initialized\n");
-  }
-}
 #endif /* BACK_END */
 
 extern void Check_for_IR_Dump(INT phase, WN *pu, const char *phase_name)

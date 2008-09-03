@@ -91,65 +91,6 @@ void (*Lno_Fini_p) ();
 WN* (*Perform_Loop_Nest_Optimization_p) (PU_Info*, WN*, WN*, BOOL);
 
 // ----------------------------------------------------------------------
-// symbols defined in wopt.so:
-
-#include "optimizer.h"
-#include "opt_defs.h"
-#include "opt_wn.h"
-#include "opt_bb.h"
-
-// from be/opt/wodriver.h
-
-void (*wopt_main_p) (INT argc, char **argv, INT, char **);
-void (*Wopt_Init_p) ();
-void (*Wopt_Fini_p) ();
-WN* (*Perform_Preopt_Optimization_p) (WN *, WN *);
-WN* (*Perform_Global_Optimization_p) (WN *, WN *, struct ALIAS_MANAGER *);
-
-// from be/opt/optimizer.h
-WN* (*Pre_Optimizer_p) (INT32, WN*, DU_MANAGER*, ALIAS_MANAGER*);
-DU_MANAGER* (*Create_Du_Manager_p) (MEM_POOL *);
-void (*Delete_Du_Manager_p) (DU_MANAGER *, MEM_POOL *);
-
-// from be/com/opt_alias_interface.h
-BOOL (*Verify_alias_p) (ALIAS_MANAGER *, WN *);
-
-// from be/opt/opt_alias_analysis.cxx
-void (*Print_points_to_p) (FILE *fp, POINTS_TO *ptmp);
-
-// from be/opt/opt_wn.h
-AUX_ID (*WN_aux_p) (const WN*);
-
-// from be/opt/opt_du.h
-BOOL (DU_MANAGER::*CD_is_br_taken_p) (IDTYPE);
-BOOL (DU_MANAGER::*CD_is_fall_thru_p) (IDTYPE);
-BOOL (DU_MANAGER::*Dominate_p) (IDTYPE, IDTYPE);
-IDTYPE (DU_MANAGER::*Get_cd_p) (IDTYPE);
-WN* (DU_MANAGER::*Get_last_stmt_p) (IDTYPE);
-
-// from be/opt/opt_htable.h
-BOOL (CODEREP::*Def_at_entry_p) () const;
-BB_NODE* (CODEREP::*Defbb_p) () const;
-
-// ----------------------------------------------------------------------
-// symbols defined in cg.so:
-// from be/cg/cgdriver.h
-
-void (*CG_Init_p) ();
-void (*CG_Fini_p) ();
-void (*CG_Process_Command_Line_p) (INT, char **, INT, char **);
-
-// from be/cg/cg.h
-void (*CG_PU_Initialize_p) (WN*);
-void (*CG_PU_Finalize_p) ();
-void (*CG_Change_Elf_Symbol_To_Undefined_p) (ST*);
-WN* (*CG_Generate_Code_p) (WN*, ALIAS_MANAGER*, DST_IDX, BOOL);
-void (*CG_Dump_Region_p) (FILE*, WN*);
-
-// from be/cg/eh_region.h
-void (*EH_Generate_Range_List_p) (WN *);
-
-// ----------------------------------------------------------------------
 // symbols defined in ipl.so:
 // from ipa/local/ipl_main.cxx
 
@@ -157,8 +98,6 @@ void (*Ipl_Extra_Output_p) (Output_File *);
 void (*Ipl_Init_p) ();
 void (*Ipl_Fini_p) ();
 void (*ipl_main_p) (INT, char **);
-void (*Perform_Procedure_Summary_Phase_p) (WN*, DU_MANAGER*, ALIAS_MANAGER*,
-					   void*);
 
 // ----------------------------------------------------------------------
 // symbols from whirl2c.so 

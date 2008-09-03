@@ -269,31 +269,6 @@ static BOOL WN_Solve_For(WN *wn_top,
   return ok;
 }
 
-/*-----------------------------------------------------------------------
-// NAME: WN_Copy_Frequency_Tree 
-// FUNCTION: Copy the frequency information from 'wn_from' to 'wn'.
-//
-// Hmm... This function looks like it puts feedback frequencies on
-// expression nodes, which isn't useful and really isn't allowed
-// (although it isn't known to cause problems at present). Why does
-// this function need to be written this way? -- rkennedy
-//---------------------------------------------------------------------*/
-
-static void WN_Copy_Frequency_Tree(const WN *wn, const WN *wn_from)
-{
-  WN_ITER *wniter; 
-  INT32 count = 0; 
-
-  if (Cur_PU_Feedback) {
-    count = WN_MAP32_Get(WN_MAP_FEEDBACK, wn_from);
-    wniter = WN_WALK_TreeIter((WN *) wn );
-    while (wniter) {
-      WN *cur = wniter->wn;
-      wniter = WN_WALK_TreeNext(wniter);
-      WN_MAP32_Set(WN_MAP_FEEDBACK, cur, count);
-    }
-  }
-}
 
 /*-----------------------------------------------------------------------
 // NAME: WN_Upper_Bound_Standardize 
@@ -336,7 +311,6 @@ WN_Upper_Bound_Standardize(WN   *doloop,
     ub1 = WN_CreateExp2(subop, WN_kid1(ub), wn_const); 
     ub1 = WN_Simplify_Tree(ub1); 
     WN_kid1(ub) = ub1;
-    WN_Copy_Frequency_Tree(ub1, ub);
   }
   WN_kid1(WN_end(doloop)) = WN_Simplify_Tree(WN_kid1(WN_end(doloop))); 
   ok = WN_Solve_For(WN_end(doloop), WN_st_idx(WN_index(doloop)),

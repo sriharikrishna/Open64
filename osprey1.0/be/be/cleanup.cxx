@@ -163,9 +163,6 @@ Cleanup_Files (BOOL report,         /* Report errors during cleanup? */
     /* Close trace file: */
     Set_Trace_File ( NULL );
 
-    /* Close Feedback File */
-    Close_Feedback_Files();
-
     /* Disable timing file: */
     Tim_File = NULL;
 

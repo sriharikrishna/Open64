@@ -958,89 +958,6 @@ namespace
 } 
 
 
-void
-WN_write_feedback (PU_Info* pu, Output_File* fl)
-{
-    Is_True (PU_Info_state (pu, WT_FEEDBACK) == Subsect_InMem,
-	     ("Missing Feedback Section"));
-
-    Section *cur_section = fl->cur_section;
-
-    /* make sure we're in the right section */
-    if (strcmp(cur_section->name, MIPS_WHIRL_PU_SECTION) != 0)
-	ErrMsg (EC_IR_Scn_Write, "feedback", fl->file_name);
-
-    fl->file_size = ir_b_align (fl->file_size, ALIGNOF(Pu_Hdr), 0);
-    off_t feedback_base = fl->file_size;
-
-    if (Cur_PU_Feedback == NULL) {
-	// we have the feedback info in file, but have not created a
-	// FEEDBACK structure for it.  This is the case when the feedback
-	// info is not consumed (as in the IPA alias classification phase
-	// where the file is just read in for minor modification and then
-	// written out directly).  In this case, we just dump the entire
-	// section from the input file to the output file.
-	Elf64_Word size = PU_Info_subsect_offset (pu, WT_FEEDBACK);
-	(void) ir_b_save_buf (PU_Info_feedback_ptr (pu), size,
-			      ALIGNOF(Pu_Hdr), 0, fl);
-	
-	Set_PU_Info_state (pu, WT_FEEDBACK, Subsect_Written);
-	PU_Info_subsect_size (pu, WT_FEEDBACK) = size;
-	PU_Info_subsect_offset (pu, WT_FEEDBACK) =
-	    feedback_base - cur_section->shdr.sh_offset;
-	return;
-    }
-    
-
-    // leave room for the Pu_Hdr
-    fl->file_size += sizeof(Pu_Hdr);
-    fl->file_size = ir_b_align (fl->file_size, sizeof(mINT64), 0);
-
-    Pu_Hdr pu_hdr;
-    PU_Profile_Handle pu_handle;
-
-    pu_hdr.pu_checksum = Convert_Feedback_Info (Cur_PU_Feedback,
-						PU_Info_tree_ptr (pu),
-						pu_handle);
-    
-    pu_hdr.pu_name_index = 0;
-    pu_hdr.pu_file_offset = 0;
-
-    write_profile (feedback_base, pu_handle.Get_Invoke_Table (), fl,
-		   pu_hdr.pu_num_inv_entries, pu_hdr.pu_inv_offset);
-			  
-    write_profile (feedback_base, pu_handle.Get_Branch_Table (), fl,
-		   pu_hdr.pu_num_br_entries, pu_hdr.pu_br_offset);
-
-    write_target_profile (feedback_base, pu_handle.Get_Switch_Table (), fl,
-			  pu_hdr.pu_num_switch_entries,
-			  pu_hdr.pu_switch_offset,
-			  pu_hdr.pu_switch_target_offset);
-
-    Is_True (pu_handle.Get_Compgoto_Table ().size () == 0,
-	     ("Compgoto Table should be empty"));
-
-    write_profile (feedback_base, pu_handle.Get_Loop_Table (), fl,
-		   pu_hdr.pu_num_loop_entries,
-		   pu_hdr.pu_loop_offset);
-    
-    write_profile (feedback_base, pu_handle.Get_Short_Circuit_Table (), fl,
-		   pu_hdr.pu_num_scircuit_entries,
-		   pu_hdr.pu_scircuit_offset);
-    
-    write_profile (feedback_base, pu_handle.Get_Call_Table (), fl,
-		   pu_hdr.pu_num_call_entries,
-		   pu_hdr.pu_call_offset);
-
-    memmove (fl->map_addr + feedback_base, &pu_hdr, sizeof(pu_hdr));
-    
-
-    Set_PU_Info_state (pu, WT_FEEDBACK, Subsect_Written);
-    PU_Info_subsect_size (pu, WT_FEEDBACK) = fl->file_size - feedback_base;
-    PU_Info_subsect_offset (pu, WT_FEEDBACK) =
-	feedback_base - cur_section->shdr.sh_offset;
-
-} // WN_write_feedback
 
 /*
  *  Write out the IPA summary information.
@@ -1065,41 +982,6 @@ IPA_write_summary (void (*IPA_irb_write_summary) (Output_File*),
 }
 
 
-/*
- * Write out the dependence graph mapping.  Dependence graphs are written
- * to PU subsections.  The size and offset of the output subsection are
- * stored in the PU_Info structure.  The off_map mapping must contain the
- * subsection offsets for the WN nodes referenced from the dependence graph.
- */
-
-void
-WN_write_depgraph (PU_Info *pu, WN_MAP off_map, Output_File *fl)
-{
-    void *g;			/* actually an ARRAY_DIRECTED_GRAPH16* */
-    off_t depgraph_base;
-    Section *cur_section = fl->cur_section;
-
-    if (PU_Info_state(pu, WT_DEPGRAPH) == Subsect_Missing)
-	return;
-
-    /* make sure we're in the right section */
-    if (strcmp(cur_section->name, MIPS_WHIRL_PU_SECTION) != 0 ||
-	PU_Info_state(pu, WT_DEPGRAPH) != Subsect_InMem)
-	ErrMsg (EC_IR_Scn_Write, "dependence graph", fl->file_name);
-
-    g = PU_Info_depgraph_ptr(pu);
-
-    fl->file_size = ir_b_align(fl->file_size, sizeof(mINT32), 0);
-    depgraph_base = fl->file_size;
-
-    Depgraph_Write(g, fl, off_map);
-
-    Set_PU_Info_state(pu, WT_DEPGRAPH, Subsect_Written);
-    PU_Info_subsect_size(pu, WT_DEPGRAPH) = fl->file_size - depgraph_base;
-    PU_Info_subsect_offset(pu, WT_DEPGRAPH) =
-	depgraph_base - cur_section->shdr.sh_offset;
-
-} /* WN_write_depgraph */
 
 /*
  * Write out the prefetch pointer mapping. The prefetch mappings are written
@@ -1476,9 +1358,6 @@ Write_PU_Info (PU_Info *pu)
 
     /* create a map to save the file offsets for certain WN nodes */
 #ifdef BACK_END
-    if (PU_Info_state (pu, WT_FEEDBACK) == Subsect_InMem)
-	WN_write_feedback (pu, ir_output);
-
     if (Write_BE_Maps || Write_ALIAS_CLASS_Map) {
 	Current_Map_Tab = PU_Info_maptab(pu);
 	MEM_POOL_Push(MEM_local_nz_pool_ptr);
@@ -1490,12 +1369,6 @@ Write_PU_Info (PU_Info *pu)
 
 #ifdef BACK_END
     if (Write_BE_Maps || Write_ALIAS_CLASS_Map) {
-	if (Write_BE_Maps) {
-	    WN_write_depgraph(pu, off_map, ir_output);
-	    
-	    /* check if the PU contains prefetches */
-	    WN_write_prefetch(pu, off_map, ir_output);
- 	}
 
 	if (Write_ALIAS_CLASS_Map) {
 	  WN_write_INT32_map(pu, off_map, ir_output, WT_ALIAS_CLASS,

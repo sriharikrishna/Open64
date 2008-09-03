@@ -239,9 +239,6 @@ Process_Command_Line (INT argc, char **argv)
 		    case 'f':
 			Feedback_File_Name = cp + 2;
 			break;
-		    case 'i':
-			Set_Instrumentation_File_Name(cp + 2);
-			break;
 		    case 'o':
 			Obj_File_Name = cp + 2;
 			/* fall through */
@@ -297,11 +294,7 @@ Process_Command_Line (INT argc, char **argv)
 		break;
               
 	    case 'm':		    /* Message reporting: */
-		if (!strcmp( cp, "pio" )) {
-		  mp_io = TRUE;
-		  cp += 3;
-		  break;
-		} else if (!strcmp(cp, "plist")) {
+	        if (!strcmp(cp, "plist")) {
 		  Run_w2fc_early = TRUE; 
 	   	  cp += 5; 
 		  break;
@@ -564,15 +557,3 @@ Prepare_Listing_File (void)
     } else Lst_File = stdout;
   }
 } /* Prepare_Listing_File */
-
-/* perform initialization of the lowerer for lowering High WHIRL */
-void
-Lowering_Initialize (void)
-{
-    Create_Slink_Symbol();
-
-   /*
-    *  lowering specific initialization
-    */
-    Lower_Init();
-}

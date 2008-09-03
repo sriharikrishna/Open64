@@ -90,13 +90,6 @@
 #endif
 
 
-#ifdef BACK_END
-extern "C" {
-extern void Init_Dep_Graph(void *g);
-extern void Dealloc_Dep_Graph(void);
-extern void *Depgraph_Read(char *cur_addr, char *end_addr, char *tree_base);
-}
-#endif /* BACK_END */
 
 static BOOL verbose_info = FALSE;
 static WN *last_node = NULL;
@@ -998,58 +991,6 @@ WN_get_feedback (void* handle, PU_Info* pu, MEM_POOL* pool)
 } // WN_get_feedback
 #endif 
 
-#ifdef BACK_END
-/* Read the dependence graph mapping */
-void *
-WN_get_depgraph (void *handle, PU_Info *pu)
-{
-    Elf64_Word offset, size;
-    char *cur_addr, *end_addr, *tree_base;
-    void *g;
-    Subsect_State st = PU_Info_state(pu, WT_DEPGRAPH);
-    Current_Map_Tab = PU_Info_maptab(pu);
-
-    if (st == Subsect_Written)
-	return (void *) ERROR_RETURN;
-    if (st == Subsect_InMem)
-	return PU_Info_depgraph_ptr(pu);
-    if (st != Subsect_Exists) {
-	Init_Dep_Graph(NULL);
-	return NULL;
-    }
-
-    offset = PU_Info_subsect_offset(pu, WT_DEPGRAPH);
-    size = PU_Info_subsect_size(pu, WT_DEPGRAPH);
-
-    OFFSET_AND_SIZE shdr = get_section (handle, SHT_MIPS_WHIRL, WT_PU_SECTION);
-    if (shdr.offset == 0) return (void *) ERROR_RETURN;
-
-    if (offset + size >= shdr.size) {
-	errno = EINVAL;
-	return (void *) ERROR_RETURN;
-    }
-
-    /* find the start of the tree subsection */
-    tree_base = (char *) handle + shdr.offset +
-	PU_Info_subsect_offset(pu, WT_TREE);
-
-    cur_addr = (char *)handle + shdr.offset + offset;
-    end_addr = cur_addr + size;
-
-    /* read the graph */
-    g = Depgraph_Read(cur_addr, end_addr, tree_base);
-
-    /* if g is NULL there was an error reading the graph -- it is safe to
-       return it anyway since an empty graph will be created in its place */
-    Is_True(g, ("Error: Unable to read the dependence graph"));
-
-    Init_Dep_Graph(g);
-    Set_PU_Info_depgraph_ptr(pu, g);
-    Set_PU_Info_state(pu, WT_DEPGRAPH, Subsect_InMem);
- 
-    return g;
-} /* WN_get_depgraph */
-#endif /* BACK_END */
 
 
 #if defined(BACK_END) || defined(BUILD_WNPREFETCH)
@@ -1386,18 +1327,6 @@ Read_Local_Info (MEM_POOL *pool, PU_Info *pu)
 	ErrMsg ( EC_IR_Scn_Read, "tree", local_ir_file);
     }
 
-#if defined(BACK_END) || defined(IR_TOOLS)
-    if (WN_get_feedback (local_fhandle, pu, pool) == ERROR_RETURN) {
-	ErrMsg ( EC_IR_Scn_Read, "feedback info", local_ir_file);
-    }
-#endif
-
-#ifdef BACK_END
-    if (WN_get_depgraph (local_fhandle, pu) == (void *) -1) {
-	ErrMsg ( EC_IR_Scn_Read, "dependence graph", local_ir_file);
-    }
-#endif
-
 #if defined(BACK_END) || defined(BUILD_WNPREFETCH)
     if (WN_get_prefetch (local_fhandle, pu) == -1) {
 	ErrMsg ( EC_IR_Scn_Read, "prefetch map", local_ir_file);
@@ -1422,10 +1351,6 @@ Read_Local_Info (MEM_POOL *pool, PU_Info *pu)
 void
 Free_Local_Info (PU_Info *pu)
 {
-#ifdef BACK_END
-    Dealloc_Dep_Graph();
-#endif /* BACK_END */
-
     Delete_Scope (PU_lexical_level (&St_Table[PU_Info_proc_sym (pu)]));
 
     /* deallocate the old map table */
@@ -1434,14 +1359,6 @@ Free_Local_Info (PU_Info *pu)
 	PU_Info_maptab(pu) = NULL;
     }
 }
-
-void 
-Free_Dep_Graph (void)
-{
-#ifdef BACK_END
-    Dealloc_Dep_Graph();
-#endif /* BACK_END */
-} 
 
 void
 Free_Local_Input(void)

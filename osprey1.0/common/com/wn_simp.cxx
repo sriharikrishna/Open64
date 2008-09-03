@@ -208,11 +208,6 @@ WN *WN_Simplify_Tree(WN *t, ALIAS_MANAGER *alias_manager)
       k0 = WN_Simplify_Tree(WN_kid0(t));
       r = WN_SimplifyIload(op,WN_load_offset(t),WN_ty(t),WN_field_id(t),WN_load_addr_ty(t),k0);
       if (r) {
-#ifdef BACK_END
-	 if (alias_manager) {
-	    Copy_alias_info(alias_manager,t,r);
-	 }
-#endif
 	 WN_Delete(t);
 	 result = r;
       } else {
@@ -224,11 +219,6 @@ WN *WN_Simplify_Tree(WN *t, ALIAS_MANAGER *alias_manager)
       k1 = WN_Simplify_Tree(WN_kid1(t));
       r = WN_SimplifyIstore(op,WN_load_offset(t),WN_ty(t),WN_field_id(t),k0,k1);
       if (r) {
-#ifdef BACK_END
-	 if (alias_manager) {
-	    Copy_alias_info(alias_manager,t,r);
-	 }
-#endif
 	 WN_Delete(t);
 	 result = r;
       } else {
@@ -241,11 +231,6 @@ WN *WN_Simplify_Tree(WN *t, ALIAS_MANAGER *alias_manager)
       k1 = WN_Simplify_Tree(WN_kid1(t));
       r = WN_SimplifyPstore(op,WN_load_offset(t),WN_ty(t),WN_field_id(t),k0,k1);
       if (r) {
-#ifdef BACK_END
-         if (alias_manager) {
-            Copy_alias_info(alias_manager,t,r);
-         }
-#endif
          WN_Delete(t);
          result = r;
       } else {
@@ -350,11 +335,6 @@ WN *WN_Simplify_Rebuild_Expr_Tree(WN *t,ALIAS_MANAGER *alias_manager)
       k0 = WN_kid0(t);
       r = WN_SimplifyIload(op,WN_load_offset(t),WN_ty(t),WN_field_id(t),WN_load_addr_ty(t),k0);
       if (r) {
-#ifdef BACK_END
-	 if (alias_manager) {
-	    Copy_alias_info(alias_manager,t,r);
-	 }
-#endif
 	 WN_Delete(t);
 	 result = r;
       } else {

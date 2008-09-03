@@ -212,57 +212,6 @@ Adjusted_Alignment(ST *sym)
 
 
 
-/* ====================================================================
- *
- * ST_alignment
- *
- * Returns alignment for the object. 
- * The object can have an improved alignment then the TY_align() if 
- * already allocated.
- *
- * ====================================================================
- */
-INT32 ST_alignment(ST *sym)
-{
-  INT32 align=	Adjusted_Alignment(sym);
-
-  if (ST_pu_defined(sym))
-  {
-    if (Is_Allocated(sym))
-    {
-      ST	*base;
-      INT64	ofst;
-      INT32	basealign;
-
-      Base_Symbol_And_Offset(sym, &base, &ofst);
-
-      Is_True((sym != base), ("sym should != base"));
-
-      basealign=	Adjusted_Alignment(base);
-
-      Is_True((basealign>=align), ("sym has align > than base"));
-
-      while (basealign > align)
-      {
-	if ((ofst % basealign) == 0)
-	{
-	  if (Get_Trace(TP_LOWER, 4))
-	  {
-	    DevWarn("ST_alignment: Using allocated alignment for %s (prev align %d) (new align %d)",
-		    ST_name(sym), align, basealign);
-	  }
-	  return basealign;
-	}
-	basealign >>=	1;
-      }
-      return align;
-    }
-    return align;
-  }
- 
-  return align;
-}
-
 
 /* ====================================================================
  *

@@ -159,7 +159,6 @@ static const WN2F_OPR_HANDLER WN2F_Opr_Handler_List[] =
 {
    {OPR_FUNC_ENTRY, &WN2F_func_entry},
    {OPR_BLOCK, &WN2F_block},
-   {OPR_REGION, &WN2F_region},
    {OPR_REGION_EXIT, &WN2F_goto},
 /*   {OPR_SWITCH, &WN2F_switch}, Not a Fortran construct! */
    {OPR_COMPGOTO, &WN2F_compgoto},
