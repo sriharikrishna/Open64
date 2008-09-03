@@ -49,17 +49,9 @@ INCLUDE_SUBDIRS = \
 #
 LIBRARY_SUBDIRS = \
 	arith \
-	g++3-include \
 	libcif \
 	libcmplrs \
 	libcomutil \
-	libdwarf \
-	libelf \
-	libelfutil \
-	libiberty \
-	libunwind \
-	libunwindP \
-	libunwind_gdb
 
 
 #
@@ -80,31 +72,8 @@ TOOL_SUBDIRS = \
 	whirl2c \
 	libf90caf
 
-TOOL_SUBDIRS1 = \
-        be \
-        cg \
-        crayf90/libf90sgi \
-        crayf90/fe90 \
-        crayf90/sgi \
-        driver \
-        dwarfdump \
-        elfdump \
-        fec_238 \
-        g++fe \
-        gccfe \
-        ipa \
-        ipl \
-        ir_tools \
-        lno \
-        lw_inline \
-        medusa \
-        whirl2c \
-        whirl2f \
-        wopt \
-        gdb \
-        be_driver \
-        libf90caf
 #       ld64
+
 
 
 SUBDIRS=$(INCLUDE_SUBDIRS) $(LIBRARY_SUBDIRS) $(TOOL_SUBDIRS)
