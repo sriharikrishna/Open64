@@ -278,8 +278,6 @@ BOOL WN_Can_Be_Speculative (WN *wn, struct ALIAS_MANAGER *alias)
     if (WN_Is_Volatile_Mem(wn))
       return FALSE;
 
-    if (alias && alias->Safe_to_speculate(wn))
-      return TRUE;
     return FALSE;
 
   case OPR_DIV:

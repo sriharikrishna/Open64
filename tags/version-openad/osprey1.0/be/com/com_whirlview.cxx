@@ -93,11 +93,6 @@ id_str(WN *wn)
    strcpy( dv_id, "NULL-WN" );
  }
 
- if ( Cur_PU_Feedback ) {
-   FB_FREQ freq = Cur_PU_Feedback->Query_total_out( wn );
-   freq.Sprintf( dv_id + len );
- }
-
  return dv_id;
 }
 
@@ -189,13 +184,6 @@ draw_stmt(WN *wn, BOOL show_expr)
     }
   }
 
-
-  if ( Cur_PU_Feedback ) {
-    FB_FREQ freq = Cur_PU_Feedback->Query_total_out( wn );
-    if ( freq.Known() ) {
-      nt.Color( "wheat1" );
-    }
-  }
 
   DV->Node_Begin( NODE_ID(wn), id_str(wn), nt );
 

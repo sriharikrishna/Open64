@@ -71,7 +71,6 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "whirl2f_common.h"
 #include "const.h"           /* For FOR_ALL_CONSTANTS */
 #include "pf_cg.h"
-#include "region_util.h"     /* For RID and RID_map */
 #include "w2cf_parentize.h"
 #include "PUinfo.h"          /* In be/whirl2c directory */
 #include "wn2f.h"
@@ -1773,98 +1772,6 @@ WN2F_block(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
    }
    return EMPTY_WN2F_STATUS;
 } /* WN2F_block */
-
-
-WN2F_STATUS 
-WN2F_region(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
-{
-   /* Emit region #pragma, the WN_region_pragmas(wn), and the 
-    * WN_region_body(wn).
-    */
-   WN  *stmt;
-   RID *rid;
-   BOOL good_rid; 
-   
-   Is_True(WN_operator(wn) == OPR_REGION, 
-	   ("Invalid operator for WN2F_region()"));
-
-   Is_True(WN_operator(WN_region_body(wn)) == OPR_BLOCK, 
-	   ("Expected OPR_BLOCK as body of OPR_REGION in WN2F_region()"));
-
-   if (W2F_Prompf_Emission)
-      WN2F_Start_Prompf_Transformed_Region(tokens, wn, context);
-
-   good_rid = RID_map >= 0;
-   if (good_rid) 
-     rid = (RID *)WN_MAP_Get(RID_map, wn);
-   if (W2F_Emit_All_Regions ||
-       (!W2F_No_Pragmas && good_rid && 
-        (rid == NULL          ||              /* == RID_TYPE_pragma */
-         RID_type(rid) == RID_TYPE_pragma)))  /* User defined region */
-   {
-      Append_F77_Directive_Newline(tokens, "C*$*");
-      Append_Token_String(tokens, "REGION BEGIN");
-
-      set_WN2F_CONTEXT_explicit_region(context);
-
-      if (!W2F_No_Pragmas)
-         WN2F_pragma_list_begin(tokens, 
-                                WN_first(WN_region_pragmas(wn)),
-                                context);
-
-      for (stmt = WN_first(WN_region_body(wn));
-	   stmt != NULL;
-	   stmt = WN_next(stmt))
-      {
-	 if (!WN2F_Skip_Stmt(stmt))
-	    (void)WN2F_translate(tokens, stmt, context);
-      }
-
-      if (!W2F_No_Pragmas)
-         WN2F_pragma_list_end(tokens,
-                              WN_first(WN_region_pragmas(wn)),
-                              context);
-
-      Append_F77_Directive_Newline(tokens, "C*$*");
-      Append_Token_String(tokens, "REGION END");
-   }
-   else
-   {
-      reset_WN2F_CONTEXT_explicit_region(context);
-
-      /* Emit the pragmas that are associated with regions and that have
-       * a corresponding pragma in the source language.
-       */
-      if (!W2F_No_Pragmas)
-         WN2F_pragma_list_begin(tokens, 
-                                WN_first(WN_region_pragmas(wn)),
-                                context);
-
-      /* Emit the body of the region, making the actual region 
-       * markings and associated pragmas completely transparent.
-       */
-      for (stmt = WN_first(WN_region_body(wn));
-	   stmt != NULL;
-	   stmt = WN_next(stmt))
-      {
-	 if (!WN2F_Skip_Stmt(stmt))
-	    (void)WN2F_translate(tokens, stmt, context);
-      }
-
-      /* Close the region, if necessary, based on the kind of region
-       * we have as determined by the first pragma in the list.
-       */
-      if (!W2F_No_Pragmas)
-         WN2F_pragma_list_end(tokens,
-                              WN_first(WN_region_pragmas(wn)),
-                              context);
-   } /* if emit pragma */
-
-   if (W2F_Prompf_Emission)
-      WN2F_End_Prompf_Transformed_Region(tokens, wn, context);
-   
-   return EMPTY_WN2F_STATUS;
-} /* WN2F_region */
 
 
 WN2F_STATUS 

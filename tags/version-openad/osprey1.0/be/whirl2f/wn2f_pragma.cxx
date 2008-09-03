@@ -64,7 +64,6 @@ static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/ospre
 #include "w2cf_parentize.h"  /* For W2CF_Get_Parent */
 #include "const.h"           /* For FOR_ALL_CONSTANTS */
 #include "pf_cg.h"
-#include "region_util.h"     /* For RID and RID_map */
 #include "PUinfo.h"          /* In be/whirl2c directory */
 #include "wn2f.h"
 #include "st2f.h"

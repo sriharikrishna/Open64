@@ -71,13 +71,6 @@
 
 #include "dra_internal.h"       // Internal DRA interface
 
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
-  extern void (*CG_Change_Elf_Symbol_To_Undefined_p) (ST*);
-# define CG_Change_Elf_Symbol_To_Undefined \
-    (*CG_Change_Elf_Symbol_To_Undefined_p)
-#else
-# pragma weak CG_Change_Elf_Symbol_To_Undefined
-#endif // __linux__
 
 // =====================================================================
 //
@@ -842,9 +835,6 @@ DRA_Mangle_Entry(WN* entry_wn,
       Set_ST_sclass (old_st, SCLASS_EXTERN);
       if (!PU_has_non_mangled_call (Pu_Table[ST_pu (old_st)]))
         Set_ST_is_not_used (old_st);
-      else if (Run_cg) {
-        CG_Change_Elf_Symbol_To_Undefined(old_st);
-      }
     }
   }
   else {

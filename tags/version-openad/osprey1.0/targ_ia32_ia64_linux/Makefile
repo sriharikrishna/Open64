@@ -49,17 +49,9 @@ INCLUDE_SUBDIRS = \
 #
 LIBRARY_SUBDIRS = \
 	arith \
-	g++3-include \
 	libcif \
 	libcmplrs \
 	libcomutil \
-	libdwarf \
-	libelf \
-	libelfutil \
-	libiberty \
-	libunwind \
-	libunwindP \
-	libunwind_gdb
 
 
 #

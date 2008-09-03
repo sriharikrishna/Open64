@@ -93,7 +93,6 @@ extern void Early_Terminate (INT status);
 ST *SP_Sym;
 ST *FP_Sym;
 ST *Local_Spill_Sym;
-extern INT32 mp_io;
 INT32 Current_PU_Actual_Size;
 STACK_MODEL Current_PU_Stack_Model = SMODEL_UNDEF;
 
@@ -217,7 +216,7 @@ static void Allocate_Object_To_Section (ST *, SECTION_IDX, UINT);
 static void Allocate_Label (ST *lab);
 
 
-extern BOOL
+BOOL
 Is_Allocated (ST *st)
 {
   ST *base;
@@ -1804,10 +1803,6 @@ Initialize_Stack_Frame (WN *PU_tree)
   actual_size = Max_Arg_Area_Bytes(PU_tree);
   // mp_io and alloca rely on the actual size being register-sized aligned
   actual_size = ROUNDUP(actual_size, MTYPE_byte_size(Spill_Int_Mtype));
-  if (mp_io && actual_size < MTYPE_byte_size(Spill_Int_Mtype)) {
-    actual_size = MTYPE_byte_size(Spill_Int_Mtype);
-    Frame_Has_Calls = TRUE;
-  }
   Current_PU_Actual_Size = actual_size;
 
   frame_size = Calc_Local_Area ();
