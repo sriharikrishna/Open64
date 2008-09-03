@@ -80,19 +80,16 @@
 #include "data_layout.h"	    /* for Initialize_Stack_Frame() */
 #include "opt_alias_interface.h"    /* for ALIAS_MANAGER stuff */
 #include "wn_lower.h"		    /* for WN_Lower() */
-#include "cgdriver.h"		    /* for CG_Init, etc. */
 #include "ori.h"		    /* for Olimit_Region_Insertion */
 #include "w2c_driver.h"		    /* for W2C_Process_Command_Line, etc. */
 #include "w2f_driver.h"		    /* for W2F_Process_Command_Line, etc. */
 #include "anl_driver.h"		    /* for Anl_Process_Command_Line, etc. */
 #include "region_util.h"	    /* for Regions_Around_Inner_Loops */
 #include "region_main.h"	    /* for REGION_* driver specific routines */
-#include "cg/cg.h"	            /* for CG PU-level routines */
 #include "tracing.h"                /* For the trace routines */
 #include "ir_reader.h"              /* For fdump_tree */
 #include "dwarf_DST.h"	    	    /* for Orig_PU_Name */
 #include "fb_whirl.h"		    /* for FEEDBACK */
-#include "eh_region.h"		    /* for EH_Generate_Range_List, etc. */
 #include "iter.h"		    /* PU iterator for loops */
 #include "dra_export.h"             /* for DRA routines */
 #include "ti_init.h"		    /* for targ_info */
@@ -125,43 +122,6 @@ INT64       New_Construct_Id(void) { return 0; }
 INT64       Get_Next_Construct_Id(void) { return 0; }
 }
 #endif
-
-
-// symbols defined in cg.so
-#if defined(__linux__) || defined(_GCC_NO_PRAGMAWEAK) || defined(__CYGWIN__)
-
-extern void (*CG_Process_Command_Line_p) (INT, char **, INT, char **);
-#define CG_Process_Command_Line (*CG_Process_Command_Line_p)
-
-extern void (*CG_Init_p) ();
-#define CG_Init (*CG_Init_p)
-
-extern void (*CG_Fini_p) ();
-#define CG_Fini (*CG_Fini_p)
-
-extern void (*CG_PU_Initialize_p) (WN*);
-#define CG_PU_Initialize (*CG_PU_Initialize_p)
-
-extern void (*CG_PU_Finalize_p) ();
-#define CG_PU_Finalize (*CG_PU_Finalize_p)
-
-extern WN* (*CG_Generate_Code_p) (WN*, ALIAS_MANAGER*, DST_IDX, BOOL);
-#define CG_Generate_Code (*CG_Generate_Code_p)
-
-extern void (*EH_Generate_Range_List_p) (WN *);
-#define EH_Generate_Range_List (*EH_Generate_Range_List_p)
-
-#else
-
-#pragma weak CG_Process_Command_Line
-#pragma weak CG_Init
-#pragma weak CG_Fini
-#pragma weak CG_PU_Finalize
-#pragma weak CG_PU_Initialize
-#pragma weak CG_Generate_Code
-#pragma weak EH_Generate_Range_List
-
-#endif // __linux__
 
 
 // symbols defined in wopt.so
@@ -1066,7 +1026,6 @@ main (INT argc, char **argv)
   if (Run_preopt || Run_wopt || Run_lno || Run_Distr_Array || Run_autopar 
 	|| Run_cg) {
     Set_Error_Descriptor (EP_BE, EDESC_BE);
-    Set_Error_Descriptor (EP_CG, EDESC_CG);
   }
  /* For UPC - disable  optimizations for the time being */
   if (Compile_Upc) {

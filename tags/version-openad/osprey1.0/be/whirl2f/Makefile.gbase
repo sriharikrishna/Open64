@@ -100,7 +100,6 @@ endif
 BE_DIR 			= $(BUILD_BASE)/..
 BE_MIPS_DIR 		= $(BE_DIR)/MIPS
 BE_BE_DIR 		= $(BE_DIR)/be
-BE_CG_DIR 		= $(BE_DIR)/cg
 BE_COM_DIR 		= $(BE_DIR)/com
 BE_WHIRL2F_DIR 		= $(BE_DIR)/whirl2f
 BE_WHIRL2C_DIR          = $(BE_DIR)/whirl2c

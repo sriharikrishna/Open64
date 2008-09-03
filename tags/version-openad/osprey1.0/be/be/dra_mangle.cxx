@@ -67,8 +67,6 @@
 #include "wn_util.h"            // WN_DELETE
 #include "dwarf_DST.h"          // DST_IDX
 #include "config.h"             // Run_ipl, Run_cg
-#include "cg.h"                 // CG_Change_Elf_Symbol_To_Undefined
-
 #include "dra_internal.h"       // Internal DRA interface
 
 
