@@ -32,14 +32,8 @@
 #
 #
 
-#
-#  Makefile for targia64_ia64_nodebug
-#
-
-#
 #  These directories must be "built" first because they generate header files
 #  which other directories depend on.
-#
 INCLUDE_SUBDIRS = \
 	include \
 	targ_info
@@ -58,10 +52,7 @@ TOOL_SUBDIRS = \
         crayf90/fe90 \
         crayf90/sgi \
         ir_tools \
-        whirl2f \
-        whirl2c 
-
-
+        whirl2f
 
 SUBDIRS=$(INCLUDE_SUBDIRS) $(LIBRARY_SUBDIRS) $(TOOL_SUBDIRS)
 
