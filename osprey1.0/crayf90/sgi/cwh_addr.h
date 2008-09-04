@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_addr.h
- * $Revision: 1.3 $
- * $Date: 2006-05-10 19:31:01 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_addr.h,v $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -55,7 +50,6 @@
 #define CWH_ADDR_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_addr.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Offset field as 64 bits - translate into 32 later ***FIX */

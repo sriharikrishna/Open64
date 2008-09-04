@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: config_vho.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:28 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_vho.h,v $
  *
  * Revision history:
  *  05-May-96 - Extracted from be/opt/opt_config.h.

@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_pdgcs
- * $Revision: 1.7 $
- * $Date: 2007-08-08 18:58:15 $
- * $Author: utke $
- * $Source: 
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -59,7 +54,6 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_pdgcs.cxx,v $ $Revision: 1.7 $";
 #endif /* _KEEP_RCS_ID */
 
 

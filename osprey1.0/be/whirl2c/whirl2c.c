@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: whirl2c.c
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:41 $
- * $Author: jle $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/whirl2c.c,v $
  *
  * Revision history:
  *  07-Nov-94 - Original Version
@@ -78,7 +73,6 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/whirl2c.c,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <elf.h>              /* for wn.h */

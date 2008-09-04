@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: wn2c_pragma.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:18 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c_pragma.h,v $
  *
  * Revision history:
  *    12-Aug-95 - Original Version

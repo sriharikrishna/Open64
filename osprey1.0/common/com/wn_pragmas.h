@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: wn_pragmas.h
- * $Revision: 1.5 $
- * $Date: 2004-12-14 17:34:11 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $
  *
  * Description:
  *
@@ -115,7 +110,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *pragmas_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_pragmas.h,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Pragma IDs: */

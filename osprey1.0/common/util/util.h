@@ -42,7 +42,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *util_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/util.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Generate a call to an external command:

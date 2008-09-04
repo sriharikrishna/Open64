@@ -35,7 +35,6 @@
 
 
 static const char source_file[] = __FILE__;
-static const char rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_prop.c,v $ $Revision: 1.1.1.1 $";
 
 
 /* ====================================================================

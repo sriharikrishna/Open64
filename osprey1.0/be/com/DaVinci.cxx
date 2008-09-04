@@ -36,9 +36,6 @@
 /* -*-Mode: c++;-*- (Tell emacs to use c++ mode) */
 /* ====================================================================
  *
- * Module: DaVinci.cxx
- * $Revision: 1.3 $
- * $Date: 2003-12-09 19:16:19 $
  *
  * Description:
  *	Interface to daVinci, a visualization system for displaying

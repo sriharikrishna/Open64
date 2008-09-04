@@ -37,11 +37,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: whirl2f_common.c
- * $Revision: 1.4 $
- * $Date: 2003-12-29 23:30:32 $
- * $Author: johnmc $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f_common.h,v $
  *
  * Revision history:
  *  17-Apr-95 - Original Version

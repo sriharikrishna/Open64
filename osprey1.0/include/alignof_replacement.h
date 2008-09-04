@@ -34,9 +34,6 @@
 
 /****************************************************************************
  *
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/include/alignof_replacement.h,v $
- * $Revision: 1.1 $
- * $Date: 2003-12-09 19:10:25 $
  *
  * Nathan Tallent: 
  *  - Brought into Open64 and made minor cosmetic changes.

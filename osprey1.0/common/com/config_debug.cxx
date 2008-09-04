@@ -36,10 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.3 $
- * $Date: 2003-11-04 16:12:49 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_debug.cxx,v $
  *
  * Revision history:
  *  02-Nov-96 - Original Version.
@@ -54,7 +50,6 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *config_debug_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_debug.cxx,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 

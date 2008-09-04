@@ -43,11 +43,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: dwarf_DST_producer.h
- * $Revision: 1.4 $
- * $Date: 2004-06-28 18:39:47 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST_producer.h,v $
  *
  * Revision history:
  *  25-Apr-93 - Original Version
@@ -68,7 +63,6 @@
 
 
 #ifdef _KEEP_RCS_ID
-static char *dwarf_DST_producer_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST_producer.h,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 

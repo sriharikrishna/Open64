@@ -66,10 +66,6 @@
 /////////////////////////////////////
 
 
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:07 $
-//  $Author: dsystem $
-//  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/generate/isa_subset_gen.h,v $
 
 
 #ifndef ISA_SUBSET_GEN_INCLUDED
@@ -80,7 +76,6 @@ extern "C" {
 #ifndef ISA_SUBSET_GEN_RCS_ID
 #define ISA_SUBSET_GEN_RCS_ID
 #ifdef _KEEP_RCS_ID
-static char *isa_subset_gen_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/generate/isa_subset_gen.h,v $ $Revision: 1.1.1.1 $";
 #endif
 #endif
 

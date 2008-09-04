@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: ir_gdar.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:09:11 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/ir_tools/ir_gdar.c,v $
  *
  * Revision history:
  *  20-Jun-97 - Original Version

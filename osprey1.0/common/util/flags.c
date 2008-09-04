@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: flags.c
- * $Revision: 1.2 $
- * $Date: 2003-12-12 17:39:43 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/flags.c,v $
  *
  * Revision history:
  *  17-Jun-91 - Original Version
@@ -55,7 +50,6 @@
 
 #ifdef _KEEP_RCS_ID
 static const char source_file[] = __FILE__;
-static const char rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/flags.c,v $ $Revision: 1.2 $";
 #endif
 
 #include <string.h>

@@ -35,7 +35,6 @@
 
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/quadop.cxx,v $ $Revision: 1.2 $";
 #include "defs.h"
 #include "erglob.h"
 #include "config_host.h"

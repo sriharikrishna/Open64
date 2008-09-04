@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: tcon2c.c
- * $Revision: 1.4 $
- * $Date: 2003-11-20 02:55:44 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/tcon2c.cxx,v $
  *
  * Revision history:
  *  07-Nov-94 - Original Version
@@ -54,7 +49,6 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/tcon2c.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "whirl2c_common.h"

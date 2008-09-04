@@ -42,7 +42,6 @@ extern "C" {
 
 /* %Q% %I% %M% */
 
-#ident "$Revision: 1.1.1.1 $"
 
 /*
  * fpu.h -- fpu specific defines

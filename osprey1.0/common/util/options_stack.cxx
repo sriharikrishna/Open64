@@ -36,11 +36,6 @@
 //-*-c++-*-
 //============================================================================
 //
-// Module: options_stack.cxx
-// $Revision: 1.2 $
-// $Date: 2003-11-04 16:07:35 $
-// $Author: eraxxon $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/options_stack.cxx,v $
 //
 // Revision history:
 //  23-SEP-97 dahl - Original Version

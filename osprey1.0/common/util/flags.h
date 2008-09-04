@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: flags.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:08 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/flags.h,v $
  *
  * Revision history:
  *  08-Sep-89 - Original Version
@@ -272,7 +267,6 @@
 #define flags_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *flags_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/flags.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifdef __cplusplus

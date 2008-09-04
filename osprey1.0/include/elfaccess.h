@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: elfaccess.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:09:05 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/include/elfaccess.h,v $
  *
  * Revision history:
  *  03-Jun-93 - Original Version

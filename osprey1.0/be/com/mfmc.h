@@ -37,9 +37,6 @@
 #define MFMC_H_INCLUDED "mfmc.h"
 /* ======================================================================
  *
- * Module: mfmc.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:32 $
  *
  * Revision history:
  * 17-Jul-96 - Original version

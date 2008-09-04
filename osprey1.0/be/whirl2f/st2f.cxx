@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: st2f.c
- * $Revision: 1.41 $
- * $Date: 2008-03-13 15:43:00 $
- * $Author: utke $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $
  *
  * Revision history:
  *  07-May-95 - Original Version
@@ -86,7 +81,6 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/st2f.cxx,v $ $Revision: 1.41 $";
 #endif
 
 #include <ctype.h>

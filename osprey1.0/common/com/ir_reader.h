@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: ir_reader.h
- * $Revision: 1.3 $
- * $Date: 2004-02-25 16:39:55 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ir_reader.h,v $
  *
  * Revision history:
  *  31-AUG-94 - Original Version
@@ -55,7 +50,6 @@
 
 
 #ifdef _KEEP_RCS_ID
-static const char *opt_irrcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ir_reader.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 extern void IR_reader_init(void);

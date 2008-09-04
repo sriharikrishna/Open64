@@ -36,13 +36,8 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: ip_graph.h
  * Author: Seema Hiranandani
  *
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:09:11 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/ir_tools/ir_graph.h,v $
  *
  * Revision history:
  *  19-Aug-95 - Original Version

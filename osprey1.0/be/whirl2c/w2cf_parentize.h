@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: w2cf_parentize.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_parentize.h,v $
  *
  * Revision history:
  *  10-Sept-96 - Original Version

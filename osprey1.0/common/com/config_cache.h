@@ -38,11 +38,6 @@
  * ====================================================================
  * ====================================================================
  *
- * Module: config_cache.h
- * $Revision: 1.3 $
- * $Date: 2004-12-01 16:43:40 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_cache.h,v $
  *
  * Revision history:
  *  14-Nov-96 - Original Version, duplicated from cache_parameters.h.
@@ -67,7 +62,6 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *config_cache_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_cache.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /*

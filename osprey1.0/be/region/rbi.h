@@ -36,11 +36,6 @@
 //-*-c++-*-
 //=====================================================================
 //
-// Module: rbi.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:53 $
-// $Author: dsystem $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/region/rbi.h,v $
 //
 // Revision history:
 //  7-SEP-95 dahl - Original Version
@@ -54,7 +49,6 @@
 #ifndef rbi_INCLUDED
 #define rbi_INCLUDED "rbi.h"
 #ifdef _KEEP_RCS_ID
-static char *rbircs_id = rbi_INCLUDED"$ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "region_util.h"

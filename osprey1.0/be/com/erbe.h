@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: erbe.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:31 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/erbe.h,v $
  *
  * Revision history:
  *  02-Nov-89 - Original Version
@@ -66,7 +61,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *erbe_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/erbe.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "errors.h"	/* Always needed */

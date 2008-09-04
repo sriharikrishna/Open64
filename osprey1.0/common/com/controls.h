@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: controls.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:29 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/controls.h,v $
  *
  * Revision history:
  *  17-Jun-91 - Integrated from Josie flags.h
@@ -62,7 +57,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *controls_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/controls.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 /* The following is a list of IDs for the available controls: */

@@ -63,9 +63,5 @@
 /////////////////////////////////////
 
 
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:07 $
-//  $Author: dsystem $
-//  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/generate/proc_gen.h,v $
 
 extern void PROC_Create (const char *proc_name, ...);

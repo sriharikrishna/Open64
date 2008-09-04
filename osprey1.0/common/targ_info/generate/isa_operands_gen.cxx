@@ -41,8 +41,6 @@
 //
 /////////////////////////////////////
 //
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:06 $
 
 typedef struct operand_value_type *OPERAND_VALUE_TYPE;
 

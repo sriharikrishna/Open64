@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: mtypes.c
- * $Revision: 1.4 $
- * $Date: 2005-01-18 21:42:56 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/mtypes.cxx,v $
  *
  * Revision history:
  *

@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: w2cf_symtab.c
- * $Revision: 1.9 $
- * $Date: 2004-08-19 21:52:24 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $
  *
  * Revision history:
  *  07-Oct-95 - Original Version
@@ -76,7 +71,6 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_symtab.cxx,v $ $Revision: 1.9 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>

@@ -36,11 +36,6 @@
 //-*-c++-*-
 
 /**
-*** Module: graph_template.cxx
-*** $Revision: 1.1.1.1 $
-*** $Date: 2002-05-22 20:06:31 $
-*** $Author: dsystem $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/graph_template.cxx,v $
 ***
 *** Revision history:
 ***

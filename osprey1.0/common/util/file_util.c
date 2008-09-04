@@ -35,7 +35,6 @@
 
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/file_util.c,v $ $Revision: 1.1.1.1 $";
 
 #include <sys/types.h>
 #include <sys/stat.h>

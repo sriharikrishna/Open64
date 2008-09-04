@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: driver_util.h
- * $Revision: 1.2 $
- * $Date: 2003-02-21 21:13:41 $
- * $Author: jle $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/driver_util.h,v $
  *
  * Revision history:
  *  17-Feb-95 - Original Version

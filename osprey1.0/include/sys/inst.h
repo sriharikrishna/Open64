@@ -35,7 +35,6 @@
 
 #ifndef __SYS_INST_H__
 #define __SYS_INST_H__
-#ident "$Revision: 1.1.1.1 $"
 
 /*
  * inst.h -- instruction format defines

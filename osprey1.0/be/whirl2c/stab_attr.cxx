@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: stab_attr.c
- * $Revision: 1.6 $
- * $Date: 2005-06-30 15:57:28 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $
  *
  * Revision history:
  *  07-Mar-95 - Original Version
@@ -55,7 +50,6 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/stab_attr.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 

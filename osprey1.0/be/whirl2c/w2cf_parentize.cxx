@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: w2cf_parentize.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_parentize.cxx,v $
  *
  * Revision history:
  *  10-Sept-96 - Original Version
@@ -50,7 +45,6 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2cf_parentize.cxx,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 

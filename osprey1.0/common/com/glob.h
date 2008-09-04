@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: glob.h
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:42 $
- * $Author: jle $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/glob.h,v $
  *
  * Revision history:
  *  15-Sep-89 - Original Version

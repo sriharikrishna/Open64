@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: x_set_macro.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:09 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_set_macro.h,v $
  *
  * Revision history:
  *  05-05-93 - Original Version

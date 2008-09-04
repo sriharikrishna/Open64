@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: c_a_to_q
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:08 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/c_a_to_q.c,v $
  *
  * Revision history:
  *  28-jun-93 - Original Version
@@ -52,7 +47,6 @@
  */
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/c_a_to_q.c,v $ $Revision: 1.1.1.1 $";
 
 /* Macros to pull apart parts of single and  double precision
  * floating point numbers in IEEE format

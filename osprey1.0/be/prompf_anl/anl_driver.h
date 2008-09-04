@@ -42,11 +42,6 @@ extern "C" {
 /* ==============================================================
  * ==============================================================
  *
- * Module: anl_driver.h
- * $Revision: 1.2 $
- * $Date: 2003-12-09 19:16:57 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/prompf_anl/anl_driver.h,v $
  *
  * Description:
  *

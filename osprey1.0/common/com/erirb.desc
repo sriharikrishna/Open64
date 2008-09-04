@@ -35,11 +35,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: erirb.desc
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:30 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/erirb.desc,v $
  *
  * Revision history:
  *  23-Jun-89 - Original Version
@@ -56,7 +51,6 @@
 #ifndef erirb_desc_INCLUDED
 #define erirb_desc_INCLUDED
 
-static char *erirb_desc_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/erirb.desc,v $ $Revision: 1.2 $";
 
 /* Include the error code definitions: */
 #include "erirb.h"

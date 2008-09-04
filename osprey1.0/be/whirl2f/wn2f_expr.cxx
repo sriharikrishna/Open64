@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: wn2f_expr.c
- * $Revision: 1.22 $
- * $Date: 2006-05-10 19:30:58 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $
  *
  * Revision history:
  *  12-Apr-95 - Original Version
@@ -58,7 +53,6 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_expr.cxx,v $ $Revision: 1.22 $";
 #endif
 
 #include "whirl2f_common.h"

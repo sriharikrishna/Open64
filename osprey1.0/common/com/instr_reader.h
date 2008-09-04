@@ -37,11 +37,6 @@
 // ====================================================================
 // ====================================================================
 //
-// Module: instr_reader.h
-// $Revision: 1.3 $
-// $Date: 2003-12-11 22:13:04 $
-// $Author: eraxxon $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/instr_reader.h,v $
 //
 // Revision history:
 //  10-Aug-98 - Original Version

@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: phase.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:32 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/phase.cxx,v $
  *
  * Revision history:
  *  17-Feb -95 - Original Version

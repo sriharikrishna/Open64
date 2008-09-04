@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: w2c_driver.c
- * $Revision: 1.6 $
- * $Date: 2004-07-02 18:37:30 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $
  *
  * Revision history:
  *  07-Oct-95 - Original Version
@@ -61,7 +56,6 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.cxx,v $ $Revision: 1.6 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */

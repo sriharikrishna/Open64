@@ -36,7 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_ipa.cxx,v $
  *
  * Revision history:
  *  11-Apr-96 - Original Version, extracted from ipa_option.c.

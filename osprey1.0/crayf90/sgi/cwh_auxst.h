@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_auxst.h
- * $Revision: 1.3 $
- * $Date: 2005-06-08 22:15:55 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.h,v $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -56,7 +51,6 @@
 #define CWH_AUXST_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_auxst.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* de/allocation */

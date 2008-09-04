@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: errdesc.h
- * $Revision: 1.2 $
- * $Date: 2003-07-16 19:41:34 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/errdesc.h,v $
  *
  * This header describes the structure used to create the error message
  * tables.  Do not reference the structure directly.  Only the

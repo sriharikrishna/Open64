@@ -38,7 +38,6 @@
 // ====================================================================
 // ====================================================================
 //
-// Module: config_targ_cache.cxx
 // Revision history:
 //  14-Nov-96 - Original Version, copied from cache_parameters.cxx.
 //

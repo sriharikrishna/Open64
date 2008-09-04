@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: betarget.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:29 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/betarget.h,v $
  *
  * Description: Target Specific Miscellany
  *
@@ -64,7 +59,6 @@
 #define betarget_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static const char betarget_rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/betarget.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "topcode.h"

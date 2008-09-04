@@ -36,7 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_flist.cxx,v $
  *
  * Revision history:
  *  25-Mar-97 - Original Version

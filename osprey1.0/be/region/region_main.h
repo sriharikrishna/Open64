@@ -36,11 +36,6 @@
 /*-*-c++-*-*/
 /* ====================================================================
  *
- * Module: region_main.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:53 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/region/region_main.h,v $
  *
  * Revision history:
  *  8-NOV-95 dahl - Original Version

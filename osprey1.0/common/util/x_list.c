@@ -36,11 +36,6 @@
 /* =======================================================================
  * =======================================================================
  *
- *  Module: x_list.c
- *  $Revision: 1.1.1.1 $
- *  $Date: 2002-05-22 20:07:09 $
- *  $Author: dsystem $
- *  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_list.c,v $
  *
  *  Revision comments:
  *
@@ -57,7 +52,6 @@
  */
 
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_list.c,v $ $Revision: 1.1.1.1 $";
 
 #define _X_first_(x)    ((x)->first)
 #define _X_rest_(x)     ((x)->rest)

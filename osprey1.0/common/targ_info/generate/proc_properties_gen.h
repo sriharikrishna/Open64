@@ -61,10 +61,6 @@
 //
 /////////////////////////////////////
 //
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:07 $
-//  $Author: dsystem $
-//  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/generate/proc_properties_gen.h,v $
 
 typedef struct proc_property *PROC_PROPERTY;
 

@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- *  Module: tn_prop.h
- *  $Revision: 1.1.1.1 $
- *  $Date: 2002-05-22 20:07:09 $
- *  $Author: dsystem $
- *  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_prop.h,v $
  *
  *  Revision history:
  *   13-Dec-91 - Original Version
@@ -130,7 +125,6 @@ extern "C" {
 
 
 
-static const char _X_RCS_ID_[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/x_prop.h,v $ $Revision: 1.1.1.1 $";
 
 #if defined(_MIPS_ISA) && _MIPS_ISA >= 3
 typedef UINT64 _X_PROP_TYPE_;

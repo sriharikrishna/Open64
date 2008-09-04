@@ -34,11 +34,6 @@
 
 
 /* ====================================================================
- * Module: omp_lower.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:20 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/omp_lower.h,v $
  *
  * Revision history:
  *  26-Jun-97 : First created by Dave Kohr

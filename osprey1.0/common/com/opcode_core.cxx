@@ -36,14 +36,7 @@
 #define opcode_core_C      "opcode_core.c"
 
 #ifdef _KEEP_RCS_ID
-static const char rcs_id[] =   opcode_core_C "$Revision: 1.2 $";
 #endif
-
-/** $Revision: 1.2 $
-*** $Date: 2002-07-12 16:48:32 $
-*** $Author: fzhao $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/opcode_core.cxx,v $
-**/
 
 #include "defs.h"
 #include "opcode_core.h"

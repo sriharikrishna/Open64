@@ -36,11 +36,6 @@
 //-*-c++-*-
 //
 /**
-*** Module: graph_template.h
-*** $Revision: 1.2 $
-*** $Date: 2004-12-01 16:42:38 $
-*** $Author: eraxxon $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/graph_template.h,v $
 *** 
 *** Revision history:
 ***
@@ -214,7 +209,6 @@
 #define graph_template_INCLUDED "graph_template.h"
 
 #ifdef _KEEP_RCS_ID
-static char *graph_template_rcs_id = graph_template_INCLUDED "$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifndef defs_INCLUDED

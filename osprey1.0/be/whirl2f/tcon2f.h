@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: tcon2f.h
- * $Revision: 1.3 $
- * $Date: 2003-01-10 02:47:29 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/tcon2f.h,v $
  *
  * Revision history:
  *    13-Apr-95 - Original Version

@@ -210,10 +210,6 @@
 /////////////////////////////////////
 
 
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:07 $
-//  $Author: dsystem $
-//  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/generate/si_gen.h,v $
 
 
 #ifndef SI_GEN_INCLUDED

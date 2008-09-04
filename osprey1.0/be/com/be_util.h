@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: be_util.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:29 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/be_util.h,v $
  *
  * Revision history:
  *  06-Dec-95 - Original Version
@@ -55,7 +50,6 @@
 #define be_util_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *be_utilrcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/be_util.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifndef wn_INCLUDED

@@ -35,11 +35,6 @@
 
 //-*-c++-*-
 /* ====================================================================
- * Module: privatize_common.cxx
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:32 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/privatize_common.h,v $
  *
  * Revision history:
  *  11-12-97 : First created by Dave Kohr

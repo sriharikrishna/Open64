@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_pdgcs
- * $Revision: 1.4 $
- * $Date: 2003-11-28 23:04:08 $
- * $Author: eraxxon $
- * $Source: 
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -59,7 +54,6 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_mkdepend.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <ctype.h>

@@ -27,11 +27,6 @@
 #define unparse_target_INCLUDED
 /* ====================================================================
  *
- * Module: unparse_target.h
- * $Revision: 1.3 $
- * $Date: 2003-06-19 19:22:35 $
- * $Author: broom $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/unparse_target.h,v $
  *
  * Revision history:
  *  06-Jun-03 - Original Version

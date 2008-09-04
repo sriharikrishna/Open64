@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: mempool.h
- * $Revision: 1.3 $
- * $Date: 2004-05-24 17:03:48 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/mempool.h,v $
  *
  * Revision history:
  *  19-Sep-89 - Original Version

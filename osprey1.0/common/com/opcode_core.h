@@ -147,17 +147,10 @@
 ***	    OPCODE_PROPERTY_boolean		boolean returns, e.g. GE
 **/
 
-/** $Revision: 1.2 $
-*** $Date: 2002-07-12 16:48:32 $
-*** $Author: fzhao $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/opcode_core.h,v $
-**/
-
 #ifndef opcode_core_INCLUDED
 #define opcode_core_INCLUDED "opcode_core.h"
 
 #ifdef _KEEP_RCS_ID
-static char *opcode_core_rcs_id = opcode_core_INCLUDED "$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "opcode_gen_core.h"

@@ -116,16 +116,11 @@
 /////////////////////////////////////
 
 
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:06 $
-//  $Author: dsystem $
-//  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/generate/isa_pack_gen.h,v $
 
 #ifndef isa_pack_gen_INCLUDED
 #define isa_pack_gen_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static const char isa_operands_gen_rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/generate/isa_pack_gen.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifdef __cplusplus

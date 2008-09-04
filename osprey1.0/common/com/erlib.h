@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: erlib.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:30 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/erlib.h,v $
  *
  * Revision history:
  *  08-Sep-89 - Original Version
@@ -64,7 +59,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *erlib_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/erlib.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "errors.h"	/* Always needed */

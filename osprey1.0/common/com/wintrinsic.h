@@ -71,12 +71,6 @@
 ***
 **/
 
-/** $Revision: 1.6 $
-*** $Date: 2004-06-28 18:39:47 $
-*** $Author: eraxxon $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wintrinsic.h,v $
-**/
-
 #ifndef wintrinsic_INCLUDED
 #define wintrinsic_INCLUDED "wintrinsic.h"
 

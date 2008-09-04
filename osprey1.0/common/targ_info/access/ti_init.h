@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- *  Module: ti_init.h
- *  $Revision: 1.1.1.1 $
- *  $Date: 2002-05-22 20:07:06 $
- *  $Author: dsystem $
- *  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_init.h,v $
  *
  *  Synopsis:
  *
@@ -64,7 +59,6 @@
 #define ti_init_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static const char ti_init_rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_init.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "targ_abi_properties.h"
