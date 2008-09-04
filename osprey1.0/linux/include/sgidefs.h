@@ -40,7 +40,6 @@
 extern "C" {
 #endif
 
-#ident "$Revision: 1.1.1.1 $"
 
 /*
  * sgidefs.h - SGI/MIPS basic software generation system constants & types
