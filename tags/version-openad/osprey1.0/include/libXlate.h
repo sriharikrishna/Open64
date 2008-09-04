@@ -42,7 +42,6 @@ extern "C" {
 /*
     libXlate.h
 
-    $Revision: 1.1.1.1 $
 
     All external symbols  and macros begin with one of the following
 	XLATE_

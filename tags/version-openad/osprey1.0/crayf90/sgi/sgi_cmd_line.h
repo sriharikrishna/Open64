@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: sgi_cmd_line.h
- * $Revision: 1.3 $
- * $Date: 2007-08-08 18:58:15 $
- * $Author: utke $ 
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/sgi_cmd_line.h,v $
  *
  * Revision history:
  *  09-26-95 - Original Version
@@ -55,7 +50,6 @@
 #define SGI_CMD_LINE_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/sgi_cmd_line.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 extern char *FE_command_line;

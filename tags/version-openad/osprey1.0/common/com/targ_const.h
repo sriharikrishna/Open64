@@ -39,8 +39,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: targ_const.h
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/targ_const.h,v $
  *
  * Revision history:
  *  12-Jun-91 - Integrated from Josie

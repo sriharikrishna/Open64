@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: common_include.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:15 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/common_include.h,v $
  *
  * Revision history:
  *  07-Mar-95 - Original Version

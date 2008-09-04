@@ -37,11 +37,6 @@
 // ====================================================================
 // ====================================================================
 //
-// Module: fb_freq.h
-// $Revision: 1.3 $
-// $Date: 2002-09-06 22:34:55 $
-// $Author: open64 $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/fb_freq.h,v $
 //
 // Description:
 //

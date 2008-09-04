@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_dope.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:08 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dope.h,v $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -55,7 +50,6 @@
 #define CWH_DOPE_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dope.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 extern WN * cwh_dope_from_expression(WN *expr, WN *array, WN *char_len, TY_IDX ty, WN *craytype);

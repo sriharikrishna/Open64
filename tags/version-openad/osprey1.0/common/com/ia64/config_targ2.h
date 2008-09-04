@@ -36,7 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: config_targ2.h
  *
  * Revision history:
  *  11-Apr-96 - Original Version
@@ -66,7 +65,6 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *config_TARG_h_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_targ2.h,v $ $Revision: 1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifdef __cplusplus

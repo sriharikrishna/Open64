@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: PUinfo.c
- * $Revision: 1.9 $
- * $Date: 2006-05-10 19:30:56 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $
  *
  * Revision history:
  *  07-Oct-94 - Original Version
@@ -67,7 +62,6 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.cxx,v $ $Revision: 1.9 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <string.h>

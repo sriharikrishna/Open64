@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: ty2f.h
- * $Revision: 1.7 $
- * $Date: 2004-02-09 16:55:45 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty2f.h,v $
  *
  * Revision history:
  *    13-Apr-95 - Original Version

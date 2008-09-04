@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: aux_stab.cxx
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:29 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/aux_stab.cxx,v $
  *
  * Description:
  *

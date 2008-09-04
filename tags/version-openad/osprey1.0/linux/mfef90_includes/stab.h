@@ -56,8 +56,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: stab.h
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/linux/mfef90_includes/stab.h,v $
  *
  * Revision history:
  *  11-Feb-89 - Original Version

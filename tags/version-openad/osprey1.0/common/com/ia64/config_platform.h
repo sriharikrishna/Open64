@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: config_platform.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:03 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_platform.h,v $
  *
  * Revision history:
  *  11-May-96 - Original Version
@@ -69,7 +64,6 @@
 #define config_platform_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *config_platform_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_platform.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifdef __cplusplus

@@ -37,11 +37,6 @@
 /** ====================================================================
 *** ====================================================================
 ***
-*** Module: cxx_template.h
-*** $Revision: 1.1.1.1 $
-*** $Date: 2002-05-22 20:06:30 $
-*** $Author: dsystem $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/cxx_template.h,v $
 ***
 *** Revision history:
 ***  8-SEP-94 shin - Original Version
@@ -169,7 +164,6 @@
 #ifndef cxx_template_INCLUDED
 #define cxx_template_INCLUDED	  "cxx_template.h"
 #ifdef _KEEP_RCS_ID
-static char *cxx_templatercs_id = cxx_template_INCLUDED"$Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "mempool.h"

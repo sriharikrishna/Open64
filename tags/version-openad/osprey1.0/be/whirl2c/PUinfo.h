@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: PUinfo.h
- * $Revision: 1.3 $
- * $Date: 2003-06-19 19:22:34 $
- * $Author: broom $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/PUinfo.h,v $
  *
  * Revision history:
  *   26-Dec-94 - Original Version

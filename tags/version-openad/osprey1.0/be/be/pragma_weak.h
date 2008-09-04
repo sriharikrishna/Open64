@@ -35,11 +35,6 @@
 
 /* ====================================================================
  *
- * Module: pragma_weak.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:20 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/pragma_weak.h,v $
  *
  * Revision history:
  *  4-Jan-96 - Original Version

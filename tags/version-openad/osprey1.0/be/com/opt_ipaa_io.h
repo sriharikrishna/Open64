@@ -37,11 +37,6 @@
 // ====================================================================
 // ====================================================================
 //
-// Module: opt_ipaa_io.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:32 $
-// $Author: dsystem $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/opt_ipaa_io.h,v $
 //
 // Revision history:
 //  22-Nov-95 - Original Version
@@ -60,7 +55,6 @@
 #define cxx_opt_ipaa_io_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *opt_ipaa_io_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/opt_ipaa_io.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 extern "C" {

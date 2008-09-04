@@ -37,9 +37,6 @@
 /* ====================================================================
 * ====================================================================
 *
-* Module: opt_alias_rule.h
-* $Revision: 1.2 $
-* $Date: 2003-12-11 22:12:27 $
 *
 * Revision history:
 *  04-APR-95 lo - Split from opt_alias.h
@@ -53,7 +50,6 @@
 #ifndef opt_alias_rule_INCLUDED
 #define opt_alias_rule_INCLUDED	"opt_alias_rule.h"
 #ifdef _KEEP_RCS_ID
-static char *opt_alias_rulercs_id = 	opt_alias_rule_INCLUDED"$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 

@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: ty2c.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:52:17 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/ty2c.h,v $
  *
  * Revision history:
  *  07-Oct-94 - Original Version

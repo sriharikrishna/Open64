@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: config_platform.c
- * $Revision: 1.2 $
- * $Date: 2003-11-04 16:12:49 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_platform.c,v $
  *
  * Revision history:
  *  11-May-96 - Original Version
@@ -65,7 +60,6 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/ia64/config_platform.c,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #include "x_string.h" /* for strcasecmp() */

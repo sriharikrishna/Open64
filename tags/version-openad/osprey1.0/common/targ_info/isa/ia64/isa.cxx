@@ -47,10 +47,6 @@
 // This arrangement of instructions matches the order in the ISA manual.
 /////////////////////////////////////
 //
-//  $Revision: 1.1.1.1 $
-//  $Date: 2002-05-22 20:07:07 $
-//  $Author: dsystem $
-//  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/isa/ia64/isa.cxx,v $
 
 #include <stddef.h>
 #include "isa_gen.h"

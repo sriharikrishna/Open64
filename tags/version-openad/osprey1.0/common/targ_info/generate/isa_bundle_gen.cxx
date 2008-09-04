@@ -40,8 +40,6 @@
 //  within a bundle.
 //
 /////////////////////////////////////
-//  $Revision: 1.2 $
-//  $Date: 2003-12-11 22:13:20 $
 
 #include <alloca.h>
 #include <stddef.h>

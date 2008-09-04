@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: controls.c
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:29 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/controls.cxx,v $
  *
  * Revision history:
  *  12-Sep-90 - Original Version

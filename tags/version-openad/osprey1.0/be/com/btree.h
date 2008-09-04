@@ -62,7 +62,6 @@
 #ifndef bin_tree_INCLUDED
 #define bin_tree_INCLUDED 
 
-static char *bin_tree_rcs_id  = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/btree.h,v $ $Revision: 1.1.1.1 $";
 
 
 #ifndef defs_INCLUDED

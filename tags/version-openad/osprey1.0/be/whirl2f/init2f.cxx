@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: init2f.c
- * $Revision: 1.5 $
- * $Date: 2003-09-25 02:22:58 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $
  *
  * Revision history:
  *  15-June-95 - Original Version
@@ -75,7 +70,6 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.cxx,v $ $Revision: 1.5 $";
 #endif
 
 #include "whirl2f_common.h"

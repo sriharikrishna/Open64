@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: diagnostics.c
- * $Revision: 1.3 $
- * $Date: 2005-02-01 22:30:35 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/diagnostics.cxx,v $
  *
  * Revision history:
  *  12-Apr-95 - Original Version

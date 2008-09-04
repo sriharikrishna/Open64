@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_mkdepend.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:45:09 $
- * $Author: fzhao $ 
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_mkdepend.h,v $
  *
  * Revision history:
  *  09-26-95 - Original Version

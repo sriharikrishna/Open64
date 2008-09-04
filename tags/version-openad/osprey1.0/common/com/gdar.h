@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: gdar.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:31 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/gdar.h,v $
  *
  * Revision history:
  *  09-Jun-97 - Original Version

@@ -37,11 +37,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: ty_ftn.h
- * $Revision: 1.1 $
- * $Date: 2003-06-19 19:22:35 $
- * $Author: broom $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/ty_ftn.h,v $
  *
  * Revision history:
  *  18-Jun-03 - Original version based on text extracted from stab_attr.h

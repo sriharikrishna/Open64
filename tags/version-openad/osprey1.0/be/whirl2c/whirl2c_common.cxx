@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: whirl2c_common.c
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:41 $
- * $Author: jle $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/whirl2c_common.cxx,v $
  *
  * Revision history:
  *  07-Nov-94 - Original Version

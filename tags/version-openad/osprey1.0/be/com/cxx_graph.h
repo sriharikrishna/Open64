@@ -35,11 +35,6 @@
 
 //-*-c++-*-
 /**
-*** Module: cxx_graph.h
-*** $Revision: 1.2 $
-*** $Date: 2004-12-01 16:42:38 $
-*** $Author: eraxxon $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/cxx_graph.h,v $
 *** 
 *** Revision history:
 ***
@@ -108,7 +103,6 @@
 #define cxx_graph_INCLUDED "cxx_graph.h"
 
 #ifdef _KEEP_RCS_ID
-static char *cxx_graph_rcs_id = cxx_graph_INCLUDED "$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifndef defs_INCLUDED

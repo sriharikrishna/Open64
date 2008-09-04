@@ -35,7 +35,6 @@
 
 #ifdef _KEEP_RCS_ID
 static const char source_file[] = __FILE__;
-static const char rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/dwarf_DST_dump.cxx,v $ $Revision: 1.2 $";
 #endif
 
 #include <stdio.h>

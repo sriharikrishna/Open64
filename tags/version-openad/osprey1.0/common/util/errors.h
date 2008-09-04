@@ -46,11 +46,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: errors.h
- * $Revision: 1.5 $
- * $Date: 2003-12-09 19:18:36 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/errors.h,v $
  *
  * Revision history:
  *  21-Aug-89 - Original Version

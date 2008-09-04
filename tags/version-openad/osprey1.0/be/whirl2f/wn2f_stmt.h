@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: wn2f_stmt.h
- * $Revision: 1.4 $
- * $Date: 2005-05-19 16:06:36 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_stmt.h,v $
  *
  * Revision history:
  *    13-Apr-95 - Original Version

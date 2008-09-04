@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: wn2c.c
- * $Revision: 1.22 $
- * $Date: 2004-10-12 15:23:29 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $
  *
  * Revision history:
  *  07-Oct-94 - Original Version
@@ -58,7 +53,6 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/wn2c.cxx,v $ $Revision: 1.22 $";
 #endif /* _KEEP_RCS_ID */
 
 

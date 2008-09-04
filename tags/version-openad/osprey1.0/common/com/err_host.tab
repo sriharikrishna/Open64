@@ -35,11 +35,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: err_host.tab
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:31 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/err_host.tab,v $
  *
  * Revision history:
  *  18-Feb-94 - Original Version, extracted from err_host.h.
@@ -54,7 +49,6 @@
  * ====================================================================
  */
 #ifdef _KEEP_RCS_ID
-static char *err_host_tab_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/err_host.tab,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Include the typedef for our various tables */

@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: config_elf_targ.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:27 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_elf_targ.h,v $
  *
  * Description:
  *

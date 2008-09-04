@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: diagnostics.h
- * $Revision: 1.3 $
- * $Date: 2003-06-05 13:50:17 $
- * $Author: ccristi $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/diagnostics.h,v $
  *
  * Revision history:
  *    13-Apr-95 - Original Version

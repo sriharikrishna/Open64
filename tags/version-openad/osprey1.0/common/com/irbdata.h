@@ -39,11 +39,6 @@
 #define irbdata_INCLUDED
 
 /* ====================================================================
- * Module: irbdata.h
- * $Revision: 1.3 $
- * $Date: 2005-02-01 00:38:42 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/irbdata.h,v $
  *
  * Revision history:
  *  21-Mar-93 - Original Version

@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_data.h
- * $Revision: 1.3 $
- * $Date: 2002-07-19 14:25:46 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.h,v $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -56,7 +51,6 @@
 
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_data.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 extern void cwh_data_emit_symbol_inits(SYMTAB_IDX level);

@@ -36,11 +36,7 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: driver_util.c
  * $Revisionr: 1.34 $
- * $Date: 2004-11-29 16:14:13 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/driver_util.cxx,v $
  *
  * Revision history:
  *  16-Feb-95 - Original Version

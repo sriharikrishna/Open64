@@ -41,11 +41,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: erirb.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:30 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/erirb.h,v $
  *
  * Revision history:
  *  23-Jun-89 - Original Version
@@ -61,7 +56,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *erirb_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/erirb.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Include errors.h for the benefit of any users: */

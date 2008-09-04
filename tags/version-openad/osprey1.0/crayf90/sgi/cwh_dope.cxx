@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_dope
- * $Revision: 1.4 $
- * $Date: 2006-05-10 19:31:01 $
- * $Author: fzhao $
- * $Source: 
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -58,7 +53,6 @@ static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_dope.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 /* sgi includes */

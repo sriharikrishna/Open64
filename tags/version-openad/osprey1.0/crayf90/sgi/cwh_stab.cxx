@@ -36,10 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * $Revision: 1.30 $
- * $Date: 2007-06-28 20:05:09 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -70,7 +66,6 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stab.cxx,v $ $Revision: 1.30 $";
 #endif /* _KEEP_RCS_ID */
 
 

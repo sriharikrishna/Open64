@@ -37,11 +37,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: tlog.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:09 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/tlog.h,v $
  *
  * Revision history:
  *  14-Sep-95 - Original Version
@@ -60,7 +55,6 @@ extern "C" {
 #endif
 
 #ifdef _KEEP_RCS_ID
-static char *tlog_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/tlog.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <sys/types.h>

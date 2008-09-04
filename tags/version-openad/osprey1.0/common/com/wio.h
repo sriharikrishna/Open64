@@ -78,12 +78,6 @@
 ***
 **/
 
-/** $Revision: 1.2 $
-*** $Date: 2002-07-12 16:48:33 $
-*** $Author: fzhao $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wio.h,v $
-**/
-
 #ifndef wio_INCLUDED
 #define wio_INCLUDED "wio.h"
 

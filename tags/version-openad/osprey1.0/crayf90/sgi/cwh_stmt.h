@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_stmt.h
- * $Revision: 1.3 $
- * $Date: 2004-12-14 17:34:47 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stmt.h,v $
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -55,7 +50,6 @@
 #define CWH_STMT_INCLUDED
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stmt.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 

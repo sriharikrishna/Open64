@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: stack.h
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:09 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/mstack.h,v $
  *
  * Revision history:
  *  14-Jun-93 - Original Version
@@ -59,7 +54,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *stack_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/mstack.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 

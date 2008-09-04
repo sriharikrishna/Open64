@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: mtypes.h
- * $Revision: 1.3 $
- * $Date: 2005-01-12 22:38:21 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/mtypes.h,v $
  *
  * Revision history:
  *  11-Oct-89 - Original Version
@@ -62,7 +57,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *mtypes_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/mtypes.h,v $ $Revision: 1.3 $";
 #endif /* _KEEP_RCS_ID */
 
 /* The predefined machine data types, present on many machines: */

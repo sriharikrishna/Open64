@@ -37,11 +37,6 @@
 ### ====================================================================
 ### ====================================================================
 ###
-### Module: gen_x_prop.csh
-### $Revision: 1.1.1.1 $
-### $Date: 2002-05-22 20:07:08 $
-### $Author: dsystem $
-### $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/gen_x_set,v $
 ###
 ### Usage: gen_x_set [-f] file_name base_type set_type
 ###                       elt_num num_elt [include_file...]
@@ -144,7 +139,6 @@ $uset_type =~ tr/a-z/A-Z/;
 $lset_type = $set_type;
 $lset_type =~ tr/A-Z/a-z/;
 
-$rev = '$Revision: 1.1.1.1 $ ';
 
 # Write the .cxx file.
 #
@@ -197,9 +191,6 @@ sub Filter {
         while ( $l = <IF> ) {
             if ( $l =~ /^BEGIN/ ) {
                 last;
-            }
-            elsif ( ($rev) = ($l =~ /\$Revision: *([0-9\.]+)/) ) {
-                print OF "/* Generated from $file Rev $rev */\n";
             }
         }
 

@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: token_buffer.c
- * $Revision: 1.5 $
- * $Date: 2003-06-13 23:05:29 $
- * $Author: broom $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/token_buffer.cxx,v $
  *
  * Revision history:
  *  07-Oct-94 - Original Version
@@ -100,7 +95,6 @@
  */
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/token_buffer.cxx,v $ $Revision: 1.5 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <stdio.h>

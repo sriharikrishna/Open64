@@ -33,7 +33,6 @@
 #
 
 #
-#ident "$Revision: 1.1.1.1 $"
 
 SHELL=/bin/sh
 ECHO=echo

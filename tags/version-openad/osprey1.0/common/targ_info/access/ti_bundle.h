@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- *  Module: ti_bundle.h
- *  $Revision: 1.1.1.1 $
- *  $Date: 2002-05-22 20:07:06 $
- *  $Author: dsystem $
- *  $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_bundle.h,v $
  *
  *  Synopsis:
  *
@@ -148,7 +143,6 @@ extern "C" {
 #endif
 
 #ifdef _KEEP_RCS_ID
-static const char ti_bundle_rcs_id[] = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/targ_info/access/ti_bundle.h,v $ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifndef defs_INCLUDED

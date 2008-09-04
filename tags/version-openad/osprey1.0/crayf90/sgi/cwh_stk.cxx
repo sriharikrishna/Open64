@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cwh_stk
- * $Revision: 1.4 $
- * $Date: 2007-01-08 21:48:42 $
- * $Author: fzhao $
- * $Source: 
  *
  * Revision history:
  *  dd-mmm-95 - Original Version
@@ -63,7 +58,6 @@
 static char *source_file = __FILE__;
 
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/crayf90/sgi/cwh_stk.cxx,v $ $Revision: 1.4 $";
 #endif /* _KEEP_RCS_ID */
 
 

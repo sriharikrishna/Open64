@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: wn2f_io.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:58:35 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_io.h,v $
  *
  * Revision history:
  *    13-Apr-95 - Original Version

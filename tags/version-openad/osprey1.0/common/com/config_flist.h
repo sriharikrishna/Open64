@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: config_flist.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:27 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_flist.h,v $
  *
  * Revision history:
  *  25-Mar-97 - Original Version
@@ -106,7 +101,6 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *config_flist_h_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/config_flist.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifdef __cplusplus

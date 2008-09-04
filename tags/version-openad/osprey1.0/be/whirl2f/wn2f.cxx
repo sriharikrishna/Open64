@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: wn2f.c
- * $Revision: 1.23 $
- * $Date: 2006-05-10 19:30:57 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $
 
  *
  * Revision history:
@@ -67,7 +62,6 @@
 
 #ifdef _KEEP_RCS_ID
 /*REFERENCED*/
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f.cxx,v $ $Revision: 1.23 $";
 #endif
 
 #include <alloca.h>

@@ -41,11 +41,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: w2f_driver.h
- * $Revision: 1.4 $
- * $Date: 2006-05-10 19:30:57 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/w2f_driver.h,v $
  *
  * Description:
  *

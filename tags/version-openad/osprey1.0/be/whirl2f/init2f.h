@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: init2f.c
- * $Revision: 1.3 $
- * $Date: 2003-09-25 02:22:58 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/init2f.h,v $
  *
  * Revision history:
  *  17-June-94 - Original Version

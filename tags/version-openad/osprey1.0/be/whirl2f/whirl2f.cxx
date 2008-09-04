@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: whirl2f.c
- * $Revision: 1.3 $
- * $Date: 2004-01-28 23:01:40 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f.cxx,v $
  *
  * Revision history:
  *  07-Nov-94 - Original Version
@@ -77,7 +72,6 @@
  * ====================================================================
  */
 static char *source_file = __FILE__;
-static char *rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/whirl2f.cxx,v $ $Revision: 1.3 $";
 
 #include <unistd.h>		    /* for close(), etc. */
 #include <elf.h>              /* for wn.h */

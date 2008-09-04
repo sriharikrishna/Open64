@@ -40,11 +40,6 @@
 // ==============================================================
 // ==============================================================
 //
-// Module: w2cf_translator.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:53 $
-// $Author: dsystem $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/prompf_anl/w2cf_translator.h,v $
 //
 // Description:
 //

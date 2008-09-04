@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: c_q_to_a
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:07:08 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/util/c_q_to_a.c,v $
  *
  * Revision history:
  *  26-jul-93 - Original Version

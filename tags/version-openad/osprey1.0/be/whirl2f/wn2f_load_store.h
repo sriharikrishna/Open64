@@ -38,11 +38,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: wn2f_load_store.h
- * $Revision: 1.4 $
- * $Date: 2006-05-10 19:30:58 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2f/wn2f_load_store.h,v $
  *
  * Revision history:
  *    13-Apr-95 - Original Version

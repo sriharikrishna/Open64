@@ -37,11 +37,6 @@
 // ====================================================================
 // ====================================================================
 //
-// Module: cxx_base.cxx
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:30 $
-// $Author: dsystem $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/cxx_base.cxx,v $
 //
 // Revision history:
 //  18-SEP-94 shin - Original Version

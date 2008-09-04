@@ -41,7 +41,6 @@ extern "C" {
 
 /*
 	dwarf.h   DWARF  debugging information values
-	$Revision: 1.1.1.1 $    $Date: 2002-05-22 20:09:05 $    
 
 */
 

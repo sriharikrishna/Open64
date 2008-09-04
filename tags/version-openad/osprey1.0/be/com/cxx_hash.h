@@ -37,11 +37,6 @@
 // ====================================================================
 // ====================================================================
 //
-// Module: cxx_hash.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:30 $
-// $Author: dsystem $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/cxx_hash.h,v $
 //
 // Revision history:
 //  07-Dec-95 - Merged USER_HASH_TABLE support.
@@ -211,7 +206,6 @@
 #define cxx_hash_INCLUDED "cxx_hash.h"
 
 #ifdef _KEEP_RCS_ID
-static char *cxx_hash_rcs_id  = cxx_hash_INCLUDED "$Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #ifndef CXX_MEMORY_INCLUDED

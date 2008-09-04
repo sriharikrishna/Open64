@@ -36,11 +36,6 @@
 /* ====================================================================
 * ====================================================================
 *
-* Module: opt_alias_interface.h
-* $Revision: 1.2 $
-* $Date: 2003-12-11 22:12:27 $
-* $Author: eraxxon $
-* $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/com/opt_alias_interface.h,v $
 *
 * Revision history:
 *  07-APR-95 lo - spilt from opt_alias.h
@@ -54,7 +49,6 @@
 #ifndef opt_alias_interface_INCLUDED
 #define opt_alias_interface_INCLUDED	"opt_alias_interface.h"
 #ifdef _KEEP_RCS_ID
-static char *opt_alias_interfacercs_id = 	opt_alias_interface_INCLUDED"$Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 

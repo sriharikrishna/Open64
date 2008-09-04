@@ -40,7 +40,6 @@ extern "C" {
 #endif
 
 #ifdef _KEEP_RCS_ID
-static char *wn_map_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_map.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 

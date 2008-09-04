@@ -36,11 +36,6 @@
 //-*-c++-*-
 //=====================================================================
 //
-// Module: rail.h
-// $Revision: 1.1.1.1 $
-// $Date: 2002-05-22 20:06:53 $
-// $Author: dsystem $
-// $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/region/rail.h,v $
 //
 // Revision history:
 //  24-AUG-95 dahl - Original Version
@@ -55,7 +50,6 @@
 #ifndef rail_INCLUDED
 #define rail_INCLUDED "rail.h"
 #ifdef _KEEP_RCS_ID
-static char *railrcs_id = rail_INCLUDED"$ $Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 class RAIL {

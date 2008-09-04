@@ -284,13 +284,6 @@
 ***------------------------------------------------------------------*/
 
 
-/** $Revision: 1.2 $
-*** $Date: 2002-07-12 16:48:34 $
-*** $Author: fzhao $
-*** $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/wn_util.h,v $
-**/
-
-
 #ifndef wn_util_INCLUDED
 #define wn_util_INCLUDED
 

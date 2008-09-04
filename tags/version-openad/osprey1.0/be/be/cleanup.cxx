@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: cleanup.c
- * $Revision: 1.3 $
- * $Date: 2003-12-09 19:14:50 $
- * $Author: eraxxon $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/cleanup.cxx,v $
  *
  * Revision history:
  *  21-Feb-95 - Original Version

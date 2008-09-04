@@ -42,11 +42,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: misalign.h
- * $Revision: 1.2 $
- * $Date: 2002-07-12 16:48:32 $
- * $Author: fzhao $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/misalign.h,v $
  *
  * Revision history:
  *  30-Apr-94 - Original Version
@@ -63,7 +58,6 @@ extern "C" {
 
 
 #ifdef _KEEP_RCS_ID
-static char *misalign_rcs_id = "$Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/common/com/misalign.h,v $ $Revision: 1.2 $";
 #endif /* _KEEP_RCS_ID */
 
 /* Misalignment models -- see memmodel.h for global defaults: */

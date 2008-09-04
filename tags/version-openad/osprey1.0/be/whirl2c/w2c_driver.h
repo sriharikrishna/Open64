@@ -39,11 +39,6 @@ extern "C" {
 /* ====================================================================
  * ====================================================================
  *
- * Module: w2c_driver.h
- * $Revision: 1.3 $
- * $Date: 2003-02-21 21:13:41 $
- * $Author: jle $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/whirl2c/w2c_driver.h,v $
  *
  * Description:
  *

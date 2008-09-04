@@ -36,11 +36,6 @@
 /* ====================================================================
  * ====================================================================
  *
- * Module: iter.c
- * $Revision: 1.1.1.1 $
- * $Date: 2002-05-22 20:06:20 $
- * $Author: dsystem $
- * $Source: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/be/be/iter.cxx,v $
  *
  * Revision history:
  *  3-MAR-96 dahl - Original Version
@@ -54,7 +49,6 @@
 
 #define rbi_CXX	"iter.c"
 #ifdef _KEEP_RCS_ID
-static char *rcs_id = iter_C"$Revision: 1.1.1.1 $";
 #endif /* _KEEP_RCS_ID */
 
 #include <elf.h>	/* for Elf64_Word */
