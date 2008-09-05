@@ -31,7 +31,7 @@ PROJECT_NAME           = "Open64 (mfef90, whirl2f, and IR tools)"
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = 1
+PROJECT_NUMBER         = "TAG: version-openad; SVN changeset: $(REPTAG) "
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
@@ -462,16 +462,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = $(OPEN64_BASE)/osprey1.0/include \
-                         $(OPEN64_BASE)/osprey1.0/common/com \
-                         $(OPEN64_BASE)/osprey1.0/common/com/ia64 \
-                         $(OPEN64_BASE)/osprey1.0/common/util \
-                         $(OPEN64_BASE)/osprey1.0/crayf90 \
-                         $(OPEN64_BASE)/osprey1.0/ir_tools \
-                         $(OPEN64_BASE)/osprey1.0/be/com \
-                         $(OPEN64_BASE)/osprey1.0/be/be \
-                         $(OPEN64_BASE)/osprey1.0/be/whirl2f \
-                         $(OPEN64_BASE)/osprey1.0/targ_ia32_ia64_linux/include
+INPUT                  = $(OPEN64_BASE)/osprey1.0
 
 # This tag can be used to specify the character encoding of the source files that 
 # doxygen parses. Internally doxygen uses the UTF-8 encoding, which is also the default 
@@ -493,7 +484,8 @@ FILE_PATTERNS          = *.cpp \
                          *.c \
                          *.cxx \
                          *.hxx \
-                         *.i
+                         *.i \
+			 *.m
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 
 # should be searched for input files as well. Possible values are YES and NO. 
