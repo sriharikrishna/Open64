@@ -116,6 +116,12 @@ static int	set_up_pe_offset_attr(void);
 static void	gen_bias_ref(opnd_type *);
 static void	linearize_pe_dims(int, int, int, int, opnd_type *);
 # endif
+#ifdef KEY /* Bug 934 */
+static boolean expr_sem_d(opnd_type *result_opnd, expr_arg_type *exp_desc,
+  boolean derived_assign);
+static boolean expr_semantics_d (opnd_type *result_opnd,
+  expr_arg_type *exp_desc, boolean derived_assign);
+#endif /* KEY Bug 934 */
 
 
 # if (defined(_HOST_OS_IRIX) || defined(_HOST_OS_LINUX))
@@ -290,8 +296,12 @@ void assignment_stmt_semantics (void)
       xref_state = CIF_Symbol_Reference;
       COPY_OPND(r_opnd, IR_OPND_R(ir_idx));
       exp_desc_r.rank = 0;
+#ifdef KEY /* Bug 934 */
+      ok &= expr_semantics_d(&r_opnd, &exp_desc_r,
+        (exp_desc_l.type == Structure));
+#else /* KEY Bug 934 */
       ok &= expr_semantics(&r_opnd, &exp_desc_r);
-      ok &= TRUE;
+#endif /* KEY Bug 934 */
       COPY_OPND(IR_OPND_R(ir_idx), r_opnd);
 
       if (! ok) {
@@ -1024,6 +1034,19 @@ static void lower_ptr_asg(expr_arg_type *exp_desc_r)
 
 boolean expr_semantics (opnd_type       *result_opnd,
                         expr_arg_type   *exp_desc)
+#ifdef KEY /* Bug 934 */
+{
+  return expr_semantics_d(result_opnd, exp_desc, FALSE);
+}
+
+/*
+ * Like expr_semantics(), but capable of passing along the knowledge that
+ * we're dealing with the RHS of an assignment of an entire derived type.
+ */
+static boolean expr_semantics_d (opnd_type     *result_opnd,
+                        expr_arg_type   *exp_desc,
+			boolean		derived_assign)
+#endif /* KEY Bug 934 */
 
 {
    boolean      	ok = TRUE;
@@ -1052,7 +1075,11 @@ boolean expr_semantics (opnd_type       *result_opnd,
    target_char_len_idx          = NULL_IDX;
    target_type_idx              = NULL_IDX;
 
+#ifdef KEY /* Bug 934 */
+   ok = expr_sem_d(result_opnd, exp_desc, derived_assign);
+#else /* KEY Bug 934 */
    ok = expr_sem(result_opnd, exp_desc);
+#endif /* KEY Bug 934 */
 
    check_type_conversion        = save_check_type_conversion;
    target_array_idx             = save_target_array_idx;
@@ -1210,6 +1237,19 @@ boolean expr_semantics (opnd_type       *result_opnd,
 
 boolean expr_sem (opnd_type       *result_opnd,
                   expr_arg_type   *exp_desc)
+#ifdef KEY /* Bug 934 */
+{
+  return expr_sem_d(result_opnd, exp_desc, FALSE);
+}
+
+/*
+ * Like expr_sem(), but capable of passing in the knowledge that we're dealing
+ * with the RHS of an assignment of an entire derived type.
+ */
+static boolean expr_sem_d(opnd_type      *result_opnd,
+                  expr_arg_type   *exp_desc,
+		  boolean	  derived_assign)
+#endif /* KEY Bug 934 */
 
 {
    int                 al_list_idx;
@@ -1240,6 +1280,9 @@ boolean expr_sem (opnd_type       *result_opnd,
 
    rank_in			= exp_desc->rank;
    (*exp_desc)			= init_exp_desc;
+#ifdef KEY /* Bug 934 */
+   exp_desc->derived_assign = derived_assign;
+#endif /* KEY Bug 934 */
    exp_desc->linear_type	= TYPELESS_DEFAULT_TYPE;
    exp_desc->type_idx		= TYPELESS_DEFAULT_TYPE;
 
@@ -1454,6 +1497,12 @@ boolean expr_sem (opnd_type       *result_opnd,
             exp_desc->linear_type = TYP_LINEAR(exp_desc->type_idx);
 
             if (ATD_PURE(attr_idx) && 
+#ifdef KEY /* Bug 934 */
+		/* This constraint only applies when assigning an entire
+		 * derived type. Note that it's one of the areas where
+		 * "allocatable" and "pointer" behave differently. */
+                exp_desc->derived_assign &&
+#endif /* KEY Bug 934 */
                 stmt_type == Assignment_Stmt &&
                 exp_desc->type == Structure &&
                 ATT_POINTER_CPNT(TYP_IDX(exp_desc->type_idx))) {
