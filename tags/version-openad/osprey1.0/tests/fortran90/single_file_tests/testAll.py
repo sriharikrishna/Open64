@@ -45,7 +45,7 @@ def fileCompare(fcfileName,fcmode,ignoreString):
 		sys.stdout.write("skipping change\n")
 	    else:
 		shutil.copy(fcfileName,referenceFile)
-    os.path.remove(fcFileName)            
+    os.remove(fcfileName)            
     sys.stdout.flush()
 
 
@@ -61,6 +61,11 @@ def printSep(sepChar,msg,sepLength):
 
 def populateExamplesList(args):
     import glob
+    cleanUpFiles = glob.glob("*.w2f.f")
+    cleanUpFiles = cleanUpFiles + glob.glob("*.B")
+    cleanUpFiles = cleanUpFiles + glob.glob("*.b2a")
+    for i in cleanUpFiles:
+        os.remove(i)
     allExamples = glob.glob("*.f")
     allExamples = allExamples + glob.glob("*.f90")
     allExamples.sort() 
@@ -216,7 +221,7 @@ def main():
 	if not (os.environ.has_key('F90FLAGS')):
             os.environ['F90FLAGS']=''
 
-        cmd=os.environ['F90C']+" "+os.environ['F90FLAGS']+" -c "+ "w2f__types.f90"
+        cmd=os.environ['F90C']+" "+os.environ['F90FLAGS']+" -c "+ "Extras/w2f__types.f90"
         if (os.system(cmd)):
             raise MakeError, "Error while executing \"" + cmd + "\""
 
