@@ -2070,7 +2070,17 @@ struct  expr_semantics_args    {basic_type_type		type		: 8;
 				boolean			optional_darg	: 1;
 				boolean			pe_dim_ref	: 1;
 				boolean			dist_reshape_ref: 1;
+#ifdef KEY /* Bug 934 */
+				/* Set to indicate that we are evaluating
+				 * the RHS of an assignment of an entire
+				 * derived type, so that we can enforce
+				 * the constraint on such assigments
+				 * within pure procedures */
+				boolean                 derived_assign  : 1;
+				Uint			UNUSED2		: 5;
+#else /* KEY Bug 934 */
 				Uint			UNUSED2		: 6;
+#endif /* KEY Bug 934 */
 
                                 Uint			rank   		: 32;
 

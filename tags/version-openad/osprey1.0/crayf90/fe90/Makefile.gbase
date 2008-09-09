@@ -245,6 +245,7 @@ endif
 
 CF90CATPATH = '"'$(PWD)/../sgi/cf90.cat'"'  # put it in targ dir
 CFLAGS += -DCF90CATPATHNAME=$(CF90CATPATH)
+CFLAGS += -DKEY
 
 #----------------------------------------------------------------------
 #  Define target
