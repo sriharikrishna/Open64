@@ -14,13 +14,12 @@ C
 C
 C     **** Parameters and Result ****
 C
-      REAL(w2f__8) X(1 :, 1 :)
-      REAL(w2f__8) Y(1 : 10)
+      INTEGER(w2f__i4) X(1 :, 1 :)
+      INTEGER(w2f__i4) Y(1 : 10)
 C
 C     **** Statements ****
 C
       Y(1 : 10) = RESHAPE(X, SHAPE(Y))
-      WRITE(*, *) 'OK'
       END SUBROUTINE
 
       PROGRAM main
@@ -29,12 +28,26 @@ C
 C
 C     **** Local Variables and Functions ****
 C
-      EXTERNAL head
-      REAL(w2f__8) X(1 : 2, 1 : 5)
-      REAL(w2f__8) Y(1 : 10)
+      INTEGER(w2f__i4) X(1 : 2, 1 : 5)
+      INTEGER(w2f__i4) Y(1 : 10)
 C
 C     **** Statements ****
 C
+      interface 
+        SUBROUTINE head(X, Y)
+        use w2f__types
+        INTEGER(w2f__i4) X(1 :, 1 :)
+        INTEGER(w2f__i4) Y(1 : 10)
+        END SUBROUTINE
+
+      end interface 
+      
+      X(2, 3) = 6
       CALL head(X, Y)
+      IF(Y(6) .eq. 6) THEN
+        WRITE(*, *) 'OK'
+      ELSE
+        WRITE(*, *) 'failed; yields', Y(6), ' expected 6'
+      ENDIF
       
       END PROGRAM
