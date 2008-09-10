@@ -14362,6 +14362,7 @@ void    shape_intrinsic(opnd_type     *result_opnd,
                  spec_idx,
                  FALSE);
 
+# if 0 
 
    res_exp_desc->type_idx = ATD_TYPE_IDX(ATP_RSLT_IDX(*spec_idx));
    res_exp_desc->type = TYP_TYPE(res_exp_desc->type_idx);
@@ -14603,11 +14604,16 @@ void    shape_intrinsic(opnd_type     *result_opnd,
       res_exp_desc->will_fold_later = FALSE;
    }
 
+# endif
+
    if (OPND_FLD((*result_opnd)) != IR_Tbl_Idx ||
        IR_OPR(OPND_IDX((*result_opnd))) != Call_Opr) {
 
       cast_opnd_to_type_idx(result_opnd, INTEGER_DEFAULT_TYPE);
    }
+
+    res_exp_desc->foldable = FALSE;  
+    res_exp_desc->will_fold_later = FALSE;
 
    TRACE (Func_Exit, "shape_intrinsic", NULL);
 
@@ -18498,6 +18504,11 @@ void    reshape_intrinsic(opnd_type     *result_opnd,
       res_exp_desc->rank = 0;
       fold_it = FALSE;
       optimize = FALSE;
+   }
+   else  if (OPND_FLD(arg_info_list[info_idx2].ed.shape[0]) == NO_Tbl_Idx) {
+     res_exp_desc->rank = 0;
+     fold_it = FALSE;
+     optimize = FALSE; 
    }
    else {
       res_exp_desc->rank =  (long)
