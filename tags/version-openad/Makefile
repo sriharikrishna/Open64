@@ -26,7 +26,7 @@ open64_tools_build:
 
 clean: 
 	cd $(OPEN64ROOT) && $(MAKE) clean 
-	cd osprey1.0/tests/fortran90/single_file_tests && $(MAKE) clean
+	cd osprey1.0/tests && $(MAKE) clean
 
 veryclean: clean
 	cd $(OPEN64ROOT) && $(MAKE) clobber 
