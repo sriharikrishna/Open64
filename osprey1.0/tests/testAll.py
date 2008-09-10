@@ -176,7 +176,7 @@ def runTest(exName,exNum,totalNum):
     cmd="./executable"
     output=os.popen(cmd).read().strip()
     if (output!="OK"):
-	raise MakeError, "Error (output is "+output+") while executing \"" + cmd + "\""
+	raise MakeError, "Error (output is: "+output+") while executing \"" + cmd + "\""
     # dump the B file:
     cmd=ir_b2a + " " + basename+".B > "+basename+".b2a"
     if (os.system(cmd)):

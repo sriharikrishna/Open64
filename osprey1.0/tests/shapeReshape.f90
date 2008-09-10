@@ -2,14 +2,25 @@ module bla
 end module
 
 subroutine head(x,y)
- double precision, dimension(:,:) :: x
- double precision, dimension(10) :: y
+ integer, dimension(:,:) :: x
+ integer, dimension(10) :: y
  y = reshape(x,shape(y))
- write(*,*) 'OK'
 end subroutine
 
 program main
- double precision, dimension(2,5) :: x
- double precision, dimension(10) :: y
+ interface 
+  subroutine head(x,y)
+   integer, dimension(:,:) :: x
+   integer, dimension(10) :: y
+  end subroutine
+ end interface
+ integer, dimension(2,5) :: x
+ integer, dimension(10) :: y
+ x(2,3)=6
  call head(x,y)
+ if (y(6) .eq. 6) then 
+    write(*,*) 'OK'
+ else
+    write(*,*) 'failed; yields', y(6), ' expected 6'
+ end if 
 end program
