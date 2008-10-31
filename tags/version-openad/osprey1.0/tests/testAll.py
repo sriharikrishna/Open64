@@ -185,8 +185,9 @@ def populateExamplesList(args):
     cleanUpFiles = cleanUpFiles + glob.glob("*.b2a")
     for i in cleanUpFiles:
         os.remove(i)
-    allExamples = glob.glob("*.f")
-    allExamples = allExamples + glob.glob("*.f90")
+    allExamples = glob.glob(os.path.join("TestSources","*.f"))
+    allExamples = allExamples + glob.glob(os.path.join("TestSources","*.f90"))
+    allExamples = [ os.path.split(e)[1] for e in allExamples]
     allExamples.sort() 
     rangeStart = 1
     rangeEnd = len(allExamples)
@@ -277,10 +278,14 @@ def runTest(exName,exNum,totalNum):
     if not haveRef :
         if globalIgnoreFailingCases : 
             printSep("*","** skipping %i of %i (%s) - no reference file" % (exNum,totalNum,exName),sepLength)
+            if (os.path.exists(os.path.join('Reference',exName+'.FAIL'))):
+                sys.stdout.write("   failure reason:")
+                sys.stdout.flush()
+                os.system("cat "+os.path.join('Reference',exName+'.FAIL'))
             return 0
         else: 
             printSep("*","** testing %i of %i (%s)" % (exNum,totalNum,exName),sepLength)
-	sys.stdout.write("No reference file available")
+	sys.stdout.write("   No reference file available")
 	if not (globalBatchMode):
             answer=""
             if globalAcceptAll:
@@ -295,7 +300,6 @@ def runTest(exName,exNum,totalNum):
                     if (answer != "y") :
                         answer="n"
             if (answer == "n"):
-		sys.stdout.write("\n")
                 sys.stdout.flush()
 		return 0
 	else:
@@ -305,6 +309,9 @@ def runTest(exName,exNum,totalNum):
                 return 0
     else:
         printSep("*","** testing %i of %i (%s)" % (exNum,totalNum,exName),sepLength)
+    cmd="ln -sf "+os.path.join("TestSources",exName) + " " + exName
+    if (os.system(cmd)):
+	raise MakeError, "Error while executing \"" + cmd + "\""
     # simple mfef90
     cmd=mfef90 + " " + exName
     if (os.system(cmd)):
