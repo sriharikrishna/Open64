@@ -12,6 +12,9 @@ globalIgnoreFailingCases=False
 globalOfferAcceptAsDefault=False
 globalAcceptAll=False
 globalVerbose=False
+globalUnstructured=False
+globalOkCount=0
+globalKnownFailCount=0
 
 class MultiColumnOutput:
 
@@ -311,27 +314,43 @@ def runTest(exName,exNum,totalNum):
                 sys.stdout.write("\n")
                 sys.stdout.flush()
                 return 0
+        global globalKnownFailCount
+        globalKnownFailCount+=1
+        global globalNewFailCount
+        globalNewFailCount-=1
     else:
         printSep("*","** testing %i of %i (%s)" % (exNum,totalNum,exName),sepLength)
     cmd="ln -sf "+os.path.join("TestSources",exName) + " " + exName
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     # simple mfef90
     cmd=mfef90 + " " + exName
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     cmd=whirl2f + " " + basename+".B > /dev/null 2>&1"
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     cmd=os.environ['F90C']+" "+os.environ['F90FLAGS']+" -o executable "+ basename+".w2f.f"
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     cmd="./executable"
+    if globalVerbose :
+        print cmd
     output=os.popen(cmd).read().strip()
     if (output!="OK"):
 	raise MakeError, "Error (output is: "+output+") while executing \"" + cmd + "\""
     # dump the B file:
     cmd=ir_b2a + " " + basename+".B > "+basename+".b2a"
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     # compare all the transformation results
@@ -340,27 +359,39 @@ def runTest(exName,exNum,totalNum):
 
     # with -z and -openad
     cmd=mfef90 + " -z " + exName
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     basename,ext=os.path.splitext(exName)
     cmd=whirl2f + " -openad " + basename+".B"
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     cmd=os.environ['F90C']+" "+os.environ['F90FLAGS']+" -o executable "+ basename+".w2f.f"
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     cmd="./executable"
+    if globalVerbose :
+        print cmd
     output=os.popen(cmd).read().strip()
     if (output!="OK"):
 	raise MakeError, "Error (output is "+output+") while executing \"" + cmd + "\""
     # dump the B file:
     cmd=ir_b2a + " " + basename+".B > "+basename+".b2a"
+    if globalVerbose :
+        print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
     # compare all the transformation results
     fileCompare(basename+".w2f.f","z_openad_","file translated from")
     fileCompare(basename+".b2a","z_openad_"," LOC 0 0 source files")
     printSep("*","",sepLength)
+    global globalOkCount
+    globalOkCount+=1
 
 
 def main():
@@ -397,6 +428,7 @@ def main():
                    help="turn compiler optimization on (default off)",
                    action='store_true',default=False)
     (options, args) = opt.parse_args()
+    newFailCount=0
     try:
         if os.environ.has_key('BATCHMODE') or options.batchMode :
             global globalBatchMode
@@ -434,6 +466,7 @@ def main():
 		runTest(examples[j],j+1,len(examples))
 	    except ConfigError, errMsg:
 		print "ERROR (environment configuration) in test %i of %i (%s): %s" % (j+1,len(examples),examples[j],errMsg)
+	        newFailCount+=1
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
@@ -441,6 +474,7 @@ def main():
 		    return -1
 	    except MakeError, errMsg:
 		print "ERROR in test %i of %i (%s) while executing \"%s\"." % (j+1,len(examples),examples[j],errMsg)
+	        newFailCount+=1
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
@@ -448,11 +482,13 @@ def main():
 		    return -1
 	    except ComparisonError, errMsg:
 		print "ERROR in test %i of %i (%s): %s." % (j+1,len(examples),examples[j],errMsg)
+	        newFailCount+=1
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
 	    except RuntimeError, errMsg:
 		print "ERROR in test %i of %i (%s): %s." % (j+1,len(examples),examples[j],errMsg)
+	        newFailCount+=1
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
@@ -468,7 +504,7 @@ def main():
     except RuntimeError, errMsg:
 	print 'caught exception: ',errMsg
 	return -1
-    print "ALL OK (or acknowledged)"
+    print "total: "+str(rangeEnd-rangeStart+1)+", ran  OK:"+str(globalOkCount)+", known errors:"+str(globalKnownFailCount)+", new errors:"+str(newFailCount)
     return 0
 
 if __name__ == "__main__":
