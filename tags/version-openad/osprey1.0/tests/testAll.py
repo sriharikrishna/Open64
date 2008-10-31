@@ -92,8 +92,8 @@ class MultiColumnOutput:
             thisRow+=1
         sys.stdout.flush()
 
-class NumericalError(Exception):
-    """Exception thrown when the numerical comparison discovers error that is beyond the given threshold"""
+class ComparisonError(Exception):
+    """Exception thrown when the output comparison sees differences"""
 
 class MakeError(Exception):
     """Exception thrown when the a make command fails"""
@@ -105,9 +105,9 @@ class ConfigError(Exception):
     """Exception thrown when there is a problem with the environment configuration"""
 
 def fileCompare(fcfileName,fcmode,ignoreString):
-    referenceFile = "Reference/"+fcmode + fcfileName
+    referenceFile = os.path.join("Reference",fcmode + fcfileName)
     if not (os.path.exists(referenceFile)):
-	sys.stdout.write(referenceFile +" not available")
+	sys.stdout.write("   "+referenceFile +" not available")
 	if not (globalBatchMode):
             answer=""
             if globalAcceptAll:
@@ -122,7 +122,7 @@ def fileCompare(fcfileName,fcmode,ignoreString):
                     if (answer != "y") :
                         answer="n"
             if (answer == "n"):
-		sys.stdout.write("cannot verify %s\n" % fcfileName)
+		sys.stdout.write("   cannot verify %s\n" % fcfileName)
                 sys.stdout.flush()
 		return 0
 	    else:
@@ -138,22 +138,22 @@ def fileCompare(fcfileName,fcmode,ignoreString):
     if (hasDiff == 512):
 	raise RuntimeError, "command "+cmd+" not successful"
     elif (hasDiff == 256):
-	sys.stdout.write("Transformation -- diff "+fcfileName+" "+referenceFile+"\n")
+	sys.stdout.write("   Transformation -- diff "+fcfileName+" "+referenceFile+"\n")
 	if not (globalBatchMode):
             answer=""
             if globalAcceptAll:
                 answer="y"
             else:    
                 if (globalOfferAcceptAsDefault) :
-                    answer = raw_input("accept/copy new %s to %s? (y)/n: " % (fcfileName,referenceFile))
+                    answer = raw_input("   accept/copy new %s to %s? (y)/n: " % (fcfileName,referenceFile))
                     if (answer != "n"):
                         answer="y"
                 else:
-                    answer = raw_input("accept/copy new %s to %s? y/(n): " % (fcfileName,referenceFile))
+                    answer = raw_input("   accept/copy new %s to %s? y/(n): " % (fcfileName,referenceFile))
                     if (answer != "y"):
                         answer="n"
             if (answer == "n"):
-		sys.stdout.write("skipping change\n")
+		sys.stdout.write("   skipping change\n")
 	    else:
 		shutil.copy(fcfileName,referenceFile)
     os.remove(fcfileName)            
@@ -285,7 +285,11 @@ def runTest(exName,exNum,totalNum):
             return 0
         else: 
             printSep("*","** testing %i of %i (%s)" % (exNum,totalNum,exName),sepLength)
-	sys.stdout.write("   No reference file available")
+        if (os.path.exists(os.path.join('Reference',exName+'.FAIL'))):
+                sys.stdout.write("   failure reason:")
+                sys.stdout.flush()
+                os.system("cat "+os.path.join('Reference',exName+'.FAIL'))
+	sys.stdout.write("   reference file: "+basename+'.w2f.f'+" unavailable")
 	if not (globalBatchMode):
             answer=""
             if globalAcceptAll:
@@ -428,41 +432,41 @@ def main():
 	while (j < rangeEnd):
 	    try:
 		runTest(examples[j],j+1,len(examples))
-	    except ConfigError, errtxt:
-		print "ERROR (environment configuration) in test %i of %i (%s): %s" % (j+1,len(examples),examples[j],errtxt)
+	    except ConfigError, errMsg:
+		print "ERROR (environment configuration) in test %i of %i (%s): %s" % (j+1,len(examples),examples[j],errMsg)
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
 		else:
 		    return -1
-	    except MakeError, errtxt:
-		print "ERROR in test %i of %i (%s) while executing \"%s\"." % (j+1,len(examples),examples[j],errtxt)
+	    except MakeError, errMsg:
+		print "ERROR in test %i of %i (%s) while executing \"%s\"." % (j+1,len(examples),examples[j],errMsg)
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
 		else:
 		    return -1
-	    except NumericalError:
-		print "NUMERICAL ERROR in test %i of %i (%s)." % (j+1,len(examples),examples[j])
+	    except ComparisonError, errMsg:
+		print "ERROR in test %i of %i (%s): %s." % (j+1,len(examples),examples[j],errMsg)
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
-	    except RuntimeError, errtxt:
-		print "ERROR in test %i of %i (%s): %s." % (j+1,len(examples),examples[j],errtxt)
+	    except RuntimeError, errMsg:
+		print "ERROR in test %i of %i (%s): %s." % (j+1,len(examples),examples[j],errMsg)
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
 		else:
 			return -1
 	    j = j + 1
-    except ConfigError, errtxt:
-	print "ERROR (environment configuration):",errtxt
+    except ConfigError, errMsg:
+	print "ERROR (environment configuration):",errMsg
 	return -1
-    except CommandLineError, errtxt:
-	print "ERROR (command line arguments):",errtxt
+    except CommandLineError, errMsg:
+	print "ERROR (command line arguments):",errMsg
 	return -1
-    except RuntimeError, errtxt:
-	print 'caught exception: ',errtxt
+    except RuntimeError, errMsg:
+	print 'caught exception: ',errMsg
 	return -1
     print "ALL OK (or acknowledged)"
     return 0
