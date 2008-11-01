@@ -278,6 +278,7 @@ def runTest(exName,exNum,totalNum):
     ir_b2a=os.path.join(os.environ['OPEN64ROOT'],'ir_tools','ir_b2a')
     sys.stdout.flush()
     basename,ext=os.path.splitext(exName)
+    failCountAdjusted=False
     haveRef=os.path.exists(os.path.join('Reference',basename+'.w2f.f'))
     if not haveRef :
         if globalIgnoreFailingCases : 
@@ -319,6 +320,7 @@ def runTest(exName,exNum,totalNum):
         globalKnownFailCount+=1
         global globalNewFailCount
         globalNewFailCount-=1
+        failCountAdjusted=True
     else:
         printSep("*","** testing %i of %i (%s)" % (exNum,totalNum,exName),sepLength)
     cmd="ln -sf "+os.path.join("TestSources",exName) + " " + exName
@@ -393,6 +395,10 @@ def runTest(exName,exNum,totalNum):
     printSep("*","",sepLength)
     global globalOkCount
     globalOkCount+=1
+    if failCountAdjusted:
+        globalKnownFailCount-=1
+        globalNewFailCount+=1
+        failCountAdjusted=True
 
 
 def main():
