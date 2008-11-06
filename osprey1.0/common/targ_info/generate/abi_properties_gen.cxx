@@ -43,12 +43,12 @@
 /////////////////////////////////////
 //
 
-#include <string.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <assert.h>
+#include <cstring>
+#include <cstddef>
+#include <cstdlib>
+#include <cstdarg>
+#include <cstdio>
+#include <cassert>
 
 #include <list>
 

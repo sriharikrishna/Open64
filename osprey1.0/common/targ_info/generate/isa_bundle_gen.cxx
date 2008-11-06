@@ -42,12 +42,12 @@
 /////////////////////////////////////
 
 #include <alloca.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <assert.h>
-#include <string.h>
+#include <cstddef>
+#include <cstdlib>
+#include <cstdarg>
+#include <cstdio>
+#include <cassert>
+#include <cstring>
 
 #include <vector>
 #include <list>

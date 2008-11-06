@@ -55,7 +55,7 @@
 /*REFERENCED*/
 #endif
 
-#include <limits.h>
+#include <climits>
 
 #include "whirl2f_common.h"
 #include "PUinfo.h"          /* In be/whirl2c directory */
