@@ -46,6 +46,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #include <vector>
 #include <list>

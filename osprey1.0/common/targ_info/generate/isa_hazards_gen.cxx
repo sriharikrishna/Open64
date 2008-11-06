@@ -48,7 +48,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <assert.h>
 
 #include <list>
