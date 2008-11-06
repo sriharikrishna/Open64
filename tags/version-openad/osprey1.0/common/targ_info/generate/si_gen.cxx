@@ -46,17 +46,17 @@
 
 
 
-#include <assert.h>
-#include <stdio.h>
+#include <cassert>
+#include <cstdio>
 #include <unistd.h>
-#include <limits.h>
-#include <stdarg.h>
+#include <climits>
+#include <cstdarg>
+#include <cstring>
+#include <cstdlib>
 
 #include <vector>
 #include <list>
 #include <map>
-#include <string.h>
-#include <stdlib.h>
 
 using namespace std;
 
