@@ -46,7 +46,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <assert.h>
-#include <strings.h>
+#include <string.h>
 #include <alloca.h>
 
 #include <vector>
