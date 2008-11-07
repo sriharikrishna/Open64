@@ -328,6 +328,18 @@ def runTest(exName,exNum,totalNum,compiler,optimizeFlag):
         print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
+    # run the test as is
+    cmd=compiler+" "+optimizeFlag+" "+os.environ['F90FLAGS']+" -o "+basename+".run "+ exName
+    if globalVerbose :
+        print cmd
+    if (os.system(cmd)):
+	raise MakeError, "Error while executing \"" + cmd + "\""
+    cmd="./"+basename+".run"
+    if globalVerbose :
+        print cmd
+    output=os.popen(cmd).read().strip()
+    if (output!="OK"):
+	raise MakeError, "Error (output is: "+output+") while executing \"" + cmd + "\""
     # simple mfef90
     cmd=mfef90 + " " + exName
     if globalVerbose :
@@ -339,12 +351,12 @@ def runTest(exName,exNum,totalNum,compiler,optimizeFlag):
         print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
-    cmd=compiler+" "+optimizeFlag+" "+os.environ['F90FLAGS']+" -o executable "+ basename+".w2f.f"
+    cmd=compiler+" "+optimizeFlag+" "+os.environ['F90FLAGS']+" -o "+basename+".w2f.run "+ basename+".w2f.f"
     if globalVerbose :
         print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
-    cmd="./executable"
+    cmd="./"+basename+".w2f.run"
     if globalVerbose :
         print cmd
     output=os.popen(cmd).read().strip()
@@ -372,12 +384,12 @@ def runTest(exName,exNum,totalNum,compiler,optimizeFlag):
         print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
-    cmd=compiler+" "+optimizeFlag+" "+os.environ['F90FLAGS']+" -o executable "+ basename+".w2f.f"
+    cmd=compiler+" "+optimizeFlag+" "+os.environ['F90FLAGS']+" -o "+basename+".w2f.run " + basename+".w2f.f"
     if globalVerbose :
         print cmd
     if (os.system(cmd)):
 	raise MakeError, "Error while executing \"" + cmd + "\""
-    cmd="./executable"
+    cmd="./"+basename+".w2f.run"
     if globalVerbose :
         print cmd
     output=os.popen(cmd).read().strip()
