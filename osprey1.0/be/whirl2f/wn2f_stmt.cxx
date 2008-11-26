@@ -2699,7 +2699,7 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
       * arguments ---FMZ
       */
 
-     if (strcmp(ST_name(WN_st(wn)),"SYSTEM_CLOCK") != 0 || TRUE) { //don't need it anymore FMZ
+     //     if (strcmp(ST_name(WN_st(wn)),"SYSTEM_CLOCK") != 0 || TRUE) { //don't need it anymore FMZ
        
        for (arg_idx = first_arg_idx, implicit_args = 0; 
             arg_idx <= last_arg_idx - implicit_args; 
@@ -2850,7 +2850,7 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
              }
          }
        }
-     } /*not system_clock*/
+       //     } /*not system_clock*/
 #if 0 
      else { /* here for system clock*/
        arg_idx = 0;  
@@ -2934,7 +2934,8 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
          
          WN2F_Stmt_Newline(tokens, NULL/*label*/, WN_Get_Linenum(wn), context);
        
-       if (strcmp(ST_name(WN_st(wn)),"_ALLOCATE") !=0 &&
+       if (WN_operator(wn)==OPR_ICALL || 
+	   strcmp(ST_name(WN_st(wn)),"_ALLOCATE") !=0 &&
            strcmp(ST_name(WN_st(wn)),"_END") !=0 &&
            (strcmp(ST_name(WN_st(wn)),"_DEALLOCATE") !=0 ))
          Prepend_Token_String(call_tokens, "CALL");
