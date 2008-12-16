@@ -137,11 +137,14 @@ def fileCompare(fcfileName,fcmode,ignoreString):
 	    sys.stdout.write("\n")
             sys.stdout.flush()
             return 0
-    cmd="diff -I '"+ignoreString+"' "+fcfileName+" "+referenceFile        
+    cmd="diff "
+    if (ignoreString != '') : 
+	cmd+="-I '"+ignoreString+"' "
+    cmd+=fcfileName+" "+referenceFile        
     hasDiff = os.system(cmd)
     if (hasDiff == 512):
 	raise RuntimeError, "command "+cmd+" not successful"
-    elif (hasDiff == 256):
+    elif (hasDiff != 0):
 	sys.stdout.write("   Transformation -- diff "+fcfileName+" "+referenceFile+"\n")
 	if not (globalBatchMode):
             answer=""
