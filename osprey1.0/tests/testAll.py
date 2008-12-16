@@ -16,6 +16,7 @@ globalUnstructured=False
 globalOkCount=0
 globalKnownFailCount=0
 globalNewFailCount=0
+globalDiffCmd='diff'
 
 class MultiColumnOutput:
 
@@ -141,10 +142,12 @@ def fileCompare(fcfileName,fcmode,ignoreString):
     if (ignoreString != '') : 
 	cmd+="-I '"+ignoreString+"' "
     cmd+=fcfileName+" "+referenceFile        
-    hasDiff = os.system(cmd)
+    hasDiff = os.system(cmd+" > /dev/null")
     if (hasDiff == 512):
 	raise RuntimeError, "command "+cmd+" not successful"
     elif (hasDiff != 0):
+	if not (globalBatchMode):
+            os.system(globalDiffCmd+" "+fcfileName+" "+referenceFile)
 	sys.stdout.write("   Transformation -- diff "+fcfileName+" "+referenceFile+"\n")
 	if not (globalBatchMode):
             answer=""
@@ -439,6 +442,8 @@ def main():
     opt.add_option('-b','--batchMode',dest='batchMode',
                    help="run in batchMode suppressing output",
                    action='store_true',default=False)
+    opt.add_option('-d','--diff',dest='diff',
+                   help="different diff command (e.g. kdiff3) to show differences in case the regular diff detects differences")
     opt.add_option('-v','--verbose',dest='verbose',
                    help="let the pipeline components produce some extra output",
                    action='store_true',default=False)
@@ -465,6 +470,9 @@ def main():
         if options.acceptAll :
             global globalAcceptAll
             globalAcceptAll=True
+        if options.diff :
+            global globalDiffCmd
+            globalDiffCmd=options.diff 
         if options.verbose :
             global globalVerbose
             globalVerbose=True
