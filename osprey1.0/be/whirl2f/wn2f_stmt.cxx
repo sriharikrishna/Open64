@@ -778,7 +778,8 @@ WN2F_Get_DoLoop_Bound(WN         *end_test,
    else if (comparison_opr == OPR_LE || 
 	    comparison_opr == OPR_GE ||
 	    comparison_opr == OPR_LT || 
-	    comparison_opr == OPR_GT)
+	    comparison_opr == OPR_GT ||
+	    comparison_opr == OPR_NE )
    {
       /* We only handle LE, GE, LT, and GT loop termination tests.
        * Find a path in end_test to an only LDID reference to the
