@@ -3638,10 +3638,30 @@ fei_doloop(INT32	line)
 
      /* Stride is an integer constant (+ve or -ve?)*/
 
-     if (WN_const_val(stride) > 0) 
-       op = OPR_LE;
-     else
-       op = OPR_GE;
+     if (WNOPR(stride) == OPR_INTCONST 
+	 || 
+	 WNOPR(stride) == OPR_CONST) { 
+       if ( WN_const_val(stride) > 0) 
+	 op = OPR_LE;
+       else 
+	 op = OPR_GE;
+     }
+     else { 
+       /* prior to this change we always 
+	  assumed if the stride is not constant > 0 
+	  then the operator should be GE but this 
+	  is obviously wrong if the stride is a variable which 
+	  could of course be either.  On unparsing 
+	  it didn't matter because this kind of do loop
+	  was unparsed to the fortran syntax ommitting 
+	  the comparison operator. 
+	  Now, with assuming NE it is 
+	  at least indicating an uncertain direction 
+	  even though it is not logically correct  in general either
+	  because nothing requires to hit the loop bound exactly.
+	  the stride is not equal +- 1. */
+       op = OPR_NE;
+     }
      
      end  = WN_CreateExp2(OPCODE_make_op(op,MTYPE_I4,Mtype_comparison(lcv_t)),
 			  WN_Ldid(lcv_t,0,lcv,ST_type(lcv)),
