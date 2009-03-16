@@ -2594,16 +2594,26 @@ WN2F_call(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
        
        if (strcmp(ST_name(WN_st(wn)),"ALLOCATED")== 0) {
 	 Append_Token_Special(call_tokens,'(');
-	 Append_Token_String(call_tokens,
-			     ST_name(WN_st(WN_kid0(WN_kid0(WN_kid0(wn))))));
 	 /* Get the array name,it shoud be CALL->PARM->ARRSECTION->LDA->st_name
 	  * Is there any other possible?
+	  * JU: we have e.g. CALL->PARM->LDID->st_name or a "value" selector injected
 	  */
+	 // get PARM
+	 WN* kidWN_p=WN_kid0(wn);
+         while(kidWN_p!=0) { 
+	   if WN_has_sym(kidWN_p) { 
+	     Append_Token_String(call_tokens,
+				 ST_name(WN_st(kidWN_p)));
+	     break; 
+	   }
+	   kidWN_p=WN_kid0(kidWN_p);
+	 }
+	 ASSERT_DBG_FATAL(kidWN_p!=0,
+			  (DIAG_W2F_UNEXPECTED_CONTEXT, "no name found for ALLOCATED parameter"));
 	 Append_Token_Special(call_tokens,')');
 	 Append_And_Reclaim_Token_List(tokens, &call_tokens);
 	 return EMPTY_WN2F_STATUS;
        }    
-       
        func_ty = ST_pu_type(WN_st(wn));
        last_arg_idx = WN_kid_count(wn) - 1;
      }
