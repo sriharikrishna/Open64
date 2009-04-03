@@ -64,6 +64,7 @@
 #include "ty2f.h"
 #include "tcon2f.h"
 #include "wn2f_pragma.h"
+#include "wn2f_stmt.h"
 
 extern BOOL    Run_w2fc_early;      /* Defined in be.so */
 extern WN_MAP *W2F_Construct_Map;   /* Defined in w2f_driver.c */
@@ -2122,6 +2123,10 @@ WN2F_pragma_list_begin(TOKEN_BUFFER tokens,
       if (WN_operator(next_pragma) == OPR_PRAGMA ||
 	  WN_operator(next_pragma) == OPR_XPRAGMA)
 	 WN2F_process_pragma(tokens, &next_pragma, context);
+      else if (WN_operator(next_pragma) == OPR_INTERFACE) { 
+	 WN2F_interface_blk(tokens,next_pragma, context); 
+         next_pragma = WN_next(next_pragma);
+      }
       else
 	 next_pragma = WN_next(next_pragma);
    }
