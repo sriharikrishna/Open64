@@ -1285,8 +1285,7 @@ TY2F_scalar(TOKEN_BUFFER decl_tokens, TY_IDX ty_idx)
    // Special override for OpenAD types
    if (W2F_OpenAD) {
      const char* tyname = TY_name(ty);
-     static const char* OpenADTyFlag = "OpenADTy";
-     if (tyname && strncmp(tyname, OpenADTyFlag, strlen(OpenADTyFlag)) == 0) {
+     if (tyname && strncasecmp(tyname, W2F_activeType, strlen(W2F_activeType)) == 0) {
        const char* str = Concat3_Strings("TYPE (", tyname, ")");
        Prepend_Token_String(decl_tokens, str);
        return;

@@ -79,7 +79,7 @@ Usage (char *progname)
 	   "USAGE: in EBNF notation, where '|' indicates choice and '['\n"
 	   "indicates an optional item:\n"
 	   "\n"
-	   "\t%s [-FLIST:<opts>] [-TARG:<t>] [-TENV:<e>] [-openad] <inp_files>\n"
+	   "\t%s [-FLIST:<opts>] [-TARG:<t>] [-TENV:<e>] [-openad] [-openadType <name>]  <inp_files>\n"
 	   "\n"
 	   "\t<inp_files> ::= [-fB,<Whirl_File_Name>] <File_Name>\n"
 	   "\t<opts> ::= <single_opt>[:<opts>]\n"
@@ -92,6 +92,8 @@ Usage (char *progname)
 	   "derived from the <File_Name>\n" 
 	   "-openad is to be used within the OpenAD tool pipeline, see \n"
 	   "        http://www.mcs.anl.gov/OpenAD .\n" 
+	   "-openadType <name> unparses a specially named active type <name>; default is \'oadactive\'\n"
+           "\t<name> cannot be longer than 26 characters; requires the -openad flag\n"
 	   "\n",
 	   progname);
    
