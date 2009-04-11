@@ -223,6 +223,8 @@ extern BOOL W2F_Emit_Pcf;        /* Emitting PCF spellings of pragmas */
 extern BOOL W2F_Emit_Omp;        /* Emitting OMP spellings of pragmas */
 
 extern BOOL W2F_OpenAD;          /* Special OpenAD mode */
+#define W2F_ACTIVE_TYPE_LEN 28
+extern char W2F_activeType[W2F_ACTIVE_TYPE_LEN];      /* active type for OpenAD */
 
 
                      /* Files */

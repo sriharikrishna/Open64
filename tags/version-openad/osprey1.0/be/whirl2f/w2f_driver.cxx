@@ -157,8 +157,8 @@ BOOL   W2F_Emit_Pcf = FALSE;        /* Force Pcf pragmas wherever possible */
 BOOL   W2F_Emit_Omp = FALSE;        /* Force OMP pragmas wherever possible */
 INT32  W2F_Line_Length = 0;         /* 'zero' means: use the default */
 
-BOOL   W2F_OpenAD;                 /* Special OpenAD mode */
-
+BOOL   W2F_OpenAD;                 /* Special OpenAD mode set by -openad */
+char W2F_activeType[W2F_ACTIVE_TYPE_LEN]; /* for -openadType <name> */
 
 /* External data set through the API or otherwise */
 BOOL    W2F_Only_Mark_Loads = FALSE; /* Only mark, do not translate loads */
@@ -188,24 +188,36 @@ Process_Command_Line (INT argc, char **argv)
   INT16 i;
   char *cp;
   
+  // we set the default here:
+  strncpy(W2F_activeType,"oadactive",W2F_ACTIVE_TYPE_LEN);
+
   /* Check the command line flags: */
   for ( i=0; i<argc; i++ ) {
      if ( argv[i] != NULL && *(argv[i]) == '-' ) {
         cp = argv[i]+1;	    /* Pointer to next flag character */
-	
-#if 0
-      /* First try to process as command-line option group */
-	if (Process_Command_Line_Group(cp, Cg_Option_Groups))
-	  continue;
-#endif
-      
+
 	switch ( *cp++ ) {
 	  
         case 'o':
 	  if ( strcmp( cp, "penad") == 0 ) {
 	    W2F_OpenAD = TRUE;
 	    Show_OPT_Warnings= FALSE;
-	  }
+          }
+          else if ( strcmp( cp, "penadType") == 0 ) { 
+	    if (i==argc) { 
+              fprintf(stderr,
+                      "error: the openadType option requires an argument");
+              exit(-1);
+            }	
+            i++;
+	    if (strlen(argv[i])>W2F_ACTIVE_TYPE_LEN) { 
+              fprintf(stderr,
+                      "error: the openadType argument is too long");
+              exit(-1);
+            }	
+            strncpy(W2F_activeType,argv[i],W2F_ACTIVE_TYPE_LEN);
+            Show_OPT_Warnings= FALSE;
+          }
 	  break;
 	}
      }

@@ -330,6 +330,17 @@ Process_Command_Line (INT argc, char **argv)
 		if (!strcmp( cp, "penad" )) {
 		  add_phase_args (PHASE_W2F, argv[i]);
 		}
+		else if (!strcmp( cp, "penadType" )) {
+		  add_phase_args (PHASE_W2F, argv[i]);
+		  if (i<argc)
+		    i++;
+		  else { 
+		    fprintf(stderr,
+			    "error: the openadType option requires an argument\n");
+		    exit(-1);
+		  }
+		  add_phase_args (PHASE_W2F, argv[i]);
+		}
 		else {
 		  ErrMsg ( EC_Unknown_Flag, *(cp-1), argv[i] );
 		}
