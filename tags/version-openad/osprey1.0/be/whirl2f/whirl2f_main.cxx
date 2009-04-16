@@ -90,7 +90,7 @@ Usage (char *progname)
 	   "denote either a (Fortran) source filename or a WHIRL file.\n"
 	   "In the abscense of a -fB option, the <Whirl_File_Name> will be\n"
 	   "derived from the <File_Name>\n" 
-	   "-openad is to be used within the OpenAD tool pipeline, see \n"
+	   "-openad required within the OpenAD tool, see \n"
 	   "        http://www.mcs.anl.gov/OpenAD .\n" 
 	   "-openadType <name> unparses a specially named active type <name>; default is \'oadactive\'\n"
            "\t<name> cannot be longer than 26 characters; requires the -openad flag\n"
