@@ -402,8 +402,8 @@ void	check_for_duplicate_renames(int		rename_idx)
                          RO_NAME_LEN(rename_idx),
                          RO_NAME_LONG(ro_idx),
                          RO_NAME_LEN(ro_idx)) == 0) && ro_idx != rename_idx) {
-         RO_DUPLICATE_RENAME(rename_idx)	= TRUE;
-         RO_DUPLICATE_RENAME(ro_idx)		= TRUE;
+	//         RO_DUPLICATE_RENAME(rename_idx)	= TRUE;
+	//         RO_DUPLICATE_RENAME(ro_idx)		= TRUE;
          break;
       }
    }
