@@ -491,7 +491,7 @@ static	void allocate_mod_link_tbl(int		size)
 \******************************************************************************/
 extern	void	create_mod_info_file(void)
 {
-   		int		 ga_idx;
+   		int		 ga_idx=0;
 		FILE		*fp_file_ptr;
    		int		 fp_idx			= NULL_IDX;
    		int		 idx;
@@ -4305,7 +4305,7 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
 {
    int		 attr_idx;
    int		 begin_idx;
-   int		 cif_symbol_id;
+   int		 cif_symbol_id=0;
    int		 end_idx;
    int		 func_idx;
    boolean	 has_renames		= FALSE;
@@ -4314,7 +4314,7 @@ static	boolean	rename_only_semantics(int	module_attr_idx,
    int		 length;
    int		 ln_idx;
    int		 match;
-   int		 name_idx;
+   int		 name_idx=0;
    int		 new_attr_idx;
    int		 new_name_idx;
    int		 np_idx;
@@ -5436,7 +5436,7 @@ static	boolean	srch_ar_file_for_module_tbl(int		 module_attr_idx,
    		int		idx;
    		boolean		in_middle_of_file;
    		long_type	member_start_offset;
-   		int		name_length;
+   		int		name_length=0;
    		long_type	name_tbl_offset;
    		int		num_recs_read;
    		long_type	offset;
@@ -6624,10 +6624,10 @@ static	boolean	read_sytb_from_module_file(int			module_attr_idx,
    boolean		 ok		= TRUE;
    old_const_tbl_type	*old_cn_tbl 	= NULL;
    old_ir_tbl_type	*old_ir_tbl 	= NULL;
-   int			 save_const_tbl_idx;
-   int			 save_ir_tbl_idx;
+   int			 save_const_tbl_idx=0;
+   int			 save_ir_tbl_idx=0;
    int			 size;
-   void			*tbl;
+   void			*tbl=0;
    tbl_type_type	 tbl_type;
    long			*to_idx;
 
@@ -8757,7 +8757,7 @@ static	void	merge_interfaces(int		new_interface_idx,
 				 int		old_interface_idx)
 
 {
-   int		end_sn_idx;
+   int		end_sn_idx=0;
    boolean	found_intrin	= FALSE;
    int		last_old_sn_idx;
    boolean	move_intrin	= FALSE;
