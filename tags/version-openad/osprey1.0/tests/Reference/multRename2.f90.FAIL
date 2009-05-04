@@ -1,0 +1,1 @@
+the front end claims:  "FOO" has been use associated from module "A1" and at least one more module.  It must not be referenced. This test works under gfortran and NAG f95 but not under ifort 11.0 
