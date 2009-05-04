@@ -1,0 +1,1 @@
+renames in different modules kept in one table in the front-end lead to erroneous error messages
