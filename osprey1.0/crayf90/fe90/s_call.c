@@ -1217,6 +1217,7 @@ if ((ATP_INTRIN_ENUM(spec_idx)!=Kind_Intrinsic) &&
     (ATP_INTRIN_ENUM(spec_idx)!=Amax1_Intrinsic) &&
     (ATP_INTRIN_ENUM(spec_idx)!=Dmax1_Intrinsic) &&
 # endif
+    (ATP_INTRIN_ENUM(spec_idx)!=Dble_Intrinsic) &&
     (ATP_INTRIN_ENUM(spec_idx)!=SIK_Intrinsic) &&
     (ATP_INTRIN_ENUM(spec_idx)!=SRK_Intrinsic)){
 
