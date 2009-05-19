@@ -76,13 +76,22 @@ void cleanUpPUInfo(PU_Info* aPUInfo_p) {
 	  // make sure the parent is set by now
 	  if (!aWNPtreeIterator.Get_parent_wn())
 	  Fatal_Error("cleanUpWhirl: no parent set");
-	  // replace the current node within the parent
-	  WN_kid(aWNPtreeIterator.Get_parent_wn(),aWNPtreeIterator.Get_kid_index()) = WN_COPY_Tree((*mapIter).second);
 	  skipKids=true;
-	  const char* tmpName = ST_name(tempST_p); 
-	  ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
-	  const char* puName = ST_name(puST_p);
-	  xDEBUG(DEB_CleanUpWhirl, printf("cleanUpWhirl: subsituted temporary %s in %s\n",tmpName, puName););
+	  // there was some very hackish logic implemented in whirl2f 
+	  // that sets an ST entry in all CASEGOTO nodes (even though they 
+	  // are not supposed to have symbols at all) that are  the children 
+	  // of a block following the LDID that is the first child of a 
+	  // SWITCH. If the switch condition is an expression we need to 
+	  // retain the temporary so here we inject the condtion that we will not 
+	  // to the replacement for an LDID directly under a SWITCH
+	  if (WN_operator(aWNPtreeIterator.Get_parent_wn())!=OPR_SWITCH) { 
+	    // replace the current node within the parent
+	    WN_kid(aWNPtreeIterator.Get_parent_wn(),aWNPtreeIterator.Get_kid_index()) = WN_COPY_Tree((*mapIter).second);
+	    const char* tmpName = ST_name(tempST_p); 
+	    ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
+	    const char* puName = ST_name(puST_p);
+	    xDEBUG(DEB_CleanUpWhirl, printf("cleanUpWhirl: subsituted temporary %s in %s\n",tmpName, puName););
+	  }
 	}
       }
     } 
