@@ -931,8 +931,8 @@ TY2F_Equivalence(TOKEN_BUFFER tokens,
    Append_Token_Special(tokens, '(');
    Append_Token_String(tokens, equiv_name); /* equiv_name at given offset */
    Append_Token_Special(tokens, '(');
-//   Append_Token_String(tokens, Number_as_String(fld_ofst+1, "%lld"));
-   Append_Token_String(tokens, Number_as_String(fld_ofst, "%lld"));
+   Append_Token_String(tokens, Number_as_String(fld_ofst+1, "%lld"));
+   // Append_Token_String(tokens, Number_as_String(fld_ofst, "%lld"));
    Append_Token_Special(tokens, ')');
    Append_Token_Special(tokens, ',');
    Append_Token_String(tokens, fld_name);   /* fld_name at offset zero */
@@ -1981,13 +1981,14 @@ TY2F_Translate_Equivalence(TOKEN_BUFFER tokens, TY_IDX ty_idx, BOOL alt_return)
       first_fld = TY_flist(ty);
    }
 
-   /* Emit specification statements for every element of the
-    * equivalence block.
-    */  
-   TY2F_Declare_Common_Flds(tokens, 
-			    first_fld,
-			    alt_return,
-			    &is_equiv);  /* Redundant in this call */
+
+//    /* Emit specification statements for every element of the
+//     * equivalence block.
+//     */  
+//    TY2F_Declare_Common_Flds(tokens, 
+// 			    first_fld,
+// 			    alt_return,
+// 			    &is_equiv);  /* Redundant in this call */
 
    if (!alt_return)
       TY2F_Equivalence_List(tokens, ty_idx /*struct_ty*/);
