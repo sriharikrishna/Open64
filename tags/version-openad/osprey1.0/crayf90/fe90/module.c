@@ -3901,6 +3901,7 @@ void	use_stmt_semantics(void)
    }
 
    while (module_list_idx != NULL_IDX) {
+      error_break=0;  
       module_attr_idx			= AL_ATTR_IDX(module_list_idx);
       only_update_new_tbl_entries	= TRUE;
 
