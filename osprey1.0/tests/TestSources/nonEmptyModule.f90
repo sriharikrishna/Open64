@@ -1,19 +1,19 @@
-module empty
+module NEM
  integer i
 end module
 
-module a
+module aNEM
 	integer ai,aj,ak
 end module
 
 subroutine foo()
-  use a 
+  use aNEM
   aj=ai
 end subroutine
 
-program multRename
-        use empty
-	use a , only :  ai,ak
+program p
+        use NEM
+	use aNEM , only :  ai,ak
 	integer aj
         aj=1
         ai=2

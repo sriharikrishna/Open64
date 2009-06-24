@@ -1,6 +1,6 @@
  LOC 0 0 source files:	1	"/m_home/m_utkej/Argonne/Dev/Current/OpenAD/Open64/osprey1.0/tests/nonEmptyModule.f90"
- LOC 1 1 module empty
-FUNC_ENTRY <1,20,empty_>
+ LOC 1 1 module NEM
+FUNC_ENTRY <1,20,nem_>
 BODY
  BLOCK
  END_BLOCK
@@ -12,8 +12,8 @@ BODY
  LOC 1 2  integer i
  LOC 1 3 end module
  LOC 1 4 
- LOC 1 5 module a
-FUNC_ENTRY <1,22,a_>
+ LOC 1 5 module aNEM
+FUNC_ENTRY <1,22,anem_>
 BODY
  BLOCK
  END_BLOCK
@@ -34,8 +34,8 @@ BODY
  END_BLOCK
  BLOCK
  PRAGMA 0 120 <null-st> 0 (0x0) # PREAMBLE_END
- LOC 1 10   use a 
- VUSE <1,22,a_>
+ LOC 1 10   use aNEM
+ VUSE <1,22,anem_>
  USE!!!!!
  LOC 1 11   aj=ai
   I4I4LDID 0 <1,23,AI> T<4,.predef_I4,4>
@@ -44,8 +44,8 @@ BODY
  RETURN
  END_BLOCK
  LOC 1 13 
- LOC 1 14 program multRename
-FUNC_ENTRY <1,27,multrename_>
+ LOC 1 14 program p
+FUNC_ENTRY <1,27,p_>
 BODY
  BLOCK
  END_BLOCK
@@ -53,11 +53,11 @@ BODY
  END_BLOCK
  BLOCK
  PRAGMA 0 120 <null-st> 0 (0x0) # PREAMBLE_END
- LOC 1 15         use empty
- VUSE <1,20,empty_>
+ LOC 1 15         use NEM
+ VUSE <1,20,nem_>
  USE!!!!!
- LOC 1 16 	use a , only :  ai,ak
- BUSE <1,22,a_>
+ LOC 1 16 	use aNEM , only :  ai,ak
+ BUSE <1,22,anem_>
  USE!!!!!
  LOC 1 17 	integer aj
  LOC 1 18         aj=1

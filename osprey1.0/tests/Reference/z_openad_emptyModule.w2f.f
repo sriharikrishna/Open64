@@ -1,18 +1,14 @@
 
-      MODULE nem
+      MODULE emp
       use w2f__types
       IMPLICIT NONE
       SAVE
-C
-C     **** Global Variables & Derived Type Definitions ****
-C
-      INTEGER(w2f__i4) I
 C
 C     **** Statements ****
 C
       END MODULE
 
-      MODULE anem
+      MODULE aemp
       use w2f__types
       IMPLICIT NONE
       SAVE
@@ -29,7 +25,7 @@ C
 
       SUBROUTINE foo()
       use w2f__types
-      use anem
+      use aemp
       IMPLICIT NONE
 C
 C     **** Statements ****
@@ -39,8 +35,8 @@ C
 
       PROGRAM p
       use w2f__types
-      use nem
-      use anem ,only: AI , AK
+      use emp
+      use aemp ,only: AI , AK
       IMPLICIT NONE
 C
 C     **** Local Variables and Functions ****

@@ -1,7 +1,3 @@
-module EMP
-
-end module
-
 module aEMP
 	integer ai,aj,ak
 end module
@@ -11,9 +7,13 @@ subroutine foo()
   aj=ai
 end subroutine
 
+module EMP
+
+end module
+
 program p
-        use EMP
 	use aEMP , only :  ai,ak
+        use EMP
 	integer aj
         aj=1
         ai=2

@@ -1,1 +1,0 @@
-parser starts to confuse the symbol table entries when encountering an empty module 
