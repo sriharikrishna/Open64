@@ -1,6 +1,6 @@
- LOC 0 0 source files:	1	"/m_home/m_utkej/Argonne/Dev/Current/OpenAD/Open64/osprey1.0/tests/nonEmptyModule.f90"
- LOC 1 1 module NEM
-FUNC_ENTRY <1,20,nem_>
+ LOC 0 0 source files:	1	"/m_home/m_utkej/Argonne/Dev/Current/OpenAD/Open64/osprey1.0/tests/emptyModuleReordered.f90"
+ LOC 1 1 module aEMP
+FUNC_ENTRY <1,20,aemp_>
 BODY
  BLOCK
  END_BLOCK
@@ -9,11 +9,11 @@ BODY
  BLOCK
  PRAGMA 0 120 <null-st> 0 (0x0) # PREAMBLE_END
  END_BLOCK
- LOC 1 2  integer i
+ LOC 1 2 	integer ai,aj,ak
  LOC 1 3 end module
  LOC 1 4 
- LOC 1 5 module aNEM
-FUNC_ENTRY <1,22,anem_>
+ LOC 1 5 subroutine foo()
+FUNC_ENTRY <1,24,foo_>
 BODY
  BLOCK
  END_BLOCK
@@ -21,31 +21,18 @@ BODY
  END_BLOCK
  BLOCK
  PRAGMA 0 120 <null-st> 0 (0x0) # PREAMBLE_END
- END_BLOCK
- LOC 1 6 	integer ai,aj,ak
- LOC 1 7 end module
- LOC 1 8 
- LOC 1 9 subroutine foo()
-FUNC_ENTRY <1,26,foo_>
-BODY
- BLOCK
- END_BLOCK
- BLOCK
- END_BLOCK
- BLOCK
- PRAGMA 0 120 <null-st> 0 (0x0) # PREAMBLE_END
- LOC 1 10   use aNEM
- VUSE <1,22,anem_>
+ LOC 1 6   use aEMP 
+ VUSE <1,20,aemp_>
  USE!!!!!
- LOC 1 11   aj=ai
-  I4I4LDID 0 <1,23,AI> T<4,.predef_I4,4>
- I4STID 0 <1,24,AJ> T<4,.predef_I4,4>
- LOC 1 12 end subroutine
+ LOC 1 7   aj=ai
+  I4I4LDID 0 <1,21,AI> T<4,.predef_I4,4>
+ I4STID 0 <1,22,AJ> T<4,.predef_I4,4>
+ LOC 1 8 end subroutine
  RETURN
  END_BLOCK
- LOC 1 13 
- LOC 1 14 program p
-FUNC_ENTRY <1,27,p_>
+ LOC 1 9 
+ LOC 1 10 module EMP
+FUNC_ENTRY <1,25,emp_>
 BODY
  BLOCK
  END_BLOCK
@@ -53,11 +40,24 @@ BODY
  END_BLOCK
  BLOCK
  PRAGMA 0 120 <null-st> 0 (0x0) # PREAMBLE_END
- LOC 1 15         use NEM
- VUSE <1,20,nem_>
+ END_BLOCK
+ LOC 1 11 
+ LOC 1 12 end module
+ LOC 1 13 
+ LOC 1 14 program p
+FUNC_ENTRY <1,26,p_>
+BODY
+ BLOCK
+ END_BLOCK
+ BLOCK
+ END_BLOCK
+ BLOCK
+ PRAGMA 0 120 <null-st> 0 (0x0) # PREAMBLE_END
+ LOC 1 15 	use aEMP , only :  ai,ak
+ BUSE <1,20,aemp_>
  USE!!!!!
- LOC 1 16 	use aNEM , only :  ai,ak
- BUSE <1,22,anem_>
+ LOC 1 16         use EMP
+ VUSE <1,25,emp_>
  USE!!!!!
  LOC 1 17 	integer aj
  LOC 1 18         aj=1
@@ -65,9 +65,9 @@ BODY
  I4STID 0 <2,1,AJ> T<4,.predef_I4,4>
  LOC 1 19         ai=2
   I4INTCONST 2 (0x2)
- I4STID 0 <1,23,AI> T<4,.predef_I4,4>
+ I4STID 0 <1,21,AI> T<4,.predef_I4,4>
  LOC 1 20         call foo()
- VCALL 2174 <1,26,foo_> # flags 0x87e
+ VCALL 2174 <1,24,foo_> # flags 0x87e
  LOC 1 21         if (aj ==1 ) then 
  IF
    I4I4LDID 0 <2,1,AJ> T<4,.predef_I4,4>
@@ -86,7 +86,7 @@ BODY
    IO_ITEM <70,END_EOR_EOF_FLAG>
     I4INTCONST 0 (0x0)
    IO_ITEM <76,ENCODE_DECODE_FLAG>
-    U8LDA 0 <1,30,"OK"> T<32,anon_ptr.,8>
+    U8LDA 0 <1,29,"OK"> T<32,anon_ptr.,8>
     I8INTCONST 140763258159104 (0x800600000000)
     U4INTCONST 2 (0x2)
    IO_ITEM <96,CHAR> T<31,.ch_str.,1>
@@ -108,7 +108,7 @@ BODY
    IO_ITEM <70,END_EOR_EOF_FLAG>
     I4INTCONST 0 (0x0)
    IO_ITEM <76,ENCODE_DECODE_FLAG>
-    U8LDA 0 <1,32,"FAILED"> T<35,anon_ptr.,8>
+    U8LDA 0 <1,31,"FAILED"> T<35,anon_ptr.,8>
     I8INTCONST 140763258159104 (0x800600000000)
     U4INTCONST 6 (0x6)
    IO_ITEM <96,CHAR> T<34,.ch_str.,1>
@@ -118,7 +118,7 @@ BODY
  END_IF
  LOC 1 25         end if
  LOC 1 26 end program
- VCALL 2174 <1,28,_END> # flags 0x87e
+ VCALL 2174 <1,27,_END> # flags 0x87e
  RETURN
  RETURN
  END_BLOCK

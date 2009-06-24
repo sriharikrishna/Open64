@@ -1,9 +1,9 @@
 C ***********************************************************
-C Fortran file translated from WHIRL Mon Jun 22 17:35:22 2009
+C Fortran file translated from WHIRL Tue Jun 23 12:35:19 2009
 C ***********************************************************
 C ***********************************************************
 
-      MODULE empty
+      MODULE nem
       use w2f__types
       IMPLICIT NONE
       SAVE
@@ -16,7 +16,7 @@ C     **** Statements ****
 C
       END MODULE
 
-      MODULE a
+      MODULE anem
       use w2f__types
       IMPLICIT NONE
       SAVE
@@ -33,7 +33,7 @@ C
 
       SUBROUTINE foo()
       use w2f__types
-      use a
+      use anem
       IMPLICIT NONE
 C
 C     **** Statements ****
@@ -42,10 +42,10 @@ C
       RETURN
       END SUBROUTINE
 
-      PROGRAM multrename
+      PROGRAM p
       use w2f__types
-      use empty
-      use a ,only: AI , AK
+      use nem
+      use anem ,only: AI , AK
       IMPLICIT NONE
 C
 C     **** Local Variables and Functions ****
