@@ -8,6 +8,8 @@ end module
 
 module a1
 	use a, only: s => longName
+	private :: foo
+	public :: a1Foo
 	interface a1Foo
 	module procedure foo
 	end interface
@@ -19,6 +21,8 @@ end module
 
 module b1
 	use b, only: s => longName
+	private :: foo
+	public :: b1Foo
         interface b1Foo
         module procedure foo
         end interface
