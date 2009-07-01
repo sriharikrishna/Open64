@@ -12,6 +12,10 @@ ifndef OPEN64ROOT
   $(error "Error: OPEN64ROOT not set!")
 endif 
 
+ifndef OPEN64TARG
+  $(error "Error: OPEN64TARG not set!")
+endif
+
 all: open64_fe_build open64_be_build open64_tools_build
 
 open64_fe_build: 
@@ -34,7 +38,7 @@ veryclean: clean
 ifndef INST_DIR
 INST_DIR=/opt/Open64
 endif
-INST_EXT=$(subst ${PWD},${INST_DIR},${OPEN64ROOT})
+INST_EXT=${INST_DIR}/osprey1.0/${OPEN64TARG}
 
 install: uninstall all
 	mkdir -p ${INST_EXT}/crayf90/sgi/
