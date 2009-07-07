@@ -53,6 +53,9 @@
 /*REFERENCED*/
 #endif
 
+#include <cctype>
+#include <algorithm>
+
 #include "alloca.h"
 #include "whirl2f_common.h"
 #include "w2cf_parentize.h"  /* For W2CF_Get_Parent */
@@ -71,6 +74,7 @@ extern WN_MAP *W2F_Construct_Map;   /* Defined in w2f_driver.c */
 extern BOOL    W2F_Prompf_Emission; /* Defined in w2f_driver.c */
 extern BOOL    W2F_Emit_Omp;        /* Emitting OMP spellings of pragmas */
 
+const std::string filePragma("file_start");
 
 extern void WN2F_Append_Purple_Funcinfo(TOKEN_BUFFER tokens);
                                                      /* from wn2f_stmt.c */
@@ -1071,7 +1075,7 @@ Append_Nest_Clauses(TOKEN_BUFFER tokens,
 } /* Append_Nest_Clauses */
 
 
-static void
+void
 Append_ST_String(TOKEN_BUFFER tokens, WN *pragma)
 {
   // Note: pragma should have symbol of CLASS_CONST and TCON of STR
@@ -1988,6 +1992,16 @@ WN2F_process_pragma(TOKEN_BUFFER tokens, WN **next, WN2F_CONTEXT context)
 
    /* eraxxon: OpenAD specific pragmas */
    case WN_PRAGMA_OPENAD_XXX: {
+     if (WN_has_sym(apragma)) { 
+       std::string pragmaName(Targ_Print(NULL, WN_val(apragma)));
+       std::transform(pragmaName.begin(),
+		      pragmaName.end(),
+		      pragmaName.begin(),
+		      static_cast < int(*)(int) > (tolower));
+       if (pragmaName.compare(1,filePragma.length(),filePragma)==0) { 
+	 break; 
+       }
+     }
       WN2F_Directive_Newline(tokens, "C$OPENAD XXX", WN_Get_Linenum(apragma));
       Append_Token_Special(tokens, ' ');
       Append_ST_String(tokens, apragma);

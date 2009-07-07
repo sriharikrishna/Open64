@@ -58,6 +58,8 @@
 /*REFERENCED*/
 #endif
 
+#include <iostream>
+
 #include <sys/elf_whirl.h>  /* for WHIRL_REVISION */
 #include <time.h>
 #include <errno.h>          /* For sys_errlist */
@@ -70,12 +72,14 @@
 #include "flags.h"          /* for OPTION_GROUP */
 #include "timing.h"         /* Start/Stop Timer */
 #include "wn_lower.h"       /* WN_lower() */
+#include "wn_tree_util.h" 
 
 #include "const.h"          /* For FOR_ALL_CONSTANTS */
 #include "PUinfo.h"
 #include "st2f.h"
 #include "wn2f.h"
 #include "wn2f_stmt.h"
+#include "wn2f_pragma.h"
 #include "unparse_target_ftn.h"
 
 #define DEB_Whirl2f_IR_TY_W2F_Outfile_Translate_Pu 0
@@ -1371,6 +1375,38 @@ W2F_Outfile_Translate_Pu(WN *pu)
        if (TY_kind(ty<<8)==KIND_STRUCT)
             Set_TY_is_translated_to_c(ty<<8);
        }
+
+  if (W2F_OpenAD) { 
+    // look ahead to find a file_start pragmas
+    // in this PU which would be located in the beginning  
+    // of the 3rd block under the FUNC_ENTRY 
+    WN_TREE_CONTAINER<PRE_ORDER> aWNPtree(pu);
+    WN_TREE_CONTAINER<PRE_ORDER>::iterator aWNPtreeIterator=aWNPtree.begin();
+    while (aWNPtreeIterator != aWNPtree.end()) { 
+      WN* curWN_p = aWNPtreeIterator.Wn();
+      OPERATOR opr = WN_operator(curWN_p);
+      if (opr==OPR_PRAGMA 
+	  && 
+	  WN_pragma(curWN_p)==WN_PRAGMA_OPENAD_XXX
+	  && 
+	  WN_has_sym(curWN_p)) { 
+	std::string pragmaName(Targ_Print(NULL, WN_val(curWN_p)));
+	std::transform(pragmaName.begin(),
+		       pragmaName.end(),
+		       pragmaName.begin(),
+		       static_cast < int(*)(int) > (tolower));
+	if (pragmaName.compare(1,filePragma.length(),filePragma)==0) { 
+	  // have a match
+	  // dump it
+	  Append_F77_Directive_Newline(tokens, "C$OPENAD XXX");
+	  Append_Token_Special(tokens, ' ');
+	  Append_ST_String(tokens, curWN_p);
+	  break;
+	}
+      }
+      ++aWNPtreeIterator;
+    }
+  }
 
    (void)WN2F_translate(tokens, pu, Global_Context);
    Write_And_Reclaim_Tokens(W2F_File[W2F_FTN_FILE], 

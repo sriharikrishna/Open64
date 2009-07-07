@@ -35,6 +35,9 @@
 
 #ifndef wn2f_pragma_INCLUDED
 #define wn2f_pragma_INCLUDED
+
+#include <string>
+
 /* ====================================================================
  * ====================================================================
  *
@@ -81,6 +84,10 @@ BOOL
 Ignore_Synchronized_Construct(WN          *construct_pragma,  
 			      WN2F_CONTEXT context);
 
+void
+Append_ST_String(TOKEN_BUFFER tokens, WN *pragma);
+
+extern const std::string filePragma;
 #endif /* wn2f_pragma_INCLUDED */
 
 
