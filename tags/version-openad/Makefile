@@ -55,7 +55,7 @@ install: uninstall all
 	cp -f ${OPEN64ROOT}/whirl2f/be.so ${INST_EXT}/whirl2f/
 	strip ${INST_EXT}/whirl2f/be.so
 	chmod a+r ${INST_EXT}/whirl2f/be.so
-	ln -sf ${INST_EXT}/whirl2f/be.so ${INST_EXT}/whirl2f/libbe.so
+	cd ${INST_EXT}/whirl2f && ln -sf be.so libbe.so
 
 uninstall:
 	@if [ -d ${INST_DIR} ]; then \
