@@ -1047,11 +1047,12 @@ ST2F_func_header(TOKEN_BUFFER tokens,
        Append_F77_Indented_Newline(header_tokens, 1/*empty-lines*/, NULL/*label*/);
        Append_Token_String(header_tokens, "use");
        Append_Token_String(header_tokens, st_name);
-       if ( WN_kid_count(stmt) ) { 
-	 if (WN_rtype(stmt) == MTYPE_B) // signals presence of the ONLY predicate
-	   Append_Token_String(header_tokens, ",only:");
-	 else
+       if (WN_rtype(stmt) == MTYPE_B) // signals presence of the ONLY predicate
+	 Append_Token_String(header_tokens, ",only:");
+       else { 
+	 if ( WN_kid_count(stmt) ) { 
 	   Append_Token_String(header_tokens, ",");
+	 }
        }
        
        for(k=0;k< WN_kid_count(stmt);k=k+2 ) {

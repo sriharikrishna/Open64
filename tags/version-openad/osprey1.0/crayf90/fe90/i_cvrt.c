@@ -9328,7 +9328,7 @@ CONTINUE:
        
        cvrt_exp_to_pdg(IR_IDX_L(ir_idx),
                         IR_FLD_L(ir_idx));
-       if (ATP_USE_TYPE(IR_IDX_L(ir_idx)) == Use_Only && rename_only_num)
+       if (ATP_USE_TYPE(IR_IDX_L(ir_idx)) == Use_Only)
            onlyPredicate = 1;
 
         fei_use(rename_only_num,onlyPredicate);
