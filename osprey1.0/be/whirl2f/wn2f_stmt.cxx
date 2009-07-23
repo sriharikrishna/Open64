@@ -3038,43 +3038,6 @@ WN2F_eval(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
 WN2F_STATUS
 WN2F_use_stmt(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
  {
-//   int k ;
-
-   const char *st_name =  W2CF_Symtab_Nameof_St(WN_st(wn));
-//   const char *st_name1;
-#if 0
-    ASSERT_DBG_FATAL(WN_operator(wn) == OPR_USE,
-                     (DIAG_W2F_UNEXPECTED_OPC, "WN2F_use_stmt"));
-
-     Append_F77_Indented_Newline(tokens, 1/*empty-lines*/, NULL/*label*/);
-     Append_Token_String(tokens, "use");
-     Append_Token_String(tokens, st_name);
-     if ( WN_kid_count(wn) ) { 
-       if (WN_rtype(wn) == MTYPE_B) // signals presence of the ONLY predicate
-         Append_Token_String(tokens, ",only:");
-       else
-         Append_Token_String(tokens, ",");
-     }
-
-     for(k=0;k< WN_kid_count(wn);k=k+2 ) { 
-       st_name = W2CF_Symtab_Nameof_St(WN_st(WN_kid(wn,k)));
-       st_name1= W2CF_Symtab_Nameof_St(WN_st(WN_kid(wn,k+1)));
-       if (k==0)
-	 ;
-       else
-	 Append_Token_String(tokens,","); 
-       if (strcmp(st_name,st_name1)) {
-	 Append_Token_String(tokens,st_name);
-	 Append_Token_String(tokens,"=>"); 
-	 Append_Token_String(tokens, st_name1);
-       }
-       else 
-	 Append_Token_String(tokens,st_name);
-     }
-     
-//     (void)WN2F_translate(tokens, WN_kid0(wn), context);
-# endif
-
      return EMPTY_WN2F_STATUS;
  } //WN2F_use_stmt
 //**********************************************
