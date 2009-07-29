@@ -1063,8 +1063,11 @@ WN2F_stid(TOKEN_BUFFER tokens, WN *wn, WN2F_CONTEXT context)
        && 
        ST_is_temp_var(WN_st(wn))
        && 
-       strncmp("select_expr_",ST_name(WN_st(wn)),12)!=0)
-      // emit assignments for values of select expressions.
+       (
+	strncmp("select_expr_",ST_name(WN_st(wn)),12)!=0
+	&& 
+	!ST_keep_in_openad(WN_st(wn))))
+      // emit assignments for symbols marked as to be kept and values of select expressions.
       // the hard coded name (see cwg_stmt.cxx:2271) 
       // is awful but not particularly worse than the other 
       // hacks done for select constructs
