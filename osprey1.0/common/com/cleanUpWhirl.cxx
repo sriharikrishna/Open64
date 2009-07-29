@@ -23,7 +23,7 @@
 // Therefore we currently do not remove any temporary assignments or 
 // the respective entries in the  symbol table. 
 void cleanUpPUInfo(PU_Info* aPUInfo_p) { 
-  typedef std::map<ST*,WN*> STPtoWNPmap;
+  typedef std::map<ST*,std::pair<WN*,int> > STPtoWNPmap;
   STPtoWNPmap tempMap; 
   bool skipKids=false;
   WN* thePU_WN_p = PU_Info_tree_ptr(aPUInfo_p);
@@ -37,20 +37,36 @@ void cleanUpPUInfo(PU_Info* aPUInfo_p) {
     if (opr==OPR_STID) {  // definitions
       if (ST_is_temp_var(WN_st(curWN_p))) {
 	ST* tempST_p=WN_st(curWN_p);
-	// is it not in the set? 
-	if (tempMap.find(tempST_p) == tempMap.end()) { //not found
+	// is it not in the set?
+	STPtoWNPmap::iterator mapIter=tempMap.find(tempST_p);
+	if (mapIter == tempMap.end()) { //not found
 	  // add it
-	  tempMap.insert(std::pair<ST*,WN*>(tempST_p,WN_kid0(curWN_p)));
+	  tempMap.insert(std::pair<ST*,std::pair<WN*,int> >(tempST_p, std::pair<WN*,int>(WN_kid0(curWN_p),1)));
 	  const char* tmpName = ST_name(tempST_p); 
 	  ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
 	  const char* puName = ST_name(puST_p);
 	  xDEBUG(DEB_CleanUpWhirl, printf("cleanUpWhirl: recorded temporary %s defined in %s\n",tmpName, puName););
 	}
-	else { // this should not happen since these are supposed to be single assignment
-	  const char* tmpName = ST_name(tempST_p); 
-	  ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
-	  const char* puName = ST_name(puST_p);
-	  DevWarn("cleanUpWhirl: recorded temporary %s is redefined in %s\n",tmpName, puName);
+	else { 
+	  // in many cases these are single assignment but in some cases 
+	  // there reassignments for instance when used in conjunction 
+	  // with PRESENT for optional parameters
+	  // where a different const value is assigned. 
+	  WN* defWN_p=(*mapIter).second.first;
+	  if (WN_operator(defWN_p)==OPR_INTCONST 
+	      && 
+	      WN_operator(WN_kid0(curWN_p))== OPR_INTCONST
+	      && WN_const_val(defWN_p)!=WN_const_val(WN_kid0(curWN_p))) {
+	    // assigning different values, i.e. can't replace
+	    Set_ST_keep_in_openad(tempST_p);
+	    ++((*mapIter).second.second);
+	  }
+	  else { 
+	    const char* tmpName = ST_name(tempST_p); 
+	    ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
+	    const char* puName = ST_name(puST_p);
+	    DevWarn("cleanUpWhirl: recorded temporary %s is redefined in %s\n",tmpName, puName);
+	  }
 	}
       }
     }
@@ -84,9 +100,10 @@ void cleanUpPUInfo(PU_Info* aPUInfo_p) {
 	  // SWITCH. If the switch condition is an expression we need to 
 	  // retain the temporary so here we inject the condtion that we will not 
 	  // to the replacement for an LDID directly under a SWITCH
-	  if (WN_operator(aWNPtreeIterator.Get_parent_wn())!=OPR_SWITCH) { 
+	  // and also not replace if we detected more than one definition
+	  if (WN_operator(aWNPtreeIterator.Get_parent_wn())!=OPR_SWITCH && (*mapIter).second.second==1) { 
 	    // replace the current node within the parent
-	    WN_kid(aWNPtreeIterator.Get_parent_wn(),aWNPtreeIterator.Get_kid_index()) = WN_COPY_Tree((*mapIter).second);
+	    WN_kid(aWNPtreeIterator.Get_parent_wn(),aWNPtreeIterator.Get_kid_index()) = WN_COPY_Tree((*mapIter).second.first);
 	    const char* tmpName = ST_name(tempST_p); 
 	    ST* puST_p = ST_ptr(PU_Info_proc_sym(aPUInfo_p));
 	    const char* puName = ST_name(puST_p);

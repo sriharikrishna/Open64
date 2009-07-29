@@ -469,6 +469,12 @@ Set_ST_is_parameter (ST* s)     { s->flags_ext |= ST_IS_PARAMETER; }
 inline void
 Clear_ST_is_parameter (ST* s)   { s->flags_ext &= ~ST_IS_PARAMETER; }
 
+inline BOOL
+ST_keep_in_openad(const ST* s)   { return s->flags_ext & ST_KEEP_IN_OPENAD;}
+inline void
+Set_ST_keep_in_openad(ST* s)     { s->flags_ext |= ST_KEEP_IN_OPENAD; }
+inline void
+Clear_ST_keep_in_openad(ST* s)   { s->flags_ext &= ~ST_KEEP_IN_OPENAD; }
 
 inline BOOL
 ST_is_temp_var (const ST* s)		{ return s->flags & ST_IS_TEMP_VAR;}

@@ -182,7 +182,8 @@ enum ST_EXT_FLAGS
     ST_INITV_IN_OTHER_ST       = 0x10000,  // ST is being used as an initianliation offset by other symbol
     ST_IS_INITIALIZED_IN_F90    =0x20000,
     ST_IS_DELETED 		=0x40000,
-    ST_IS_COARRAY_CONCURRENT    =0x80000
+    ST_IS_COARRAY_CONCURRENT    =0x80000,
+    ST_KEEP_IN_OPENAD           =0x100000
   
  }; // ST_EXT_FLAGS
 
