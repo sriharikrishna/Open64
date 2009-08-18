@@ -1,4 +1,4 @@
-This is subset of the sources released as the Open64 compiler
+This collection is a subset of the sources released as the Open64 compiler
 to the research community.
 The original SGI copyright statement found in most of the files is as follows:
 =========================================================================== 
@@ -34,7 +34,7 @@ The original SGI copyright statement found in most of the files is as follows:
 ===========================================================================
 
 Subsequently some of the sources have been modified/added at Rice University 
-and consequently the copyright may in some source files have been 
+and consequently the copyright in some source files has been 
 amended by the following statement: 
 ===========================================================================
   Copyright (C) 2003 Rice University. All rights reserved.
@@ -60,5 +60,14 @@ amended by the following statement:
 
 ===========================================================================
 
-Some files in the repository carry additional Copyrights beyond the ones 
-listed above
+The excpetions to above are the following files: 
+./osprey1.0/linux/mfef90_includes/xopen_lim.h : 
+	GPL v 2 or later Copyright (C) 1996, 1997 Free Software Foundation, Inc.
+
+./osprey1.0/include/alignof_replacement.h : 
+	BSD style license  Copyright (C) 2003 Martin Buchholz
+
+./osprey1.0/common/com/dwarf_DST.h
+./osprey1.0/common/com/dwarf_DST_producer.h
+./osprey1.0/common/com/dwarf_DST_producer.cxx:
+	the original SGI GPL extended to 2004 by PathScale, Inc. 
