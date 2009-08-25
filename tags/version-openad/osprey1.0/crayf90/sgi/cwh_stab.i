@@ -686,7 +686,7 @@ static const INTRIN_NAME Iname_Map[] =
 {"_THIS_IMAGE3","THIS_IMAGE"},
 {"shmem_n_pes","NUM_IMAGES"},
 {"_TIME","TIME"},
-{"_TRANS","TRANS"},
+{"_TRANS","TRANSPOSE"},
 {"_TRANSFER","TRANSFER"},
 {"_TRIM","TRIM"},
 {"_UBOUND","UBOUND"},
