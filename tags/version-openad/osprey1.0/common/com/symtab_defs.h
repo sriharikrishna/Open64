@@ -390,7 +390,10 @@ enum LABEL_KIND
     LKIND_BEGIN_HANDLER		= 4,
     LKIND_END_HANDLER		= 5,
     LKIND_TAG			= 6,	// symbolic address, never branched to
-    LKIND_COUNT			= 7	// total number of kinds
+    LKIND_INTERNAL              = 7,    // internally generated
+    LKIND_LOOP_GEN              = 8,    // generated for loop control flow
+    LKIND_SELECT_GEN            = 9,    // generated for SELECT statements
+    LKIND_COUNT			= 10	// total number of kinds
 };
 
 enum LABEL_FLAGS

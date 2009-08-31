@@ -5343,7 +5343,7 @@ BACK:
    if (attr_idx == NULL_IDX) {
       attr_idx                  = ntr_sym_tbl(&lbl_token, name_idx);
       AT_OBJ_CLASS(attr_idx)    = Label;
-      ATL_CLASS(attr_idx)       = Lbl_Internal;
+      ATL_CLASS(attr_idx)       = Lbl_LoopInternal;
       ATL_EXECUTABLE(attr_idx)  = TRUE;
 
       if (lbl_pos == Top_Lbl  && 

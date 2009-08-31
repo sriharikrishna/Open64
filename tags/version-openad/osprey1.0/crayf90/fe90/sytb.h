@@ -58,7 +58,8 @@ enum	atd_class_values	{Atd_Unknown,		Variable,
 
 enum	atl_class_values	{Lbl_Unknown,		Lbl_User,
 				 Lbl_Format,		Lbl_Internal,
-				 Lbl_Debug,		Lbl_Construct };
+				 Lbl_Debug,		Lbl_Construct,
+                                 Lbl_LoopInternal };
 
 /*      This is set up to match the Interface calls */
 

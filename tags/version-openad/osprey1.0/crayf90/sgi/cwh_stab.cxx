@@ -1887,9 +1887,13 @@ fei_label(char       *name_string,
     break ;
     
   case PDGCS_Lbl_Internal:
+  case PDGCS_Lbl_LoopInternal:
     {
       LABEL& int_lbl = New_LABEL (CURRENT_SYMTAB, l_idx);
-      LABEL_Init(int_lbl, 0, LKIND_DEFAULT);
+      if ((LABEL_SYM)Class==PDGCS_Lbl_LoopInternal)
+	LABEL_Init(int_lbl, 0, LKIND_LOOP_GEN);
+      else
+	LABEL_Init(int_lbl, 0, LKIND_INTERNAL);
     }
     break ;
     

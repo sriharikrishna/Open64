@@ -637,7 +637,8 @@ typedef enum {
         PDGCS_Lbl_Format,
         PDGCS_Lbl_Internal,
         PDGCS_Lbl_Debug,
-        PDGCS_Lbl_Cstrct } LABEL_SYM;
+        PDGCS_Lbl_Cstrct,
+        PDGCS_Lbl_LoopInternal } LABEL_SYM;
 
 typedef enum {
 	Seg_Unknown,
