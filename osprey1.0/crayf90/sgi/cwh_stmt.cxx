@@ -2096,7 +2096,7 @@ cwh_stmt_select_case_char(INT32 low_value_pres,
   cwh_expr_str_operand(expr);
   default_label = cwh_expr_operand(NULL);
   remaining_cases = WN_const_val(cwh_expr_operand(NULL));
-  (void) New_LABEL (CURRENT_SYMTAB, new_label_num);
+  Set_LABEL_KIND(New_LABEL (CURRENT_SYMTAB, new_label_num), LKIND_SELECT_GEN);
   
   if (remaining_cases > 0) {
     copy[0] = WN_COPY_Tree(W_wn(expr[0]));
@@ -2280,6 +2280,10 @@ fei_new_select(INT32 num_cases,
        lb = cast_to_LB(default_label_idx);
        last_lb = cast_to_LB(last_label_idx);
        default_label = WN_CreateGoto (lb);
+       if (Label_Table[lb].kind==LKIND_INTERNAL)
+	 Label_Table[lb].kind=LKIND_SELECT_GEN;
+       if (Label_Table[last_lb].kind==LKIND_INTERNAL)
+	 Label_Table[last_lb].kind=LKIND_SELECT_GEN;
        wn = WN_CreateSwitch (num_cases, expr, cwh_block_current(), 
 			     default_label, last_lb);
    
@@ -2384,7 +2388,7 @@ fei_new_select_case(INT64 low_value_pres,
      if (low_value_pres ||  high_value_pres) {      /* if not empty or default case */
 
        ty = Be_Type_Tbl(WN_rtype(expr));
-       (void) New_LABEL (CURRENT_SYMTAB, new_label_num);
+       Set_LABEL_KIND(New_LABEL (CURRENT_SYMTAB, new_label_num), LKIND_SELECT_GEN);
 
        if (low_value_pres && high_value_pres) {
 
@@ -2431,6 +2435,8 @@ fei_new_select_case(INT64 low_value_pres,
 
      }
      wn = WN_CreateCasegoto(WN_const_val(o_val),label);
+     if (Label_Table[label].kind==LKIND_INTERNAL)
+       Label_Table[label].kind=LKIND_SELECT_GEN;
 
      cwh_block_append_given_block(wn,casegoto_block);
 
