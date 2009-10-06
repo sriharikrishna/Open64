@@ -56,6 +56,9 @@ install: uninstall all
 	strip ${INST_EXT}/whirl2f/be.so
 	chmod a+r ${INST_EXT}/whirl2f/be.so
 	cd ${INST_EXT}/whirl2f && ln -sf be.so libbe.so
+	cp -f ${OPEN64ROOT}/whirl2f/whirl2f.so ${INST_EXT}/whirl2f/
+	strip ${INST_EXT}/whirl2f/whirl2f.so
+	chmod a+r ${INST_EXT}/whirl2f/whirl2f.so
 
 uninstall:
 	@if [ -d ${INST_DIR} ]; then \
