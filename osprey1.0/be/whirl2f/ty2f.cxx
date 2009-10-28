@@ -1223,7 +1223,8 @@ static void
 TY2F_List_Common_Flds(TOKEN_BUFFER tokens, FLD_HANDLE fldlist)
 {
   FLD_ITER fld_iter = Make_fld_iter(fldlist);
-
+  
+  bool needComma=false, gotComma=false; // problem is we need to jump over fields flagged "equivalenced"
   do
     {
       FLD_HANDLE fld (fld_iter);
@@ -1241,14 +1242,18 @@ TY2F_List_Common_Flds(TOKEN_BUFFER tokens, FLD_HANDLE fldlist)
 			    TY2F_Fld_Name(fld_iter,
 					  TRUE/*common*/, 
 					  FALSE/*alt_ret_name*/));
+	needComma=true;
       }
       
       if (!FLD_last_field(fld)) 
       {
 	FLD_ITER  next_iter = fld_iter ;
 	FLD_HANDLE next (++next_iter);
-        if (!FLD_equivalence(next))
+        if (!FLD_equivalence(next) && needComma && !gotComma) { 
 	  Append_Token_Special(tokens, ',');
+	  needComma=false;
+	  gotComma=true;
+	}
       }
 
     } while (!FLD_last_field (fld_iter++)) ;
