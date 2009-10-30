@@ -61,6 +61,8 @@
 /*REFERENCED*/
 #endif
 
+#include <iostream>
+
 #include <alloca.h>
 #include "whirl2f_common.h"
 #include "const.h"           /* For FOR_ALL_CONSTANTS */
@@ -1252,6 +1254,9 @@ public:
 
 
      char *stname = ST_name(st);
+
+//      std::cout << "JU: dealing with " << stname << std::endl; 
+
      BOOL variabledefinemodule = !strcmp(stbasename,scope_name);
 
        nomodulevar = !ST_is_in_module(st)||strcmp(stbasename,scope_name);
@@ -1289,16 +1294,38 @@ public:
             Set_TY_is_translated_to_c(ST_type(st)); 
         return;
       }
+     
+//      std::cout << "JU: decide:" 
+// 	       << "\n\tBE_ST_w2fc_referenced(st)=" << BE_ST_w2fc_referenced(st)
+// 	       << "\n\tST_is_in_module(st)=" << ST_is_in_module(st)
+// 	       << "\n\tnomodulevar=" << nomodulevar
+// 	       << "\n\tstrcmp(ST_name(st)="<< ST_name(st) << ",stbasename=" << stbasename << ")=" << strcmp(ST_name(st),stbasename) << std::endl; 
+     if (!BE_ST_w2fc_referenced(st) 
+	 &&
+	 !(BE_ST_w2fc_referenced(stbase) 
+	   &&
+	   ST_is_equivalenced(st)
+	   && 
+	   ST_is_temp_var(stbase))
+	 && 
+	 !ST_has_nested_ref(st)
+	 && 
+	 !ST_is_in_module(st)   
+	 && 
+	 ST_sclass(st)!= SCLASS_DGLOBAL
+	 && 
+	 ST_sclass(st)!= SCLASS_PSTATIC
+	 &&
+	 (nomodulevar 
+	  || 
+	  !strcmp(ST_name(st),stbasename))
+	 && 
+	 ST_sclass(st) != SCLASS_EXTERN ) { 
+//        std::cout << "JU: return" << std::endl;  
+       return ;
+     }
 
-     if (!BE_ST_w2fc_referenced(st) && !ST_has_nested_ref(st)
-            && !ST_is_in_module(st)   
-            && ST_sclass(st)!= SCLASS_DGLOBAL
-            && ST_sclass(st)!= SCLASS_PSTATIC
-            &&(nomodulevar 
-                || !strcmp(ST_name(st),stbasename))
-            && ST_sclass(st) != SCLASS_EXTERN )
-	  return ;
-
+//      std::cout << "JU: keepgoing" << std::endl;  
 
      if (ST_sclass(st) == SCLASS_EXTERN &&
          symtab ==  GLOBAL_SYMTAB)
