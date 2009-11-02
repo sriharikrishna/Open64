@@ -47,6 +47,7 @@
  * ====================================================================
  * ====================================================================
  */
+#include <iostream>
 #include "whirl2f_common.h"
 #include "PUinfo.h"
 #include "wn2f.h"
@@ -222,7 +223,7 @@ TY2F_Append_Array_Bnd_Ph(TOKEN_BUFFER decl_tokens,
 			 BOOL         purple_assumed_size)
 {
    char ptr_string[128];
-   char * p = "%s";
+   const char * p = "%s";
    WN  * wn;
 
    if (purple_assumed_size)
@@ -921,8 +922,7 @@ static TOKEN_BUFFER TY2F_Structure_Decls = NULL;
 static void
 TY2F_Equivalence(TOKEN_BUFFER tokens, 
 		 const char  *equiv_name, 
-		 const char  *fld_name,
-		 STAB_OFFSET  fld_ofst)
+		 const char  *fld_name)
 {
    /* Append one equivalence statement to the tokens buffer,
     * keeping in mind that the equiv_name is based at index 1.
@@ -930,51 +930,64 @@ TY2F_Equivalence(TOKEN_BUFFER tokens,
    Append_Token_String(tokens, "EQUIVALENCE");
    Append_Token_Special(tokens, '(');
    Append_Token_String(tokens, equiv_name); /* equiv_name at given offset */
-   Append_Token_Special(tokens, '(');
-   Append_Token_String(tokens, Number_as_String(fld_ofst+1, "%lld"));
-   // Append_Token_String(tokens, Number_as_String(fld_ofst, "%lld"));
-   Append_Token_Special(tokens, ')');
    Append_Token_Special(tokens, ',');
    Append_Token_String(tokens, fld_name);   /* fld_name at offset zero */
    Append_Token_Special(tokens, ')');
 } /* TY2F_Equivalence */
 
 
+const char* findEquivFldNm(TY_IDX struct_ty,
+			   mUINT64 ofst,
+			   FLD_HANDLE*& equivFld){ 
+  FLD_ITER fld_iter = Make_fld_iter(TY_fld(struct_ty));
+  do {
+    FLD_HANDLE fld(fld_iter);
+    UINT64 fldOfst = FLD_ofst(fld);
+//     std::cout << "JU: looking at " << FLD_name(fld) << ":" << FLD_ofst(fld) << std::endl; 
+    if (ofst == fldOfst) { // need to match the offset 
+      if (FLD_st(fld)) {  // common block elemens being referenced in an equivalence have a FLD_st
+	equivFld=&fld;
+	return ST_name(ST_ptr(FLD_st(fld)));
+      }
+      if (FLD_last_field(fld)) { // for local variables there is always one last one
+	equivFld=&fld;
+	return FLD_name(fld);
+      }
+    }
+  } while (!FLD_last_field(fld_iter++));
+  ASSERT_FATAL(false, 
+	       (DIAG_W2F_UNEXPECTED_CONTEXT, 
+		"findEquivFldNm"));
+} 
+
 static void
 TY2F_Equivalence_FldList(TOKEN_BUFFER tokens, 
+			 TY_IDX       struct_ty,
                          FLD_HANDLE   fldlist,
-                         UINT         equiv_var_idx,
-                         mUINT64      ofst,
-                         BOOL        *common_block_equivalenced)
-{
+//                          UINT         equiv_var_idx,
+                         mUINT64      ofst) {
   FLD_ITER fld_iter = Make_fld_iter(fldlist);
-
-  do 
-    {
-      FLD_HANDLE fld (fld_iter);
-
-      if (TY_split(Ty_Table[FLD_type(fld)]))
-	{
-	  TY2F_Equivalence_FldList(tokens, 
-				   TY_flist(Ty_Table[FLD_type(fld)]),
-				   equiv_var_idx,
-				   ofst + FLD_ofst(fld),
-				   common_block_equivalenced);
-	}
-      else if (FLD_equivalence(fld) || !*common_block_equivalenced)
-	{
-	  Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
-	  TY2F_Equivalence(tokens,
-			   W2CF_Symtab_Nameof_Tempvar(equiv_var_idx),
-			   TY2F_Fld_Name(fld_iter, TRUE/*equiv*/, FALSE/*alt_ret*/),
-			   ofst + FLD_ofst(fld));
-	  if (!FLD_equivalence(fld))
-	    *common_block_equivalenced = TRUE;
-	}
-
+  do {
+    FLD_HANDLE fld (fld_iter);
+    if (TY_split(Ty_Table[FLD_type(fld)])) {
+      TY2F_Equivalence_FldList(tokens, 
+			       struct_ty,
+			       TY_flist(Ty_Table[FLD_type(fld)]),
+// 			       equiv_var_idx,
+			       ofst + FLD_ofst(fld));
     }
-  while (!FLD_last_field (fld_iter++)) ;
-
+    else if (FLD_equivalence(fld) ) {
+      Append_F77_Indented_Newline(tokens, 1, NULL/*label*/);
+//       std::cout << "JU: searching for " << FLD_name(fld) << ":" << FLD_ofst(fld) << std::endl; 
+      FLD_HANDLE *equivFld_p(NULL);
+      const char* equivVarNm=findEquivFldNm(struct_ty,FLD_ofst(fld),equivFld_p);
+      if (*equivFld_p==fld) // search came up with the same field, skip this
+	continue; 
+      TY2F_Equivalence(tokens,
+		       equivVarNm,
+		       TY2F_Fld_Name(fld_iter, TRUE/*equiv*/, FALSE/*alt_ret*/));
+    }
+  } while (!FLD_last_field (fld_iter++)) ;
 } /* TY2F_Equivalence_FldList */
 
 
@@ -996,25 +1009,23 @@ TY2F_Equivalence_List(TOKEN_BUFFER tokens,
     */
    TY_IDX     equiv_ty;
    UINT       equiv_var_idx;
-   BOOL       common_block_equivalenced = FALSE;
 
-   /* Declare an INTEGER*1 array (or CHARACTER string?) variable
-    * to represent the whole equivalenced structure. Don't unlock
-    * the tmpvar, or a similar equivalence group (ie: TY) will 
-    * get the same temp.
-    */
+//    /* Declare an INTEGER*1 array (or CHARACTER string?) variable
+//     * to represent the whole equivalenced structure. Don't unlock
+//     * the tmpvar, or a similar equivalence group (ie: TY) will 
+//     * get the same temp.
+//     */
 
-   equiv_ty = Stab_Array_Of(Stab_Mtype_To_Ty(MTYPE_I1), TY_size(struct_ty));
-   equiv_var_idx = Stab_Lock_Tmpvar(equiv_ty, &ST2F_Declare_Tempvar);
+//    equiv_ty = Stab_Array_Of(Stab_Mtype_To_Ty(MTYPE_I1), TY_size(struct_ty));
+//    equiv_var_idx = Stab_Lock_Tmpvar(equiv_ty, &ST2F_Declare_Tempvar);
 
    /* Relate every equivalence field to the temporary variable.
     */
    TY2F_Equivalence_FldList(tokens, 
+			    struct_ty, 
                             TY_flist(Ty_Table[struct_ty]),
-                            equiv_var_idx,
-                            0, /* Initial offset */
-                            &common_block_equivalenced);
-
+//                             equiv_var_idx,
+                            0 /* Initial offset */ );
 } /* TY2F_Equivalence_List */
 
 static void
