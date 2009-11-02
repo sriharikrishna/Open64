@@ -6,16 +6,16 @@ C
 C     **** Local Variables and Functions ****
 C
       
-      EQUIVALENCE(tmp0(1), A)
-      EQUIVALENCE(tmp0(1), B)
+      EQUIVALENCE(B, A)
+      
       REAL(w2f__4) A
       SAVE A
       REAL(w2f__4) B
       SAVE B
       
-      EQUIVALENCE(tmp1(1), GJC)
-      EQUIVALENCE(tmp1(1), GJP)
-      EQUIVALENCE(tmp1(1), GJW)
+      EQUIVALENCE(GJW, GJC)
+      EQUIVALENCE(GJW, GJP)
+      
       REAL(w2f__4) GJC(1 : 36)
       SAVE GJC
       REAL(w2f__4) GJP(1 : 6, 1 : 6)
@@ -25,14 +25,12 @@ C
 C
 C     **** Temporary Variables ****
 C
-      INTEGER(w2f__i1) tmp0(1 : 4)
-      INTEGER(w2f__i1) tmp1(1 : 144)
-      INTEGER(w2f__i8) tmp2
+      INTEGER(w2f__i8) tmp0
 C
 C     **** Initializers ****
 C
       DATA A / 1.0 /
-      DATA(GJC(tmp2), tmp2 = 1, 36, 1) / 0.0, 5.5555558205E-01,
+      DATA(GJC(tmp0), tmp0 = 1, 36, 1) / 0.0, 5.5555558205E-01,
      >  8.739387989E-01, 9.5491147041E-01, 9.8046720028E-01,
      >  9.902908206E-01, 2.0, 0.0, 2.8606122732E-01, 6.5127015114E-01,
      >  8.26603055E-01, 9.0725797415E-01, 7.2783446312E-01,
