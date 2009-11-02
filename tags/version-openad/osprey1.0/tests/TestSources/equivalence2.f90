@@ -1,10 +1,10 @@
 program p 
-  common /cb/ v1,v2
-  real v1,v2,f1,f2
-  equivalence (v1,f1)
-  equivalence (v2,f2)
-  v1=1.0
-  v2=2.0
+  common /cb/ cb1,cb2
+  real cb1,cb2,f1,f2
+  equivalence (cb1,f1)
+  equivalence (cb2,f2)
+  cb1=1.0
+  cb2=2.0
   if (f2.gt.1.5) then 
     print *, 'OK'
   else
