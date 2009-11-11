@@ -1499,7 +1499,7 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
             If the length of the typeless constant is TBPW,
             make the constant an arithmetic constant.
             */
-            if (bit_length == TARGET_BITS_PER_WORD ||
+            if (/* bit_length == TARGET_BITS_PER_WORD || */
                 TYP_LINEAR(CN_TYPE_IDX(ir_idx)) == Typeless_4 ||
                 TYP_LINEAR(CN_TYPE_IDX(ir_idx)) == Typeless_8) {
                constant_class = Arith_Const;
