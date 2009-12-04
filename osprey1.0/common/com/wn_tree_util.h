@@ -511,9 +511,21 @@ WN_TREE_ITER<PRE_ORDER, WHIRL>::WN_TREE_next ()
 
   } // if (OPCODE_OPERATOR(WN_opcode(wn)) == OPR_BLOCK)
   else { // not a block ==> look at kid_count to determine where to go
-    if ((WN_kid_count(this->_wn) != 0) && (WN_kid0(this->_wn)))
-      this->Push(); // go down
-    else  // go sideways (if parent is BLOCK) or UP otherwise
+    BOOL goingDown=FALSE;
+    INT wnKidCount=WN_kid_count(this->_wn);
+    if (wnKidCount != 0) { 
+      INT32 thisKid=0;
+      while (!goingDown && thisKid<wnKidCount) { 
+	WN* kid = WN_kid(this->_wn, thisKid);
+	if (kid) {
+	  this->_parent.push_back (std::make_pair (this->_wn, thisKid));
+	  this->Set_wn(kid);
+	  goingDown = TRUE;
+	}
+	++thisKid;
+      }
+    }
+    if (! goingDown)  // go sideways (if parent is BLOCK) or UP otherwise
       Unwind(); // Pop(parent_wn) + MORE WORK NEEDED
   }
 }
