@@ -249,8 +249,8 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
             ST_sclass(st) != SCLASS_FORMAL)
    {
       /* Declare pointee with the name specified in the symbol table */
-      pointee_name = W2CF_Symtab_Nameof_St_Pointee(st);
-      Append_Token_String(decl_tokens, pointee_name);
+//      pointee_name = W2CF_Symtab_Nameof_St_Pointee(st);
+      Append_Token_String(decl_tokens, st_name);
 
       if (TY_ptr_as_array(Ty_Table[ty_rt]))
 	 TY2F_translate(decl_tokens, 
@@ -261,12 +261,12 @@ ST2F_decl_var(TOKEN_BUFFER tokens, ST *st)
       Append_F77_Indented_Newline(decl_tokens, 1, NULL/*label*/);
 
       /* Declare the pointer object */
-      Append_Token_String(decl_tokens, "POINTER");
-      Append_Token_Special(decl_tokens, '(');
-      Append_Token_String(decl_tokens, st_name);
-      Append_Token_Special(decl_tokens, ',');
-      Append_Token_String(decl_tokens, pointee_name);
-      Append_Token_Special(decl_tokens, ')');
+//       Append_Token_String(decl_tokens, "POINTER");
+//       Append_Token_Special(decl_tokens, '(');
+//       Append_Token_String(decl_tokens, st_name);
+//       Append_Token_Special(decl_tokens, ',');
+//       Append_Token_String(decl_tokens, pointee_name);
+//       Append_Token_Special(decl_tokens, ')');
    }
    else if (ST_sclass(st) == SCLASS_FORMAL && !ST_is_value_parm(st))
    {
