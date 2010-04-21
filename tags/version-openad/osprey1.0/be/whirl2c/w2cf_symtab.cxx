@@ -868,8 +868,12 @@ W2CF_Symtab_Nameof_St_Pointee(const ST *st)
    W2CF_Get_Symbol(&symtab, &symhdr, &symbol, &match_symbol, symname);
    
    /* Return the resultant disambiguated name */
-   return W2CF_SYMBOL_name_string(symtab, symbol);
-   
+   if (Run_w2f)
+     return pointee_name;
+   else
+     return W2CF_SYMBOL_name_string(symtab, symbol);
+   // the above does:    W2CF_SYMTAB_strbuf_chars(symtab)[W2CF_SYMBOL_name(symbol)]
+
 } /* W2CF_Symtab_Nameof_St_Pointee */
 
 
