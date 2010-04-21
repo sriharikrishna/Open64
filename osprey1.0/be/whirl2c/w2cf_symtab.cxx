@@ -855,7 +855,8 @@ W2CF_Symtab_Nameof_St_Pointee(const ST *st)
     * suffix (symid).  Create a name-buffer large enough to hold the
     * name appended to the suffix (hence the "+32").
     */
-   pointee_name = Concat2_Strings("deref_", W2CF_Symtab_Nameof_St(st));
+   //pointee_name = Concat2_Strings("deref_", W2CF_Symtab_Nameof_St(st));
+   pointee_name = W2CF_Symtab_Nameof_St(st);
    symname = Get_Name_Buf_Slot(strlen(pointee_name) + 32);
    W2CF_Get_Basename(pointee_name, symname, &symid);
    
@@ -978,7 +979,8 @@ W2CF_Symtab_Nameof_Fld_Pointee(FLD_HANDLE fld)
     * suffix (symid).  Create a name-buffer large enough to hold the
     * name appended to the suffix (hence the "+32").
     */
-   pointee_name = Concat2_Strings("deref_", W2CF_Symtab_Nameof_Fld(fld));
+   //pointee_name = Concat2_Strings("deref_", W2CF_Symtab_Nameof_Fld(fld));
+   pointee_name = W2CF_Symtab_Nameof_Fld(fld);
    symname = Get_Name_Buf_Slot(strlen(pointee_name) + 32);
    W2CF_Get_Basename(pointee_name, symname, &symid);
    
