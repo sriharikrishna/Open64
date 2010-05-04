@@ -93,7 +93,7 @@ typedef longlong_t int64;
 typedef ulonglong_t uint64;
 
 typedef void *pointer;          /* a generic pointer type */
-#if ! defined __USE_ISOC99 || ! defined __FLT_EVAL_METHOD__
+#ifndef __USE_ISOC99
 typedef double double_t;
 typedef float float_t;
 #endif
