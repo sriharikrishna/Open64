@@ -35,7 +35,9 @@
 
 
 /* $Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/libF77/pow_ri.c,v 1.1.1.1 2002-05-22 20:09:13 dsystem Exp $ */
+#include <math.h>
 #include "cmplrs/host.h"
+#include "moremath.h"
 
 float_t __powri(float_t x, int32 n)
 {

@@ -93,8 +93,10 @@ typedef longlong_t int64;
 typedef ulonglong_t uint64;
 
 typedef void *pointer;          /* a generic pointer type */
+#ifndef __FLT_EVAL_METHOD__ 
 typedef double double_t;
 typedef float float_t;
+#endif
 typedef int32 fsize_t; /* Size of a "hidden length" when passing Fortran CHARACTER arguments */
 /* Another reasonable choice:  (requires <string.h>)
 **    typedef size_t fsize_t;

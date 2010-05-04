@@ -33,8 +33,9 @@
 
 */
 
-
+#include <math.h>
 #include "cmplrs/host.h"
+#include "moremath.h"
 #include "cmplx.h"
 #include "c_div.h"
 
