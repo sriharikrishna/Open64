@@ -35,8 +35,8 @@
 
 
 /* $Header: /m_home/m_utkej/Argonne/cvs2svn/cvs/Open64/osprey1.0/libF77/pow_di.c,v 1.1.1.1 2002-05-22 20:09:13 dsystem Exp $ */
-#include "cmplrs/host.h"
 #include <math.h>
+#include "cmplrs/host.h"
 #include "moremath.h"
 
 double_t __powdi(double_t x, int32 n)
