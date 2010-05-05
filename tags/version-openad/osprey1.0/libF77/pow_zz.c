@@ -35,9 +35,9 @@
 
 
 
+#include <math.h>
 #include "cmplx.h"
 #include "cmplrs/host.h"
-#include <math.h>
 #include "moremath.h"
 
 /* 
