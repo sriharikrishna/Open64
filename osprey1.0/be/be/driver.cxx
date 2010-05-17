@@ -52,6 +52,7 @@
 #include <cmplrs/rcodes.h>
 #include <dirent.h>
 #include <iostream>
+#include <sys/param.h>
 
 #include "defs.h"
 #include "dso.h"		    /* for load_so() */
@@ -104,6 +105,7 @@
 #include "wn_instrument.h"          /* whirl instrumenter */
 #include "mem_ctr.h"
 #include "upc_symtab_utils.h"
+#include "ipl_driver.h"
 
 
 #if defined(__CYGWIN__)

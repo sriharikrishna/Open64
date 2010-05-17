@@ -45,7 +45,7 @@
 #include <fortran.h>	/* for _fcdlen() */
 #include <memory.h>
 #include <values.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <cray/fmtconv.h>
 #include "fio.h"
 #include "fmt.h"

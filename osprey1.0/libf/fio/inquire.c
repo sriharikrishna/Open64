@@ -39,11 +39,7 @@
 
 #include <errno.h>
 #include <limits.h>
-#if !defined(_ABSOFT)
-#include <malloc.h>
-#else
 #include <stdlib.h>
-#endif
 #include <string.h>
 #include <cray/assign.h>
 #include <sys/types.h>

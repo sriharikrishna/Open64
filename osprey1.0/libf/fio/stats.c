@@ -52,11 +52,7 @@ extern int _pstatfd; 		/* file descriptor of stat pipe */
 #endif
   
 #include <errno.h>
-#if !defined(_ABSOFT)
-#include <malloc.h>
-#else
 #include <stdlib.h>
-#endif
 #include <string.h>
 #include <unistd.h>
 #include "fio.h"

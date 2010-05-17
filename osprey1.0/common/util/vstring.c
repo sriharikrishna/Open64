@@ -38,7 +38,7 @@
  */
 #define USE_STANDARD_TYPES
 #include <stdarg.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "vstring.h"

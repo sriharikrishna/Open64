@@ -38,11 +38,7 @@
 #pragma ident "@(#) libf/fio/unitclose.c	92.2	06/18/99 18:38:26"
 
 #include <errno.h>
-#ifndef	_ABSOFT
-#include <malloc.h>
-#else
 #include <stdlib.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>

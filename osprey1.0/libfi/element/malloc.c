@@ -38,7 +38,7 @@
 
 #include <fortran.h>
 #include <cray/portdefs.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 extern _f_int4 _MALLOC_I4_I4(_f_int4);
 extern _f_int4 _MALLOC_I4_I8(_f_int8);
