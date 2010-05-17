@@ -422,13 +422,8 @@ def runTest(exName,exNum,totalNum,compiler,optimizeFlag):
 def main():
     from optparse import OptionParser
     usage = '%prog [options] '
-    compilers=['ifort','gfortran','g95','f95','openf95']
-    compilerOpts='[ '
-    for i in compilers :
-        compilerOpts+=i
-        if  i != compilers[-1]:
-            compilerOpts+=" | "
-    compilerOpts+=" ]"        
+    compilers=['gfortran','ifort','g95','f95','openf95']
+    compilerOpts='[ '+' | '.join(compilers)+' ]'
     opt = OptionParser(usage=usage)
     opt.add_option('-i','--ignoreFailingCases',dest='ignoreFailingCases',
                    help="don't if we should try to run  the cases known to fail",
@@ -449,8 +444,8 @@ def main():
                    action='store_true',default=False)
     opt.add_option('-c','--compiler',dest='compiler',
                    type='choice', choices=compilers,
-                   help="pick a compiler (defaults to ifort) from the following list: " +compilerOpts+" - the compiler should be in PATH; we use F90FLAGS when set in the environment",
-                   default='ifort')
+                   help="pick a compiler (defaults to "+compilers[0]+") from the following list: " +compilerOpts+" - the compiler should be in PATH; we use F90FLAGS when set in the environment",
+                   default=compilers[0])
     opt.add_option('-O','--optimize',dest='optimize',
                    help="turn compiler optimization on (default off)",
                    action='store_true',default=False)
