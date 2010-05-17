@@ -41,7 +41,7 @@
 #include <fcntl.h>
 #include <liberrno.h>
 #ifndef	_ABSOFT
-#include <malloc.h>
+#include <stdlib.h>
 #endif
 #include <stddef.h>
 #include <stdio.h>

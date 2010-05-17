@@ -38,7 +38,7 @@
 #pragma ident "@(#) libf/fio/uptr.c	92.1	06/18/99 18:38:26"
    
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <liberrno.h>
 #include <fortran.h>

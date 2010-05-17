@@ -39,11 +39,7 @@
 
 #include <sys/param.h>	/* PATH_MAX */
 #include <string.h>
-#ifdef	_ABSOFT
 #include <stdlib.h>
-#else
-#include <malloc.h>
-#endif
 #include <errno.h>
 #include <liberrno.h>
 #include <fcntl.h>

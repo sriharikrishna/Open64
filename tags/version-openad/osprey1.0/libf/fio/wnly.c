@@ -45,9 +45,8 @@
 #include <errno.h>
 #include <fortran.h>
 #include <memory.h>
-#include <malloc.h>
-#include <liberrno.h>
 #include <stdlib.h>
+#include <liberrno.h>
 #include <cray/fmtconv.h>
 #include "fio.h"
 #include "fmt.h"	

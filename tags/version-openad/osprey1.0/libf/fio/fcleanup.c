@@ -40,7 +40,7 @@
 #include <errno.h>
 #include <foreign.h>
 #ifndef	_ABSOFT
-#include <malloc.h>
+#include <stdlib.h>
 #endif
 #include <liberrno.h>
 #include "fio.h"

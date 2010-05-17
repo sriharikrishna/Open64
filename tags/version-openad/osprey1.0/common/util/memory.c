@@ -35,7 +35,7 @@
 
 
 #include <sys/types.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h> /* for memset() and memmove() */
   
 #include "defs.h"

@@ -43,7 +43,7 @@
 
 #include <fortran.h>
 #include <liberrno.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
 #include <cray/dopevec.h>

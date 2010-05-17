@@ -40,11 +40,7 @@
 #endif
 #include "lio.h"	/* For spiffy IS_DIGIT() macro */
 #include <ctype.h>
-#ifndef	_ABSOFT
-#include <malloc.h>
-#else
 #include <stdlib.h>
-#endif
 #include <string.h>
 #include <cray/format.h>
 #include <cray/nassert.h>

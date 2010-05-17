@@ -39,11 +39,7 @@
 
 #include <limits.h>
 #include <ctype.h>
-#ifndef	_ABSOFT
-#include <malloc.h>
-#else
 #include <stdlib.h>
-#endif
 #include <string.h>
 #include <fortran.h>
 #include <cray/fmtconv.h>
