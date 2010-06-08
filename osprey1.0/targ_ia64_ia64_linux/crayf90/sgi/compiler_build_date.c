@@ -1,1 +1,1 @@
-char * mfef90_compiler_build_date = " Fri Nov 7 16:16:20 CST 2003 ";
+char * mfef90_compiler_build_date = " Mon Jun 7 07:29:58 CDT 2010 ";
