@@ -146,6 +146,8 @@ def fileCompare(fcfileName,fcmode,ignoreString):
     if (hasDiff == 512):
 	raise RuntimeError, "command "+cmd+" not successful"
     elif (hasDiff != 0):
+        if (globalBatchMode and not globalAcceptAll):
+            raise ComparisonError("Batch mode assumes no difference or one has to accept all differences")		
 	if not (globalBatchMode):
             os.system(globalDiffCmd+" "+fcfileName+" "+referenceFile)
 	sys.stdout.write("   Transformation -- diff "+fcfileName+" "+referenceFile+"\n")
@@ -509,6 +511,8 @@ def main():
 		if not (globalBatchMode):
 		    if (raw_input("Do you want to continue? (y)/n: ") == "n"):
 			return -1
+                else: 
+	            return -1
 	    except RuntimeError, errMsg:
 		print "ERROR in test %i of %i (%s): %s." % (j+1,len(examples),examples[j],errMsg)
 	        globalNewFailCount+=1
