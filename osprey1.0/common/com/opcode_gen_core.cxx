@@ -2293,9 +2293,13 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
       case OPR_FLOOR: 
 #endif
       case OPR_RND:
-      case OPR_TRUNC:
         // [RTYPE] : i [DESC] : f
         valid = Is_MTYPE_i [rtype] && Is_MTYPE_f [desc];
+        break;
+
+      case OPR_TRUNC:
+        // [RTYPE] : i 
+        valid = Is_MTYPE_i [rtype];
         break;
 
       case OPR_COMMA:
