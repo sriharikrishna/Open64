@@ -420,11 +420,13 @@ inline UINT SI_RESOURCE_Bit_Index( SI_RESOURCE* res )
 }
 
 extern const INT SI_resource_count;
+#ifndef __CYGWIN__
 #pragma weak SI_resource_count
-
+#endif
 extern SI_RESOURCE* const SI_resources[];
+#ifndef __CYGWIN__
 #pragma weak SI_resources
-
+#endif
 inline const char* SI_RESOURCE_ID_Name( SI_RESOURCE_ID id )
 {
   return SI_RESOURCE_Name(SI_resources[id]);
@@ -487,10 +489,14 @@ SI_RESOURCE_ID_SET_Complement( SI_RESOURCE_ID_SET s )
 typedef mUINT64 SI_RRW;
 
 extern const SI_RRW SI_RRW_initializer;
+#ifndef __CYGWIN__
 #pragma weak SI_RRW_initializer
+#endif
 
 extern const SI_RRW SI_RRW_overuse_mask;
+#ifndef __CYGWIN__
 #pragma weak SI_RRW_overuse_mask
+#endif
 
 inline SI_RRW SI_RRW_Initial(void)
 {
@@ -537,10 +543,14 @@ inline INT SI_ISSUE_SLOT_Avail_Per_Cycle( SI_ISSUE_SLOT* slot )
 }
 
 extern const INT SI_issue_slot_count;
+#ifndef __CYGWIN__
 #pragma weak SI_issue_slot_count
+#endif
 
 extern SI_ISSUE_SLOT* const SI_issue_slots[];
+#ifndef __CYGWIN__
 #pragma weak SI_issue_slots
+#endif
 
 inline INT SI_ISSUE_SLOT_Count(void)
 {
@@ -625,7 +635,9 @@ typedef const struct {
 } SI;
 
 extern SI* const SI_top_si[];
+#ifndef __CYGWIN__
 #pragma weak SI_top_si
+#endif
 
 inline const char* TSI_Name( TOP top )
 {
@@ -724,7 +736,9 @@ inline INT TSI_Write_Write_Interlock( TOP top )
  ****************************************************************************/
 
 extern const INT SI_ID_count;
+#ifndef __CYGWIN__
 #pragma weak SI_ID_count
+#endif
 
 inline INT SI_ID_Count(void)
 {
@@ -732,7 +746,9 @@ inline INT SI_ID_Count(void)
 }
 
 extern SI* const SI_ID_si[];
+#ifndef __CYGWIN__
 #pragma weak SI_ID_si
+#endif
 
 inline const SI_RESOURCE_ID_SET*
 SI_ID_II_Cycle_Resource_Ids_Used( SI_ID id, INT ii )
