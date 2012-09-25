@@ -465,7 +465,7 @@ WN_TREE_ITER<PRE_ORDER, WHIRL>::Unwind() {
     
     if (WN_operator(parent_wn) == OPR_BLOCK) {
       if (WN_next(wn)) {
-        Set_wn(WN_next(wn));
+        this->Set_wn(WN_next(wn));
         done = TRUE;
       }
       else // all stmts in a block processed ==> go back up
