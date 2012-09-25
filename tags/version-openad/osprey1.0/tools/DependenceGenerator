@@ -117,7 +117,7 @@
   #
   foreach $arg (@ARGV) 
   {
-     if ($arg =~ /^-I(.*)/) 
+     if ($arg =~ /^-I(.*)/m) 
      {
         if (! -d $1) 
         { 
@@ -171,7 +171,7 @@
    $/ = "\n";
  
       # do multiline matching within a string
-   $* = 1;
+   # $* = 1;  deprecated, replaced by 'm' qualifier
  
       # take the output of cpp and filter it.  Store the include files in
       # an associative array based on the included name.
@@ -209,12 +209,12 @@
      {
 #        if (/^#include[ \t]+["<]([^">]*)[">]/) 
 # js: changed to deal with blank spaces before, between # and include 
-	if (/^[ \t]*#[ \t]*include[ \t]*["<]([^">]*)[">]/)
+	if (/^[ \t]*#[ \t]*include[ \t]*["<]([^">]*)[">]/m)
         {
            $tmp_list{$1} = 1;
         }
 # js: ?
-        if (/^[ \t]+include\s+["']([^"']*)["']/) 
+        if (/^[ \t]+include\s+["']([^"']*)["']/m) 
         {
            $tmp_list{$1} = 1;
         }
