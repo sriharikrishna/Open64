@@ -1581,6 +1581,7 @@ WN2F_Exit_PU_Block(TOKEN_BUFFER tokens, TOKEN_BUFFER *stmts)
 
   WN2F_Next_ReturnSite = NULL;
   WN2F_Prev_CallSite = NULL;
+  haveCommonBlockName(NULL);
 } /* WN2F_Exit_PU_Block */
 
 /*-------- The initializers and handlers statement translation --------*/
