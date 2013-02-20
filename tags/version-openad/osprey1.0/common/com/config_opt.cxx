@@ -68,7 +68,7 @@ extern BOOL WOPT_Enable_Goto;	/* In case config_wopt.h is later */
  */
 
 /***** Optimization Warning Messages *****/
-BOOL Show_OPT_Warnings = TRUE;          /* Display OPT warning messages */
+BOOL Show_OPT_Warnings = FALSE;          /* Display OPT warning messages */
 
 /***** Aliasing control *****/
 OPTION_LIST *Alias_Option = NULL;
