@@ -89,6 +89,7 @@
 #include <vector> // STL
 using std::set;
 using std::vector;
+#include <string> 
 
 #include "whirl2f_common.h"
 #include "PUinfo.h"
@@ -544,6 +545,21 @@ ST2F_use_error(TOKEN_BUFFER tokens, ST *st)
 		     ST_sym_class(st), "ST2F_use_error"));
 } /* ST2F_use_error */
 
+bool haveCommonBlockName(ST *st) { 
+  static set<std::string> nameSet;
+  if (st==NULL) { 
+    nameSet.clear();
+    return false;
+  }
+  for (set<std::string>::iterator it=nameSet.begin(); it!=nameSet.end(); ++it){ 
+    if (*it==ST_name(st)) { 
+      return true;
+    }
+  }
+  nameSet.insert(ST_name(st));
+  return false; 
+}
+
 static void 
 ST2F_use_var(TOKEN_BUFFER tokens, ST *st)
 {
@@ -576,8 +592,11 @@ ST2F_use_var(TOKEN_BUFFER tokens, ST *st)
        */
       Append_Token_String(tokens, 
 			  WHIRL2F_make_valid_name(ST_name(st),WN2F_F90_pu && !ST_is_temp_var(st)));
-     if  (Stab_Is_Based_At_Common_Or_Equivalence(st))
-           Set_BE_ST_w2fc_referenced((ST *)ST_base(st));
+      if  (Stab_Is_Based_At_Common_Or_Equivalence(st)) { 
+	if (!haveCommonBlockName((ST *)ST_base(st))) {
+	  Set_BE_ST_w2fc_referenced((ST *)ST_base(st));
+	}
+      }
      else
            Set_BE_ST_w2fc_referenced(st); //June
    }
