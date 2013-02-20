@@ -113,6 +113,8 @@ extern void ST2F_Declare_Tempvar(TY_IDX ty, UINT idx);
 extern void ST2F_output_keyword(TOKEN_BUFFER tokens,
 			        ST            *st);
 
+extern bool haveCommonBlockName(ST *st);
+
 //-------------------------------------
 
 #define ST2F_FIRST_PARAM_IDX(funtype) \
